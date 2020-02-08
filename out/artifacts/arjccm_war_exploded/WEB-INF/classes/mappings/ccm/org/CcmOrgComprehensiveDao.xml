@@ -1,0 +1,204 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.arjjs.ccm.modules.ccm.org.dao.CcmOrgComprehensiveDao">
+    
+	<sql id="ccmOrgComprehensiveColumns">
+		a.id AS "id",
+		a.office_id AS "office.id",
+		a.pic_path AS "picPath",
+		a.description AS "description",
+		a.main_func AS "mainFunc",
+		a.area_map AS "areaMap",
+		a.area_point AS "areaPoint",
+		a.icon AS "icon",
+		a.more1 AS "more1",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag",
+		a.max_dispatch_time AS "maxDispatchTime",
+		a.max_arrive_time AS "maxArriveTime",
+		o2.name AS "office.name"
+	</sql>
+	
+	<sql id="ccmOrgComprehensiveJoins">
+		LEFT JOIN sys_office o2 ON o2.id = a.office_id
+	</sql>
+    
+	<select id="get" resultType="CcmOrgComprehensive">
+		SELECT 
+			<include refid="ccmOrgComprehensiveColumns"/>
+		FROM ccm_org_comprehensive a
+		<include refid="ccmOrgComprehensiveJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<!-- 新填officeId查询  -->
+	<select id="findOfficeId" resultType="CcmOrgComprehensive">
+		SELECT 
+			<include refid="ccmOrgComprehensiveColumns"/>
+		FROM ccm_org_comprehensive a
+		<include refid="ccmOrgComprehensiveJoins"/>
+		WHERE a.office_id = #{office.id}
+	</select>
+	
+	
+	<select id="findList" resultType="CcmOrgComprehensive">
+		SELECT 
+			<include refid="ccmOrgComprehensiveColumns"/>
+		FROM ccm_org_comprehensive a
+		<include refid="ccmOrgComprehensiveJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="CcmOrgComprehensive">
+		SELECT 
+			<include refid="ccmOrgComprehensiveColumns"/>
+		FROM ccm_org_comprehensive a
+		<include refid="ccmOrgComprehensiveJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO ccm_org_comprehensive(
+			id,
+			office_id,
+			pic_path,
+			description,
+			main_func,
+			area_map,
+			area_point,
+			icon,
+			more1,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag,
+			max_dispatch_time,
+			max_arrive_time
+		) VALUES (
+			#{id},
+			#{office.id},
+			#{picPath},
+			#{description},
+			#{mainFunc},
+			#{areaMap},
+			#{areaPoint},
+			#{icon},
+			#{more1},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag},
+			#{maxDispatchTime},
+			#{maxArriveTime}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE ccm_org_comprehensive SET 	
+			office_id = #{office.id},
+			pic_path = #{picPath},
+			description = #{description},
+			main_func = #{mainFunc},
+			area_map = #{areaMap},
+			area_point = #{areaPoint},
+			icon = #{icon},
+			more1 = #{more1},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks},
+			max_dispatch_time = #{maxDispatchTime},
+			max_arrive_time = #{maxArriveTime}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE ccm_org_comprehensive SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	<!--添加坐标 -->
+	<insert id="insertCoordinates">
+		INSERT INTO ccm_org_comprehensive(
+			id,
+			office_id,
+			pic_path,
+			description,
+			main_func,
+			area_map,
+			area_point,
+			icon,
+			more1,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag,
+			max_dispatch_time,
+			max_arrive_time
+		) VALUES (
+			#{id},
+			#{office.id},
+			#{picPath},
+			#{description},
+			#{mainFunc},
+			#{areaMap},
+			#{areaPoint},
+			#{icon},
+			#{more1},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag},
+			#{maxDispatchTime},
+			#{maxArriveTime}
+		)
+	</insert>
+	<update id="updateCoordinates">
+		UPDATE ccm_org_comprehensive SET 	
+			office_id = #{office.id},
+			pic_path = #{picPath},
+			description = #{description},
+			main_func = #{mainFunc},
+			area_map = #{areaMap},
+			area_point = #{areaPoint},
+			icon = #{icon},
+			more1 = #{more1},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks},
+			max_dispatch_time = #{maxDispatchTime},
+			max_arrive_time = #{maxArriveTime}
+		WHERE id = #{id}
+	</update>
+</mapper>

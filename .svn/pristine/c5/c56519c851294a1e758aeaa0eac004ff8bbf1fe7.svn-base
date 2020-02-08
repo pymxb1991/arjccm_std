@@ -1,0 +1,196 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper
+	namespace="com.arjjs.ccm.modules.ccm.chemical.dao.CcmPlaceChemicalDao">
+
+	<sql id="ccmPlaceChemicalColumns">
+		a.id AS "id",
+		a.create_by AS "createBy.id",
+		a.create_date AS
+		"createDate",
+		a.update_by AS "updateBy.id",
+		a.remarks AS "remarks",
+		a.type AS "type",
+		a.business_certificate_code AS
+		"businessCertificateCode",
+		a.business_certificate_level AS
+		"businessCertificateLevel",
+		a.business_certificate_begin AS
+		"businessCertificateBegin",
+		a.business_scope AS "businessScope",
+		a.registered_address AS "registeredAddress",
+		a.storage_address AS
+		"storageAddress",
+		a.del_flag AS "delFlag",
+		a.business_certificate_end AS
+		"businessCertificateEnd",
+		a.base_place_id AS "basePlaceId",
+		s.name AS "ccmBasePlace.area.name"
+	</sql>
+	<sql id="ccmPlaceChemicalAllColumns">
+		a.id AS "id",
+		a.create_by AS "createBy.id",
+		a.create_date AS
+		"createDate",
+		a.update_by AS "updateBy.id",
+		a.remarks AS "remarks",
+		a.type AS "type",
+		a.business_certificate_code AS
+		"businessCertificateCode",
+		a.business_certificate_level AS
+		"businessCertificateLevel",
+		a.business_certificate_begin AS
+		"businessCertificateBegin",
+		a.business_scope AS "businessScope",
+		a.registered_address AS "registeredAddress",
+		a.storage_address AS
+		"storageAddress",
+		a.del_flag AS "delFlag",
+		a.business_certificate_end AS
+		"businessCertificateEnd",
+		a.base_place_id AS "basePlaceId",
+		b.place_name AS "placeName",
+		b.leader_name AS "leaderName",
+		b.leader_id_card AS"leaderIdCard",
+		b.leader_contact AS"leaderContact",
+		b.relevance_org AS"relevanceOrg"
+	</sql>
+
+	<sql id="ccmPlaceChemicalJoins">
+	LEFT JOIN sys_area s ON s.id = b.administrative_division
+	</sql>
+
+	<select id="get" resultType="CcmPlaceChemical">
+		SELECT
+		<include refid="ccmPlaceChemicalAllColumns" />
+		FROM ccm_place_chemical a
+		LEFT JOIN ccm_base_place b ON a.base_place_id = b.id
+		<include refid="ccmPlaceChemicalJoins" />
+		WHERE a.id = #{id}
+	</select>
+
+	<select id="findList" resultType="CcmPlaceChemical">
+		SELECT
+		<include refid="ccmPlaceChemicalAllColumns" />
+		FROM ccm_place_chemical a LEFT JOIN ccm_base_place b ON
+		a.base_place_id = b.id
+		<include refid="ccmPlaceChemicalJoins" />
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="placeName != null and placeName != ''">
+				AND b.place_name LIKE
+				<if test="dbName == 'oracle'">'%'||#{placeName}||'%'</if>
+				<if test="dbName == 'mssql'">'%'+#{placeName}+'%'</if>
+				<if test="dbName == 'mysql'">concat('%',#{placeName},'%')</if>
+			</if>
+			<if test="leaderName != null and leaderName != ''">
+				AND b.leader_name LIKE
+				<if test="dbName == 'oracle'">'%'||#{leaderName}||'%'</if>
+				<if test="dbName == 'mssql'">'%'+#{leaderName}+'%'</if>
+				<if test="dbName == 'mysql'">concat('%',#{leaderName},'%')</if> 
+			</if>
+			<if test="leaderContact != null and leaderContact != ''">
+				AND b.leader_contact LIKE
+				<if test="dbName == 'oracle'">'%'||#{leaderContact}||'%'</if>
+				<if test="dbName == 'mssql'">'%'+#{leaderContact}+'%'</if>
+				<if test="dbName == 'mysql'">concat('%',#{leaderContact},'%')</if>
+			</if>
+			<if test="type != null and type != ''">
+				AND a.type = #{type}
+			</if>
+			<if test="id != null and id != ''">
+				AND a.id = #{id}
+			</if>
+		</where>
+		<choose>
+			<when
+				test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+
+	<select id="findAllList" resultType="CcmPlaceChemical">
+		SELECT
+		<include refid="ccmPlaceChemicalColumns" />
+		FROM ccm_place_chemical a
+		<include refid="ccmPlaceChemicalJoins" />
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>
+		<choose>
+			<when
+				test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+
+	<insert id="insert">
+		INSERT INTO ccm_place_chemical(
+		id,
+		create_by,
+		create_date,
+		update_by,
+		update_date,
+		remarks,
+		type,
+		business_certificate_code,
+		business_certificate_level,
+		business_certificate_begin,
+		business_scope,
+		registered_address,
+		storage_address,
+		del_flag,
+		business_certificate_end,
+		base_place_id
+		) VALUES (
+		#{id},
+		#{createBy.id},
+		#{createDate},
+		#{updateBy.id},
+		#{updateDate},
+		#{remarks},
+		#{type},
+		#{businessCertificateCode},
+		#{businessCertificateLevel},
+		#{businessCertificateBegin},
+		#{businessScope},
+		#{registeredAddress},
+		#{storageAddress},
+		#{delFlag},
+		#{businessCertificateEnd},
+		#{basePlaceId}
+		)
+	</insert>
+
+	<update id="update">
+		UPDATE ccm_place_chemical SET
+		update_by = #{updateBy.id},
+		update_date = #{updateDate},
+		remarks = #{remarks},
+		type = #{type},
+		business_certificate_code = #{businessCertificateCode},
+		business_certificate_level = #{businessCertificateLevel},
+		business_certificate_begin = #{businessCertificateBegin},
+		business_scope = #{businessScope},
+		registered_address = #{registeredAddress},
+		storage_address = #{storageAddress},
+		business_certificate_end = #{businessCertificateEnd},
+		base_place_id = #{basePlaceId}
+		WHERE id = #{id}
+	</update>
+
+	<update id="delete">
+		UPDATE ccm_place_chemical SET
+		del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+
+</mapper>

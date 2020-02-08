@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.arjjs.ccm.modules.ccm.patrol.dao.CcmPatrolResultDao">
+
+	<sql id="ccmPatrolResultColumns">
+		a.id AS "id",
+		a.plan_id AS "plan.id",
+		plan.name AS
+		"plan.name",
+		a.begin_date AS "beginDate",
+		a.end_date AS "endDate",
+		a.status AS "status",
+		a.create_by AS "createBy.id",
+		a.create_date AS
+		"createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS
+		"updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag" ,
+        a.name AS "name"
+	</sql>
+
+	<sql id="ccmPatrolResultJoins">
+	</sql>
+
+	<sql id="ccmPatrolResultJoinPlan">
+		left join ccm_patrol_plan plan on a.plan_id = plan.id
+	</sql>
+	<select id="get" resultType="CcmPatrolResult">
+		SELECT
+		<include refid="ccmPatrolResultColumns" />
+		FROM ccm_patrol_result a
+		<include refid="ccmPatrolResultJoinPlan" />
+		WHERE a.id = #{id}
+	</select>
+
+	<select id="findList" resultType="CcmPatrolResult">
+		SELECT
+		<include refid="ccmPatrolResultColumns" />
+		FROM ccm_patrol_result a
+		<include refid="ccmPatrolResultJoinPlan" />
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="plan != null and plan.id != null and plan.id != ''">
+				AND a.plan_id LIKE
+				<if test="dbName == 'oracle'">'%'||#{plan.id}||'%'</if>
+				<if test="dbName == 'mssql'">'%'+#{plan.id}+'%'</if>
+				<if test="dbName == 'mysql'">concat('%',#{plan.id},'%')</if>
+			</if>
+			<if test="status != null and status != ''">
+				AND a.status = #{status}
+			</if>
+			<if test="plan!=null and plan.name != null and plan.name != ''">
+				AND plan.name LIKE concat('%',#{plan.name},'%')
+			</if>
+			 <if test="beginDate != null  and beginDate != ''  ">
+                AND a.create_date &gt; #{beginDate}
+            </if>
+            <if test=" endDate != null and  endDate != ''">
+                AND a.create_date &lt; #{endDate}
+            </if>  
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+
+	<select id="findAllList" resultType="CcmPatrolResult">
+		SELECT
+		<include refid="ccmPatrolResultColumns" />
+		FROM ccm_patrol_result a
+		<include refid="ccmPatrolResultJoinPlan" />
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+
+	<insert id="insert">
+        INSERT INTO ccm_patrol_result(
+            id,
+            plan_id,
+            begin_date,
+            end_date,
+            status,
+            create_by,
+            create_date,
+            update_by,
+            update_date,
+            remarks,
+            del_flag,
+            name
+        ) VALUES (
+            #{id},
+            #{plan.id},
+            #{beginDate},
+            #{endDate},
+            #{status},
+            #{createBy.id},
+            #{createDate},
+            #{updateBy.id},
+            #{updateDate},
+            #{remarks},
+            #{delFlag},
+            #{name}
+        )
+    </insert>
+    
+    <update id="update">
+        UPDATE ccm_patrol_result SET    
+            plan_id = #{plan.id},
+            begin_date = #{beginDate},
+            end_date = #{endDate},
+            status = #{status},
+            update_by = #{updateBy.id},
+            update_date = #{updateDate},
+            remarks = #{remarks},
+            name = #{name}
+        WHERE id = #{id}
+    </update>
+
+	<update id="delete">
+		UPDATE ccm_patrol_result SET
+		del_flag =
+		#{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+
+</mapper>

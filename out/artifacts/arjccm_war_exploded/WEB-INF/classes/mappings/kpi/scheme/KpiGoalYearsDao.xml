@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.arjjs.ccm.modules.kpi.scheme.dao.KpiGoalYearsDao">
+    
+	<sql id="kpiGoalYearsColumns">
+		a.id AS "id",
+		a.office_id AS "office.id",
+		a.years AS "years",
+		a.goal AS "goal",
+		a.goal_plan AS "goalPlan",
+		a.progress AS "progress",
+		a.finished AS "finished",
+		a.conclusion AS "conclusion",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag",
+		o2.name AS "office.name"
+	</sql>
+	
+	<sql id="kpiGoalYearsJoins">
+		LEFT JOIN sys_office o2 ON o2.id = a.office_id
+	</sql>
+    
+	<select id="get" resultType="KpiGoalYears">
+		SELECT 
+			<include refid="kpiGoalYearsColumns"/>
+		FROM kpi_goal_years a
+		<include refid="kpiGoalYearsJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="KpiGoalYears">
+		SELECT 
+			<include refid="kpiGoalYearsColumns"/>
+		FROM kpi_goal_years a
+		<include refid="kpiGoalYearsJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="office != null and office.id != null and office.id != ''">
+				AND a.office_id = #{office.id}
+			</if>
+			<if test="years != null and years != ''">
+				AND a.years LIKE 
+					<if test="dbName == 'oracle'">'%'||#{years}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{years}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{years},'%')</if>
+			</if>
+			<if test="finished != null and finished != ''">
+				AND a.finished = #{finished}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="KpiGoalYears">
+		SELECT 
+			<include refid="kpiGoalYearsColumns"/>
+		FROM kpi_goal_years a
+		<include refid="kpiGoalYearsJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO kpi_goal_years(
+			id,
+			office_id,
+			years,
+			goal,
+			goal_plan,
+			progress,
+			finished,
+			conclusion,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag
+		) VALUES (
+			#{id},
+			#{office.id},
+			#{years},
+			#{goal},
+			#{goalPlan},
+			#{progress},
+			#{finished},
+			#{conclusion},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE kpi_goal_years SET 	
+			office_id = #{office.id},
+			years = #{years},
+			goal = #{goal},
+			goal_plan = #{goalPlan},
+			progress = #{progress},
+			finished = #{finished},
+			conclusion = #{conclusion},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE kpi_goal_years SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

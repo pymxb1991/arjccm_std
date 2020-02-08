@@ -1,0 +1,425 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.arjjs.ccm.modules.ccm.org.dao.CcmOrgAreaDao">
+
+	<sql id="ccmOrgAreaColumns">
+		a.id AS "id",
+		a.area_id AS "area.id",
+		a.net_man_name AS
+		"netManName",
+		a.sex AS "sex",
+		a.nation AS "nation",
+		a.politics AS
+		"politics",
+		a.birthday AS "birthday",
+		a.education AS "education",
+		a.telephone AS "telephone",
+		a.fix_tel AS "fixTel",
+		a.net_peo_name AS
+		"netPeoName",
+		a.net_peo_num AS "netPeoNum",
+		a.net_num AS "netNum",
+		a.mannum AS "mannum",
+		a.net_area AS "netArea",
+		a.video_safety_num AS
+		"videoSafetyNum",
+		a.definition_num AS "definitionNum",
+		a.video_towns_num AS "videoTownsNum",
+		a.video_allday_num AS
+		"videoAlldayNum",
+		a.each_kilo_num AS "eachKiloNum",
+		a.each_hund_num AS
+		"eachHundNum",
+		a.area_map AS "areaMap",
+		a.area_point AS "areaPoint",
+		a.icon AS "icon",
+		a.more1 AS "more1",
+		a.areainfor AS "areainfor",
+		a.more2 AS "more2",
+		a.more3 AS "more3",
+		a.area_color AS "areaColor",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag",
+		a.party_members_num AS "PartyMembersNum",
+		a.director_poverty_alleviation AS "directorPovertyAlleviation",
+		a.first_secretary AS "firstSecretary",
+		a.police_assistant AS "policeAssistant",
+		a.political_legal_deployment AS "politicalLegalDeployment",
+		a.people_livelihood_supervisor AS "peopleLivelihoodSupervisor",
+		a2.name AS "area.name",
+		a2.code As "area.code"
+	</sql>
+
+	<sql id="ccmOrgAreaJoins">
+		LEFT JOIN sys_area a2 ON a2.id = a.area_id
+	</sql>
+
+	<select id="get" resultType="CcmOrgArea">
+		SELECT
+		<include refid="ccmOrgAreaColumns" />
+		FROM ccm_org_area a
+		<include refid="ccmOrgAreaJoins" />
+		WHERE a.id = #{id}
+	</select>
+
+	<select id="findList" resultType="CcmOrgArea">
+		SELECT
+		<include refid="ccmOrgAreaColumns" />
+		,a.area_id AS "areaId"
+		FROM ccm_org_area a
+		<include refid="ccmOrgAreaJoins" />
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="areaId != null and areaId != ''">
+				AND a.area_id = #{areaId}
+			</if>
+			<if test="id != null and id != ''">
+				AND a.id = #{id}
+			</if>
+			<if test="type != null and type != ''">
+				AND a2.type = #{type}
+			</if>
+			
+			<if test="area != null and area.parentIds != null and area.parentIds != ''">
+				AND a2.parent_ids LIKE
+				<if test="dbName == 'oracle'">'%'||#{area.parentIds}||'%'</if>
+				<if test="dbName == 'mssql'">'%'+#{area.parentIds}+'%'</if>
+				<if test="dbName == 'mysql'">concat('%',#{area.parentIds},'%')</if>
+				OR a2.id = #{area.parentIds}
+			</if>
+              <if test="userArea != null and userArea.parentIds != null and userArea.parentIds != ''">
+             AND   (a2.parent_ids LIKE  CONCAT('%',#{userArea.id},'%')  or a.area_id = #{userArea.id})
+              </if>
+               <if test="more1 != null and more1 != ''">
+                AND  (${more1})
+            </if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+
+	<select id="findAllList" resultType="CcmOrgArea">
+		SELECT
+		<include refid="ccmOrgAreaColumns" />
+		FROM ccm_org_area a
+		<include refid="ccmOrgAreaJoins" />
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+
+	<insert id="insert">
+		INSERT INTO ccm_org_area(
+		id,
+		area_id,
+		net_man_name,
+		sex,
+		nation,
+		politics,
+		birthday,
+		education,
+		telephone,
+		fix_tel,
+		net_peo_name,
+		net_peo_num,
+		net_num,
+		mannum,
+		net_area,
+		video_safety_num,
+		definition_num,
+		video_towns_num,
+		video_allday_num,
+		each_kilo_num,
+		each_hund_num,
+		area_map,
+		area_point,
+		icon,
+		more1,
+		areainfor,
+		more2,
+		more3,
+		create_by,
+		create_date,
+		update_by,
+		update_date,
+		remarks,
+		party_members_num,
+		a.director_poverty_alleviation,
+		a.first_secretary,
+		a.police_assistant,
+		a.political_legal_deployment,
+		a.people_livelihood_supervisor,
+		del_flag
+		) VALUES (
+		#{id},
+		#{area.id},
+		#{netManName},
+		#{sex},
+		#{nation},
+		#{politics},
+		#{birthday},
+		#{education},
+		#{telephone},
+		#{fixTel},
+		#{netPeoName},
+		#{netPeoNum},
+		#{netNum},
+		#{mannum},
+		#{netArea},
+		#{videoSafetyNum},
+		#{definitionNum},
+		#{videoTownsNum},
+		#{videoAlldayNum},
+		#{eachKiloNum},
+		#{eachHundNum},
+		#{areaMap},
+		#{areaPoint},
+		#{icon},
+		#{more1},
+		#{areainfor},
+		#{more2},
+		#{more3},
+		#{createBy.id},
+		#{createDate},
+		#{updateBy.id},
+		#{updateDate},
+		#{remarks},
+		#{partyMembersNum},
+		#{directorPovertyAlleviation"},
+		#{firstSecretary"},
+		#{policeAssistant"},
+		#{politicalLegalDeployment"},
+		#{peopleLivelihoodSupervisor"},
+		#{delFlag}
+		)
+	</insert>
+
+	<update id="update">
+		UPDATE ccm_org_area SET
+		area_id = #{area.id},
+		net_man_name = #{netManName},
+		sex = #{sex},
+		nation = #{nation},
+		politics= #{politics},
+		birthday = #{birthday},
+		education = #{education},
+		telephone = #{telephone},
+		fix_tel = #{fixTel},
+		net_peo_name = #{netPeoName},
+		net_peo_num = #{netPeoNum},
+		net_num = #{netNum},
+		mannum = #{mannum},
+		net_area = #{netArea},
+		video_safety_num = #{videoSafetyNum},
+		definition_num = #{definitionNum},
+		video_towns_num = #{videoTownsNum},
+		video_allday_num = #{videoAlldayNum},
+		each_kilo_num = #{eachKiloNum},
+		each_hund_num = #{eachHundNum},
+		area_map = #{areaMap},
+		area_point = #{areaPoint},
+		icon = #{icon},
+		more1 = #{more1},
+		areainfor = #{areainfor},
+		more2 = #{more2},
+		more3 = #{more3},
+		update_by = #{updateBy.id},
+		update_date = #{updateDate},
+		party_members_num = #{partyMembersNum},
+		director_poverty_alleviation=#{directorPovertyAlleviation},
+		first_secretary=#{firstSecretary},
+		police_assistant=#{policeAssistant},
+		political_legal_deployment=#{politicalLegalDeployment},
+		people_livelihood_supervisor=#{peopleLivelihoodSupervisor},
+		remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+
+	<update id="delete">
+		UPDATE ccm_org_area SET
+		del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+
+	<select id="GetItByUserId" resultType="CcmOrgArea">
+		SELECT
+		<include refid="ccmOrgAreaColumns" />
+		FROM
+		ccm_org_area a
+		<include refid="ccmOrgAreaJoins" />
+		LEFT JOIN sys_office b ON a.area_id = b.area_id
+		LEFT JOIN sys_user c ON
+		c.office_id = b.id
+		WHERE
+		c.id = #{currentUser.id}
+	</select>
+
+
+
+	<!-- 首页社区弹框：社区网格（通过父键查子集）area借用ccmOrgArea -->
+	<select id="findAreaNet" resultType="Area">
+		SELECT
+		a.id,
+		a.parent_id AS "parent.id",
+		a.parent_ids,
+		a.code,
+		a.name,
+		a.sort,
+		a.type,
+		a.remarks,
+		a.create_by AS "createBy.id",
+		a.create_date,
+		a.update_by AS "updateBy.id",
+		a.update_date,
+		a.del_flag,
+		p.name AS
+		"parent.name"
+		FROM
+		sys_area a
+		LEFT JOIN sys_office p ON p.id =
+		a.parent_id
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="parentIds != null and parentIds != ''">
+				AND a.parent_ids LIKE
+				<if test="dbName == 'oracle'">'%'||#{parentIds}||'%'</if>
+				<if test="dbName == 'mssql'">'%'+#{parentIds}+'%'</if>
+				<if test="dbName == 'mysql'">concat('%',#{parentIds},'%')</if>
+			</if>
+		</where>
+		ORDER BY a.sort ASC
+	</select>
+
+	<!-- 首页社区弹框：社区网格外表（通过社区网格id查外表） -->
+	<select id="findCcmOrgArea" resultType="CcmOrgArea">
+		SELECT
+		<include refid="ccmOrgAreaColumns" />
+		FROM ccm_org_area a
+		<include refid="ccmOrgAreaJoins" />
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="area != null and area.id != null and area.id != ''">
+				AND a.area_id = #{area.id}
+			</if>
+		</where>
+
+	</select>
+
+
+	<update id="updateCoordinates">
+		UPDATE ccm_org_area SET
+		area_map = #{areaMap},
+		area_point = #{areaPoint}
+		<where>
+			<if test="id != null and id != ''">
+				id = #{id}
+			</if>
+			<if test="area != null and area.id != null and area.id != ''">
+				AND ccm_org_area.area_id = #{area.id}
+			</if>
+		</where>
+	</update>
+
+	<!-- 区域全部数据 -->
+	<select id="findListAllData" resultType="com.arjjs.ccm.tool.SearchTab">
+		SELECT
+			<!--  a.id AS "id",
+			a.net_man_name AS
+			"netManName",
+			a.sex AS "sex",
+			a.nation AS "nation",
+			a.politics AS
+			"politics",
+			a.birthday AS "birthday",
+			a.education AS "education",
+			a.telephone AS "telephone",
+			a.fix_tel AS "fixTel",
+			a.net_peo_name AS
+			"netPeoName",
+			a.net_peo_num AS "netPeoNum",
+			a.net_num AS "netNum",
+			a.mannum AS "mannum",
+			a.net_area AS "netArea",
+			a.video_safety_num AS
+			"videoSafetyNum",
+			a.definition_num AS "definitionNum",
+			a.video_towns_num AS "videoTownsNum",
+			a.video_allday_num AS
+			"videoAlldayNum",
+			a.each_kilo_num AS "eachKiloNum",
+			a.each_hund_num AS
+			"eachHundNum",
+			a.area_map AS "areaMap",
+			a.area_point AS "areaPoint",
+			a.icon AS "icon",
+			a.more1 AS "more1",
+			a.areainfor AS "areainfor",
+			a.more2 AS "more2",
+			a.more3 AS "more3",
+			a.create_by AS "createBy.id",
+			a.create_date AS "createDate",
+			a.update_by AS "updateBy.id",
+			a.update_date AS "updateDate",
+			a.areainfor AS "remarks",
+			a.del_flag AS "delFlag",
+			a.area_id AS "areaId",
+			a2.id AS "area.id",
+			a2.name AS "area.name",
+			a2.parent_id AS "area.parent.id",
+			a2.parent_ids AS "area.parentIds",
+			a2.code AS "area.code",
+			a2.sort AS "area.sort",
+			a2.type AS "area.type",
+			a2.remarks AS "area.remarks",
+			a2.del_flag AS "area.delFlag",
+			p.name AS "parent.name"-->
+		
+			a2.id AS "type",
+			a2.name AS "value",
+			a.area_map AS "value1",
+			a.area_point AS "value2"
+		FROM sys_area a2
+		LEFT JOIN sys_office p ON p.id = a2.parent_id
+		LEFT JOIN ccm_org_area a ON a2.id = a.area_id
+		WHERE
+			a2.del_flag = '0'
+			<if test="area != null and area.type != null and area.type != ''">
+				AND a2.type = #{area.type}
+			</if>
+			<if test="area != null and area.parent != null and area.parent.id != null and area.parent.id != ''">
+				AND a2.parent_id = #{area.parent.id}
+			</if>
+			
+	</select>
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+</mapper>

@@ -1,0 +1,176 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.arjjs.ccm.modules.pbs.vote.dao.PbsVoteItemDao">
+
+	<sql id="pbsVoteItemColumns">
+		a.id AS "id",
+		a.s_parentid AS "sParentid.id",
+		a.s_name AS
+		"sName",
+		a.i_cnt AS "iCnt",
+		a.s_sort AS "sSort",
+		a.s_spare01 AS
+		"sSpare01",
+		a.s_spare02 AS "sSpare02",
+		a.s_spare03 AS "sSpare03",
+		a.s_spare04 AS "sSpare04",
+		a.create_by AS "createBy.id",
+		a.create_date
+		AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS
+		"updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag",
+		sub.s_name AS "sParentid.sName",
+		sub.s_name AS "subjectName",
+		top.id AS
+		"topid.id",
+		top.s_name AS "topid.sName",
+		top.s_name AS "topicName"
+	</sql>
+
+	<sql id="pbsVoteItemJoins">
+		left join pbs_vote_subject sub on sub.id = a.s_parentid
+		left join pbs_vote_topic top on top.id = sub.s_parentid
+	</sql>
+	<sql id="pbsVoteItemJoinsTopic">
+	</sql>
+
+	<select id="get" resultType="PbsVoteItem">
+		SELECT
+		<include refid="pbsVoteItemColumns" />
+		FROM pbs_vote_item a
+		<include refid="pbsVoteItemJoins" />
+		WHERE a.id = #{id}
+	</select>
+
+	<select id="findList" resultType="PbsVoteItem">
+		SELECT
+		<include refid="pbsVoteItemColumns" />
+		FROM pbs_vote_item a
+		<include refid="pbsVoteItemJoins" />
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			and sub.del_flag = #{DEL_FLAG_NORMAL}
+			and top.del_flag = #{DEL_FLAG_NORMAL}
+			<if
+				test=" sParentid != null and sParentid != '' and sParentid.id != null and sParentid.id != '' ">
+				AND a.s_parentid = #{sParentid.id}
+			</if>
+			<if
+				test=" sParentid != null and sParentid != '' and sParentid.sName != null and sParentid.sName != '' ">
+				AND sub.s_name LIKE
+				<if test="dbName == 'oracle'">'%'||#{sParentid.sName}||'%'</if>
+				<if test="dbName == 'mssql'">'%'+#{sParentid.sName}+'%'</if>
+				<if test="dbName == 'mysql'">concat('%',#{sParentid.sName},'%')</if>
+			</if>
+			<if test="sName != null and sName != ''">
+				AND a.s_name LIKE
+				<if test="dbName == 'oracle'">'%'||#{sName}||'%'</if>
+				<if test="dbName == 'mssql'">'%'+#{sName}+'%'</if>
+				<if test="dbName == 'mysql'">concat('%',#{sName},'%')</if>
+			</if>
+			<if test="iCnt != null and iCnt != ''">
+				AND a.i_cnt = #{iCnt}
+			</if>
+			<if test="createBy != null and createBy.id != null and createBy.id != ''">
+				AND a.create_by = #{createBy.id}
+			</if>
+			<if
+				test="topid != null and topid != '' and topid.id != null and topid.id != ''">
+				AND top.id= #{topid.id}
+			</if>
+			<if test="sBelongfunc != null and sBelongfunc != '' ">
+				AND top.s_belongfunc= #{sBelongfunc}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.s_parentid,a.s_sort ASC
+			</otherwise>
+		</choose>
+	</select>
+
+	<select id="findAllList" resultType="PbsVoteItem">
+		SELECT
+		<include refid="pbsVoteItemColumns" />
+		FROM pbs_vote_item a
+		<include refid="pbsVoteItemJoins" />
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+
+	<insert id="insert">
+		INSERT INTO pbs_vote_item(
+		id,
+		s_parentid,
+		s_name,
+		i_cnt,
+		s_sort ,
+		s_spare01,
+		s_spare02,
+		s_spare03,
+		s_spare04,
+		create_by,
+		create_date,
+		update_by,
+		update_date,
+		remarks,
+		del_flag
+		) VALUES (
+		#{id},
+		#{sParentid.id},
+		#{sName},
+		#{iCnt},
+		#{sSort},
+		#{sSpare01},
+		#{sSpare02},
+		#{sSpare03},
+		#{sSpare04},
+		#{createBy.id},
+		#{createDate},
+		#{updateBy.id},
+		#{updateDate},
+		#{remarks},
+		#{delFlag}
+		)
+	</insert>
+
+	<update id="update">
+		UPDATE pbs_vote_item SET
+		s_parentid = #{sParentid.id},
+		s_name = #{sName},
+		i_cnt = #{iCnt},
+		s_sort = #{sSort},
+		s_spare01 =
+		#{sSpare01},
+		s_spare02 = #{sSpare02},
+		s_spare03 = #{sSpare03},
+		s_spare04
+		= #{sSpare04},
+		update_by = #{updateBy.id},
+		update_date = #{updateDate},
+		remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+
+	<update id="delete">
+		UPDATE pbs_vote_item SET
+		del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+
+</mapper>

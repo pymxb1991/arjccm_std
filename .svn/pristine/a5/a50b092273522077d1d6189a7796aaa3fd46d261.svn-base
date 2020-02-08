@@ -1,0 +1,671 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.arjjs.ccm.modules.flat.handle.dao.BphAlarmHandleDao">
+    
+	<sql id="bphAlarmHandleColumns">
+		a.id AS "id",
+		a.alarm_id AS "alarmId",
+		a.handle_code AS "handleCode",
+		a.handle_police_id AS "handlePoliceId",
+		a.task AS "task",
+		a.destiny_x AS "destinyX",
+		a.destiny_y AS "destinyY",
+		a.dispatch_time AS "dispatchTime",
+		a.receive_time AS "receiveTime",
+		a.arrive_time AS "arriveTime",
+		a.finish_time AS "finishTime",
+		a.receive_x AS "receiveX",
+		a.receive_y AS "receiveY",
+		a.arrive_x AS "arriveX",
+		a.arrive_y AS "arriveY",
+		a.finish_x AS "finishX",
+		a.finish_y AS "finishY",
+		a.handle_result AS "handleResult",
+		a.status AS "status",
+		a.plan_id AS "planId",
+		a.step_id AS "stepId",
+		a.action_id AS "actionId",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag"
+	</sql>
+    
+    <!-- 警情详情 -->
+    <select id="findAlarmHandlePlanStepAction" resultType="BphAlarmHandle">
+		   SELECT 
+				a.id AS "id",
+				a.alarm_id AS "alarmId",
+				a.handle_code AS "handleCode",
+				a.handle_police_id AS "handlePoliceId",
+				a.task AS "task",
+				a.destiny_x AS "destinyX",
+				a.destiny_y AS "destinyY",
+				a.dispatch_time AS "dispatchTime",
+				a.receive_time AS "receiveTime",
+				a.arrive_time AS "arriveTime",
+				a.finish_time AS "finishTime",
+				a.receive_x AS "receiveX",
+				a.receive_y AS "receiveY",
+				a.arrive_x AS "arriveX",
+				a.arrive_y AS "arriveY",
+				a.finish_x AS "finishX",
+				a.finish_y AS "finishY",
+				a.handle_result AS "handleResult",
+				a.status AS "status",
+				a.plan_id AS "planId",
+				a.step_id AS "stepId",
+				a.action_id AS "actionId",
+				p.name AS "plan.name",
+				p.content AS "plan.content",
+				s.name AS "step.name",
+				s.content AS "step.content",
+				ac.name AS "action.name",
+				ac.content AS "action.content",
+				u.name AS "user.name"
+			FROM bph_alarm_handle a 
+				LEFT JOIN sys_user u ON u.id = a.handle_police_id
+				LEFT JOIN bph_plan_info p ON p.id = a.plan_id
+				LEFT JOIN bph_step_info s ON s.id = a.step_id
+				LEFT JOIN bph_action_info ac ON	ac.id = a.action_id
+			WHERE 
+				a.del_flag = 0 
+				AND  a.alarm_id = #{id,jdbcType=VARCHAR}
+			ORDER BY a.dispatch_time ASC 
+    </select>
+    
+    <!-- 处警时间统计 -->
+    <select id="findHandleTimeCount" resultType="BphAlarmHandle">
+    	SELECT
+			office.id AS "officeId",
+			office.NAME AS "officeName",
+		CASE
+			WHEN handleTime1.avgTime IS NULL THEN
+			0 ELSE handleTime1.avgTime 
+			END VALUE0,
+		CASE
+				WHEN handleTime2.avgTime IS NULL THEN
+				0 ELSE handleTime2.avgTime 
+			END VALUE1,
+		CASE
+				WHEN handleTime3.avgTime IS NULL THEN
+				0 ELSE handleTime3.avgTime 
+			END VALUE2,
+		CASE
+				WHEN handleTime4.avgTime IS NULL THEN
+				0 ELSE handleTime4.avgTime 
+			END VALUE3,
+		CASE
+				WHEN handleTime5.avgTime IS NULL THEN
+				0 ELSE handleTime5.avgTime 
+			END VALUE4,
+		CASE
+				WHEN handleTime6.avgTime IS NULL THEN
+				0 ELSE handleTime6.avgTime 
+			END VALUE5,
+		CASE
+				WHEN handleTime7.avgTime IS NULL THEN
+				0 ELSE handleTime7.avgTime 
+			END VALUE6 
+			FROM
+				sys_office office
+				LEFT JOIN (
+				SELECT
+					DATE_FORMAT( alarmHandle.finish_time, '%Y-%m-%d' ) AS "date",
+					alarmInfo.office_id AS "officeId",
+					AVG( TIMESTAMPDIFF( MINUTE, alarmHandle.dispatch_time, alarmHandle.finish_time ) ) AS "avgTime" 
+				FROM
+					bph_alarm_handle alarmHandle
+					LEFT JOIN bph_alarm_info alarmInfo ON alarmInfo.id = alarmHandle.alarm_id 
+				WHERE
+					DATE_FORMAT( alarmHandle.finish_time, '%Y-%m-%d' ) = DATE_FORMAT( date_add( now( ), INTERVAL - 0 DAY ), '%Y-%m-%d' ) 
+				GROUP BY
+					alarmInfo.office_id 
+				) handleTime1 ON office.id = handleTime1.officeId
+				LEFT JOIN (
+				SELECT
+					DATE_FORMAT( alarmHandle.finish_time, '%Y-%m-%d' ) AS "date",
+					alarmInfo.office_id AS "officeId",
+					AVG( TIMESTAMPDIFF( MINUTE, alarmHandle.dispatch_time, alarmHandle.finish_time ) ) AS "avgTime" 
+				FROM
+					bph_alarm_handle alarmHandle
+					LEFT JOIN bph_alarm_info alarmInfo ON alarmInfo.id = alarmHandle.alarm_id 
+				WHERE
+					DATE_FORMAT( alarmHandle.finish_time, '%Y-%m-%d' ) = DATE_FORMAT( date_add( now( ), INTERVAL - 1 DAY ), '%Y-%m-%d' ) 
+				GROUP BY
+					alarmInfo.office_id 
+				) handleTime2 ON office.id = handleTime2.officeId
+				LEFT JOIN (
+				SELECT
+					DATE_FORMAT( alarmHandle.finish_time, '%Y-%m-%d' ) AS "date",
+					alarmInfo.office_id AS "officeId",
+					AVG( TIMESTAMPDIFF( MINUTE, alarmHandle.dispatch_time, alarmHandle.finish_time ) ) AS "avgTime" 
+				FROM
+					bph_alarm_handle alarmHandle
+					LEFT JOIN bph_alarm_info alarmInfo ON alarmInfo.id = alarmHandle.alarm_id 
+				WHERE
+					DATE_FORMAT( alarmHandle.finish_time, '%Y-%m-%d' ) = DATE_FORMAT( date_add( now( ), INTERVAL - 2 DAY ), '%Y-%m-%d' ) 
+				GROUP BY
+					alarmInfo.office_id 
+				) handleTime3 ON office.id = handleTime3.officeId
+				LEFT JOIN (
+				SELECT
+					DATE_FORMAT( alarmHandle.finish_time, '%Y-%m-%d' ) AS "date",
+					alarmInfo.office_id AS "officeId",
+					AVG( TIMESTAMPDIFF( MINUTE, alarmHandle.dispatch_time, alarmHandle.finish_time ) ) AS "avgTime" 
+				FROM
+					bph_alarm_handle alarmHandle
+					LEFT JOIN bph_alarm_info alarmInfo ON alarmInfo.id = alarmHandle.alarm_id 
+				WHERE
+					DATE_FORMAT( alarmHandle.finish_time, '%Y-%m-%d' ) = DATE_FORMAT( date_add( now( ), INTERVAL - 3 DAY ), '%Y-%m-%d' ) 
+				GROUP BY
+					alarmInfo.office_id 
+				) handleTime4 ON office.id = handleTime4.officeId
+				LEFT JOIN (
+				SELECT
+					DATE_FORMAT( alarmHandle.finish_time, '%Y-%m-%d' ) AS "date",
+					alarmInfo.office_id AS "officeId",
+					AVG( TIMESTAMPDIFF( MINUTE, alarmHandle.dispatch_time, alarmHandle.finish_time ) ) AS "avgTime" 
+				FROM
+					bph_alarm_handle alarmHandle
+					LEFT JOIN bph_alarm_info alarmInfo ON alarmInfo.id = alarmHandle.alarm_id 
+				WHERE
+					DATE_FORMAT( alarmHandle.finish_time, '%Y-%m-%d' ) = DATE_FORMAT( date_add( now( ), INTERVAL - 4 DAY ), '%Y-%m-%d' ) 
+				GROUP BY
+					alarmInfo.office_id 
+				) handleTime5 ON office.id = handleTime5.officeId
+				LEFT JOIN (
+				SELECT
+					DATE_FORMAT( alarmHandle.finish_time, '%Y-%m-%d' ) AS "date",
+					alarmInfo.office_id AS "officeId",
+					AVG( TIMESTAMPDIFF( MINUTE, alarmHandle.dispatch_time, alarmHandle.finish_time ) ) AS "avgTime" 
+				FROM
+					bph_alarm_handle alarmHandle
+					LEFT JOIN bph_alarm_info alarmInfo ON alarmInfo.id = alarmHandle.alarm_id 
+				WHERE
+					DATE_FORMAT( alarmHandle.finish_time, '%Y-%m-%d' ) = DATE_FORMAT( date_add( now( ), INTERVAL - 5 DAY ), '%Y-%m-%d' ) 
+				GROUP BY
+					alarmInfo.office_id 
+				) handleTime6 ON office.id = handleTime6.officeId
+				LEFT JOIN (
+				SELECT
+					DATE_FORMAT( alarmHandle.finish_time, '%Y-%m-%d' ) AS "date",
+					alarmInfo.office_id AS "officeId",
+					AVG( TIMESTAMPDIFF( MINUTE, alarmHandle.dispatch_time, alarmHandle.finish_time ) ) AS "avgTime" 
+				FROM
+					bph_alarm_handle alarmHandle
+					LEFT JOIN bph_alarm_info alarmInfo ON alarmInfo.id = alarmHandle.alarm_id 
+				WHERE
+					DATE_FORMAT( alarmHandle.finish_time, '%Y-%m-%d' ) = DATE_FORMAT( date_add( now( ), INTERVAL - 6 DAY ), '%Y-%m-%d' ) 
+				GROUP BY
+					alarmInfo.office_id 
+				) handleTime7 ON office.id = handleTime7.officeId 
+			WHERE
+				office.type = 4 
+				AND office.del_flag = 0 
+				AND office.USEABLE = 1 
+				AND office.id IN (
+				SELECT DISTINCT
+					alarmInfo.office_id 
+				FROM
+					bph_alarm_handle handle
+					LEFT JOIN bph_alarm_info alarmInfo ON alarmInfo.id = handle.alarm_id 
+				WHERE
+				DATE_FORMAT( handle.finish_time, '%Y-%m-%d' ) >= DATE_FORMAT( date_add( now( ), INTERVAL - 6 DAY ), '%Y-%m-%d' ) 
+			)
+    </select>
+    
+	<select id="get" resultType="BphAlarmHandle">
+		SELECT 
+			<include refid="bphAlarmHandleColumns"/>
+		FROM bph_alarm_handle a
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findAlarmHandle" resultType="BphAlarmHandle">
+		SELECT 
+			<include refid="bphAlarmHandleColumns"/>
+		FROM bph_alarm_handle a
+		WHERE a.alarm_id = #{id,jdbcType=VARCHAR}
+	</select>
+	
+	<select id="findList" resultType="BphAlarmHandle">
+		SELECT 
+			<include refid="bphAlarmHandleColumns"/>
+		FROM bph_alarm_handle a
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<sql id="bphAlarmHandleFileColumns">
+		a.handle_code AS "handleCode",
+		a.task AS "task",
+		a.destiny_x AS "destinyX",
+		a.destiny_y AS "destinyY",
+		a.dispatch_time AS "dispatchTime",
+		a.receive_time AS "receiveTime",
+		a.arrive_time AS "arriveTime",
+		a.finish_time AS "finishTime",
+		a.receive_x As "receiveX",
+		a.receive_y AS "receiveY",
+		a.arrive_x AS "arriveX",
+		a.arrive_y AS "arriveY",
+		a.finish_x AS "finishX",
+		a.finish_y As "finishY",
+		a.handle_result As "handleResult",
+		a.create_date AS "createDate",
+		f.type AS "handleFileType",
+		f.file_name AS "handleFileName",
+		f.path AS  "handleFilePath",
+		p.name AS "planName",
+		p.is_important AS "planIsImportant",
+		p.type_code AS "planTypeCode",
+		p.content As "planContent",
+		s.name AS "stepName",
+		s.content AS "stepContent",
+		ac.name AS "actionName",
+		ac.type AS "actionType",
+		ac.title AS "actionTitle",
+		ac.content AS "actionContent",
+		u.NAME AS "userName"
+	</sql>
+	
+	<select id="findAlarmHandleFilePlanStepAction" resultType="com.arjjs.ccm.modules.flat.export.entity.WordAlarmHandleFilePlanStepActionData">
+		SELECT 
+			<include refid="bphAlarmHandleFileColumns"/>
+		FROM bph_alarm_handle a 
+			LEFT JOIN sys_user u ON u.id = a.handle_police_id
+			LEFT JOIN bph_alarm_handle_file f ON f.alarm_handle_id = a.id
+			LEFT JOIN bph_plan_info p ON p.id = a.plan_id
+			LEFT JOIN bph_step_info s ON s.id = a.step_id
+			LEFT JOIN bph_action_info ac ON	ac.id = a.action_id
+		WHERE 
+			a.del_flag = 0 
+			AND  a.alarm_id = #{id,jdbcType=VARCHAR}
+		ORDER BY a.create_date ASC 
+	</select>
+	
+	<select id="findAllList" resultType="BphAlarmHandle">
+		SELECT 
+			<include refid="bphAlarmHandleColumns"/>
+		FROM bph_alarm_handle a
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="fingListByAlarmId" resultType="BphAlarmHandle">
+		SELECT
+			<include refid="bphAlarmHandleColumns"/>
+		FROM bph_alarm_handle a
+		<where>
+		a.del_flag = 0 
+		AND a.alarm_id = #{alarmId}
+		AND a.status IS NOT NULL
+		</where>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO bph_alarm_handle(
+			id,
+			alarm_id,
+			handle_code,
+			handle_police_id,
+			task,
+			destiny_x,
+			destiny_y,
+			dispatch_time,
+			receive_time,
+			arrive_time,
+			finish_time,
+			receive_x,
+			receive_y,
+			arrive_x,
+			arrive_y,
+			finish_x,
+			finish_y,
+			handle_result,
+			status,
+			plan_id,
+			step_id,
+			action_id,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag
+		) VALUES (
+			#{id},
+			#{alarmId},
+			#{handleCode},
+			#{handlePoliceId},
+			#{task},
+			#{destinyX},
+			#{destinyY},
+			#{dispatchTime},
+			#{receiveTime},
+			#{arriveTime},
+			#{finishTime},
+			#{receiveX},
+			#{receiveY},
+			#{arriveX},
+			#{arriveY},
+			#{finishX},
+			#{finishY},
+			#{handleResult},
+			#{status},
+			#{planId},
+			#{stepId},
+			#{actionId},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE bph_alarm_handle SET 	
+			alarm_id = #{alarmId},
+			handle_code = #{handleCode},
+			handle_police_id = #{handlePoliceId},
+			task = #{task},
+			destiny_x = #{destinyX},
+			destiny_y = #{destinyY},
+			dispatch_time = #{dispatchTime},
+			receive_time = #{receiveTime},
+			arrive_time = #{arriveTime},
+			finish_time = #{finishTime},
+			receive_x = #{receiveX},
+			receive_y = #{receiveY},
+			arrive_x = #{arriveX},
+			arrive_y = #{arriveY},
+			finish_x = #{finishX},
+			finish_y = #{finishY},
+			handle_result = #{handleResult},
+			status = #{status},
+			plan_id = #{planId},
+			step_id = #{stepId},
+			action_id = #{actionId},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE bph_alarm_handle SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+	<select id="planManagerDetails" resultType="BphAlarmHandle">
+		SELECT
+			h.handle_code AS "handleCode",
+			h.task AS "task",
+			h.destiny_x AS "destinyX",
+			h.destiny_y AS "destinyY",
+			h.dispatch_time AS "dispatchTime",
+			u.`name` AS "name"
+		FROM
+			bph_alarm_handle h
+			LEFT JOIN sys_user u ON u.id = h.handle_police_id
+		WHERE
+			h.del_flag = 0 
+			AND h.action_id = #{actionId}
+			AND h.alarm_id = #{alarmId}
+			AND h.STATUS IS NOT NULL
+	</select>
+	
+	<select id="findUserState" resultType="com.arjjs.ccm.modules.flat.handle.entity.BphAlarmHandleUserState">
+		SELECT
+			handle.handle_police_id AS "userId",
+			handle.alarm_id AS "alarmId",
+			alarm.state AS "state",
+			CASE
+		WHEN alarm.state &lt;&gt; 3 THEN
+			'busy'
+		ELSE
+			'free'
+		END AS "userState"
+		FROM
+			bph_alarm_handle handle
+		LEFT JOIN bph_alarm_info alarm ON alarm.id = handle.alarm_id
+		AND alarm.del_flag = 0
+		WHERE
+			handle.del_flag = 0
+		AND (
+		<foreach collection="userIds" item="n" separator=" OR " >
+			<if test="n != null and n != ''">
+           		handle.handle_police_id = #{n}
+           	</if>
+        </foreach>
+        )
+	</select>
+	<select id="queryPoliceAlarm" resultType="com.arjjs.ccm.modules.dma.eventheme.entity.CountOfficeEventEntity">
+		SELECT
+			t.id,
+			t.handle_police_id,
+			case
+				when t.status = 1 then '处理中'
+				when t.status = 2 then '已处理'
+			  else '未处理'
+		END as handle_status
+		FROM
+		bph_alarm_handle AS t
+	</select>
+
+	<select id="queryOfficeInfo" resultType="String">
+		SELECT
+			t.name
+		FROM
+			sys_office t
+		WHERE
+			 1 =1
+		 and 	t.parent_ids = left(t.parent_ids, 5)
+		 and t.id != "-1"
+		 and t.del_flag = '0'
+
+	</select>
+
+
+
+	<select id="fingListByAlarmIdAndpoliceId" resultType="BphAlarmHandle">
+		SELECT
+		<include refid="bphAlarmHandleColumns"/>
+		FROM bph_alarm_handle a
+		<where>
+			a.del_flag = 0
+			AND a.alarm_id = #{alarmId}
+			AND a.handle_police_id = #{handlePoliceId}
+		</where>
+	</select>
+
+
+	<select id="queryDayAlarmList" parameterType="com.arjjs.ccm.modules.ccm.rest.entity.CcmBphReceiveAlarmVo" resultType="com.arjjs.ccm.modules.flat.handle.entity.AlarmHandleDayInfo">
+		SELECT
+		handle.id handle_id , handle.alarm_id alarm_id,	handle.task
+		, alarm.place alarm_place
+		, alarm.content alarm_content
+		, alarm.is_important alarm_is_important
+		, alarm.type_code alarm_genre_code,dictgenre.label alarm_gener_name
+		, alarm.alarm_time alarm_time
+		, handle.status handle_status
+		,compresive.max_dispatch_time , compresive.max_arrive_time
+		FROM bph_alarm_handle handle LEFT JOIN bph_alarm_info alarm ON handle.alarm_id = alarm.id
+		LEFT JOIN sys_dict dictgenre on alarm.type_code = dictgenre.`value` AND dictgenre.type = 'bph_alarm_info_typecode'
+		LEFT JOIN sys_office office ON alarm.office_id = office.id
+		LEFT JOIN ccm_org_comprehensive compresive ON office.id = compresive.office_id
+		WHERE   handle.del_flag = 0 AND alarm.del_flag = 0
+
+		AND  handle.create_date >=(NOW() - interval 24 hour)
+		<if test=" handlePoliceId != null and handlePoliceId != '' "> AND handle.handle_police_id = #{handlePoliceId}</if>
+		<if test=" handleStatus != null and handleStatus != '' "> AND handle.status = #{handleStatus}</if>
+		order by handle.create_date desc
+	</select>
+
+	<update id="updateAlarmHandleById" parameterType="com.arjjs.ccm.modules.flat.handle.entity.BphAlarmHandle">
+		update bph_alarm_handle set update_date = now()
+		<if test=" handleResult != null and handleResult != '' "> , handle_result = #{handleResult}</if>
+		<if test=" status != null and status != '' "> , status = #{status}</if>
+		<!-- 接单时经纬度 -->
+		<if test=" status != null and status != '' and status  == '1'.toString() "> , receive_time = now() </if>
+		<if test=" receiveX != null and receiveX != '' "> , receive_x = #{receiveX}</if>
+		<if test=" receiveY != null and receiveY != '' "> , receive_y = #{receiveY}</if>
+		<!-- 到达现场时经纬度 -->
+		<if test=" status != null and status != '' and status  == '2'.toString() "> , arrive_time = now() </if>
+		<if test=" arriveX != null and arriveX != '' "> , arrive_x = #{arriveX}</if>
+		<if test=" arriveY != null and arriveY != '' "> , arrive_y = #{arriveY}</if>
+		<!-- 处警完成时经纬度 -->
+		<if test=" status != null and status != '' and status  == '3'.toString() "> , finish_time = now() </if>
+		<if test=" finishX != null and finishX != '' "> , finish_x = #{finishX}</if>
+		<if test=" finishY != null and finishY != '' "> , finish_y = #{finishY}</if>
+		where id = #{id}
+		<if test=" handlePoliceId != null and handlePoliceId != '' "> and handle_police_id = #{handlePoliceId} </if>
+	</update>
+
+	<select id="queryCurrentOffHandleByAlarmIdAndOffId" resultType="com.arjjs.ccm.modules.ccm.rest.entity.CurrentOffAlarmHandleInfo">
+		SELECT
+			t1.alarm_id ,t1.id handle_id,t2.id user_id,t2.name,t2.office_id
+		FROM
+			bph_alarm_handle t1
+		LEFT JOIN sys_user t2 on t1.handle_police_id = t2.id
+		WHERE
+			t1.alarm_id = #{alarmId}
+			and t2.id !=  #{userId}
+			and t2.office_id = #{offId}
+	</select>
+
+	<select id="queryAlarmHandleInfo"  resultType="com.arjjs.ccm.modules.ccm.rest.entity.AlarmHandleInfo">
+		SELECT
+		alarm.id alarm_id,  alarm.order_num alarm_order_num
+		, alarm.police_num alarm_police_num, alarm.police_name alarm_police_name
+		, alarm.man_name alarm_man_name, alarm.man_tel alarm_man_tel, alarm.place alarm_place
+		, alarm.x alarm_x, alarm.y alarm_y, alarm.z alarm_z	, alarm.content alarm_content
+
+		,handle.id handle_id
+		, handle.destiny_x handle_destiny_x , handle.destiny_y handle_destiny_y
+		, handle.receive_x handle_receive_x , handle.receive_y handle_receive_y
+		, handle.arrive_x handle_arrive_x , handle.arrive_y handle_arrive_y
+		, handle.finish_x handle_finish_x , handle.finish_y handle_finish_y
+		, handle.handle_result handle_result , handle.status handle_status
+
+		, dictgenre.label alarm_gener_name,dicttype.label alarm_type_name,dictclass.label alarm_class_name
+		, alarm.alarm_time alarm_time	, alarm.alarm_record alarm_record
+		, office.name office_name
+		,compresive.max_dispatch_time  , compresive.max_arrive_time
+		FROM	bph_alarm_info alarm  LEFT JOIN bph_alarm_handle handle on alarm.id = handle.alarm_id
+		LEFT JOIN sys_dict dictgenre on alarm.genre_code = dictgenre.`value` AND dictgenre.type = 'bph_alarm_info_class'
+		LEFT JOIN sys_dict dicttype ON alarm.type_code = dicttype.value  AND dicttype.type = 'bph_alarm_info_typecode'
+		LEFT JOIN sys_dict dictclass on alarm.class_code =dictclass.value AND dictclass.type = 'bph_alarm_info_small_class'
+		LEFT JOIN sys_office office ON alarm.office_id = office.id
+		LEFT JOIN ccm_org_comprehensive compresive ON office.id = compresive.office_id
+		WHERE   handle.del_flag = 0 AND alarm.del_flag = 0
+		<if test=" handlePoliceId != null and handlePoliceId != '' "> AND handle.handle_police_id = #{handlePoliceId}</if>
+		<if test=" alarmId != null and alarmId != '' "> AND alarm.id = #{alarmId}</if>
+		<if test=" handleId != null and handleId != '' "> AND handle.id = #{handleId}</if>
+		order by handle.create_date desc
+	</select>
+	<select id="selectAlarmHandleByAlarmIdAndhandlePoliceId" resultType="com.arjjs.ccm.modules.ccm.rest.entity.AlarmHandle">
+		SELECT	* FROM	bph_alarm_handle t1 WHERE	t1.alarm_id = #{alarmId} 	AND t1.handle_police_id = #{handlePoliceId}
+	</select>
+
+	<resultMap id="ResultAlarmHandleFile"  type="com.arjjs.ccm.modules.ccm.rest.entity.AlarmHandleFeedBack" >
+		<result column="alarm_id" property="alarmId"  jdbcType="VARCHAR" />
+		<result column="handle_id" property="handleId"  jdbcType="VARCHAR" />
+		<result column="handle_result"  property="handleResult" jdbcType="VARCHAR" />
+		<result column="handle_status" property="handleStatus"  jdbcType="VARCHAR" />
+		<result column="alarm_gener_name"  property="alarmGenerName" jdbcType="VARCHAR" />
+		<result column="alarm_type_name"  property="alarmTypeName" jdbcType="VARCHAR" />
+		<result column="alarm_class_name" property="alarmClassName"  jdbcType="VARCHAR" />
+		<result column="office_name" property="officeName"  jdbcType="VARCHAR" />
+		<result column="user_name" property="userName"  jdbcType="VARCHAR" />
+		<collection property="handleFiles"  ofType="com.arjjs.ccm.modules.ccm.rest.entity.AlarmHandleFileInfo" >
+			<result column="file_Type" property="fileType"  jdbcType="VARCHAR" />
+			<result column="file_name"  property="fileName" jdbcType="VARCHAR" />
+			<result column="file_path"  property="filePath" jdbcType="VARCHAR" />
+			<result column="file_duration"  property="fileDuration" jdbcType="VARCHAR" />
+			<result column="file_thumbnail"  property="fileThumbnail" jdbcType="VARCHAR" />
+		</collection>
+	</resultMap>
+	<select id="alarmHandleFeedback" parameterType="String" resultMap="ResultAlarmHandleFile" >
+		SELECT
+			  alarm.id alarm_id
+			, handle.id handle_id
+			, handle.handle_result , handle.status handle_status
+			, dictgenre.label alarm_gener_name,dicttype.label alarm_type_name,dictclass.label alarm_class_name
+			, office.name office_name
+			,sysUser.`name` user_name
+			,handleFile.type file_Type ,handleFile.file_name ,handleFile.url_path file_path
+			,handleFile.duration file_duration, handleFile.thumbnail file_thumbnail
+		FROM	bph_alarm_info alarm  LEFT JOIN bph_alarm_handle handle on alarm.id = handle.alarm_id
+		LEFT JOIN sys_dict dictgenre on alarm.genre_code = dictgenre.`value` AND dictgenre.type = 'bph_alarm_info_class'
+		LEFT JOIN sys_dict dicttype ON alarm.type_code = dicttype.value  AND dicttype.type = 'bph_alarm_info_typecode'
+		LEFT JOIN sys_dict dictclass on alarm.class_code =dictclass.value AND dictclass.type = 'bph_alarm_info_small_class'
+		LEFT JOIN sys_office office ON alarm.office_id = office.id
+	 	LEFT JOIN bph_alarm_handle_file handleFile on handle.id = handleFile.alarm_handle_id
+		LEFT JOIN sys_user sysUser on sysUser.id = handle.handle_police_id
+		WHERE   handle.del_flag = 0 AND alarm.del_flag = 0
+		 AND handle.id = #{handleId}
+		order by handle.create_date desc
+	</select>
+
+	<select id="queryAlarmList" parameterType="com.arjjs.ccm.modules.ccm.rest.entity.CcmBphQueryAlarmVo" resultType="com.arjjs.ccm.modules.ccm.rest.entity.AlarmHandlEntity">
+		SELECT
+		handle.id handle_id , handle.alarm_id alarm_id
+		, alarm.place alarm_place
+		, alarm.content alarm_content
+		, alarm.is_important alarm_is_important
+		, alarm.type_code alarm_genre_code,dictgenre.label alarm_gener_name
+		, alarm.alarm_time alarm_time
+		, handle.status handle_status
+		FROM bph_alarm_handle handle LEFT JOIN bph_alarm_info alarm ON handle.alarm_id = alarm.id
+		LEFT JOIN sys_dict dictgenre on alarm.type_code = dictgenre.`value` AND dictgenre.type = 'bph_alarm_info_typecode'
+		WHERE   handle.del_flag = 0 AND alarm.del_flag = 0  AND handle.STATUS != '0'
+
+		<if test=" alarmSerach != null and alarmSerach != '' "> 	AND  (alarm.place LIKE '%${alarmSerach}%' or alarm.content LIKE '%${alarmSerach}%' )</if>
+		<if test=" crite != null and crite != '' "> 	AND  	DATE_SUB(CURDATE(), ${crite}) &lt;= alarm.alarm_time </if>
+		<if test=" alarmStartTime != null and alarmStartTime != '' "> AND alarm.alarm_time &gt;=  #{alarmStartTime}  </if>
+		<if test=" alarmEndTime != null and alarmEndTime != '' "> AND alarm.alarm_time &lt;= #{alarmEndTime} </if>
+		<if test=" handlePoliceId != null and handlePoliceId != '' "> AND handle.handle_police_id = #{handlePoliceId}  </if>
+		<if test=" officeId != null and officeId != '' ">     AND alarm.office_id =  #{officeId}  </if>
+		order by alarm.alarm_time ${criteOrderBy}
+	</select>
+
+	<select id="queryAlarmCount" resultType="int">
+		SELECT
+		count(*)
+		FROM bph_alarm_handle handle
+		WHERE   handle.del_flag = 0
+		<if test=" handlePoliceId != null and handlePoliceId != '' "> AND handle.handle_police_id = #{handlePoliceId}</if>
+		<if test="status != null and status.size() > 0">
+			and handle.`status` in
+			<foreach collection="status" item="statu" open="(" separator="," close=")">
+				#{statu}
+			</foreach>
+		</if>
+		AND  handle.create_date >=(NOW() - interval 24 hour)
+	</select>
+</mapper>

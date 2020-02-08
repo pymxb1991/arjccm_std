@@ -1,0 +1,367 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.arjjs.ccm.modules.pbs.exam.dao.PbsExamactionDao">
+
+	<sql id="pbsExamactionColumns">
+		a.id AS "id",
+		a.s_exampaper AS "sExampaper.id",
+		a.s_department AS
+		"sDepartment.id",
+		office.name AS
+		"sDepartment.name",
+		exampaper.s_name AS "sExampaper.sName",
+		a.s_examinee
+		AS "sExaminee.id",
+		mem.s_name AS "sExaminee.sName",
+		
+		a.dt_start AS
+		"dtStart",
+		a.dt_submit AS
+		"dtSubmit",
+		a.s_stat AS "sStat",
+		a.i_report AS
+		"iReport",
+		<!-- a.s_spare01 AS "sSpare01", a.s_spare02 AS "sSpare02", a.s_spare03 
+			AS "sSpare03", a.s_spare04 AS "sSpare04", -->
+		a.create_by AS
+		"createBy.id",
+		a.create_date AS
+		"createDate",
+		a.update_by
+		AS
+		"updateBy.id",
+		a.update_date AS
+		"updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag"
+	</sql>
+
+	<sql id="pbsExamactionJoins">
+		LEFT JOIN pbs_partymem mem ON mem.id = a.s_examinee
+		LEFT
+		JOIN pbs_exampaper exampaper ON exampaper.id = a.s_exampaper
+		LEFT JOIN sys_office office ON a.s_department = office.id
+	</sql>
+
+	<select id="get" resultType="PbsExamaction">
+		SELECT
+		<include refid="pbsExamactionColumns" />
+		FROM pbs_examaction a
+		<include refid="pbsExamactionJoins" />
+		WHERE a.id = #{id}
+	</select>
+
+	<select id="findList" resultType="PbsExamaction">
+		SELECT
+		<include refid="pbsExamactionColumns" />
+		FROM pbs_examaction a
+		<include refid="pbsExamactionJoins" />
+		LEFT JOIN pbs_partymembind par ON par.s_partymemid = mem.id
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<!-- AND period_diff(date_format(now(), '%Y%m'),date_format(a.create_date, '%Y%m')) = 1 -->
+			<if
+				test="sExampaper != null and sExampaper!= '' and sExampaper.id != null and sExampaper.id != ''">
+				AND exampaper.del_flag = #{DEL_FLAG_NORMAL}
+			</if>
+			<if
+				test="sExaminee != null and sExaminee != '' and sExaminee.id != null and sExaminee.id != ''">
+				AND mem.del_flag = #{DEL_FLAG_NORMAL}
+			</if>
+			<if
+                test="sExampaper != null and sExampaper!= '' and sExampaper.sName != null and sExampaper.sName != ''">
+                AND exampaper.s_name like CONCAT('%',#{sExampaper.sName},'%')
+            </if>
+			<if
+				test="sExampaper != null and sExampaper!= '' and sExampaper.id != null and sExampaper.id != ''">
+				AND a.s_exampaper = #{sExampaper.id}
+			</if>
+			<if
+				test="sExaminee != null and sExaminee != '' and sExaminee.id != null and sExaminee.id != ''">
+				AND a.s_examinee = #{sExaminee.id}
+			</if>
+			<if
+                test="sExaminee != null and sExaminee != '' and sExaminee.sName != null and sExaminee.sName != ''">
+                AND mem.s_name  like  "%${sExaminee.sName}%"
+            </if>
+			<if
+				test="sExampaper != null and sExampaper!= '' and sExampaper.sStat != null and sExampaper.sStat != ''">
+				AND exampaper.s_stat = #{sExampaper.sStat}
+			</if>
+			<if
+				test="sExampaper != null and sExampaper!= '' and sExampaper.sWay != null and sExampaper.sWay != ''">
+				AND exampaper.s_way = #{sExampaper.sWay}
+			</if>
+			<if test="sStat != null and sStat != ''">
+				AND a.s_stat = #{sStat}
+			</if>
+			<if test="iReport != null and iReport != ''">
+				AND a.i_report = #{iReport}
+			</if>
+			<if test ="sPrimarykey01 != null and sPrimarykey01 != ''">
+				AND par.s_primarykey01 = #{sPrimarykey01}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+
+	<select id="findAllList" resultType="PbsExamaction">
+		SELECT
+		<include refid="pbsExamactionColumns" />
+		FROM pbs_examaction a
+		<include refid="pbsExamactionJoins" />
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+
+	<insert id="insert">
+		INSERT INTO pbs_examaction(
+		id,
+		s_exampaper,
+		s_department,
+		s_examinee,
+		dt_start,
+		dt_submit,
+		s_stat,
+		i_report,
+		s_spare01,
+		s_spare02,
+		s_spare03,
+		s_spare04,
+		create_by,
+		create_date,
+		update_by,
+		update_date,
+		remarks,
+		del_flag
+		) VALUES (
+		#{id},
+		#{sExampaper.id},
+		#{sDepartment.id},
+		#{sExaminee.id},
+		#{dtStart},
+		#{dtSubmit},
+		#{sStat},
+		#{iReport},
+		#{sSpare01},
+		#{sSpare02},
+		#{sSpare03},
+		#{sSpare04},
+		#{createBy.id},
+		#{createDate},
+		#{updateBy.id},
+		#{updateDate},
+		#{remarks},
+		#{delFlag}
+		)
+	</insert>
+
+	<update id="update">
+		UPDATE pbs_examaction SET
+		s_exampaper =
+		#{sExampaper.id},
+		s_department =#{sDepartment.id},
+		s_examinee =
+		#{sExaminee.id},
+		dt_start = #{dtStart},
+		dt_submit = #{dtSubmit},
+		i_report = #{iReport},
+		s_stat = #{sStat},
+		update_by = #{updateBy.id},
+		update_date = #{updateDate},
+		remarks =
+		#{remarks}
+		WHERE id = #{id}
+	</update>
+
+	<update id="delete">
+		UPDATE pbs_examaction SET
+		del_flag =
+		#{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+
+	<select id="findListByIReport" resultType="PbsExamaction">
+		SELECT
+		a.id AS "id",
+		a.s_exampaper AS "sExampaper.id",
+		a.s_department AS
+		"sDepartment.id",
+		exampaper.s_name AS "sExampaper.sName",
+		a.s_examinee
+		AS "sExaminee.id",
+		mem.s_name AS "sExaminee.sName",
+		a.i_report AS
+		"iReport",
+		a.del_flag AS "delFlag",
+		ofc.name AS "sDepartment.name",
+		mem.s_photo AS "sExaminee.sPhoto"
+		FROM
+		pbs_examaction a
+		LEFT JOIN
+		pbs_partymem mem ON
+		mem.id = a.s_examinee
+		LEFT
+		JOIN sys_office ofc ON
+		ofc.id = a.s_department
+		LEFT JOIN pbs_exampaper
+		exampaper ON
+		exampaper.id = a.s_exampaper
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			AND mem.del_flag = #{DEL_FLAG_NORMAL}
+			AND a.s_stat = "1"
+			<if
+				test="sExampaper != null and sExampaper!= '' and sExampaper.id != null and sExampaper.id != ''">
+				AND exampaper.del_flag = #{DEL_FLAG_NORMAL}
+			</if>
+			<if
+				test="sExampaper != null and sExampaper!= '' and sExampaper.id != null and sExampaper.id != ''">
+				AND a.s_exampaper = #{sExampaper.id}
+			</if>
+			<if
+				test="sExaminee != null and sExaminee != '' and sExaminee.sName != null and sExaminee.sName != ''">
+				AND mem.s_name like "%${sExaminee.sName}%"
+			</if>
+		</where>
+		ORDER BY a.i_report DESC
+	</select>
+
+	<select id="findIReportByOfc" resultType="PbsExamaction">
+		SELECT
+		a.id AS "id",
+		a.s_exampaper AS "sExampaper.id",
+		a.s_department AS
+		"sDepartment.id",
+		exampaper.s_name AS "sExampaper.sName",
+		avg(a.i_report) AS "iReport",
+		count(a.i_report) AS "attends",
+		ofc.name
+		AS "sDepartment.name",
+		depE.s_imgurl AS "ofcphoto"
+		FROM
+		pbs_examaction a
+		LEFT JOIN sys_office ofc ON ofc.id = a.s_department
+		LEFT JOIN
+		pbs_exampaper exampaper ON exampaper.id = a.s_exampaper
+		LEFT JOIN
+		pbs_departmentetc depE ON depE.s_departmentid = ofc.id
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+            AND a.s_stat = "1"
+			<if
+				test="sExampaper != null and sExampaper!= '' and sExampaper.id != null and sExampaper.id != ''">
+				AND a.s_exampaper = #{sExampaper.id}
+			</if>
+			<if
+				test="sDepartment != null and sDepartment != '' and sDepartment.name != null and sDepartment.name != ''">
+				AND ofc.name like "%${sDepartment.name}%"
+			</if>
+
+		</where>
+		GROUP BY ofc.id
+		ORDER BY iReport DESC
+	</select>
+
+
+	<select id="findIntegrallist" resultType="PbsExamaction">
+		SELECT
+		a.id AS "id",
+		a.s_exampaper AS "sExampaper.id",
+		a.s_department AS
+		"sDepartment.id",
+		exampaper.s_name AS "sExampaper.sName",
+		a.s_examinee
+		AS "sExaminee.id",
+		mem.s_name AS "sExaminee.sName",
+		<!-- a.i_report AS "iReport", -->
+		count(a.i_report)*5 AS "times",
+		a.del_flag AS "delFlag",
+		ofc.name AS
+		"sDepartment.name",
+		mem.s_photo AS "sExaminee.sPhoto"
+		FROM
+		pbs_examaction a
+		LEFT JOIN pbs_partymem mem ON mem.id = a.s_examinee
+		LEFT JOIN sys_office ofc ON ofc.id = a.s_department
+		LEFT JOIN
+		pbs_exampaper exampaper ON exampaper.id = a.s_exampaper
+		LEFT JOIN
+		pbs_departmentetc depE ON depE.s_departmentid = ofc.id
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			AND mem.del_flag = #{DEL_FLAG_NORMAL}
+			AND a.s_stat = "1"
+			<if
+				test="beginHappenDate != null and endHappenDate != null and beginHappenDate != '' and endHappenDate != ''">
+				AND a.dt_submit BETWEEN #{beginHappenDate} AND #{endHappenDate}
+			</if>
+			<!-- AND period_diff(date_format(now(), '%Y%m'),date_format(a.create_date, '%Y%m')) = 1 -->
+		</where>
+		GROUP BY a.s_examinee
+		ORDER BY times DESC
+	</select>
+
+	<select id="findIntegralByOfc" resultType="PbsExamaction">
+		SELECT
+		a.id AS "id",
+		a.s_exampaper AS "sExampaper.id",
+		a.s_department AS
+		"sDepartment.id",
+		exampaper.s_name AS "sExampaper.sName",
+		count(a.i_report)*5 AS "iReport",
+		<!-- count(a.s_examinee) AS "attends", -->
+		ofc.name AS "sDepartment.name",
+		depE.s_imgurl AS "ofcphoto"
+		FROM
+		pbs_examaction a
+		LEFT JOIN pbs_partymem mem ON mem.id = a.s_examinee
+		LEFT JOIN sys_office ofc ON ofc.id = a.s_department
+		LEFT JOIN
+		pbs_exampaper exampaper ON exampaper.id = a.s_exampaper
+		LEFT JOIN
+		pbs_departmentetc depE ON depE.s_departmentid = ofc.id
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+            AND a.s_stat = "1"
+			<if
+				test="beginHappenDate != null and endHappenDate != null and beginHappenDate != '' and endHappenDate != ''">
+				AND a.dt_submit BETWEEN #{beginHappenDate} AND #{endHappenDate}
+			</if>
+			<!-- AND period_diff(date_format(now(), '%Y%m'),date_format(a.create_date, '%Y%m')) = 1 -->
+		</where>
+		GROUP BY ofc.id
+		ORDER BY iReport DESC
+	</select>
+	<select id="paperDetail" resultType="PbsExamaction">
+		SELECT
+			paper.s_name AS "sExampaper.sName",
+			paper.s_title AS "sExampaper.sTitle",
+			exam.i_report AS "i_report",
+			mem.s_name AS "sExaminee.sName",
+			mem.s_photo AS "sExaminee.sPhoto"
+		FROM
+			pbs_examaction exam
+		LEFT JOIN pbs_exampaper paper ON exam.s_exampaper = paper.id
+		LEFT JOIN pbs_partymem mem ON exam.s_examinee = mem.id
+		WHERE
+			exam.s_exampaper = #{paperId}
+		ORDER BY exam.i_report DESC
+	</select>
+</mapper>

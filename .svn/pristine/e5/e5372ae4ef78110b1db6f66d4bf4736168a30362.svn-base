@@ -1,0 +1,240 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.arjjs.ccm.modules.plm.contract.dao.PlmContractSignDao">
+    
+	<sql id="plmContractSignColumns">
+		a.id AS "id",
+		a.proc_ins_id AS "procInsId",
+		a.depart AS "depart.id",
+		a.apply_id AS "applyId",
+		a.apply_date AS "applyDate",
+		a.contract_name AS "contractName",
+		a.contract_id AS "contractId",
+		a.contract_type AS "contractType",
+		a.review_date AS "reviewDate",
+		a.head_id AS "user.id",
+		a.is_standard AS "isStandard",
+		a.provider AS "provider",
+		a.contract_money AS "contractMoney",
+		a.is_budget AS "isBudget",
+		a.supplier_id AS "supplier.id",
+		a.pur_text AS "purText",
+		a.describes AS "describes",
+		a.files AS "files",
+		a.type AS "type",
+		a.extend1 AS "extend1",
+		a.extend2 AS "extend2",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag",
+		u9.name AS "user.name",
+		o3.name As  "depart.name",
+		u12.name AS "createBy.name",
+		p.name AS "supplier.name"
+	</sql>
+	
+	<sql id="plmContractSignJoins">
+		LEFT JOIN sys_office o3 ON o3.id = a.depart
+		LEFT JOIN sys_user u9 ON u9.id = a.head_id
+		LEFT JOIN sys_user u12 ON u12.id = a.create_by
+		LEFT JOIN plm_provide_info p ON p.id = a.supplier_id
+	</sql>
+    
+	<select id="get" resultType="PlmContractSign">
+		SELECT 
+		
+			<include refid="plmContractSignColumns"/>
+		FROM plm_contract_sign a
+		
+		<include refid="plmContractSignJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	
+	<!-- 统计各个合同类型的数量 -->
+	<select id="contractTypeStatistic" parameterType="PlmPurchaseApply" resultType="java.util.HashMap">
+		SELECT 
+			count(a.id) AS value,
+			a.contract_type AS type
+		FROM plm_contract_sign a
+		<where>
+		 a.del_flag = #{DEL_FLAG_NORMAL}
+          <if test="depart != null and depart.id != null and depart.id != ''">
+				AND a.depart = #{depart.id}
+		</if>
+		and YEAR(create_date)=YEAR(NOW())
+		</where>
+		GROUP BY a.contract_type
+	</select>
+	
+	
+	<select id="getByProcInsId" resultType="PlmPurchaseApply">
+		SELECT 
+			<include refid="plmContractSignColumns"/>
+		FROM plm_contract_sign a
+		<include refid="plmContractSignJoins"/>
+		WHERE a.proc_ins_id = #{procInsId}
+	</select>
+	
+	<update id="updateProcInsId">
+		UPDATE plm_contract_sign SET 
+			proc_ins_id = #{procInsId},
+			update_by = #{updateBy.id}, 
+			update_date = #{updateDate}
+		WHERE id = #{id}
+	</update>
+	
+	<select id="findList" resultType="PlmContractSign">
+		SELECT 
+		act.status AS "plmAct.status",
+			<include refid="plmContractSignColumns"/>
+		FROM plm_contract_sign a
+		LEFT JOIN plm_act act ON a.id = act.table_id
+		<include refid="plmContractSignJoins"/>
+		
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			 AND a.create_by = #{currentUser.id}
+			 <if test="applyId != null and applyId != ''">
+				AND a.apply_id = #{applyId}
+			</if>
+			<if test="depart != null and depart.id != null and depart.id != ''">
+				AND a.depart = #{depart.id}
+			</if>
+			
+			<if test="contractName != null and contractName != ''">
+				AND a.contract_name LIKE 
+					<if test="dbName == 'oracle'">'%'||#{contractName}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{contractName}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{contractName},'%')</if>
+			</if>
+			<if test="contractType != null and contractType != ''">
+				AND a.contract_type = #{contractType}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="PlmContractSign">
+		SELECT 
+			<include refid="plmContractSignColumns"/>
+		FROM plm_contract_sign a
+		<include refid="plmContractSignJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO plm_contract_sign(
+			id,
+			proc_ins_id,
+			depart,
+			apply_id,	
+			apply_date,
+			contract_name,
+			contract_id,
+			contract_type,
+			review_date,
+			head_id,
+			is_standard,
+			provider,
+			contract_money,
+			is_budget,
+			supplier_id,
+			pur_text,
+			describes,
+			files,
+			type,
+			extend1,
+			extend2,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag
+		) VALUES (
+			#{id},
+			#{procInsId},
+			#{depart.id},
+			 #{applyId},	
+			#{applyDate},
+			#{contractName},
+			#{contractId},
+			#{contractType},
+			#{reviewDate},
+			#{user.id},
+			#{isStandard},
+			#{provider},
+			#{contractMoney},
+			#{isBudget},
+			#{supplier.id},
+			#{purText},
+			#{describes},
+			#{files},
+			#{type},
+			#{extend1},
+			#{extend2},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE plm_contract_sign SET 	
+			proc_ins_id = #{procInsId},
+			depart = #{depart.id},
+			apply_id = #{applyId},	
+			apply_date = #{applyDate},
+			contract_name = #{contractName},
+			contract_id = #{contractId},
+			contract_type = #{contractType},
+			review_date = #{reviewDate},
+			head_id = #{user.id},
+			is_standard = #{isStandard},
+			provider = #{provider},
+			contract_money = #{contractMoney},
+			is_budget = #{isBudget},
+			supplier_id = #{supplier.id},
+			pur_text = #{purText},
+			describes = #{describes},
+			files = #{files},
+			type = #{type},
+			extend1 = #{extend1},
+			extend2 = #{extend2},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE plm_contract_sign SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

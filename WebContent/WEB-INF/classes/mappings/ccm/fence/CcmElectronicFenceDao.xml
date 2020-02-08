@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.arjjs.ccm.modules.ccm.fence.dao.CcmElectronicFenceDao">
+
+	<sql id="ccmElectronicFenceColumns">
+		a.id AS "id",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag",
+		a.fence_name AS "fenceName",
+		a.alarm_rule AS "alarmRule",
+		a.start_time AS "startTime",
+		a.end_time AS "endTime",
+		a.area_point AS "areaPoint",
+		a.area_map AS "areaMap",
+		a.gravity AS "gravity"
+	</sql>
+	<sql id="ccmElectronicFenceColumnsEX">
+		a.id AS "id",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag",
+		a.fence_name AS "fenceName",
+		a.alarm_rule AS "alarmRule",
+		a.start_time AS "startTime",
+		a.end_time AS "endTime",
+		a.gravity AS "gravity",
+		a.area_point AS "areaPoint",
+		a.area_map AS "areaMap",
+		b.device_id AS "deviceId"
+	</sql>
+	<sql id="ccmElectronicFenceJoins">
+	</sql>
+
+	<select id="get" resultType="CcmElectronicFence">
+		SELECT
+			<include refid="ccmElectronicFenceColumns"/>
+		FROM ccm_electronic_fence a
+		<include refid="ccmElectronicFenceJoins"/>
+		WHERE a.id = #{id}
+	</select>
+
+	<select id="findList" resultType="CcmElectronicFence">
+		SELECT
+			<include refid="ccmElectronicFenceColumns"/>
+		FROM ccm_electronic_fence a
+		<include refid="ccmElectronicFenceJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="fenceName != null and fenceName != ''">
+				AND a.fence_name LIKE
+					<if test="dbName == 'oracle'">'%'||#{fenceName}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{fenceName}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{fenceName},'%')</if>
+			</if>
+			<if test="alarmRule != null and alarmRule != ''">
+				AND a.alarm_rule = #{alarmRule}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+
+	<select id="findAllList" resultType="CcmElectronicFence">
+		SELECT
+			<include refid="ccmElectronicFenceColumns"/>
+		FROM ccm_electronic_fence a
+		<include refid="ccmElectronicFenceJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+
+	<insert id="insert">
+		INSERT INTO ccm_electronic_fence(
+			id,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag,
+			fence_name,
+			alarm_rule,
+			start_time,
+			end_time,
+			area_point,
+			area_map,
+			gravity
+		) VALUES (
+			#{id},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag},
+			#{fenceName},
+			#{alarmRule},
+			#{startTime},
+			#{endTime},
+			#{areaPoint},
+			#{areaMap},
+			#{gravity}
+		)
+	</insert>
+
+	<update id="update">
+		UPDATE ccm_electronic_fence SET
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks},
+			fence_name = #{fenceName},
+			alarm_rule = #{alarmRule},
+			start_time = #{startTime},
+			end_time = #{endTime},
+			area_point = #{areaPoint},
+			area_map = #{areaMap},
+			gravity = #{gravity}
+		WHERE id = #{id}
+	</update>
+
+	<update id="delete">
+		UPDATE ccm_electronic_fence SET
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+
+</mapper>

@@ -1,0 +1,126 @@
+<%@ page contentType="text/html;charset=UTF-8" %>
+<%@ include file="/WEB-INF/views/include/taglib.jsp"%>
+<html>
+<head>
+	<title>社情民意调查管理</title>
+	<meta name="decorator" content="default"/>
+	<script type="text/javascript">
+		$(document).ready(function() {
+			$("#btnSubmit").on("click" ,function(){
+				$("#searchForm").submit();
+			})
+		});
+		$(function() {
+			$("#btnExport").click(
+					function() {
+						top.$.jBox.confirm("是否下载模板？", "系统提示", function(v, h, f) {
+							if (v == "ok") {
+								// 借用导出action
+								$("#searchForm").attr("action",
+										ctx + "/report/riskMassesOpinion/export");
+								$("#searchForm").submit();
+								// 还原查询action 
+								$("#searchForm").attr("action",
+										ctx + "/report/riskMassesOpinion/");
+							}
+						}, {
+							buttonsFocus : 1
+						});
+						top.$('.jbox-body .jbox-icon').css('top', '55px');
+					});
+			
+		});
+
+		function page(n, s) {
+			$("#pageNo").val(n);
+			$("#pageSize").val(s);
+			$("#searchForm").submit();
+			return false;
+		}
+	</script>
+</head>
+<body>
+	<ul class="nav nav-tabs">
+		<li class="active"><a href="${ctx}/report/riskMassesOpinion/">社情民意调查列表</a></li>
+		<shiro:hasPermission name="report:riskMassesOpinion:edit"><li><a href="${ctx}/report/riskMassesOpinion/form">社情民意调查添加</a></li></shiro:hasPermission>
+	</ul>
+	<form:form id="searchForm" modelAttribute="riskMassesOpinion" action="${ctx}/report/riskMassesOpinion/" method="post" class="breadcrumb form-search">
+		<input id="pageNo" name="pageNo" type="hidden" value="${page.pageNo}"/>
+		<input id="pageSize" name="pageSize" type="hidden" value="${page.pageSize}"/>
+		<ul class="ul-form">
+			<li><label>所属重大事项：</label>
+				<sys:treeselect id="riskEventGreat" name="riskEventGreat.id" value="${riskMassesOpinion.riskEventGreat.id}" labelName="riskEventGreat.name" labelValue="${riskMassesOpinion.riskEventGreat.name}"
+					title="重大事项" url="/report/riskIncident/treeData" cssClass="" allowClear="true" notAllowSelectParent="true" cssStyle="width: 150px"/>
+			</li>
+			<li><label>类型：</label>
+				<form:select path="type" class="input-medium">
+					<form:option value="" label="全部"/>
+					<form:options items="${fns:getDictList('risk_masses_opinion_type')}" itemLabel="label" itemValue="value" htmlEscape="false"/>
+				</form:select>
+			</li>
+			<li><label>提交人：</label>
+				<sys:treeselect id="updateBy" name="updateBy.id" value="${riskMassesOpinion.updateBy.id}" labelName="updateBy.name" labelValue="${riskMassesOpinion.updateBy.name}"
+					title="用户" url="/sys/office/treeData?type=3" cssClass="input-small" allowClear="true" notAllowSelectParent="true"/>
+			</li>
+			<li><label>提交时间：</label>
+				<input name="beginUpdateDate" type="text" readonly="readonly" maxlength="20" class="input-medium Wdate"
+					value="<fmt:formatDate value="${riskMassesOpinion.beginUpdateDate}" pattern="yyyy-MM-dd HH:mm:ss"/>"
+					onclick="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss',isShowClear:false});"/> - 
+				<input name="endUpdateDate" type="text" readonly="readonly" maxlength="20" class="input-medium Wdate"
+					value="<fmt:formatDate value="${riskMassesOpinion.endUpdateDate}" pattern="yyyy-MM-dd HH:mm:ss"/>"
+					onclick="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss',isShowClear:false});"/>
+			</li>
+			<li class="btns">
+				<a class="btn btn-primary" href="${ctx}/report/riskMassesOpinion/export"
+								onclick="return confirmx('是否下载模板？', this.href)"  title="下载模板">下载模板</a>
+				<!-- <input id="btnSubmit" class="btn btn-primary" type="submit" value="查询"/> -->
+				<a href="javascript:;" id="btnSubmit" class="btn btn-primary">
+                <i class="icon-search"></i> 查询 </a>
+			</li>
+		</ul>
+	</form:form>
+	<sys:message content="${message}"/>
+	<table id="contentTable" class="table table-striped table-bordered table-condensed">
+		<thead>
+			<tr>
+				<th>问卷名称</th>
+				<th>所属重大事项</th>
+				<th>类型</th>
+				<th>提交人</th>
+				<th>提交时间</th>
+				<th>备注信息</th>
+				<shiro:hasPermission name="report:riskMassesOpinion:edit"><th>操作</th></shiro:hasPermission>
+			</tr>
+		</thead>
+		<tbody>
+		<c:forEach items="${page.list}" var="riskMassesOpinion">
+			<tr>
+				<td><a href="${ctx}/report/riskMassesOpinion/form?id=${riskMassesOpinion.id}">
+					${riskMassesOpinion.fileName}
+				</a></td>
+				<td>
+					${riskMassesOpinion.riskEventGreat.name}
+				</td>
+				<td>
+					${fns:getDictLabel(riskMassesOpinion.type, 'risk_masses_opinion_type', '')}
+				</td>
+				<td>
+					${riskMassesOpinion.updateBy.name}
+				</td>
+				<td>
+					<fmt:formatDate value="${riskMassesOpinion.updateDate}" pattern="yyyy-MM-dd HH:mm:ss"/>
+				</td>
+				<td class="tp">
+					${riskMassesOpinion.remarks}
+				</td>
+				<shiro:hasPermission name="report:riskMassesOpinion:edit"><td>
+    				<a class="btnList" href="${ctx}/report/riskMassesOpinion/form?id=${riskMassesOpinion.id}" title="修改"><i class="icon-pencil"></i></a>
+					<a class="btnList" href="${ctx}/report/riskMassesOpinion/delete?id=${riskMassesOpinion.id}" onclick="return confirmx('确认要删除该社情民意调查吗？', this.href)" title="删除"><i class="icon-remove-sign"></i></a>
+				</td></shiro:hasPermission>
+			</tr>
+		</c:forEach>
+		</tbody>
+	</table>
+	<div class="pagination">${page}</div>
+</body>
+</html>

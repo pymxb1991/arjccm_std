@@ -1,0 +1,172 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.arjjs.ccm.modules.plm.resource.dao.PlmResourceDao">
+    
+	<sql id="plmResourceColumns">
+		a.id AS "id",
+		a.us_id AS "user.id",
+		a.name AS "name",
+		a.body AS "body",
+		a.file AS "file",
+		a.type AS "type",
+		a.img AS "img",
+		a.re_date AS "reDate",
+		a.extend1 AS "extend1",
+		a.extend2 AS "extend2",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag",
+		u3.name AS "user.name"
+	</sql>
+	
+	<sql id="plmResourceJoins">
+	LEFT JOIN sys_user u3 ON u3.id = a.us_id
+	LEFT JOIN plm_resource_user u ON u.r_id = a.id
+	</sql>
+    
+	<select id="get" resultType="PlmResource">
+		SELECT DISTINCT
+			<include refid="plmResourceColumns"/>
+		FROM plm_resource a
+		<include refid="plmResourceJoins"/>
+		WHERE a.id = #{id} 
+	</select>
+	<select id="findListAllById" resultType="PlmResource">
+		SELECT 
+			<include refid="plmResourceColumns"/>
+		FROM plm_resource a
+		<include refid="plmResourceJoins"/>
+		<where>
+		u.u_id=#{uId} 
+		AND a.type = "03"
+		AND a.del_flag = "0" AND u.del_flag = "0" 
+		</where> 
+	</select>
+	<select id="findListById" resultType="PlmResource">
+		SELECT
+			<include refid="plmResourceColumns"/>
+			FROM plm_resource a
+			<include refid="plmResourceJoins"/>
+			where 
+		u.u_id=#{currentUser.id} AND a.del_flag = "0" AND u.del_flag = "0" AND  u.r_id = #{id}
+	</select>
+	<select id="findList" resultType="PlmResource">
+		SELECT 
+			<include refid="plmResourceColumns"/>
+		FROM plm_resource a
+		LEFT JOIN sys_user u3 ON u3.id = a.us_id
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="name != null and name != ''">
+				AND a.name LIKE 
+					<if test="dbName == 'oracle'">'%'||#{name}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{name}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{name},'%')</if>
+			</if>
+			<if test="updateBy != null and updateBy != ''">
+				AND a.update_by = #{updateBy.id} 
+			</if>
+			<if test="type != null and type != ''">
+				AND a.type = #{type}
+			</if>
+			<if test="types != null and types !=''">
+				AND a.type != #{types}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="PlmResource">
+		SELECT 
+			<include refid="plmResourceColumns"/>
+		FROM plm_resource a
+		<include refid="plmResourceJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO plm_resource(
+			id,
+			us_id,
+			name,
+			body,
+			file,
+			type,
+			img,
+			re_date,
+			extend1,
+			extend2,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag
+		) VALUES (
+			#{id},
+			#{user.id},
+			#{name},
+			#{body},
+			#{file},
+			#{type},
+			#{img},
+			#{reDate},
+			#{extend1},
+			#{extend2},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE plm_resource SET 	
+			name = #{name},
+			us_id = #{user.id},
+			body = #{body},
+			file = #{file},
+			type = #{type},
+			img = #{img},
+			re_date = #{reDate},
+			extend1 = #{extend1},
+			extend2 = #{extend2},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+	<update id="updateType">
+	UPDATE plm_resource SET
+	type = "03"
+	WHERE id = #{id}
+	</update>
+	<update id="delete">
+		UPDATE plm_resource SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

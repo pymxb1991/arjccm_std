@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.arjjs.ccm.modules.ccm.event.dao.CcmAlarmLogDao">
+    
+	<sql id="ccmAlarmLogColumns">
+		a.id AS "id",
+		a.obj_table AS "objTable",
+		a.obj_id AS "objId",
+		a.alarm_type AS "alarmType",
+		a.param AS "param",
+		a.create_by AS "createBy.id",
+		a18.name AS "createBy.name",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag"
+	</sql>
+	
+	<sql id="ccmAlarmLogJoins">
+		LEFT JOIN sys_user a18 ON a18.id = a.create_by
+	</sql>
+    
+	<select id="get" resultType="CcmAlarmLog">
+		SELECT 
+			<include refid="ccmAlarmLogColumns"/>
+		FROM ccm_alarm_log a
+		<include refid="ccmAlarmLogJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="CcmAlarmLog">
+		SELECT 
+			<include refid="ccmAlarmLogColumns"/>
+		FROM ccm_alarm_log a
+		<include refid="ccmAlarmLogJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="alarmType != null and alarmType != ''">
+				AND a.alarm_type = #{alarmType}
+			</if>
+			<if test="beginCreateDate != null and beginCreateDate != ''">
+				AND a.create_date &gt;= #{beginCreateDate}
+			</if>
+			<if test="endCreateDate != null and endCreateDate != ''">
+				AND a.create_date &lt;= #{endCreateDate}
+			</if>
+			<if test="remarks != null and remarks != ''">
+				AND a.remarks LIKE 
+					<if test="dbName == 'oracle'">'%'||#{remarks}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{remarks}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{remarks},'%')</if>
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	<!-- 查找判断是否越界告警 -->
+	<select id="findListOverstep" resultType="CcmAlarmLog">
+		SELECT 
+			<include refid="ccmAlarmLogColumns"/>
+		FROM ccm_alarm_log a
+		<include refid="ccmAlarmLogJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			AND a.obj_table = 'ccm_mobile_device'
+			AND a.alarm_type = #{alarmType}
+			AND a.create_by = #{createBy.id}
+			AND a.obj_id = #{objId}
+			AND (a.create_date &gt; date_format(
+					DATE_SUB(curdate()
+					, INTERVAL 0
+					DAY), '%Y-%m-%d')
+					AND
+					a.create_date &lt;
+					date_format( DATE_SUB(curdate(),
+					INTERVAL - 1
+					DAY), '%Y-%m-%d'))
+		</where>
+	</select>
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	<!--  -->
+	<select id="findAllList" resultType="CcmAlarmLog">
+		SELECT 
+			<include refid="ccmAlarmLogColumns"/>
+		FROM ccm_alarm_log a
+		<include refid="ccmAlarmLogJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO ccm_alarm_log(
+			id,
+			obj_table,
+			obj_id,
+			alarm_type,
+			param,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag
+		) VALUES (
+			#{id},
+			#{objTable},
+			#{objId},
+			#{alarmType},
+			#{param},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE ccm_alarm_log SET 	
+			alarm_type = #{alarmType},
+			param = #{param},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE ccm_alarm_log SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

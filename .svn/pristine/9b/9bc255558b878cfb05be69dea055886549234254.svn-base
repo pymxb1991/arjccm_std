@@ -1,0 +1,109 @@
+
+<html>
+<head>
+
+	<title>公文收发申请单</title>
+	<meta name="decorator" content="default"/>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<style type="text/css">
+	body{
+	margin-left: 45px;
+	margin-right: 45px;
+	font-family: Arial Unicode MS;
+	font-size: 10px;
+	}
+	h2{
+		margin:0 auto;
+		text-align: center;
+	}	
+	table {
+	
+    border-spacing: 0;
+    margin: auto;
+	width: 100%;
+	border-collapse: collapse;
+	border: 1px solid #444444;
+	}
+	.table td {
+	height: 40px;	
+}
+  .table .shenpi{
+	height: auto;	
+}
+	#table td{
+	
+	  border: 1px solid black;
+	 word-wrap:break-word; 
+	 max-width: 80%;
+	  word-break:break-all;
+     word-wrap:break-word;
+	}
+	#tabletop { 
+	border: 0px
+	}
+	#tabletop .tabletop {
+	border-top: 0px  ;
+	}		
+	.table .trtop{		
+		text-align:center;
+		font-weight:800 ;
+		
+	}	
+	</style>
+</head>
+<body>
+	<form id="inputForm"  class="form-horizontal" >
+		<h2>公文收发申请单</h2>
+		<table id="tabletop" class="table">
+			<tr>
+				<td class="tabletop" colspan="2">申请编号:<u><span>${code!''}</span></u></td>
+				<td class="tabletop" colspan="2">密级:<u> <span>${confidentiality!''}</span></u></td>
+				<td class="tabletop" colspan="2">申请日期： <u> <span>${date!''}</span></u></td>
+			</tr>
+		</table>
+		<table id="table" class="table   table-condensed">
+			<tr>
+				<td class="trtop" >标题</td>
+				<td colspan="5">${title!''}</td>
+			</tr>
+			<tr>
+				<td class="trtop" >文案类型</td>
+				<td colspan="2" style="width: 25%">${documentType!''}</td>
+				<td class="trtop"  style="width: 25%">保密期限</td>
+				<td colspan="2">${deadline!''}</td>
+			</tr>
+			<tr>
+				<td class="trtop" >紧急程度</td>
+				<td colspan="2">${urgent!''}</td>
+				<td class="trtop" >发送单位</td>
+				<td colspan="2">${fromDept.name!''}</td>
+			</tr>
+			<tr>
+				<td class="trtop" >联合行文单位</td>
+				<td colspan="2">${associatedDept.name!''}</td>
+				<td class="trtop">接收单位</td>
+				<td colspan="2">${toDept.name!''}</td>
+			</tr>
+			<tr>
+				<td class="trtop">申请原因 ：</td>
+				<td colspan="5">${applyBody!''}</td>
+			</tr>
+			<tr>
+				<td class="trtop">备注：</td>
+				<td colspan="5">${remarks!''}</td>
+			</tr>
+			<tr>
+				<td class="trtop" colspan="1" style="width: 20%">是否督办</td>
+				<td colspan="2" style="width: 30%">${isSup!''}</td>
+				<td class="trtop" colspan="1" style="width: 20%">督办人</td>
+				<td colspan="2" style="width: 30%">${plmAct.supExe.name!''}</td>
+			</tr>		
+			<tr>
+				<td class="trtop" colspan="1">督办明细</td>
+				<td colspan="5">${plmAct.supDetail!''}</td>
+			</tr>			
+		     ${actProcIns!''}
+	</table>
+	</form>
+</body>
+</html>

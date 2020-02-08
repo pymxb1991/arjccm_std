@@ -1,0 +1,172 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.arjjs.ccm.modules.ccm.citycomponents.dao.CcmLandDao">
+    
+	<sql id="ccmLandColumns">
+		a.id AS "id",
+		a.name AS "name",
+		a.code AS "code",
+		a.area_id AS "area.id",
+		a.address AS "address",
+		a.land_area AS "landArea",
+		a.user AS "user",
+		a.land_usage AS "landUsage",
+		a.type AS "type",
+		a.life_time AS "lifeTime",
+		a.area_map AS "areaMap",
+		a.area_point AS "areaPoint",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag",
+		a4.name AS "area.name"
+	</sql>
+	
+	<sql id="ccmLandJoins">
+		LEFT JOIN sys_area a4 ON a4.id = a.area_id
+	</sql>
+    
+	<select id="get" resultType="CcmLand">
+		SELECT 
+			<include refid="ccmLandColumns"/>
+		FROM ccm_land a
+		<include refid="ccmLandJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="CcmLand">
+		SELECT 
+			<include refid="ccmLandColumns"/>
+		FROM ccm_land a
+		<include refid="ccmLandJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="name != null and name != ''">
+				AND a.name LIKE 
+					<if test="dbName == 'oracle'">'%'||#{name}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{name}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{name},'%')</if>
+			</if>
+			<if test="code != null and code != ''">
+				AND a.code LIKE 
+					<if test="dbName == 'oracle'">'%'||#{code}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{code}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{code},'%')</if>
+			</if>
+			<if test="area != null and area.id != null and area.id != ''">
+				AND a.area_id = #{area.id}
+			</if>
+			<if test="landUsage != null and landUsage != ''">
+				AND a.land_usage = #{landUsage}
+			</if>
+			<if test="type != null and type != ''">
+				AND a.type = #{type}
+			</if>
+			<if test="more1 != null and more1 != ''">
+                AND  (${more1})
+            </if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="CcmLand">
+		SELECT 
+			<include refid="ccmLandColumns"/>
+		FROM ccm_land a
+		<include refid="ccmLandJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO ccm_land(
+			id,
+			name,
+			code,
+			area_id,
+			address,
+			land_area,
+			user,
+			land_usage,
+			type,
+			life_time,
+			area_map,
+			area_point,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag
+		) VALUES (
+			#{id},
+			#{name},
+			#{code},
+			#{area.id},
+			#{address},
+			#{landArea},
+			#{user},
+			#{landUsage},
+			#{type},
+			#{lifeTime},
+			#{areaMap},
+			#{areaPoint},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE ccm_land SET 	
+			name = #{name},
+			code = #{code},
+			area_id = #{area.id},
+			address = #{address},
+			land_area = #{landArea},
+			user = #{user},
+			land_usage = #{landUsage},
+			type = #{type},
+			life_time = #{lifeTime},
+			area_map = #{areaMap},
+			area_point = #{areaPoint},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE ccm_land SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="updateCoordinates">
+        UPDATE ccm_land SET  
+            area_map = #{areaMap},
+            area_point = #{areaPoint} 
+        WHERE id = #{id}
+    </update>
+</mapper>

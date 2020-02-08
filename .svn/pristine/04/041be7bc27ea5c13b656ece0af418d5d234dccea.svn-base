@@ -1,0 +1,197 @@
+package com.arjjs.ccm.modules.ccm.index.web;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.arjjs.ccm.common.web.BaseController;
+import com.arjjs.ccm.modules.ccm.index.service.IndexChartService;
+
+@RestController
+@RequestMapping(value = "${adminPath}/index/chart")
+public class IndexChartController extends BaseController {
+
+	@Autowired
+	private IndexChartService indexChartService;
+
+	@RequestMapping("solveEvent")
+	public Object oneYearSolveEvent() {
+		return indexChartService.oneYearSolveEvent();
+	}
+
+	/**
+	 * 描述：矛盾纠纷数量查询
+	 * 
+	 * @return
+	 */
+	@RequestMapping(value = "byStatus")
+	public Object findCountByStatus() {
+		return indexChartService.indexChartService();
+	}
+
+	/**
+	 * 描述：综治机构数量查询
+	 * 
+	 * @return
+	 */
+	@RequestMapping(value = "findOfficeCount")
+	public Object findOfficeCount() {
+		return indexChartService.findOfficeCount();
+	}
+
+	/**
+	 * 描述：综治机构队伍数量查询
+	 * 
+	 * @return
+	 */
+	@RequestMapping(value = "findTeamCount")
+	public Object findTeamCount() {
+		return indexChartService.findTeamCount();
+	}
+
+	/**
+	 * 描述：首页统计两新组织数量
+	 * 
+	 * @return
+	 */
+	@RequestMapping(value = "findCountByCompType")
+	public Object findCountByCompType() {
+		return indexChartService.findCountByCompType();
+	}
+
+	/**
+	 * 描述：首页统计护线护路案件数量
+	 * 
+	 * @return
+	 */
+	@RequestMapping(value = "findCountLineProtect")
+	public Object findCountLineProtect() {
+		return indexChartService.findCountLineProtect();
+	}
+
+	/**
+	 * 描述：首页统计护线护路数量统计
+	 * 
+	 * @return
+	 */
+	@RequestMapping(value = "findCountLine")
+	public Object findCountLine() {
+		return indexChartService.findCountLine();
+	}
+
+	/**
+	 * 描述：首页校园数量统计
+	 * 
+	 * @return
+	 */
+	@RequestMapping(value = "findCountSchool")
+	public Object findCountSchool() {
+		return indexChartService.findCountSchool();
+	}
+
+	/**
+	 * 描述：首页校园师生安全数量统计
+	 * 
+	 * @return
+	 */
+	@RequestMapping(value = "findCountSchoolPeople")
+	public Object findCountSchoolPeople() {
+		return indexChartService.findCountSchoolPeople();
+	}
+
+	/**
+	 * 描述：首页重点人员数量统计
+	 * 
+	 * @return
+	 */
+	@RequestMapping(value = "findCountPeopleForType")
+	public Object findCountPeopleForType() {
+		return indexChartService.findCountPeopleForType();
+	}
+
+	/**
+	 * 描述：首页实有人口数量统计（户籍信息 。流动信息。 境外信息）
+	 * 
+	 * @return
+	 */
+	@ResponseBody
+	@RequestMapping(value = "findCountByType")
+	public Object findCountByType() {
+		return indexChartService.findCountByType();
+	}
+
+	/**
+	 * 描述：首页实有人口数量统计
+	 * 
+	 * @return
+	 */
+	@RequestMapping(value = "findCountByUniformlogo")
+	public Object findCountByUniformlogo() {
+		return indexChartService.findCountByUniformlogo();
+	}
+
+	/**
+	 * 描述：首页实有房屋数量统计
+	 * 
+	 * @return
+	 */
+	@RequestMapping(value = "findCountByHouseType")
+	public Object findCountByHouseType() {
+		return indexChartService.findCountByHouseType();
+	}
+
+	/**
+	 * 描述：首页地址库数量统计
+	 * 
+	 * @return
+	 */
+	@RequestMapping(value = "findCountAddressLibrary")
+	public Object findCountAddressLibrary() {
+		return indexChartService.findCountAddressLibrary();
+	}
+
+	/**
+	 * 描述：首页出租房屋数量统计
+	 * 
+	 * @return
+	 */
+	@ResponseBody
+	@RequestMapping(value = "findCountByHousePrup")
+	public Object findCountByHousePrup() {
+		return indexChartService.findCountByHousePrup();
+	}
+
+	/**
+	 * 查询建筑物数量
+	 * 
+	 * @return
+	 */
+	@ResponseBody
+	@RequestMapping(value = "findCountByconstruction")
+	public Object findCountByconstruction() {
+		return indexChartService.findCountByconstruction();
+	}
+
+	/**
+	 * 查询街路巷数量
+	 * 
+	 * @return
+	 */
+	@ResponseBody
+	@RequestMapping(value = "streetRoadLane")
+	public Object streetRoadLane() {
+		return indexChartService.streetRoadLane();
+	}
+
+	/**
+	 * 查询重点场所
+	 * @return
+	 */
+	@ResponseBody
+	@RequestMapping(value = "findKeyPlace")
+	public Object findKeyPlace() {
+		return indexChartService.findKeyPlace();
+	}
+
+}

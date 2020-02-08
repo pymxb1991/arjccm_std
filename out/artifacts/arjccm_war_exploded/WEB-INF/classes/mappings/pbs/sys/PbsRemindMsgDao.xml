@@ -1,0 +1,182 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.arjjs.ccm.modules.pbs.sys.dao.PbsRemindMsgDao">
+
+	<sql id="pbsRemindMsgColumns">
+		a.id AS "id",
+		a.s_funcionid AS "sFuncionid",
+		a.s_dataid AS
+		"sDataid",
+		a.s_content AS "sContent",
+		a.s_acceptorid AS
+		"sAcceptorid.id",
+		mem.s_name AS "sAcceptorid.sName",
+		a.s_stat AS
+		"sStat",
+		a.s_senderid AS "sSenderid.id",
+		memS.s_name aS
+		"sSenderid.sName",
+		a.s_spare01 AS "sSpare01",
+		a.s_spare02 AS "sSpare02",
+		a.s_spare03 AS "sSpare03",
+		a.s_spare04 AS
+		"sSpare04",
+		a.create_by AS
+		"createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS
+		"updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks
+		AS "remarks",
+		a.del_flag AS "delFlag"
+	</sql>
+
+	<sql id="pbsRemindMsgJoins">
+		LEFT JOIN pbs_partymem mem ON mem.id = a.s_acceptorid
+		LEFT
+		JOIN pbs_partymem memS ON memS.id = a.s_senderid
+	</sql>
+
+	<select id="get" resultType="PbsRemindMsg">
+		SELECT
+		<include refid="pbsRemindMsgColumns" />
+		FROM pbs_remind_msg a
+		<include refid="pbsRemindMsgJoins" />
+		WHERE a.id = #{id}
+	</select>
+
+	<select id="findList" resultType="PbsRemindMsg">
+		SELECT
+		<include refid="pbsRemindMsgColumns" />
+		FROM pbs_remind_msg a
+		<include refid="pbsRemindMsgJoins" />
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="sFuncionid != null and sFuncionid != ''">
+				AND a.s_funcionid = #{sFuncionid}
+			</if>
+			<if test="sStat != null and sStat != ''">
+				AND a.s_stat = #{sStat}
+			</if>
+			<if
+                test="sAcceptorid != null and sAcceptorid != '' and sAcceptorid.id != null and sAcceptorid.id != ''">
+                AND a.s_acceptorid = #{sAcceptorid.id}
+            </if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+
+	<select id="findAllList" resultType="PbsRemindMsg">
+		SELECT
+		<include refid="pbsRemindMsgColumns" />
+		FROM pbs_remind_msg a
+		<include refid="pbsRemindMsgJoins" />
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+
+	<insert id="insert">
+		INSERT INTO pbs_remind_msg(
+		id,
+		s_funcionid,
+		s_dataid,
+		s_content,
+		s_acceptorid,
+		s_stat,
+		s_senderid,
+		create_by,
+		create_date,
+		update_by,
+		update_date,
+		remarks,
+		del_flag
+		) VALUES (
+		#{id},
+		#{sFuncionid},
+		#{sDataid},
+		#{sContent},
+		#{sAcceptorid.id},
+		#{sStat},
+		#{sSenderid.id},
+		#{createBy.id},
+		#{createDate},
+		#{updateBy.id},
+		#{updateDate},
+		#{remarks},
+		#{delFlag}
+		)
+	</insert>
+
+	<update id="update">
+		UPDATE pbs_remind_msg SET
+		s_funcionid = #{sFuncionid},
+		s_dataid = #{sDataid},
+		s_content = #{sContent},
+		s_acceptorid =
+		#{sAcceptorid.id},
+		s_stat = #{sStat},
+		s_senderid = #{sSenderid.id},
+		update_by = #{updateBy.id},
+		update_date = #{updateDate},
+		remarks =
+		#{remarks}
+		WHERE id = #{id}
+	</update>
+
+	<update id="delete">
+		UPDATE pbs_remind_msg SET
+		del_flag =
+		#{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+
+	<update id="updateStat">
+		UPDATE pbs_remind_msg SET
+		s_stat = #{sStat}
+		WHERE
+		s_funcionid = #{sFuncionid}
+		and s_dataid = #{sDataid}
+		and s_acceptorid =
+		#{sAcceptorid.id}
+	</update>
+
+
+	<select id="getCountNotice" resultType="java.lang.Integer">
+	SELECT
+	count(1)
+	FROM pbs_remind_msg a
+		<include refid="pbsRemindMsgJoins" />
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="sFuncionid != null and sFuncionid != ''">
+				AND a.s_funcionid = #{sFuncionid}
+			</if>
+			<if test="sDataid != null and sDataid != ''">
+				AND a.s_dataid = #{sDataid}
+			</if>
+			<if
+				test="sAcceptorid != null and sAcceptorid != '' and sAcceptorid.id != null and sAcceptorid.id != ''">
+				AND a.s_acceptorid = #{sAcceptorid.id}
+			</if>
+			AND a.s_stat = "0"
+		</where>
+	</select>
+
+</mapper>

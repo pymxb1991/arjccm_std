@@ -1,0 +1,47 @@
+/**
+ * Copyright &copy; 2012-2016 <a href="https://github.com/thinkgem/jeesite">JeeSite</a> All rights reserved.
+ */
+package com.arjjs.ccm.modules.ccm.shake.service;
+
+import java.util.List;
+
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.arjjs.ccm.common.persistence.Page;
+import com.arjjs.ccm.common.service.CrudService;
+import com.arjjs.ccm.modules.ccm.shake.entity.CcmShakePovertyPeople;
+import com.arjjs.ccm.modules.ccm.shake.dao.CcmShakePovertyPeopleDao;
+
+/**
+ * 脱贫攻坚实体类Service
+ * @author chenboyuan
+ * @version 2019-06-21
+ */
+@Service
+@Transactional(readOnly = true)
+public class CcmShakePovertyPeopleService extends CrudService<CcmShakePovertyPeopleDao, CcmShakePovertyPeople> {
+
+	public CcmShakePovertyPeople get(String id) {
+		return super.get(id);
+	}
+	
+	public List<CcmShakePovertyPeople> findList(CcmShakePovertyPeople ccmShakePovertyPeople) {
+		return super.findList(ccmShakePovertyPeople);
+	}
+	
+	public Page<CcmShakePovertyPeople> findPage(Page<CcmShakePovertyPeople> page, CcmShakePovertyPeople ccmShakePovertyPeople) {
+		return super.findPage(page, ccmShakePovertyPeople);
+	}
+	
+	@Transactional(readOnly = false)
+	public void save(CcmShakePovertyPeople ccmShakePovertyPeople) {
+		super.save(ccmShakePovertyPeople);
+	}
+	
+	@Transactional(readOnly = false)
+	public void delete(CcmShakePovertyPeople ccmShakePovertyPeople) {
+		super.delete(ccmShakePovertyPeople);
+	}
+	
+}

@@ -1,0 +1,46 @@
+package com.arjjs.ccm.tool;
+
+public class EchartType {
+
+	private String type;
+
+	private String typeO;
+	
+	private String value;
+	
+	private String value1;
+
+	
+	public String getValue1() {
+		return value1;
+	}
+
+	public void setValue1(String value1) {
+		this.value1 = value1;
+	}
+
+	public String getType() {
+		return type;
+	}
+
+	public void setType(String type) {
+		this.type = type;
+	}
+
+	public String getValue() {
+		return value;
+	}
+
+	public void setValue(String value) {
+		this.value = value;
+	}
+	
+	public String getTypeO() {
+		return typeO;
+	}
+
+	public void setTypeO(String typeO) {
+		this.typeO = typeO;
+	}
+
+}

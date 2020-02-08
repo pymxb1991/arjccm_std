@@ -1,0 +1,189 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.arjjs.ccm.modules.plm.calendar.dao.PlmCalendarDao">
+    
+	<sql id="plmCalendarColumns">
+		a.id AS "id",
+		a.subject AS "subject",
+		a.begin_date AS "beginDate",
+		a.begin_time AS "beginTime",
+		a.end_date AS "endDate",
+		a.end_time AS "endTime",
+		a.is_repeat AS "isRepeat",
+		a.round AS "round",
+		a.importance AS "importance",
+		a.priority AS "priority",
+		a.tag AS "tag",
+		a.state AS "state",
+		a.notify AS "notify",
+		a.spot AS "spot",
+		a.type AS "type",
+		a.extend1 AS "extend1",
+		a.extend2 AS "extend2",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag",
+		a.user_id AS "user.id",
+		
+		u18.name AS "user.name"
+	</sql>
+	
+	<sql id="plmCalendarJoins">
+LEFT JOIN sys_user u18 ON u18.id = a.user_id
+
+	</sql>
+    
+	<select id="get" resultType="PlmCalendar">
+		SELECT 
+			<include refid="plmCalendarColumns"/>
+		FROM plm_calendar a
+		<include refid="plmCalendarJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="PlmCalendar">
+		SELECT 
+			<include refid="plmCalendarColumns"/>
+		FROM plm_calendar a
+		<include refid="plmCalendarJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			
+			AND a.user_id =#{currentUser.id}
+			
+			<if test="subject != null and subject != ''">
+			
+				AND a.subject LIKE 
+					<if test="dbName == 'oracle'">'%'||#{subject}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{subject}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{subject},'%')</if>
+			</if>
+			<if test="beginBeginDate != null and endBeginDate != null and beginBeginDate != '' and endBeginDate != ''">
+				AND a.begin_date BETWEEN #{beginBeginDate} AND #{endBeginDate}
+			</if>
+			<if test="beginBeginDate != null  and beginBeginDate != ''and endBeginDate == null ">
+					
+			AND date_format(concat_ws(' ',a.begin_date,a.begin_time),'%Y-%c-%d %H:%i:%s')>= NOW()
+				
+			</if>
+			<if test="beginEndDate != null and endEndDate != null and beginEndDate != '' and endEndDate != ''">
+				AND a.end_Date BETWEEN #{beginEndDate} AND #{endEndDate}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy},a.begin_time DESC
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC ,a.begin_time   DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="PlmCalendar">
+		SELECT 
+			<include refid="plmCalendarColumns"/>
+		FROM plm_calendar a
+		<include refid="plmCalendarJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			AND a.user_id =#{currentUser.id}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				 ${page.orderBy},a.begin_time DESC
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC ,a.begin_time DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO plm_calendar(
+			id,
+			subject,
+			begin_date,
+			begin_time,
+			end_date,
+			end_time,
+			is_repeat,
+			round,
+			importance,
+			priority,
+			tag,
+			state,
+			notify,
+			spot,
+			type,
+			extend1,
+			extend2,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag,
+			user_id
+		) VALUES (
+			#{id},
+			#{subject},
+			#{beginDate},
+			#{beginTime},
+			#{endDate},
+			#{endTime},
+			#{isRepeat},
+			#{round},
+			#{importance},
+			#{priority},
+			#{tag},
+			#{state},
+			#{notify},
+			#{spot},
+			#{type},
+			#{extend1},
+			#{extend2},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag},
+			#{user.id}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE plm_calendar SET 	
+			subject = #{subject},
+			begin_date = #{beginDate},
+			begin_time = #{beginTime},
+			end_date = #{endDate},
+			end_time = #{endTime},
+			is_repeat = #{isRepeat},
+			round = #{round},
+			importance = #{importance},
+			priority = #{priority},
+			tag = #{tag},
+			state = #{state},
+			notify = #{notify},
+			spot = #{spot},
+			type = #{type},
+			extend1 = #{extend1},
+			extend2 = #{extend2},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE plm_calendar SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

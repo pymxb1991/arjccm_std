@@ -1,0 +1,348 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.arjjs.ccm.modules.ccm.event.dao.CcmEventKaccDao">
+    
+	<sql id="ccmEventKaccColumns">
+		a.id AS "id",
+		a.secu_place AS "secuPlace",
+		a.area_id AS "area.id",
+		a.secu_prob AS "secuProb",
+		a.dist_type AS "distType",
+		a.dist_scope AS "distScope",
+		a.comp_lead AS "compLead",
+		a.comp_part AS "compPart",
+		a.comp_prin_name AS "compPrinName",
+		a.comp_prin_phone AS "compPrinPhone",
+		a.abar_date AS "abarDate",
+		a.abar_solv_num AS "abarSolvNum",
+		a.abar_inve_num AS "abarInveNum",
+		a.abar_case AS "abarCase",
+		a.resu_asse AS "resuAsse",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag",
+		a3.name AS "area.name",
+		(case a.secu_prob 
+			when 01 then '命案' 
+			when 02 then '入室盗窃' 
+			when 03 then '抢劫抢夺' 
+			when 04 then '电信诈骗' 
+			when 05 then '拎包扒窃' 
+			when 06 then '偷盗机动车'
+			when 07 then '卖淫嫖娼' 
+			when 08 then '赌博' 
+			when 09 then '拐卖妇女儿童'
+			when 10 then '制假贩假' 
+			when 11 then '制黄贩黄' 
+			when 12 then '高利贷'
+			when 13 then '强买强卖'
+			when 14 then '交通秩序混乱' 
+			when 99 then '其他' 
+			else '' end) "secuProbLable"
+	</sql>
+	
+	<sql id="ccmEventKaccJoins">
+		LEFT JOIN sys_area a3 ON a3.id = a.area_id
+	</sql>
+    
+	<select id="get" resultType="CcmEventKacc">
+		SELECT 
+			<include refid="ccmEventKaccColumns"/>
+		FROM ccm_event_kacc a
+		<include refid="ccmEventKaccJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<!-- 治安突出问题统计 -->
+	<select id="findSafePage" resultType="com.arjjs.ccm.tool.EchartType">
+		SELECT
+			a.secu_prob AS "typeO",
+			b.label AS "type",
+			COUNT(*) AS "value"
+		FROM
+			ccm_event_kacc a
+		LEFT JOIN sys_dict b ON b.type = "ccm_sese_prob" AND a.secu_prob = b.value
+		LEFT JOIN sys_area cm ON cm.id = a.area_id
+		LEFT JOIN sys_config c ON c.id = 'system_level'
+		WHERE
+		a.del_flag = #{DEL_FLAG_NORMAL}
+		AND a.secu_prob is not null
+		AND a.secu_prob !=""
+		<if test="area != null and area.id != null and area.id != ''">
+		AND  
+			(
+				CASE c.param_str
+				WHEN '1' THEN cm.id = #{area.id}
+				WHEN '2' THEN cm.parent_id = #{area.id}
+				ELSE cm.parent_id = #{area.id}
+				END
+			)
+		</if>
+		<if test="beginCreateDate != null and endCreateDate != null and beginCreateDate != '' and endCreateDate != ''">
+			AND a.create_date BETWEEN #{beginCreateDate} AND
+			#{endCreateDate}
+		</if>
+		GROUP BY typeO
+	</select>
+	<!-- 涉及区域类型统计 -->
+	<select id="findAreaPage" resultType="com.arjjs.ccm.tool.EchartType">
+		SELECT
+			a.dist_type AS "typeO",
+			b.label AS "type",
+			COUNT(*) AS "value"
+		FROM
+			ccm_event_kacc a
+		LEFT JOIN sys_dict b ON b.type = "ccm_touc_regi" AND a.dist_type = b.value
+		LEFT JOIN sys_area cm ON cm.id = a.area_id
+		LEFT JOIN sys_config c ON c.id = 'system_level'
+		WHERE
+		a.del_flag = #{DEL_FLAG_NORMAL}
+		AND a.dist_type is not null
+		AND a.dist_type !=""
+		<if test="area != null and area.id != null and area.id != ''">
+		AND  
+			(
+				CASE c.param_str
+				WHEN '1' THEN cm.id = #{area.id}
+				WHEN '2' THEN cm.parent_id = #{area.id}
+				ELSE cm.parent_id = #{area.id}
+				END
+			)
+		</if>
+		<if test="beginCreateDate != null and endCreateDate != null and beginCreateDate != '' and endCreateDate != ''">
+			AND a.create_date BETWEEN #{beginCreateDate} AND
+			#{endCreateDate}
+		</if>
+		GROUP BY typeO
+	</select>
+	<!-- 效果评估统计 -->
+	<select id="findAssessPage" resultType="com.arjjs.ccm.tool.EchartType">
+		SELECT
+			a.resu_asse AS "typeO",
+			b.label AS "type",
+			COUNT(*) AS "value"
+		FROM
+			ccm_event_kacc a
+		LEFT JOIN sys_dict b ON b.type = "ccm_impa_eval" AND a.resu_asse = b.value
+		LEFT JOIN sys_area cm ON cm.id = a.area_id
+		LEFT JOIN sys_config c ON c.id = 'system_level'
+		WHERE
+		a.del_flag = #{DEL_FLAG_NORMAL}
+		AND a.resu_asse is not null
+		AND a.resu_asse !=""
+		<if test="area != null and area.id != null and area.id != ''">
+		AND  
+			(
+				CASE c.param_str
+				WHEN '1' THEN cm.id = #{area.id}
+				WHEN '2' THEN cm.parent_id = #{area.id}
+				ELSE cm.parent_id = #{area.id}
+				END
+			)
+		</if>
+		<if test="beginCreateDate != null and endCreateDate != null and beginCreateDate != '' and endCreateDate != ''">
+			AND a.create_date BETWEEN #{beginCreateDate} AND
+			#{endCreateDate}
+		</if>
+		GROUP BY typeO
+	</select>
+	<!-- 总数统计 -->
+	<select id="findLinePage" resultType="com.arjjs.ccm.tool.EchartType">
+		SELECT
+			CONCAT(
+				YEAR (a.create_date),
+				'_',
+				DATE_FORMAT(a.create_date, '%m')
+			) AS "type",
+			COUNT(*) AS "value"
+		FROM
+			ccm_event_kacc a
+		LEFT JOIN sys_area cm ON cm.id = a.area_id
+		LEFT JOIN sys_config c ON c.id = 'system_level'
+		WHERE
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			AND a.create_date is not null
+			AND a.create_date !=""
+			<if test="area != null and area.id != null and area.id != ''">
+			AND  
+			(
+				CASE c.param_str
+				WHEN '1' THEN cm.id = #{area.id}
+				WHEN '2' THEN cm.parent_id = #{area.id}
+				ELSE cm.parent_id = #{area.id}
+				END
+			)
+			</if>
+		AND (
+			a.create_date &gt; date_format(
+				DATE_SUB(curdate(), INTERVAL 5 MONTH),
+				'%Y-%m'
+			)
+			AND a.create_date &lt; date_format(
+				DATE_SUB(curdate(), INTERVAL - 1 MONTH),
+				'%Y-%m'
+			)
+		)
+		GROUP BY
+			concat(
+				YEAR (a.create_date),
+				MONTH (a.create_date)
+			)
+		ORDER BY
+			concat(
+				YEAR (a.create_date),
+		
+			IF (
+				MONTH (a.create_date) &gt; 9,
+				MONTH (a.create_date),
+				concat("0", MONTH(a.create_date))
+			)
+			) ASC
+		LIMIT 6
+	</select>
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	<!--  -->
+	<select id="findList" resultType="CcmEventKacc">
+		SELECT 
+			<include refid="ccmEventKaccColumns"/>
+		FROM ccm_event_kacc a
+		<include refid="ccmEventKaccJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="secuPlace != null and secuPlace != ''">
+				AND a.secu_place LIKE 
+					<if test="dbName == 'oracle'">'%'||#{secuPlace}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{secuPlace}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{secuPlace},'%')</if>
+			</if>
+			<if test="area != null and area.id != null and area.id != ''">
+				AND a.area_id = #{area.id}
+			</if>
+			<if test="secuProb != null and secuProb != ''">
+				AND a.secu_prob = #{secuProb}
+			</if>
+			<if test="distType != null and distType != ''">
+				AND a.dist_type = #{distType}
+			</if>
+			<if test="resuAsse != null and resuAsse != ''">
+				AND a.resu_asse = #{resuAsse}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="CcmEventKacc">
+		SELECT 
+			<include refid="ccmEventKaccColumns"/>
+		FROM ccm_event_kacc a
+		<include refid="ccmEventKaccJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO ccm_event_kacc(
+			id,
+			secu_place,
+			area_id,
+			secu_prob,
+			dist_type,
+			dist_scope,
+			comp_lead,
+			comp_part,
+			comp_prin_name,
+			comp_prin_phone,
+			abar_date,
+			abar_solv_num,
+			abar_inve_num,
+			abar_case,
+			resu_asse,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag
+		) VALUES (
+			#{id},
+			#{secuPlace},
+			#{area.id},
+			#{secuProb},
+			#{distType},
+			#{distScope},
+			#{compLead},
+			#{compPart},
+			#{compPrinName},
+			#{compPrinPhone},
+			#{abarDate},
+			#{abarSolvNum},
+			#{abarInveNum},
+			#{abarCase},
+			#{resuAsse},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE ccm_event_kacc SET 	
+			secu_place = #{secuPlace},
+			area_id = #{area.id},
+			secu_prob = #{secuProb},
+			dist_type = #{distType},
+			dist_scope = #{distScope},
+			comp_lead = #{compLead},
+			comp_part = #{compPart},
+			comp_prin_name = #{compPrinName},
+			comp_prin_phone = #{compPrinPhone},
+			abar_date = #{abarDate},
+			abar_solv_num = #{abarSolvNum},
+			abar_inve_num = #{abarInveNum},
+			abar_case = #{abarCase},
+			resu_asse = #{resuAsse},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE ccm_event_kacc SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

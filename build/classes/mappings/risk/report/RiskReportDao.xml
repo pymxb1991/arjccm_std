@@ -1,0 +1,190 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.arjjs.ccm.modules.risk.report.dao.RiskReportDao">
+    
+	<sql id="riskReportColumns">
+		a.id AS "id",
+		a.event_id AS "riskEventGreat.id",
+		a.is_reserve AS "isReserve",
+		a.file AS "file",
+		a.fileName AS "fileName",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag",
+		g.name AS "riskEventGreat.name",
+		b.read_num,
+		b.un_read_num,
+		b.unaudit_num,
+		b.noaudit_num,
+		b.audit_num
+	</sql>
+	
+	<sql id="riskReportJoins">
+		LEFT JOIN risk_event_great g ON g.id = a.event_id
+	</sql>
+    <sql id="riskReportJoinsOthers">
+		LEFT JOIN (
+			SELECT 
+				r.report_id,
+				sum(case when r.read_flag ='1' then 1 else 0 end) read_num,
+				sum(case when r.read_flag != '1' then 1 else 0 end) un_read_num,
+				sum(case when r.result = '01' then 1 else 0 end) unaudit_num,
+				sum(case when r.result = '02' then 1 else 0 end) noaudit_num,
+				sum(case when r.result = '03' then 1 else 0 end) audit_num
+			FROM risk_audit r 
+			WHERE r.del_flag = #{DEL_FLAG_NORMAL}
+			GROUP BY
+				r.report_id
+		) b ON b.report_id = a.id
+	</sql>
+	
+	
+	<select id="get" resultType="RiskReport">
+		SELECT 
+			<include refid="riskReportColumns"/>
+		FROM risk_report a
+		<include refid="riskReportJoins"/>
+		<include refid="riskReportJoinsOthers"/>
+		WHERE a.id = #{id}
+	</select>
+	<!-- 入库查询 -->
+	<select id="findListDatabasePage" resultType="RiskReport">
+		SELECT 
+			<include refid="riskReportColumns"/>
+		FROM risk_report a
+		<include refid="riskReportJoins"/>
+		<include refid="riskReportJoinsOthers"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			AND a.is_reserve = "1"
+			<if test="riskEventGreat != null and riskEventGreat.id != null and riskEventGreat.id != ''">
+				AND a.event_id = #{riskEventGreat.id}
+			</if>
+			<if test="isReserve != null and isReserve != ''">
+				AND a.is_reserve = #{isReserve}
+			</if>
+			<if test="beginUpdateDate != null and endUpdateDate != null and beginUpdateDate != '' and endUpdateDate != ''">
+				AND a.update_date BETWEEN #{beginUpdateDate} AND #{endUpdateDate}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	<!--  -->
+	<select id="findList" resultType="RiskReport">
+		SELECT 
+			<include refid="riskReportColumns"/>
+		FROM risk_report a
+		<include refid="riskReportJoins"/>
+		<include refid="riskReportJoinsOthers"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="riskEventGreat != null and riskEventGreat.id != null and riskEventGreat.id != ''">
+				AND a.event_id = #{riskEventGreat.id}
+			</if>
+			<if test="isReserve != null and isReserve != ''">
+				AND a.is_reserve = #{isReserve}
+			</if>
+			<if test="beginUpdateDate != null and endUpdateDate != null and beginUpdateDate != '' and endUpdateDate != ''">
+				AND a.update_date BETWEEN #{beginUpdateDate} AND #{endUpdateDate}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="RiskReport">
+		SELECT 
+			<include refid="riskReportColumns"/>
+		FROM risk_report a
+		<include refid="riskReportJoins"/>
+		<include refid="riskReportJoinsOthers"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO risk_report(
+			id,
+			event_id,
+			is_reserve,
+			file,
+			fileName,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag
+		) VALUES (
+			#{id},
+			#{riskEventGreat.id},
+			#{isReserve},
+			#{file},
+			#{fileName},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE risk_report SET 	
+			event_id = #{riskEventGreat.id},
+			is_reserve = #{isReserve},
+			file = #{file},
+			fileName = #{fileName},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE risk_report SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

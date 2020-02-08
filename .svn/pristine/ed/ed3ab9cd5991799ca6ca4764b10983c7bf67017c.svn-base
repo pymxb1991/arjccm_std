@@ -1,0 +1,206 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.arjjs.ccm.modules.ccm.org.dao.CcmOrgOrgpreventDao">
+    
+	<sql id="ccmOrgOrgpreventColumns">
+		a.id AS "id",
+		a.more2 AS "more2",
+		a.more3 AS "more3",
+		a.more4 AS "more4",
+		a.area_id AS "area.id",
+		a.code AS "code",
+		a.com_name AS "comName",
+		a.com_type AS "comType",
+		a.com_scale AS "comScale",
+		a.guide_part AS "guidePart",
+		a.man_num AS "manNum",
+		a.main_func AS "mainFunc",
+		a.more1 AS "more1",
+		a.principal AS "principal",
+		a.phone AS "phone",
+		a.teladdress AS "teladdress",
+		a.orgnature AS "orgnature",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag",
+		a5.name AS "area.name"
+	</sql>
+	
+	<sql id="ccmOrgOrgpreventJoins">
+		LEFT JOIN sys_area a5 ON a5.id = a.area_id
+	</sql>
+    
+	<select id="get" resultType="CcmOrgOrgprevent">
+		SELECT 
+			<include refid="ccmOrgOrgpreventColumns"/>
+		FROM ccm_org_orgprevent a
+		<include refid="ccmOrgOrgpreventJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	<!-- 群防群治组织结构-大屏-滨海新区社会网格化管理信息平台 -->
+	<select id="findOrgpreventComTypeType" resultType="com.arjjs.ccm.tool.EchartType">
+		SELECT
+			b.label AS "type",
+			COUNT(1) AS "value"
+		FROM
+			ccm_org_orgprevent a
+		LEFT JOIN sys_dict b ON b.`value` = a.com_type AND b.type="ccm_org_type"
+		WHERE
+			a.del_flag='0'
+		GROUP BY
+			a.com_type
+	</select>
+
+	<!-- 群防群治组织类型 -->
+	<select id="getByOrgpreventComType" resultType="com.arjjs.ccm.tool.EchartType">
+		SELECT
+			b.label AS "type",
+			COUNT(1) AS "value"
+		FROM
+			ccm_org_orgprevent a
+		LEFT JOIN sys_dict b ON b.`value` = a.com_type AND b.type="ccm_org_type"
+		WHERE
+			a.del_flag='0'
+		GROUP BY
+			a.com_type
+	</select>
+
+
+	<!--  -->
+	<select id="findList" resultType="CcmOrgOrgprevent">
+		SELECT 
+			<include refid="ccmOrgOrgpreventColumns"/>
+		FROM ccm_org_orgprevent a
+		<include refid="ccmOrgOrgpreventJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="area != null and area.id != null and area.id != ''">
+				AND a.area_id = #{area.id}
+			</if>
+			<if test="comName != null and comName != ''">
+				AND a.com_name LIKE 
+					<if test="dbName == 'oracle'">'%'||#{comName}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{comName}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{comName},'%')</if>
+			</if>
+			<if test="comType != null and comType != ''">
+				AND a.com_type = #{comType}
+			</if>
+			<if test="comScale != null and comScale != ''">
+				AND a.com_scale = #{comScale}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="CcmOrgOrgprevent">
+		SELECT 
+			<include refid="ccmOrgOrgpreventColumns"/>
+		FROM ccm_org_orgprevent a
+		<include refid="ccmOrgOrgpreventJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO ccm_org_orgprevent(
+			id,
+			more2,
+			more3,
+			more4,
+			area_id,
+			code,
+			com_name,
+			com_type,
+			com_scale,
+			guide_part,
+			man_num,
+			main_func,
+			more1,
+			principal,
+			phone,
+			teladdress,
+			orgnature,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag
+		) VALUES (
+			#{id},
+			#{more2},
+			#{more3},
+			#{more4},
+			#{area.id},
+			#{code},
+			#{comName},
+			#{comType},
+			#{comScale},
+			#{guidePart},
+			#{manNum},
+			#{mainFunc},
+			#{more1},
+			#{principal},
+			#{phone},
+			#{teladdress},
+			#{orgnature},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE ccm_org_orgprevent SET 	
+			more2 = #{more2},
+			more3 = #{more3},
+			more4 = #{more4},
+			area_id = #{area.id},
+			code = #{code},
+			com_name = #{comName},
+			com_type = #{comType},
+			com_scale = #{comScale},
+			guide_part = #{guidePart},
+			man_num = #{manNum},
+			main_func = #{mainFunc},
+			more1 = #{more1},
+			principal = #{principal},
+			phone = #{phone},
+			teladdress = #{teladdress},
+			orgnature = #{orgnature},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE ccm_org_orgprevent SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

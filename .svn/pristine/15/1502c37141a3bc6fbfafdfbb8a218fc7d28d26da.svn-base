@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.arjjs.ccm.modules.plm.files.dao.PlmPublicFilesDao">
+    
+	<sql id="plmPublicFilesColumns">
+		a.id AS "id",
+		a.fid AS "fid",
+		a.seqidx AS "seqidx",
+		a.tablename AS "tablename",
+		a.cnname AS "cnname",
+		a.filename AS "filename",
+		a.filetype AS "filetype",
+		a.size AS "size",
+		a.extend1 AS "extend1",
+		a.extend2 AS "extend2",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag"
+	</sql>
+	
+	<sql id="plmPublicFilesJoins">
+	</sql>
+    
+	<select id="get" resultType="PlmPublicFiles">
+		SELECT 
+			<include refid="plmPublicFilesColumns"/>
+		FROM plm_public_files a
+		<include refid="plmPublicFilesJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="PlmPublicFiles">
+		SELECT 
+			<include refid="plmPublicFilesColumns"/>
+		FROM plm_public_files a
+		<include refid="plmPublicFilesJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="PlmPublicFiles">
+		SELECT 
+			<include refid="plmPublicFilesColumns"/>
+		FROM plm_public_files a
+		<include refid="plmPublicFilesJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO plm_public_files(
+			id,
+			fid,
+			seqidx,
+			tablename,
+			cnname,
+			filename,
+			filetype,
+			size,
+			extend1,
+			extend2,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag
+		) VALUES (
+			#{id},
+			#{fid},
+			#{seqidx},
+			#{tablename},
+			#{cnname},
+			#{filename},
+			#{filetype},
+			#{size},
+			#{extend1},
+			#{extend2},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE plm_public_files SET 	
+			fid = #{fid},
+			seqidx = #{seqidx},
+			tablename = #{tablename},
+			cnname = #{cnname},
+			filename = #{filename},
+			filetype = #{filetype},
+			size = #{size},
+			extend1 = #{extend1},
+			extend2 = #{extend2},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE plm_public_files SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

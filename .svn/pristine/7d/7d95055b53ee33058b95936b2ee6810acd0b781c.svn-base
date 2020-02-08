@@ -1,0 +1,151 @@
+package com.arjjs.ccm.tool;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.Calendar;
+import java.util.Date;
+
+import com.arjjs.ccm.modules.ccm.rest.entity.CcmRestType;
+
+import net.sf.json.JSONObject;
+
+public class Tool {
+
+  	/**
+  	 * 方法说明：http get 数据获取
+  	 *
+  	 * @param Url
+  	 * @return 
+  	 * @作者及日期：pengjianqiang    2018-5-9
+  	 * @修改人及日期：pengjianqiang    2018-5-9
+  	 * @修改描述：
+  	 * @其他：
+  	 */
+	public static String getRestReturn(String Url){
+		StringBuffer strBuffer = new StringBuffer();
+		BufferedReader brd =null;
+		HttpURLConnection connet = null;
+        try {
+			URL url = new URL(Url);
+			  //实例一个HTTP CONNECT
+			  connet = (HttpURLConnection) url.openConnection();
+			  connet.setRequestMethod("GET");
+			  connet.setDoOutput(true);
+			  connet.setDoInput(true);
+			  connet.setUseCaches(false);
+			  connet.setConnectTimeout(300000);
+			  connet.setReadTimeout(300000);
+			  connet.connect();
+			  if(connet.getResponseCode() != 200){
+			      throw new IOException(connet.getResponseMessage());
+			  }
+			  //将返回的值存入到String中
+			  brd = new BufferedReader(new InputStreamReader(connet.getInputStream(),"utf8"));
+			  String line=brd.readLine();
+			  while(line != null){
+				  line = java.net.URLDecoder.decode(line, "UTF-8");
+				  strBuffer.append(line);
+				  line = brd.readLine();
+			  }
+		} catch (MalformedURLException e) {
+			return null;
+		} catch (IOException e) {
+			return null;
+		} finally {
+			if(brd !=null){
+				 try {
+					 brd.close();
+				 } catch (IOException e) {
+					 
+				 }
+			}
+			if(connet!=null){
+				connet.disconnect();
+			}
+		}
+        return strBuffer.toString();
+    }
+	
+
+  	/**
+  	 * 方法说明：http post 
+  	 *
+  	 * @param Url
+  	 * @return 
+  	 * @作者及日期：pengjianqiang    2018-5-12
+  	 * @修改人及日期：pengjianqiang    2018-5-12
+  	 * @修改描述：
+  	 * @其他：
+  	 */
+	public static String postRestReturn(String Url) throws IOException {
+		URL url1 = new URL(Url);
+		HttpURLConnection urlConnection = (HttpURLConnection)url1.openConnection();
+		urlConnection.setRequestMethod("POST");
+		urlConnection.setDoOutput(true);
+		urlConnection.setDoInput(true);
+		urlConnection.setUseCaches(false);
+		urlConnection.setConnectTimeout(30000);
+		urlConnection.setReadTimeout(60000);
+		InputStream in1 = urlConnection.getInputStream();
+		BufferedReader bufferedReader1 = new BufferedReader(new InputStreamReader(in1, "utf8"));
+		StringBuffer temp1 = new StringBuffer();
+		String line1 = bufferedReader1.readLine();
+		while (line1 != null) {
+			line1 = java.net.URLDecoder.decode(line1, "UTF-8");
+			temp1.append(line1);
+			line1 = bufferedReader1.readLine();
+		}
+		bufferedReader1.close();
+		return temp1.toString();
+	}
+	
+  	/**
+  	 * 方法说明： 获取一个月的最后一天
+  	 *
+  	 * @param date
+  	 * @return 
+  	 * @作者及日期：pengjianqiang    2018-5-9
+  	 * @修改人及日期：pengjianqiang    2018-5-9
+  	 * @修改描述：
+  	 * @其他：
+  	 */
+  	public static int  getLastDay(final Date date){ Calendar calendar = Calendar.getInstance();
+  		calendar.setTime(date);
+  		int endDay = calendar.getActualMaximum(Calendar.DAY_OF_MONTH);
+  		return endDay;
+  		}  
+  	
+  	public static void main(String args[]) throws IOException {
+  		String urllogin = "http://192.168.1.243:8080/arjccm/app/rest/login/login?loginName=admin&password=admin";
+  		String loginReturn = postRestReturn(urllogin);
+		System.out.println(loginReturn);
+		String userId = "";
+		if (loginReturn != null && !"".equals(loginReturn)) {
+			JSONObject jsonLogin = JSONObject.fromObject(loginReturn);
+			int code = jsonLogin.getInt("code");
+			if (code != CcmRestType.OK) {
+				return;
+			}
+			String resultContent = jsonLogin.getString("result");
+			JSONObject jsonLoginUser = JSONObject.fromObject(resultContent);
+			userId = jsonLoginUser.getString("id");
+		}
+  		
+//  		String urlRest = "http://192.168.1.243:8080/arjccm/app/rest/building/saveSyn?userId=1&id=8dfb8151c58c4beb849efaeded854649&name=长征里小区&buildname=楼12&areaId=1ac94bc554e241e9abeedef982000107&floorArea=332.0&pilesNum=6&elemNum=44&buildNum=332&buildPeo=555&buildPname=沈先生&sex=0&nation=01&content=01&birthday=Wed May 12 00:00:00 CST 1954&education=&tel=13877654326&phone=&residence=&residencedetail=&areaMap=&areaPoint=&image=&images=&remarks=&isNewRecord=true";
+  		String urlRest = "http://192.168.1.243:8080/arjccm/app/rest/building/saveSyn?userId=1&id=8dfb8151c58c4beb849efaeded854649&name=长征里小区&buildname=楼12&areaId=1ac94bc554e241e9abeedef982000107&floorArea=332.0&pilesNum=6&elemNum=44&buildNum=332&buildPeo=555&buildPname=沈先生&sex=0&nation=01&content=01&education=&tel=13877654326&phone=&residence=&residencedetail=&areaMap=&areaPoint=&image=&images=&remarks=&isNewRecord=true";
+  		String restReturn = Tool.postRestReturn(urlRest);
+		if (restReturn != null && !"".equals(restReturn)) {
+			JSONObject jsonLogin = JSONObject.fromObject(restReturn);
+			int code = jsonLogin.getInt("code");
+			if (code == CcmRestType.OK) {
+			}
+		}
+  		
+  	}
+  	
+}

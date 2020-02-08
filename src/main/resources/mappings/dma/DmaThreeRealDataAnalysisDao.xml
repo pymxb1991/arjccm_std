@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.arjjs.ccm.modules.dma.dao.DmaThreeRealDataAnalysisDao">
+	<select id="findResidentData" resultType="com.arjjs.ccm.modules.dma.entity.ResidentStatisticsCount">
+		SELECT
+			count(people.id) AS dataNum,
+			people.area_com_id AS areaId,
+			sysArea.parent_ids AS areaParentIds,
+			YEAR(people.update_date) AS dateYear,
+			MONTH(people.update_date) AS dateMouth,
+			people.type AS peopleType 
+		FROM
+			ccm_people people
+		LEFT JOIN sys_area sysArea ON sysArea.id = people.area_com_id 
+		WHERE
+			people.del_flag = 0 
+		<choose>
+			<when test="dateYear != null and dateYear != ''">
+				AND year(people.update_date) = #{dateYear}
+			</when>
+			<otherwise>
+				AND year(people.update_date) = year(now())
+			</otherwise>
+		</choose>
+		GROUP BY
+			dateMouth,
+			areaId,
+			peopleType
+	</select>
+	
+	<select id="findSexData" resultType="com.arjjs.ccm.modules.dma.entity.ResidentStatisticsCount">
+		SELECT
+			count(people.id) AS dataNum,
+			people.area_com_id AS areaId,
+			sysArea.parent_ids AS areaParentIds,
+			YEAR(people.update_date) AS dateYear,
+			MONTH(people.update_date) AS dateMouth,
+			QUARTER(people.update_date) AS dateQuarter,
+			people.sex AS peopleType 
+		FROM
+			ccm_people people
+		LEFT JOIN sys_area sysArea ON sysArea.id = people.area_com_id 
+		WHERE
+			people.del_flag = 0 
+		<choose>
+			<when test="dateYear != null and dateYear != ''">
+				AND YEAR(people.update_date) = #{dateYear}
+			</when>
+			<otherwise>
+				AND YEAR(people.update_date) = YEAR(now())
+			</otherwise>
+		</choose>
+		GROUP BY
+			dateQuarter,
+			areaId,
+			peopleType
+	</select>
+	
+	<select id="findHousePropertyData" resultType="com.arjjs.ccm.tool.EchartType">
+		SELECT
+			dict.label AS `type`,
+			count( house.id ) AS `value` 
+		FROM
+			sys_dict dict
+			LEFT JOIN ccm_pop_tenant house ON house.property_type = dict.`value` 
+			AND house.del_flag = 0 
+		WHERE
+			dict.type = 'ccm_PopTenant_propertyType' 
+			AND dict.del_flag = 0 
+		GROUP BY
+			dict.`value` 
+		ORDER BY
+			dict.`value`
+	</select>
+	
+	<select id="findHousePrupData" resultType="com.arjjs.ccm.tool.EchartType">
+		SELECT
+			dict.label AS `type`,
+			count( house.id ) AS `value` 
+		FROM
+			sys_dict dict
+			LEFT JOIN ccm_pop_tenant house ON house.house_prup = dict.`value` 
+			AND house.del_flag = 0 
+		WHERE
+			dict.type = 'ccm_str_use' 
+			AND dict.del_flag = 0 
+		GROUP BY
+			dict.`value` 
+		ORDER BY
+			dict.`value`
+	</select>
+	
+	<select id="findHouseYearData" resultType="com.arjjs.ccm.tool.EchartType">
+		SELECT
+			dict.label AS `type`,
+			count( house.id ) AS `value` 
+		FROM
+			sys_dict dict
+			LEFT JOIN ccm_pop_tenant house ON house.building_years = dict.`value` 
+			AND house.del_flag = 0 
+		WHERE
+			dict.type = 'ccm_PopTenant_buildingYears' 
+			AND dict.del_flag = 0 
+		GROUP BY
+			dict.`value` 
+		ORDER BY
+			dict.`value`
+	</select>
+	
+	<select id="findHouseAreaData" resultType="com.arjjs.ccm.modules.dma.entity.ResidentStatisticsCount">
+		SELECT
+			count( people.id ) AS dataNum,
+			people.area_id,area.parent_ids AS areaParentIds
+		FROM
+			ccm_pop_tenant people
+		LEFT JOIN sys_area area ON people.area_id = area.id
+		WHERE people.del_flag = 0
+		GROUP BY
+			people.area_id
+	</select>
+	
+	<select id="findHouseStructureData" resultType="com.arjjs.ccm.tool.EchartType">
+		SELECT
+			dict.label AS `type`,
+			count( house.id ) AS `value` 
+		FROM
+			sys_dict dict
+			LEFT JOIN ccm_pop_tenant house ON house.building_type = dict.`value` 
+			AND house.del_flag = 0 
+		WHERE
+			dict.type = 'ccm_PopTenant_buildingType' 
+			AND dict.del_flag = 0 
+		GROUP BY
+			dict.`value` 
+		ORDER BY
+			dict.`value`
+	</select>
+</mapper>

@@ -1,0 +1,737 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8"/>
+    <meta name="keywords" content="天地图"/>
+    <title>天地图－地图API－范例－地图拾取器</title>
+    <script type="text/javascript" src="http://api.tianditu.com/api?v=4.0"></script>
+    <style type="text/css">body,html{width:100%;height:100%;margin:0;font-family:"Microsoft YaHei"}#mapDiv{width:100%;height:100%}input,b,p{margin-left:5px;font-size:14px}</style>
+    <script>
+        var map, control;
+        var zoom = 15;
+		
+        function onLoad() {
+			/**
+			 *  img_c
+				img_w  影像图
+				cia_c
+				cia_w  全球影像中文注记
+				vec_c 
+				vec_w  矢量图
+				cva_c
+				cva_w  全球矢量中文注记
+				
+	
+			**/
+			
+			
+			var imageURL = "http://t0.tianditu.cn/img_w/wmts?" +
+			"SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&LAYER=img&STYLE=default&TILEMATRIXSET=w&FORMAT=tiles" +
+                "&TILEMATRIX={z}&TILEROW={y}&TILECOL={x}";
+            //创建自定义图层对象
+            var lay = new T.TileLayer(imageURL, {minZoom: 2, maxZoom: zoom});
+
+			
+            //var config = {layers: [lay-1,lay-2]};
+			map = new T.Map('mapDiv');
+
+		
+            //map = new T.Map('mapDiv');
+            map.centerAndZoom(new T.LngLat(117.648920,39.034450), zoom);
+            var cp = new T.CoordinatePickup(map, {callback: getLngLat})
+            cp.addEvent();
+			
+			//创建缩放平移控件对象
+            control = new T.Control.Zoom();
+            //添加缩放平移控件
+            map.addControl(control);
+			
+			  //创建比例尺控件对象
+            var scale = new T.Control.Scale();
+            //添加比例尺控件
+            map.addControl(scale);
+			
+			//创建鹰眼控件对象
+			var miniMap = new T.Control.OverviewMap({
+                isOpen: true,
+                size: new T.Point(150, 150)
+            });
+            map.addControl(miniMap);
+			
+			
+			//创建多边形  安顺道社区
+			var points1 = [];           
+			points1.push(new T.LngLat(117.641100,39.028850));
+			points1.push(new T.LngLat(117.642910,39.028430));
+			points1.push(new T.LngLat(117.643500,39.029870));
+			points1.push(new T.LngLat(117.644040,39.031190));
+			points1.push(new T.LngLat(117.640820,39.031930));
+            points1.push(new T.LngLat(117.636270,39.032960));
+			points1.push(new T.LngLat(117.635810,39.031720));
+			points1.push(new T.LngLat(117.635230,39.030050));
+			points1.push(new T.LngLat(117.638230,39.029460));
+			points1.push(new T.LngLat(117.638800,39.029300));
+            points1.push(new T.LngLat(117.641100,39.028850));
+          
+            
+            //创建面对象
+            var polygon = new T.Polygon(points1,{
+                color: "blue", weight: 3, opacity: 0.5, fillColor: "#FFFFFF", fillOpacity: 0.5
+            });
+            //向地图上添加面
+            map.addOverLay(polygon);
+			
+			
+			//创建多边形  长征里社区
+			var points2 = [];
+            points2.push(new T.LngLat(117.652550,39.038850));
+            points2.push(new T.LngLat(117.654570,39.038380));
+            points2.push(new T.LngLat(117.656600,39.037910));
+            points2.push(new T.LngLat(117.656070,39.036450));
+			points2.push(new T.LngLat(117.655390,39.034650));
+            points2.push(new T.LngLat(117.654880,39.033390));
+            points2.push(new T.LngLat(117.652760,39.033870));
+            points2.push(new T.LngLat(117.650880,39.034290));
+			points2.push(new T.LngLat(117.651530,39.035720));
+            points2.push(new T.LngLat(117.652070,39.037220));
+            points2.push(new T.LngLat(117.652550,39.038850));           
+            //创建面对象
+            var polygon = new T.Polygon(points2,{
+                color: "blue", weight: 3, opacity: 0.5, fillColor: "#FFFFFF", fillOpacity: 0.5
+            });
+            //向地图上添加面
+            map.addOverLay(polygon);
+			
+			
+			//创建多边形  芳园里社区
+			var points3 = [];
+            points3.push(new T.LngLat(117.660410,39.027490));
+            points3.push(new T.LngLat(117.661850,39.027160));
+            points3.push(new T.LngLat(117.663960,39.026680));
+            points3.push(new T.LngLat(117.663680,39.025910));
+			points3.push(new T.LngLat(117.663560,39.025440));
+            points3.push(new T.LngLat(117.663390,39.025140));
+            points3.push(new T.LngLat(117.663330,39.024710));
+            points3.push(new T.LngLat(117.663310,39.024560));
+			points3.push(new T.LngLat(117.663350,39.023830));
+            points3.push(new T.LngLat(117.663050,39.024060));
+            points3.push(new T.LngLat(117.662600,39.024160)); 
+            points3.push(new T.LngLat(117.661610,39.024390));
+            points3.push(new T.LngLat(117.661120,39.024470));
+			points3.push(new T.LngLat(117.661290,39.025090));
+            points3.push(new T.LngLat(117.660440,39.025240));
+            points3.push(new T.LngLat(117.659620,39.025440));
+            points3.push(new T.LngLat(117.659980,39.026490));
+            points3.push(new T.LngLat(117.660410,39.027490));
+						
+            //创建面对象
+            var polygon = new T.Polygon(points3,{
+                color: "blue", weight: 3, opacity: 0.5, fillColor: "#FFFFFF", fillOpacity: 0.5
+            });
+            //向地图上添加面
+            map.addOverLay(polygon);
+			
+			//创建多边形  福州道社区 
+			var points4 = [];
+            points4.push(new T.LngLat(117.640940,39.045290));
+            points4.push(new T.LngLat(117.643840,39.044600));
+            points4.push(new T.LngLat(117.649910,39.043250));
+            points4.push(new T.LngLat(117.650750,39.045690));
+			points4.push(new T.LngLat(117.651940,39.048280));
+            points4.push(new T.LngLat(117.644540,39.049990));
+            points4.push(new T.LngLat(117.642910,39.047870));
+            points4.push(new T.LngLat(117.640940,39.045290));
+									
+            //创建面对象
+            var polygon = new T.Polygon(points4,{
+                color: "blue", weight: 3, opacity: 0.5, fillColor: "#FFFFFF", fillOpacity: 0.5
+            });
+            //向地图上添加面
+            map.addOverLay(polygon);
+			
+			//创建多边形  和平里社区
+			var points5 = [];
+            points5.push(new T.LngLat(117.660370,39.027460));
+            points5.push(new T.LngLat(117.656630,39.028310));
+            points5.push(new T.LngLat(117.655830,39.025930));
+            points5.push(new T.LngLat(117.655130,39.023980));
+			points5.push(new T.LngLat(117.655360,39.023630));
+            points5.push(new T.LngLat(117.655360,39.023630));
+            points5.push(new T.LngLat(117.656840,39.023140));
+			points5.push(new T.LngLat(117.657380,39.024660));
+            points5.push(new T.LngLat(117.660890,39.023830));
+            points5.push(new T.LngLat(117.661230,39.025040));
+			points5.push(new T.LngLat(117.660450,39.025200));
+            points5.push(new T.LngLat(117.659570,39.025410));
+            points5.push(new T.LngLat(117.659920,39.026400));
+			points5.push(new T.LngLat(117.660370,39.027460));
+           
+            //创建面对象
+            var polygon = new T.Polygon(points5,{
+                color: "blue", weight: 3, opacity: 0.5, fillColor: "#FFFFFF", fillOpacity: 0.5
+            });
+            //向地图上添加面
+            map.addOverLay(polygon);
+			
+			//创建多边形  贵阳里社区
+			var points6 = [];
+            points6.push(new T.LngLat(117.650880,39.034230));
+            points6.push(new T.LngLat(117.650380,39.032960));
+            points6.push(new T.LngLat(117.649850,39.031510));
+            points6.push(new T.LngLat(117.649280,39.030220));
+			points6.push(new T.LngLat(117.653420,39.029320));
+            points6.push(new T.LngLat(117.654120,39.031280));
+            points6.push(new T.LngLat(117.654870,39.033330));
+            points6.push(new T.LngLat(117.650880,39.034230));
+									
+            //创建面对象
+            var polygon = new T.Polygon(points6,{
+                color: "blue", weight: 3, opacity: 0.5, fillColor: "#FFFFFF", fillOpacity: 0.5
+            });
+            //向地图上添加面
+            map.addOverLay(polygon);
+			
+			//创建多边形  北邻村社区
+			var points7 = [];
+            points7.push(new T.LngLat(117.661540,39.021410));
+            points7.push(new T.LngLat(117.661830,39.021420));
+            points7.push(new T.LngLat(117.662390,39.021580));
+            points7.push(new T.LngLat(117.663330,39.021960));
+			points7.push(new T.LngLat(117.664920,39.023230));
+            points7.push(new T.LngLat(117.665240,39.023650));
+            points7.push(new T.LngLat(117.665620,39.024580));
+            points7.push(new T.LngLat(117.665740,39.025180));
+			points7.push(new T.LngLat(117.665740,39.026320));
+            points7.push(new T.LngLat(117.664070,39.026650));
+            points7.push(new T.LngLat(117.663780,39.025890));
+            points7.push(new T.LngLat(117.663620,39.024880));
+			points7.push(new T.LngLat(117.663590,39.024050));
+            points7.push(new T.LngLat(117.663460,39.023760));
+            points7.push(new T.LngLat(117.663320,39.023790));
+            points7.push(new T.LngLat(117.663040,39.024010));
+			points7.push(new T.LngLat(117.661580,39.024370));
+            points7.push(new T.LngLat(117.661120,39.024430));
+            points7.push(new T.LngLat(117.660920,39.023780));
+            points7.push(new T.LngLat(117.660510,39.023870));
+			points7.push(new T.LngLat(117.660000,39.022460));
+            points7.push(new T.LngLat(117.660550,39.022350));
+            points7.push(new T.LngLat(117.660840,39.022280));
+            points7.push(new T.LngLat(117.661120,39.022270));
+			points7.push(new T.LngLat(117.661130,39.022050));
+            points7.push(new T.LngLat(117.661310,39.021750));
+			points7.push(new T.LngLat(117.661470,39.021560));
+            points7.push(new T.LngLat(117.661540,39.021410));
+									
+            //创建面对象
+            var polygon = new T.Polygon(points7,{
+                color: "blue", weight: 3, opacity: 0.5, fillColor: "#FFFFFF", fillOpacity: 0.5
+            });
+            //向地图上添加面
+            map.addOverLay(polygon);
+			
+			//创建多边形  宏达园社区
+			var points8 = [];
+            points8.push(new T.LngLat(117.658740,39.042030));
+            points8.push(new T.LngLat(117.659100,39.041230));
+            points8.push(new T.LngLat(117.659580,39.041170));
+            points8.push(new T.LngLat(117.662280,39.041100));
+			points8.push(new T.LngLat(117.666110,39.040950));
+            points8.push(new T.LngLat(117.667260,39.044430));
+            points8.push(new T.LngLat(117.663940,39.045300));
+			points8.push(new T.LngLat(117.660620,39.046120));
+            points8.push(new T.LngLat(117.659990,39.044270));
+            points8.push(new T.LngLat(117.659560,39.043350)); 
+            points8.push(new T.LngLat(117.659140,39.042410));
+            points8.push(new T.LngLat(117.658710,39.042070));			
+            points8.push(new T.LngLat(117.658740,39.042030));
+						
+            //创建面对象
+            var polygon = new T.Polygon(points8,{
+                color: "blue", weight: 3, opacity: 0.5, fillColor: "#FFFFFF", fillOpacity: 0.5
+            });
+            //向地图上添加面
+            map.addOverLay(polygon);
+			
+			//创建多边形  华蓉里社区
+			var points9 = [];
+            points9.push(new T.LngLat(117.642260,39.043000));
+            points9.push(new T.LngLat(117.641610,39.041270));
+            points9.push(new T.LngLat(117.644690,39.040600));
+            points9.push(new T.LngLat(117.648410,39.039740));
+			points9.push(new T.LngLat(117.649050,39.041520));
+            points9.push(new T.LngLat(117.648550,39.041640));
+            points9.push(new T.LngLat(117.647010,39.041980));
+			points9.push(new T.LngLat(117.645320,39.042360));
+            points9.push(new T.LngLat(117.642260,39.043000));
+            //创建面对象
+            var polygon = new T.Polygon(points9,{
+                color: "blue", weight: 3, opacity: 0.5, fillColor: "#FFFFFF", fillOpacity: 0.5
+            });
+            //向地图上添加面
+            map.addOverLay(polygon);
+			
+			//创建多边形  吉宁里社区
+			var points10 = [];
+            points10.push(new T.LngLat(117.653470,39.029290));
+            points10.push(new T.LngLat(117.656680,39.028580));
+            points10.push(new T.LngLat(117.657500,39.030680));
+            points10.push(new T.LngLat(117.658220,39.032610));
+			points10.push(new T.LngLat(117.659030,39.034840));
+            points10.push(new T.LngLat(117.659870,39.037130));
+            points10.push(new T.LngLat(117.658310,39.037480));
+			points10.push(new T.LngLat(117.656650,39.037890));
+            points10.push(new T.LngLat(117.656060,39.036350));
+			points10.push(new T.LngLat(117.655610,39.035070));
+            points10.push(new T.LngLat(117.654910,39.033350));
+			points10.push(new T.LngLat(117.654260,39.031530));
+			points10.push(new T.LngLat(117.653470,39.029290));
+            //创建面对象
+            var polygon = new T.Polygon(points10,{
+                color: "blue", weight: 3, opacity: 0.5, fillColor: "#FFFFFF", fillOpacity: 0.5
+            });
+            //向地图上添加面
+            map.addOverLay(polygon);
+			
+			//创建多边形  吉庆里社区
+			var points11 = [];
+            points11.push(new T.LngLat(117.656600,39.028300));
+            points11.push(new T.LngLat(117.653450,39.029030));
+            points11.push(new T.LngLat(117.653330,39.028660));
+            points11.push(new T.LngLat(117.653200,39.028590));
+			points11.push(new T.LngLat(117.652570,39.026850));
+			points11.push(new T.LngLat(117.652240,39.026010));
+            points11.push(new T.LngLat(117.651470,39.024140));
+            points11.push(new T.LngLat(117.651110,39.023080));
+			points11.push(new T.LngLat(117.654360,39.022220));
+            points11.push(new T.LngLat(117.656600,39.028300));
+            //创建面对象
+            var polygon = new T.Polygon(points11,{
+                color: "blue", weight: 3, opacity: 0.5, fillColor: "#FFFFFF", fillOpacity: 0.5
+            });
+            //向地图上添加面
+            map.addOverLay(polygon);
+			
+			//创建多边形  京山道社区
+			var points12 = [];
+            points12.push(new T.LngLat(117.635250,39.030010));
+            points12.push(new T.LngLat(117.638240,39.029410));
+            points12.push(new T.LngLat(117.638660,39.029290));
+            points12.push(new T.LngLat(117.641250,39.028760));
+			points12.push(new T.LngLat(117.642880,39.028320));
+			points12.push(new T.LngLat(117.642620,39.027660));
+            points12.push(new T.LngLat(117.642130,39.026480));
+            points12.push(new T.LngLat(117.641740,39.025310));
+			points12.push(new T.LngLat(117.638740,39.026010));
+            points12.push(new T.LngLat(117.634300,39.027130));
+		    points12.push(new T.LngLat(117.635250,39.030010));
+            //创建面对象
+            var polygon = new T.Polygon(points12,{
+                color: "blue", weight: 3, opacity: 0.5, fillColor: "#FFFFFF", fillOpacity: 0.5
+            });
+            //向地图上添加面
+            map.addOverLay(polygon);
+			
+			//创建多边形  静安里社区
+			var points13 = [];
+            points13.push(new T.LngLat(117.640910,39.045170));
+            points13.push(new T.LngLat(117.643830,39.044550));
+            points13.push(new T.LngLat(117.646490,39.043960));
+            points13.push(new T.LngLat(117.649320,39.043330));
+			points13.push(new T.LngLat(117.648760,39.041630));
+			points13.push(new T.LngLat(117.646400,39.042140));
+            points13.push(new T.LngLat(117.644120,39.042630));
+            points13.push(new T.LngLat(117.642220,39.043050));
+			points13.push(new T.LngLat(117.641590,39.041310));
+            points13.push(new T.LngLat(117.639480,39.041840));
+		    points13.push(new T.LngLat(117.640210,39.043560));
+			points13.push(new T.LngLat(117.640910,39.045170));
+            //创建面对象
+            var polygon = new T.Polygon(points13,{
+                color: "blue", weight: 3, opacity: 0.5, fillColor: "#FFFFFF", fillOpacity: 0.5
+            });
+            //向地图上添加面
+            map.addOverLay(polygon);
+			
+			//创建多边形  康居园社区
+			var points14 = [];
+            points14.push(new T.LngLat(117.656620,39.037980));
+            points14.push(new T.LngLat(117.657610,39.037760));
+            points14.push(new T.LngLat(117.659900,39.037240));
+            points14.push(new T.LngLat(117.660230,39.038010));
+			points14.push(new T.LngLat(117.660220,39.038250));
+			points14.push(new T.LngLat(117.659620,39.039590));
+            points14.push(new T.LngLat(117.659280,39.040380));
+            points14.push(new T.LngLat(117.658870,39.041250));
+			points14.push(new T.LngLat(117.657910,39.041450));
+            points14.push(new T.LngLat(117.657580,39.040550));
+		    points14.push(new T.LngLat(117.657270,39.039740));
+			points14.push(new T.LngLat(117.657150,39.039400));
+			points14.push(new T.LngLat(117.656880,39.038680));
+            points14.push(new T.LngLat(117.656620,39.037980));
+            //创建面对象
+            var polygon = new T.Polygon(points14,{
+                color: "blue", weight: 3, opacity: 0.5, fillColor: "#FFFFFF", fillOpacity: 0.5
+            });
+            //向地图上添加面
+            map.addOverLay(polygon);
+			
+			//创建多边形  兰庭社区
+			var points15 = [];
+            points15.push(new T.LngLat(117.636330,39.033270));
+            points15.push(new T.LngLat(117.637120,39.035250));
+            points15.push(new T.LngLat(117.637880,39.037190));
+            points15.push(new T.LngLat(117.640040,39.036710));
+			points15.push(new T.LngLat(117.641400,39.036390));
+			points15.push(new T.LngLat(117.643110,39.036020));
+            points15.push(new T.LngLat(117.644020,39.035830));
+            points15.push(new T.LngLat(117.642440,39.031840));
+			points15.push(new T.LngLat(117.639210,39.032610));
+            points15.push(new T.LngLat(117.636330,39.033270));
+            //创建面对象
+            var polygon = new T.Polygon(points15,{
+                color: "blue", weight: 3, opacity: 0.5, fillColor: "#FFFFFF", fillOpacity: 0.5
+            });
+            //向地图上添加面
+            map.addOverLay(polygon);
+			
+			//创建多边形  丽水园社区
+			var points16 = [];
+            points16.push(new T.LngLat(117.649980,39.043290));
+            points16.push(new T.LngLat(117.652850,39.042670));
+            points16.push(new T.LngLat(117.655510,39.042060));
+            points16.push(new T.LngLat(117.658870,39.041350));
+			points16.push(new T.LngLat(117.657450,39.044570));
+			points16.push(new T.LngLat(117.656190,39.047290));
+            points16.push(new T.LngLat(117.652040,39.048360));
+            points16.push(new T.LngLat(117.651690,39.047610));
+			points16.push(new T.LngLat(117.650810,39.045680));
+            points16.push(new T.LngLat(117.650350,39.044310));
+			points16.push(new T.LngLat(117.649980,39.043290));
+            //创建面对象
+            var polygon = new T.Polygon(points16,{
+                color: "blue", weight: 3, opacity: 0.5, fillColor: "#FFFFFF", fillOpacity: 0.5
+            });
+            //向地图上添加面
+            map.addOverLay(polygon);
+			
+			//创建多边形  米兰社区
+			var points17 = [];
+            points17.push(new T.LngLat(117.666320,39.026630));
+            points17.push(new T.LngLat(117.668440,39.026170));
+            points17.push(new T.LngLat(117.669030,39.027880));
+            points17.push(new T.LngLat(117.669210,39.028090));
+			points17.push(new T.LngLat(117.670460,39.029230));
+			points17.push(new T.LngLat(117.672870,39.031150));
+            points17.push(new T.LngLat(117.674070,39.032220));
+            points17.push(new T.LngLat(117.674680,39.032500));
+			points17.push(new T.LngLat(117.675480,39.034620));
+            points17.push(new T.LngLat(117.677220,39.039410));
+			points17.push(new T.LngLat(117.673280,39.039440));
+			points17.push(new T.LngLat(117.672210,39.039470));
+            points17.push(new T.LngLat(117.669120,39.039520));
+			points17.push(new T.LngLat(117.666590,39.039500));
+			points17.push(new T.LngLat(117.666550,39.036920));
+            points17.push(new T.LngLat(117.666640,39.034070));
+            points17.push(new T.LngLat(117.666510,39.030100));
+		    points17.push(new T.LngLat(117.666320,39.026630));
+            //创建面对象
+            var polygon = new T.Polygon(points17,{
+                color: "blue", weight: 3, opacity: 0.5, fillColor: "#FFFFFF", fillOpacity: 0.5
+            });
+            //向地图上添加面
+            map.addOverLay(polygon);
+			
+			//创建多边形  泰和城社区
+			var points18 = [];
+            points18.push(new T.LngLat(117.647510,39.025270));
+            points18.push(new T.LngLat(117.648860,39.024980));
+            points18.push(new T.LngLat(117.649700,39.024830));
+            points18.push(new T.LngLat(117.650780,39.024590));
+			points18.push(new T.LngLat(117.651550,39.024420));
+			points18.push(new T.LngLat(117.652110,39.025760));
+            points18.push(new T.LngLat(117.652780,39.027560));
+            points18.push(new T.LngLat(117.653190,39.028600));
+			points18.push(new T.LngLat(117.653150,39.028710));
+            points18.push(new T.LngLat(117.653240,39.029080));
+			points18.push(new T.LngLat(117.651240,39.029550));
+			points18.push(new T.LngLat(117.649280,39.029990));
+            points18.push(new T.LngLat(117.648750,39.028460));
+			points18.push(new T.LngLat(117.648080,39.026780));
+			points18.push(new T.LngLat(117.647510,39.025270));
+            //创建面对象
+            var polygon = new T.Polygon(points18,{
+                color: "blue", weight: 3, opacity: 0.5, fillColor: "#FFFFFF", fillOpacity: 0.5
+            });
+            //向地图上添加面
+            map.addOverLay(polygon);
+			
+			//创建多边形  唐山里社区
+			var points19 = [];
+            points19.push(new T.LngLat(117.637900,39.037290));
+            points19.push(new T.LngLat(117.641110,39.036570));
+            points19.push(new T.LngLat(117.644020,39.035920));
+            points19.push(new T.LngLat(117.644790,39.038040));
+			points19.push(new T.LngLat(117.645600,39.040350));
+			points19.push(new T.LngLat(117.643600,39.040800));
+            points19.push(new T.LngLat(117.641590,39.041240));
+            points19.push(new T.LngLat(117.639500,39.041770));
+			points19.push(new T.LngLat(117.638790,39.039870));
+            points19.push(new T.LngLat(117.638440,39.038770));
+			points19.push(new T.LngLat(117.637900,39.037290));
+            //创建面对象
+            var polygon = new T.Polygon(points19,{
+                color: "blue", weight: 3, opacity: 0.5, fillColor: "#FFFFFF", fillOpacity: 0.5
+            });
+            //向地图上添加面
+            map.addOverLay(polygon);
+			
+			//创建多边形  文安里社区
+			var points20 = [];
+            points20.push(new T.LngLat(117.648480,39.039850));
+            points20.push(new T.LngLat(117.652530,39.038930));
+            points20.push(new T.LngLat(117.656600,39.037990));
+            points20.push(new T.LngLat(117.657310,39.039950));
+			points20.push(new T.LngLat(117.657870,39.041450));
+			points20.push(new T.LngLat(117.655360,39.042040));
+            points20.push(new T.LngLat(117.652610,39.042660));
+            points20.push(new T.LngLat(117.651240,39.042930));
+			points20.push(new T.LngLat(117.650100,39.043180));
+            points20.push(new T.LngLat(117.649360,39.043320));
+			points20.push(new T.LngLat(117.648800,39.041610));
+			points20.push(new T.LngLat(117.649080,39.041540));
+			points20.push(new T.LngLat(117.648760,39.040610));
+            points20.push(new T.LngLat(117.648480,39.039850));
+            //创建面对象
+            var polygon = new T.Polygon(points20,{
+                color: "blue", weight: 3, opacity: 0.5, fillColor: "#FFFFFF", fillOpacity: 0.5
+            });
+            //向地图上添加面
+            map.addOverLay(polygon);
+			
+			//创建多边形  西邻村社区
+			var points21 = [];
+            points21.push(new T.LngLat(117.655120,39.023870));
+            points21.push(new T.LngLat(117.655340,39.023600));
+            points21.push(new T.LngLat(117.656180,39.023290));
+            points21.push(new T.LngLat(117.656850,39.023120));
+			points21.push(new T.LngLat(117.657150,39.023910));
+			points21.push(new T.LngLat(117.657410,39.024630));
+            points21.push(new T.LngLat(117.659040,39.024250));			
+			points21.push(new T.LngLat(117.660450,39.023910));           
+			points21.push(new T.LngLat(117.659960,39.022450));
+            points21.push(new T.LngLat(117.660540,39.022340));	
+			points21.push(new T.LngLat(117.660800,39.022270));
+			points21.push(new T.LngLat(117.661100,39.022260));
+			points21.push(new T.LngLat(117.661090,39.022050));
+            points21.push(new T.LngLat(117.661430,39.021560));
+			points21.push(new T.LngLat(117.661500,39.021400));
+			points21.push(new T.LngLat(117.660480,39.021310));
+            points21.push(new T.LngLat(117.659780,39.021360));
+            points21.push(new T.LngLat(117.658170,39.021600));
+			points21.push(new T.LngLat(117.656340,39.021920));
+            points21.push(new T.LngLat(117.654550,39.022200));
+			points21.push(new T.LngLat(117.654850,39.022990));
+			points21.push(new T.LngLat(117.655120,39.023870));
+            //创建面对象
+            var polygon = new T.Polygon(points21,{
+                color: "blue", weight: 3, opacity: 0.5, fillColor: "#FFFFFF", fillOpacity: 0.5
+            });
+            //向地图上添加面
+            map.addOverLay(polygon);
+			
+			//创建多边形  新业里社区
+			var points22 = [];
+            points22.push(new T.LngLat(117.644100,39.035810));
+            points22.push(new T.LngLat(117.645580,39.035470));
+            points22.push(new T.LngLat(117.646670,39.035220));
+            points22.push(new T.LngLat(117.647850,39.034960));
+			points22.push(new T.LngLat(117.649880,39.034470));
+			points22.push(new T.LngLat(117.650780,39.034290));
+            points22.push(new T.LngLat(117.650040,39.032350));
+            points22.push(new T.LngLat(117.649260,39.030310));
+			points22.push(new T.LngLat(117.646670,39.030920));
+            points22.push(new T.LngLat(117.645050,39.031290));
+			points22.push(new T.LngLat(117.642570,39.031830));
+			points22.push(new T.LngLat(117.643370,39.033920));
+			points22.push(new T.LngLat(117.644100,39.035810));
+            //创建面对象
+            var polygon = new T.Polygon(points22,{
+                color: "blue", weight: 3, opacity: 0.5, fillColor: "#FFFFFF", fillOpacity: 0.5
+            });
+            //向地图上添加面
+            map.addOverLay(polygon);
+			
+			//创建多边形  新园里社区
+			var points23 = [];
+            points23.push(new T.LngLat(117.645680,39.040320));
+            points23.push(new T.LngLat(117.647120,39.040020));
+            points23.push(new T.LngLat(117.648400,39.039720));
+            points23.push(new T.LngLat(117.649760,39.039420));
+			points23.push(new T.LngLat(117.652460,39.038830));
+			points23.push(new T.LngLat(117.652030,39.037250));
+            points23.push(new T.LngLat(117.651460,39.035720));
+            points23.push(new T.LngLat(117.650800,39.034340));
+			points23.push(new T.LngLat(117.647310,39.035150));
+            points23.push(new T.LngLat(117.644130,39.035890));
+			points23.push(new T.LngLat(117.644940,39.038190));
+			points23.push(new T.LngLat(117.645680,39.040320));
+            //创建面对象
+            var polygon = new T.Polygon(points23,{
+                color: "blue", weight: 3, opacity: 0.5, fillColor: "#FFFFFF", fillOpacity: 0.5
+            });
+            //向地图上添加面
+            map.addOverLay(polygon);
+			
+			//创建多边形  延安里社区
+			var points24 = [];
+            points24.push(new T.LngLat(117.658330,39.032570));
+            points24.push(new T.LngLat(117.658760,39.032500));
+            points24.push(new T.LngLat(117.659700,39.032440));
+            points24.push(new T.LngLat(117.661760,39.032380));
+			points24.push(new T.LngLat(117.664310,39.032380));
+			points24.push(new T.LngLat(117.665670,39.032550));
+            points24.push(new T.LngLat(117.665700,39.029640));
+            points24.push(new T.LngLat(117.665670,39.026780));
+			points24.push(new T.LngLat(117.662340,39.027490));
+            points24.push(new T.LngLat(117.658750,39.028240));
+			points24.push(new T.LngLat(117.656870,39.028670));
+			points24.push(new T.LngLat(117.657620,39.030700));
+			points24.push(new T.LngLat(117.658330,39.032570));
+            //创建面对象
+            var polygon = new T.Polygon(points24,{
+                color: "blue", weight: 3, opacity: 0.5, fillColor: "#FFFFFF", fillOpacity: 0.5
+            });
+            //向地图上添加面
+            map.addOverLay(polygon);
+			
+			//创建多边形  贻丰园社区
+			var points25 = [];
+            points25.push(new T.LngLat(117.658350,39.032690));
+            points25.push(new T.LngLat(117.659170,39.032580));
+            points25.push(new T.LngLat(117.660440,39.032520));
+            points25.push(new T.LngLat(117.662830,39.032510));
+			points25.push(new T.LngLat(117.664580,39.032530));
+			points25.push(new T.LngLat(117.664860,39.032600));
+            points25.push(new T.LngLat(117.665770,39.032620));
+            points25.push(new T.LngLat(117.665730,39.035490));
+			points25.push(new T.LngLat(117.665780,39.039330));
+            points25.push(new T.LngLat(117.666080,39.040920));
+			points25.push(new T.LngLat(117.663500,39.041020));
+			points25.push(new T.LngLat(117.661450,39.041090));
+			points25.push(new T.LngLat(117.659600,39.041140));
+		    points25.push(new T.LngLat(117.659140,39.041170));
+            points25.push(new T.LngLat(117.659660,39.039860));
+            points25.push(new T.LngLat(117.660270,39.038480));
+			points25.push(new T.LngLat(117.660360,39.038180));
+		    points25.push(new T.LngLat(117.660340,39.037980));
+            points25.push(new T.LngLat(117.659970,39.037120));
+            points25.push(new T.LngLat(117.659130,39.034840));
+			points25.push(new T.LngLat(117.658350,39.032690));
+            //创建面对象
+            var polygon = new T.Polygon(points25,{
+                color: "blue", weight: 3, opacity: 0.5, fillColor: "#FFFFFF", fillOpacity: 0.5
+            });
+            //向地图上添加面
+            map.addOverLay(polygon);
+			
+			//创建多边形  毓园社区
+			var points26 = [];
+            points26.push(new T.LngLat(117.644070,39.031180));
+            points26.push(new T.LngLat(117.643650,39.030170));
+            points26.push(new T.LngLat(117.642940,39.028420));
+            points26.push(new T.LngLat(117.642670,39.027670));
+			points26.push(new T.LngLat(117.642180,39.026470));
+			points26.push(new T.LngLat(117.643800,39.026140));
+            points26.push(new T.LngLat(117.645270,39.025790));
+            points26.push(new T.LngLat(117.647400,39.025300));
+            points26.push(new T.LngLat(117.648650,39.028520));
+            points26.push(new T.LngLat(117.649170,39.030010));
+			points26.push(new T.LngLat(117.647340,39.030460));
+			points26.push(new T.LngLat(117.645650,39.030830));
+		    points26.push(new T.LngLat(117.644070,39.031180));	
+            //创建面对象
+            var polygon = new T.Polygon(points26,{
+                color: "blue", weight: 3, opacity: 0.5, fillColor: "#FFFFFF", fillOpacity: 0.5
+            });
+            //向地图上添加面
+            map.addOverLay(polygon);
+			
+			//创建多边形  智谛山社区
+			var points27 = [];
+            points27.push(new T.LngLat(117.666590,39.039580));
+            points27.push(new T.LngLat(117.669150,39.039540));
+            points27.push(new T.LngLat(117.674500,39.039470));
+            points27.push(new T.LngLat(117.676260,39.039440));
+			points27.push(new T.LngLat(117.677240,39.039440));
+			points27.push(new T.LngLat(117.677590,39.040370));
+            points27.push(new T.LngLat(117.677860,39.041190));
+            points27.push(new T.LngLat(117.675880,39.041730));
+            points27.push(new T.LngLat(117.674590,39.042040));
+            points27.push(new T.LngLat(117.674570,39.041640));
+			points27.push(new T.LngLat(117.672080,39.041650));
+			points27.push(new T.LngLat(117.668640,39.041820));
+		    points27.push(new T.LngLat(117.667580,39.041130));
+			
+			points27.push(new T.LngLat(117.667170,39.040790));
+            points27.push(new T.LngLat(117.666700,39.041010));
+            points27.push(new T.LngLat(117.666640,39.040690));
+            points27.push(new T.LngLat(117.666580,39.040020));
+            points27.push(new T.LngLat(117.666590,39.039580));
+            //创建面对象
+            var polygon = new T.Polygon(points27,{
+                color: "blue", weight: 3, opacity: 0.5, fillColor: "#FFFFFF", fillOpacity: 0.5
+            });
+            //向地图上添加面
+            map.addOverLay(polygon);
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+		    var copyControl = new T.Control.Copyright({position: T_ANCHOR_TOP_LEFT});
+            map.addControl(copyControl);
+            var bs = map.getBounds();   //返回地图可视区域
+            copyControl.addCopyright({
+                id: 1,
+                content: "<a href='http://www.tianditu.cn' target='_blank' style='font-size:14px;background:#C4E1FF'>滨海新区杭州道街道综治地图</a>",
+                bounds: bs
+            });
+
+
+        }
+
+        function getLngLat(lnglat) {
+            //document.getElementById("lnglatStr").value = lnglat.lng.toFixed(6) + "," + lnglat.lat.toFixed(6);
+        }
+    </script>
+</head>
+<body onLoad="onLoad()">
+<!--
+<div >
+	获得地理坐标:<input type="text" id="lnglatStr" value=""/>
+</div>
+
+	<input type="button" onclick="yhtdtlayer.show();" value="地图1">
+	<input type="button" onclick="yhtdtimage.show();" value="地图2">
+	<input type="button" onclick="yhtdtlayer.hide();" value="地图3">
+	<input type="button" onclick="yhtdtimage.hide();" value="地图4">
+-->
+<div id="mapDiv" ></div>
+
+
+
+</body>
+</html>

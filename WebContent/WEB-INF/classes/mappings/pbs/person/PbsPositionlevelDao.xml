@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.arjjs.ccm.modules.pbs.person.dao.PbsPositionlevelDao">
+    
+	<sql id="pbsPositionlevelColumns">
+		a.id AS "id",
+		a.s_type AS "sType",
+		a.s_name AS "sName",
+		a.s_workcode AS "sWorkcode",
+		a.s_level AS "sLevel",
+		a.s_parent AS "sParent",
+		<!-- a.s_spare01 AS "sSpare01",
+		a.s_spare02 AS "sSpare02",
+		a.s_spare03 AS "sSpare03",
+		a.s_spare04 AS "sSpare04", -->
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag"
+	</sql>
+	
+	<sql id="pbsPositionlevelJoins">
+	</sql>
+    
+	<select id="get" resultType="PbsPositionlevel">
+		SELECT 
+			<include refid="pbsPositionlevelColumns"/>
+		FROM pbs_positionlevel a
+		<include refid="pbsPositionlevelJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="PbsPositionlevel">
+		SELECT 
+			<include refid="pbsPositionlevelColumns"/>
+		FROM pbs_positionlevel a
+		<include refid="pbsPositionlevelJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="sType != null and sType != ''">
+				AND a.s_type = #{sType}
+			</if>
+			<if test="sName != null and sName != ''">
+				AND a.s_name LIKE CONCAT('%',#{sName},'%')
+			</if>
+			<if test="sWorkcode != null and sWorkcode != ''">
+				AND a.s_workcode LIKE CONCAT('%',#{sWorkcode},'%')
+			</if>
+			<if test="sLevel != null and sLevel != ''">
+				AND a.s_level = #{sLevel}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="PbsPositionlevel">
+		SELECT 
+			<include refid="pbsPositionlevelColumns"/>
+		FROM pbs_positionlevel a
+		<include refid="pbsPositionlevelJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO pbs_positionlevel(
+			id,
+			s_type,
+			s_name,
+			s_workcode,
+			s_level,
+			s_parent,
+			s_spare01,
+			s_spare02,
+			s_spare03,
+			s_spare04,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag
+		) VALUES (
+			#{id},
+			#{sType},
+			#{sName},
+			#{sWorkcode},
+			#{sLevel},
+			#{sParent},
+			#{sSpare01},
+			#{sSpare02},
+			#{sSpare03},
+			#{sSpare04},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE pbs_positionlevel SET 	
+			s_type = #{sType},
+			s_name = #{sName},
+			s_workcode = #{sWorkcode},
+			s_level = #{sLevel},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE pbs_positionlevel SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

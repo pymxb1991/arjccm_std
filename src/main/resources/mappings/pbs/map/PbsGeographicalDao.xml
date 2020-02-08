@@ -1,0 +1,208 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.arjjs.ccm.modules.pbs.map.dao.PbsGeographicalDao">
+
+	<sql id="pbsGeographicalColumns">
+		a.id AS "id",
+		a.s_type AS "sType",
+		a.s_maptype AS "sMaptype",
+		a.s_longitude AS "sLongitude",
+		a.s_latitude AS "sLatitude",
+		a.s_departname AS "sDepartname",
+		activity.s_title AS "sActivityid.sTitle",
+		activity.s_content AS "sActivityid.sContent",
+		mem.s_name AS "pbspartymem.sName",
+		task.s_resume AS "sSuperiorid.sResume",
+		task.s_content AS "sSuperiorid.sContent",
+		a.s_source AS "sSource",
+		ofc.name AS
+		"officeName",
+		ofc.remarks AS "officeRemark",
+		ofc.name AS "sDepartmentid.name",
+		a.s_primarykey01 AS "sPrimarykey01",
+		a.s_primarykey02 AS
+		"sPrimarykey02",
+		a.s_primarykey03 AS "sPrimarykey03",
+		a.s_primarykey04
+		AS "sPrimarykey04",
+		a.s_primarykey05 AS "sPrimarykey05",
+		a.s_spare01 AS
+		"sSpare01",
+		a.s_spare02 AS "sSpare02",
+		a.s_spare03 AS "sSpare03",
+		a.s_spare04 AS "sSpare04",
+		a.create_by AS "createBy.id",
+		a.create_date
+		AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS
+		"updateDate",
+		a.remarks AS "remarks",
+		labe.s_description AS "memDescription",
+		a.del_flag AS "delFlag"
+	</sql>
+
+	<sql id="pbsGeographicalJoins">
+		left join sys_office ofc on ofc.id = a.s_primarykey01
+		LEFT JOIN pbs_partymem mem ON mem.id = a.s_primarykey01
+		LEFT JOIN pbs_activityrec activity ON activity.id = a.s_primarykey01
+		LEFT JOIN pbs_taskrec task ON task.id = a.s_primarykey01
+		LEFT JOIN pbs_memlabel labe ON labe.s_memberid = a.s_primarykey01
+	</sql>
+
+	<select id="get" resultType="PbsGeographical">
+		SELECT
+		<include refid="pbsGeographicalColumns" />
+		FROM pbs_geographical a
+		<include refid="pbsGeographicalJoins" />
+		WHERE a.id = #{id}
+	</select>
+
+	<select id="findList" resultType="PbsGeographical">
+		SELECT
+		<include refid="pbsGeographicalColumns" />
+		FROM pbs_geographical a
+		<include refid="pbsGeographicalJoins" />
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="sType != null and sType != ''">
+				AND a.s_type = #{sType}
+			</if>
+			<if test="sMaptype != null and sMaptype != ''">
+				AND a.s_maptype = #{sMaptype}
+			</if>
+			<if test="sPrimarykey01 != null and sPrimarykey01 != ''">
+				AND a.s_primarykey01 = #{sPrimarykey01}
+			</if>
+		</where>
+		GROUP BY  a.id
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+
+	<select id="findAllList" resultType="PbsGeographical">
+		SELECT
+		<include refid="pbsGeographicalColumns" />
+		FROM pbs_geographical a
+		<include refid="pbsGeographicalJoins" />
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+
+	<insert id="insert">
+		INSERT INTO pbs_geographical(
+		id,
+		s_type,
+		s_maptype,
+		s_longitude,
+		s_latitude,
+		s_departname,
+		s_source,
+		s_primarykey01,
+		s_primarykey02,
+		s_primarykey03,
+		s_primarykey04,
+		s_primarykey05,
+		s_spare01,
+		s_spare02,
+		s_spare03,
+		s_spare04,
+		create_by,
+		create_date,
+		update_by,
+		update_date,
+		remarks,
+		del_flag
+		) VALUES (
+		#{id},
+		#{sType},
+		#{sMaptype},
+		#{sLongitude},
+		#{sLatitude},
+		#{sDepartname},
+		#{sSource},
+		#{sPrimarykey01},
+		#{sPrimarykey02},
+		#{sPrimarykey03},
+		#{sPrimarykey04},
+		#{sPrimarykey05},
+		#{sSpare01},
+		#{sSpare02},
+		#{sSpare03},
+		#{sSpare04},
+		#{createBy.id},
+		#{createDate},
+		#{updateBy.id},
+		#{updateDate},
+		#{remarks},
+		#{delFlag}
+		)
+	</insert>
+
+	<update id="update">
+		UPDATE pbs_geographical SET
+		s_type = #{sType},
+		s_maptype = #{sMaptype},
+		s_longitude = #{sLongitude},
+		s_latitude =
+		#{sLatitude},
+		s_departname = #{sDepartname},
+		s_source = #{sSource},
+		s_primarykey01 = #{sPrimarykey01},
+		s_primarykey02 = #{sPrimarykey02},
+		s_primarykey03 = #{sPrimarykey03},
+		s_primarykey04 = #{sPrimarykey04},
+		s_primarykey05 = #{sPrimarykey05},
+		s_spare01 = #{sSpare01},
+		s_spare02 =
+		#{sSpare02},
+		s_spare03 = #{sSpare03},
+		s_spare04 = #{sSpare04},
+		update_by
+		= #{updateBy.id},
+		update_date = #{updateDate},
+		remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+
+	<update id="delete">
+		UPDATE pbs_geographical SET
+		del_flag =
+		#{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+
+	<select id="getPartymembindCount" resultType="com.arjjs.ccm.modules.pbs.map.entity.BindCount">
+		SELECT
+		depart.s_departmentid AS "id",
+		COUNT(depart.s_departmentid) AS "sum1"
+		FROM
+		pbs_geographical geo
+		LEFT JOIN pbs_departmentbind depart ON depart.s_departmentid =
+		geo.s_primarykey01
+		where depart.s_departmentid is not null
+		GROUP BY
+		depart.s_departmentid
+	</select>
+	<select id="findByTypeAndKey" resultType="int">
+		select count(*) from pbs_geographical where del_flag = #{DEL_FLAG_NORMAL} and s_primarykey01 = #{sPrimarykey01} and s_type = #{sType}
+	</select>
+	<select id="getNumByType" resultType="int">
+		SELECT COUNT(id) FROM pbs_geographical GROUP BY s_type
+	</select>
+</mapper>

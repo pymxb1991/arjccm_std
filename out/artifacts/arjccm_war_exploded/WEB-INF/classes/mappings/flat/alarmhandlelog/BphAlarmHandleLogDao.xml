@@ -1,0 +1,175 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.arjjs.ccm.modules.flat.alarmhandlelog.dao.BphAlarmHandleLogDao">
+    
+	<sql id="bphAlarmHandleLogColumns">
+		a.id AS "id",
+		a.alarm_id AS "alarmId",
+		a.handle_id AS "handleId",
+		a.operate_user AS "user.id",
+		a.operate_time AS "operateTime",
+		a.operate_desc AS "operateDesc",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag"
+	</sql>
+	
+	<sql id="bphAlarmHandleLogJoins">
+	</sql>
+	
+    <select id="findHandleLog" resultType="BphAlarmHandleLog">
+    	SELECT
+			su.`name` AS "user.name",
+			su.photo AS "user.photo",
+			bahl.operate_time AS "operateTime",
+			operate_desc AS "operateDesc" 
+		FROM
+			bph_alarm_handle_log bahl
+			LEFT JOIN sys_user su ON bahl.operate_user = su.id 
+		WHERE
+			bahl.del_flag = #{DEL_FLAG_NORMAL}
+			AND bahl.alarm_id = #{alarmId}
+		ORDER BY bahl.operate_time
+    </select>
+    
+	<select id="get" resultType="BphAlarmHandleLog">
+		SELECT 
+			<include refid="bphAlarmHandleLogColumns"/>
+		FROM bph_alarm_handle_log a
+		<include refid="bphAlarmHandleLogJoins"/>
+		WHERE a.id = #{id}
+	</select>
+
+	<sql id="bphAlarmHandleLogByAlarIdColumns">
+		a.id AS "id",
+		a.alarm_id AS "alarmId",
+		a.handle_id AS "handleId",
+		a.operate_user AS "user.id",
+		a.operate_time AS "operateTime",
+		a.operate_desc AS "operateDesc",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag",
+		u.name AS "user.name"
+	</sql>
+
+	<select id="findByAlarmId" resultType="BphAlarmHandleLog">
+		SELECT 
+			<include refid="bphAlarmHandleLogByAlarIdColumns"/>
+		FROM bph_alarm_handle_log a
+			LEFT JOIN sys_user u ON u.id = a.operate_user
+		WHERE 
+			a.del_flag = 0
+			AND a.alarm_id = #{alarmId,jdbcType=VARCHAR}
+			AND u.del_flag = 0
+		ORDER BY a.create_date ASC
+	</select>
+	
+	<select id="findList" resultType="BphAlarmHandleLog">
+		SELECT 
+			<include refid="bphAlarmHandleLogColumns"/>
+		FROM bph_alarm_handle_log a
+		<include refid="bphAlarmHandleLogJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="BphAlarmHandleLog">
+		SELECT 
+			<include refid="bphAlarmHandleLogColumns"/>
+		FROM bph_alarm_handle_log a
+		<include refid="bphAlarmHandleLogJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO bph_alarm_handle_log(
+			id,
+			alarm_id,
+			handle_id,
+			operate_user,
+			operate_time,
+			operate_desc,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag
+		) VALUES (
+			#{id},
+			#{alarmId},
+			#{handleId},
+			#{user.id},
+			#{operateTime},
+			#{operateDesc},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE bph_alarm_handle_log SET 	
+			alarm_id = #{alarmId},
+			handle_id  = #{handleId},
+			operate_user = #{user.id},
+			operate_time = #{operateTime},
+			operate_desc = #{operateDesc},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE bph_alarm_handle_log SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	<select id="queryAlarmHandleStatusUsers" resultType="com.arjjs.ccm.modules.ccm.rest.entity.AlarmHandleUserStatus">
+          SELECT
+            t1.id log_id,t1.alarm_id AS alarm_id,t1.handle_id AS handle_id,t1.create_date,	t1.operate_desc,
+            t2.id use_id,	t2.`name` use_name,	t2.mobile,
+            t3.id office_id,t3.`name` office_name,
+            (CASE
+                  WHEN  t1.operate_desc like '%任务签收%' THEN 1
+                  WHEN  t1.operate_desc like '%到达现场%' THEN 2
+                  WHEN  t1.operate_desc like '%任务反馈%' THEN 3
+             ELSE   0   END
+            ) status
+        FROM
+            bph_alarm_handle_log t1
+        LEFT JOIN sys_user t2 on t1.operate_user = t2.id
+        LEFT JOIN sys_office t3 on t2.office_id = t3.id
+        WHERE  t1.alarm_id = #{alarmId}
+    </select>
+</mapper>

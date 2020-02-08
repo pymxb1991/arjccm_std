@@ -1,0 +1,178 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.arjjs.ccm.modules.pbs.apply.dao.PbsApplyrecDao">
+
+	<sql id="pbsApplyrecColumns">
+		a.id AS "id",
+		a.s_type AS "sType.id",
+		a.s_resume AS "sResume",
+		a.s_content AS "sContent",
+		a.s_partment AS "sPartment.id",
+		a.s_approver AS "sApprover",
+		a.s_operator AS "sOperator.id",
+		a.s_bindmember AS "sBindmember.id",
+		a.s_status AS "sStatus",
+		a.s_spare01 AS "sSpare01",
+		a.s_spare02 AS "sSpare02",
+		a.s_spare03 AS "sSpare03",
+		a.s_spare04 AS "sSpare04",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.s_fileurl AS "sFileurl",
+		a.del_flag AS "delFlag",
+		o5.`name` AS "sPartment.name",
+		u6.`name` AS "sOperator.name",
+		mem.s_name AS "sBindmember.sName",
+		definition.s_name AS "sType.sName"
+	</sql>
+
+	<sql id="pbsApplyrecJoins">
+		LEFT JOIN sys_office o5 ON o5.id = a.s_partment
+		LEFT JOIN sys_user u6 ON u6.id = a.s_approver
+		LEFT JOIN pbs_partymem mem ON mem.id = a.s_bindmember
+		LEFT JOIN pbs_flowdefinition  definition ON definition.id = a.s_type
+		LEFT JOIN pbs_flowtype flowtype ON flowtype.id = definition.s_typeid
+        
+	</sql>
+
+	<select id="get" resultType="PbsApplyrec">
+		SELECT
+		<include refid="pbsApplyrecColumns" />
+		FROM pbs_applyrec a
+		<include refid="pbsApplyrecJoins" />
+		WHERE a.id = #{id}
+	</select>
+
+	<select id="findList" resultType="PbsApplyrec">
+		SELECT
+		<include refid="pbsApplyrecColumns" />
+		FROM pbs_applyrec a
+		<include refid="pbsApplyrecJoins" />
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if
+				test="sType != null and sType != '' and sType.id != null and sType.id != ''">
+				AND a.s_type = #{sType.id}
+			</if>
+			<if test="sResume != null and sResume != ''">
+				AND a.s_resume  like  "%${sResume}%"
+			</if>
+			<if test="sStatus != null and sStatus != ''">
+				AND a.s_status = #{sStatus}
+			</if>
+			<if test="flowtype != null and flowtype != ''">
+                AND flowtype.s_name = #{flowtype}
+            </if>
+            <if test="sBindmember != null and sBindmember != '' and sBindmember.id != null and sBindmember.id != ''">
+                AND a.s_bindmember = #{sBindmember.id}
+            </if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+
+	<select id="findAllList" resultType="PbsApplyrec">
+		SELECT
+		<include refid="pbsApplyrecColumns" />
+		FROM pbs_applyrec a
+		<include refid="pbsApplyrecJoins" />
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+
+	<insert id="insert">
+		INSERT INTO pbs_applyrec(
+		id,
+		s_type,
+		s_resume,
+		s_content,
+		s_partment,
+		s_approver,
+		s_operator,
+		s_bindmember,
+		s_status,
+		s_spare01,
+		s_spare02,
+		s_spare03,
+		s_spare04,
+		create_by,
+		create_date,
+		update_by,
+		update_date,
+		remarks,
+		s_fileurl,
+		del_flag
+		) VALUES (
+		#{id},
+		#{sType.id},
+		#{sResume},
+		#{sContent},
+		#{sPartment.id},
+		#{sApprover},
+		#{sOperator.id},
+		#{sBindmember.id},
+		#{sStatus},
+		#{sSpare01},
+		#{sSpare02},
+		#{sSpare03},
+		#{sSpare04},
+		#{createBy.id},
+		#{createDate},
+		#{updateBy.id},
+		#{updateDate},
+		#{remarks},
+		#{sFileurl},
+		#{delFlag}
+		)
+	</insert>
+
+	<update id="update">
+		UPDATE pbs_applyrec SET
+		s_type = #{sType.id},
+		s_resume
+		= #{sResume},
+		s_content = #{sContent},
+		s_partment = #{sPartment.id},
+		s_approver = #{sApprover},
+		s_operator = #{sOperator.id},
+		s_bindmember =
+		#{sBindmember.id},
+		s_status = #{sStatus},
+		s_spare01 = #{sSpare01},
+		s_spare02 = #{sSpare02},
+		s_spare03 = #{sSpare03},
+		s_spare04 =
+		#{sSpare04},
+		update_by = #{updateBy.id},
+		update_date = #{updateDate},
+		remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+
+	<update id="delete">
+		UPDATE pbs_applyrec SET
+		del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	<update id="updateTypeById">
+		UPDATE pbs_applyrec SET s_type = #{typeId} where id = #{applyId}
+	</update>
+</mapper>

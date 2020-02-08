@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>地图</title>
+    <link rel="stylesheet" href="../../ol/ol.css" type="text/css">
+     <link rel="stylesheet" href="css/map.css" type="text/css">
+</head>
+<body>
+<div id="map" class="map" tabindex="0">
+    <div id="layerControl" class="layerControl">
+        <div class="title"><label>图层列表</label></div>
+        <ul id="layerTree" class="layerTree"></ul>
+    </div>
+</div>
+<div id="popup" class="ol-popup">
+    <a href="#" id="popup-closer" class="ol-popup-closer"></a>
+    <div id="popup-content"></div>
+</div>
+ <script src="../../jquery/jquery-1.9.1.min.js"></script>
+<script src="../../ol/ol.js"></script>
+<script src="js/commonMap.js"></script>
+<script>
+    //地图默认数据设置
+    var defaultPrams = {
+        id: 'map',
+        centerCoordinate: [106.193500, 38.380110],
+        zoom: 12,
+        maxZoom: 20,
+        minZoom: 2,
+        baseUrl: {'name':'底图 ','url':'http://t0.tianditu.com/DataServer?T=vec_w&x={x}&y={y}&l={z}','isShow':true},
+        urlArr: [{'name':'银川地图 ','url':'http://192.168.1.22:6080/arcgis/rest/services/YinChuan/MapServer','isShow':true}],
+        zoomShowOrHide: true,//缩小放大
+        overviewMap:true//鹰眼图
+    }
+    var Map = new ArjMap.Map(defaultPrams);
+    //加载地图
+    Map.drawMap();
+    //加载数据
+ /*    Map.addJSON(
+        [
+            {'name': '小区 ', 'url': 'data/area.json', 'isShow': true},
+            {'name': '楼栋 ', 'url': 'data/ban.json', 'isShow': true},
+            {'name': '摄像机 ', 'url': 'data/video.json', 'isShow': true},
+            {'name': '案事件 ', 'url': 'data/event.json', 'isShow': true},
+            {'name': '城市部件 ', 'url': 'data/city.json', 'isShow': true},
+        ]
+    ) */
+    $.getJSON('data/video.json',function(data){
+        Map.addJSON([{'name': '摄像机 ', 'data': data, 'isShow': true}]);
+        //图层显示隐藏
+        Map.layersControl('layerTree');
+        //定位
+       // Map.goTo();
+    })
+
+</script>
+</body>
+</html>

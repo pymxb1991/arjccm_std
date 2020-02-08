@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.arjjs.ccm.modules.ccm.event.dao.CcmEmergencyPlanDao">
+    
+	   
+    <sql id="ccmEmergencyPlanColumns">
+        a.id AS "id",
+        a.name AS "name",
+        a.event_scale AS "eventScale",
+        a.event_type AS "eventType",
+        a.leader AS "leader",
+        a.principle AS "principle",
+        a.step AS "step",
+        a.description AS "description",
+        a.create_by AS "createBy.id",
+        a.create_date AS "createDate",
+        a.update_by AS "updateBy.id",
+        a.update_date AS "updateDate",
+        a.remarks AS "remarks",
+        a.del_flag AS "delFlag",
+        a.images AS "images"
+    </sql>
+    
+    <sql id="ccmEmergencyPlanJoins">
+    </sql>
+    
+    <select id="get" resultType="CcmEmergencyPlan">
+        SELECT 
+            <include refid="ccmEmergencyPlanColumns"/>
+        FROM ccm_emergency_plan a
+        <include refid="ccmEmergencyPlanJoins"/>
+        WHERE a.id = #{id}
+    </select>
+    
+    <select id="findList" resultType="CcmEmergencyPlan">
+        SELECT 
+            <include refid="ccmEmergencyPlanColumns"/>
+        FROM ccm_emergency_plan a
+        <include refid="ccmEmergencyPlanJoins"/>
+        <where>
+            a.del_flag = #{DEL_FLAG_NORMAL}
+            <if test="name != null and name != ''">
+                AND a.name LIKE 
+                    <if test="dbName == 'oracle'">'%'||#{name}||'%'</if>
+                    <if test="dbName == 'mssql'">'%'+#{name}+'%'</if>
+                    <if test="dbName == 'mysql'">concat('%',#{name},'%')</if>
+            </if>
+            <if test="eventScale != null and eventScale != ''">
+                AND a.event_scale = #{eventScale}
+            </if>
+            <if test="eventType != null and eventType != ''">
+                AND a.event_type = #{eventType}
+            </if>
+        </where>
+        <choose>
+            <when test="page !=null and page.orderBy != null and page.orderBy != ''">
+                ORDER BY ${page.orderBy}
+            </when>
+            <otherwise>
+                ORDER BY a.update_date DESC
+            </otherwise>
+        </choose>
+    </select>
+    
+    <select id="findAllList" resultType="CcmEmergencyPlan">
+        SELECT 
+            <include refid="ccmEmergencyPlanColumns"/>
+        FROM ccm_emergency_plan a
+        <include refid="ccmEmergencyPlanJoins"/>
+        <where>
+            a.del_flag = #{DEL_FLAG_NORMAL}
+        </where>        
+        <choose>
+            <when test="page !=null and page.orderBy != null and page.orderBy != ''">
+                ORDER BY ${page.orderBy}
+            </when>
+            <otherwise>
+                ORDER BY a.update_date DESC
+            </otherwise>
+        </choose>
+    </select>
+    
+    <insert id="insert">
+        INSERT INTO ccm_emergency_plan(
+            id,
+            name,
+            event_scale,
+            event_type,
+            leader,
+            principle,
+            step,
+            description,
+            create_by,
+            create_date,
+            update_by,
+            update_date,
+            remarks,
+            del_flag,
+            images
+        ) VALUES (
+            #{id},
+            #{name},
+            #{eventScale},
+            #{eventType},
+            #{leader},
+            #{principle},
+            #{step},
+            #{description},
+            #{createBy.id},
+            #{createDate},
+            #{updateBy.id},
+            #{updateDate},
+            #{remarks},
+            #{delFlag},
+            #{images}
+        )
+    </insert>
+    
+    <update id="update">
+        UPDATE ccm_emergency_plan SET   
+            name = #{name},
+            event_scale = #{eventScale},
+            event_type = #{eventType},
+            leader = #{leader},
+            principle = #{principle},
+            step = #{step},
+            description = #{description},
+            update_by = #{updateBy.id},
+            update_date = #{updateDate},
+            remarks = #{remarks},
+            images = #{images}
+        WHERE id = #{id}
+    </update>
+    
+    <update id="delete">
+        UPDATE ccm_emergency_plan SET 
+            del_flag = #{DEL_FLAG_DELETE}
+        WHERE id = #{id}
+    </update>
+    
+</mapper>

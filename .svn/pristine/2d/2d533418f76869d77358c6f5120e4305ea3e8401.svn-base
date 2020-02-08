@@ -1,0 +1,298 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.arjjs.ccm.modules.ccm.shake.dao.CcmShakePovertyPeopleDao">
+    
+	<sql id="ccmShakePovertyPeopleColumns">
+		a.id AS "id",
+		a.name AS "name",
+		a.sex AS "sex",
+		a.area_grid_id AS "areaGridId.id",
+		a.ident AS "ident",
+		a.accountidentity AS "accountidentity",
+		a.birthday AS "birthday",
+		a.filing_time AS "filingTime",
+		a.area_town_id AS "areaTownId.id",
+		a.area_community_id AS "areaCommunityId.id",
+		a.sp_alleviation AS "spAlleviation",
+		a.sp_people_alleviation AS "spPeopleAlleviation",
+		a.sp_reason AS "spReason",
+		a.sp_health AS "spHealth",
+		a.sp_labor_skill AS "spLaborSkill",
+		a.sp_income_type AS "spIncomeType",
+		a.sp_income_amount AS "spIncomeAmount",
+		a.sp_time AS "spTime",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag",
+		a4.name AS "areaGridId.name",
+		a9.name AS "areaTownId.name",
+		a10.name AS "areaCommunityId.name"
+	</sql>
+	
+	<sql id="ccmShakePovertyPeopleJoins">
+		LEFT JOIN sys_area a4 ON a4.id = a.area_grid_id
+		LEFT JOIN sys_area a9 ON a9.id = a.area_town_id
+		LEFT JOIN sys_area a10 ON a10.id = a.area_community_id
+	</sql>
+    
+	<select id="get" resultType="CcmShakePovertyPeople">
+		SELECT 
+			<include refid="ccmShakePovertyPeopleColumns"/>
+		FROM ccm_shake_poverty_people a
+		<include refid="ccmShakePovertyPeopleJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="CcmShakePovertyPeople">
+		SELECT 
+			<include refid="ccmShakePovertyPeopleColumns"/>
+		FROM ccm_shake_poverty_people a
+		<include refid="ccmShakePovertyPeopleJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="name != null and name != ''">
+				AND a.name LIKE 
+					<if test="dbName == 'oracle'">'%'||#{name}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{name}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{name},'%')</if>
+			</if>
+			<if test="sex != null and sex != ''">
+				AND a.sex = #{sex}
+			</if>
+			<if test="areaGridId != null and areaGridId.id != null and areaGridId.id != ''">
+				AND a.area_grid_id = #{areaGridId.id}
+			</if>
+			<if test="areaTownId != null and areaTownId.id != null and areaTownId.id != ''">
+				AND a.area_town_id = #{areaTownId.id}
+			</if>
+			<if test="spPeopleAlleviation != null  and spPeopleAlleviation != ''">
+				AND a.sp_people_alleviation = #{spPeopleAlleviation}
+			</if>
+			<if test="spReason != null  and spReason != ''">
+				AND a.sp_reason = #{spReason}
+			</if>
+			<if test="areaCommunityId != null and areaCommunityId.id != null and areaCommunityId.id != ''">
+				AND a.area_community_id = #{areaCommunityId.id}
+			</if>
+			<if test="spAlleviation != null and spAlleviation != ''">
+				AND a.sp_alleviation = #{spAlleviation}
+			</if>
+			<if test="spIncomeType != null and spIncomeType != ''">
+				AND a.sp_income_type = #{spIncomeType}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="CcmShakePovertyPeople">
+		SELECT 
+			<include refid="ccmShakePovertyPeopleColumns"/>
+		FROM ccm_shake_poverty_people a
+		<include refid="ccmShakePovertyPeopleJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO ccm_shake_poverty_people(
+			id,
+			name,
+			sex,
+			area_grid_id,
+			ident,
+			accountidentity,
+			birthday,
+			filing_time,
+			area_town_id,
+			area_community_id,
+			sp_alleviation,
+			sp_people_alleviation,
+			sp_reason,
+			sp_health,
+			sp_labor_skill,
+			sp_income_type,
+			sp_income_amount,
+			sp_time,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag
+		) VALUES (
+			#{id},
+			#{name},
+			#{sex},
+			#{areaGridId.id},
+			#{ident},
+			#{accountidentity},
+			#{birthday},
+			#{filingTime},
+			#{areaTownId.id},
+			#{areaCommunityId.id},
+			#{spAlleviation},
+			#{spPeopleAlleviation},
+			#{spReason},
+			#{spHealth},
+			#{spLaborSkill},
+			#{spIncomeType},
+			#{spIncomeAmount},
+			#{spTime},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE ccm_shake_poverty_people SET 	
+			name = #{name},
+			sex = #{sex},
+			area_grid_id = #{areaGridId.id},
+			ident = #{ident},
+			accountidentity = #{accountidentity},
+			birthday = #{birthday},
+			filing_time = #{filingTime},
+			area_town_id = #{areaTownId.id},
+			area_community_id = #{areaCommunityId.id},
+			sp_alleviation = #{spAlleviation},
+			sp_people_alleviation = #{spPeopleAlleviation},
+			sp_reason = #{spReason},
+			sp_health = #{spHealth},
+			sp_labor_skill = #{spLaborSkill},
+			sp_income_type = #{spIncomeType},
+			sp_income_amount = #{spIncomeAmount},
+			sp_time = #{spTime},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE ccm_shake_poverty_people SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+
+	<select id="findGroupByTown" resultType="ccmShakePovertyPeople">
+	SELECT
+		b.name as townName,
+		count( 
+		CASE WHEN 
+			a.sp_alleviation IS NULL OR a.sp_alleviation = '' 
+		THEN 
+			CASE WHEN 
+				#{param1} = '02' 
+			THEN '02' 
+			ELSE NULL 
+			END 
+		ELSE 
+			CASE WHEN 
+				a.sp_alleviation = #{param1} 
+			THEN a.sp_alleviation 
+			ELSE NULL 
+			END 
+		END )  as sptownNum
+		FROM ccm_shake_poverty_people a, sys_area b
+		where a.del_flag = 0
+		AND a.area_town_id = b.id
+		<!-- AND b.type = '5' -->
+		GROUP BY a.area_town_id
+	</select>
+
+    <select id="findByBirNum" resultType="ccmShakePovertyPeople">
+		SELECT
+		b.name as townName,
+		Count(CASE WHEN FLOOR(DATEDIFF(CURDATE(), birthday)/365.2422) BETWEEN 0 and 18 THEN 1 ELSE null END) as baob,
+		Count(CASE WHEN FLOOR(DATEDIFF(CURDATE(), birthday)/365.2422) BETWEEN 19 and 60 THEN 1 ELSE null END) as baqo,
+		Count(CASE WHEN FLOOR(DATEDIFF(CURDATE(), birthday)/365.2422)>60 THEN 1 ELSE null END) as baow
+		FROM ccm_shake_poverty_people a, sys_area b
+		where
+		a.del_flag = 0
+		AND a.area_town_id = b.id
+		AND (a.sp_alleviation = '01'
+		OR a.sp_alleviation = '02')
+-- 		AND b.type = '5'
+		GROUP BY b.id
+	</select>
+
+    <select id="findByIncome" resultType="ccmShakePovertyPeople">
+		SELECT
+		b.name as townName,
+		AVG(sp_income_amount) as spIncomeAmount,
+		count(*) as spSum
+		FROM ccm_shake_poverty_people a, sys_area b
+		where a.area_town_id = b.id
+		AND a.sp_alleviation = '03'
+		AND b.type = '5'
+		GROUP BY sp_income_type,area_town_id
+	</select>
+
+    <select id="findCount" resultType="ccmShakePovertyPeople">
+		SELECT
+		b.name as townName,
+		count(*) as spSum
+		FROM ccm_shake_poverty_people a, sys_area b
+		where a.area_town_id = b.id
+		AND a.sp_alleviation = '03'
+		AND b.type = '5'
+		GROUP BY sp_income_type,area_town_id
+	</select>
+    <select id="findTown" resultType="SysArea">
+		SELECT sys_area.id,sys_area.name from sys_area JOIN ccm_shake_poverty_people on sys_area.id=ccm_shake_poverty_people.area_town_id GROUP BY  ccm_shake_poverty_people.area_town_id
+	</select>
+	
+	<select id="skilllist" resultType="ccmShakePovertyPeople">
+		select count(*) as spSum,sp_labor_skill from ccm_shake_poverty_people WHERE del_flag = 0 GROUP BY sp_labor_skill
+	</select>
+	
+	<select id="Healthlist" resultType="ccmShakePovertyPeople">
+		select count(*) as spSum,sp_health from ccm_shake_poverty_people WHERE del_flag = 0 GROUP BY sp_health
+	</select>
+	
+	<select id="selectAll" resultType="ccmShakePovertyPeople">
+		select count(*) as spSum from ccm_shake_poverty_people WHERE del_flag = 0
+	</select>
+	<select id="selectAreaid" resultType="ccmShakePovertyPeople">
+		select * from ccm_shake_poverty_people WHERE del_flag = 0 GROUP BY area_grid_id
+	</select>
+	<select id="selectAreaCountId" resultType="ccmShakePovertyPeople">
+		select * from ccm_shake_poverty_people WHERE del_flag = 0 GROUP BY area_community_id
+	</select>
+	<select id="selectJDLK" resultType="ccmShakePovertyPeople">
+		select count(*) as spSum from ccm_shake_poverty_people WHERE del_flag = 0 GROUP BY accountidentity
+	</select>
+	<select id="selectTP" resultType="ccmShakePovertyPeople">
+		select count(*) as spSum from ccm_shake_poverty_people where del_flag = 0 and sp_alleviation='01' GROUP BY accountidentity
+	</select>
+	<select id="selectWTP" resultType="ccmShakePovertyPeople">
+		select count(*) as spSum from ccm_shake_poverty_people where del_flag = 0 and (sp_alleviation='02' or sp_alleviation='03' OR sp_alleviation IS NULL OR sp_alleviation = '') GROUP BY accountidentity
+	</select>
+	<select id="selectTMD" resultType="ccmShakePovertyPeople">
+		SELECT count(*) as spSum FROM ccm_shake_poverty_people WHERE  del_flag = 0 and sp_alleviation='03' and  DATE_FORMAT(sp_time, '%Y%m' ) = DATE_FORMAT( CURDATE() , '%Y%m' )
+	</select>
+	
+</mapper>

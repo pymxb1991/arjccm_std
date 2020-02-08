@@ -1,0 +1,157 @@
+<%@ page contentType="text/html;charset=UTF-8" %>
+<%@ include file="/WEB-INF/views/include/taglib.jsp"%>
+<html>
+<head>
+	<title>文化教育场所管理</title>
+	<meta name="decorator" content="default"/>
+	<script type="text/javascript">
+		$(document).ready(
+				function() {
+					$('#ccmBasePlaceCommon').attr(
+							'href',
+							'${ctx}/place/ccmBasePlace/form/common?id=${ccmPlaceEducation.basePlaceId}&name='
+									+ encodeURI('学校信息')
+									+ '&url=${ctx}/education/ccmPlaceEducation/form?id=${ccmPlaceEducation.id}'
+			//$("#name").focus();
+			$("#inputForm").validate({
+				submitHandler: function(form){
+					loading('正在提交，请稍等...');
+					form.submit();
+				},
+				errorContainer: "#messageBox",
+				errorPlacement: function(error, element) {
+					$("#messageBox").text("输入有误，请先更正。");
+					if (element.is(":checkbox")||element.is(":radio")||element.parent().is(".input-append")){
+						error.appendTo(element.parent().parent());
+					} else {
+						error.insertAfter(element);
+					}
+				}
+			});
+		});
+	</script>
+</head>
+<body>
+	<ul class="nav nav-tabs">
+		<li><a id="ccmBasePlaceCommon" href="">场所基本信息</a></li>
+		<li><a href="${ctx}/education/ccmPlaceEducation/">文化教育场所列表</a></li>
+		<li class="active"><a href="${ctx}/education/ccmPlaceEducation/form?id=${ccmPlaceEducation.id}">文化教育场所<shiro:hasPermission name="education:ccmPlaceEducation:edit">${not empty ccmPlaceEducation.id?'修改':'添加'}</shiro:hasPermission><shiro:lacksPermission name="education:ccmPlaceEducation:edit">查看</shiro:lacksPermission></a></li>
+	</ul><br/>
+	<form:form id="inputForm" modelAttribute="ccmPlaceEducation" action="${ctx}/education/ccmPlaceEducation/save" method="post" class="form-horizontal">
+		<form:hidden path="id"/>
+		<sys:message content="${message}"/>		
+		
+		<div class="control-group">
+			<label class="control-label">场所类型：</label>
+			<div class="controls">
+			<form:select path="type" class="input-xlarge required" items="${fns:getDictList('place_types')}" itemLabel="label" itemValue="value" htmlEscape="false">
+							</form:select>
+				<span class="help-inline"><font color="red">*</font> </span>
+			</div>
+		</div>
+		<div class="control-group">
+			<label class="control-label">学校标识码：</label>
+			<div class="controls">
+				<form:input path="schoolCode" htmlEscape="false" maxlength="255" class="input-xlarge "/>
+			</div>
+		</div>
+		<div class="control-group">
+			<label class="control-label">学校官网：</label>
+			<div class="controls">
+				<form:input path="schoolNet" htmlEscape="false" maxlength="255" class="input-xlarge "/>
+			</div>
+		</div>
+		<div class="control-group">
+			<label class="control-label">学校级别：</label>
+			<div class="controls">
+				<form:input path="schoolRank" htmlEscape="false" maxlength="255" class="input-xlarge "/>
+			</div>
+		</div>
+		<div class="control-group">
+			<label class="control-label">办学类型：</label>
+			<div class="controls">
+				<form:select path="schoolType" class="input-xlarge required" items="${fns:getDictList('ccm_schol_type')}" itemLabel="label" itemValue="value" htmlEscape="false">
+				</form:select>
+			</div>
+		</div>
+		<div class="control-group">
+			<label class="control-label">办公电话：</label>
+			<div class="controls">
+				<form:input path="schoolPhone" htmlEscape="false" maxlength="255" class="input-xlarge "/>
+			</div>
+		</div>
+		<div class="control-group">
+			<label class="control-label">传真号：</label>
+			<div class="controls">
+				<form:input path="faxNumber" htmlEscape="false" maxlength="11" class="input-xlarge "/>
+			</div>
+		</div>
+		<div class="control-group">
+			<label class="control-label">行政管理员名字：</label>
+			<div class="controls">
+				<form:input path="managerName" htmlEscape="false" maxlength="255" class="input-xlarge "/>
+			</div>
+		</div>
+		<div class="control-group">
+			<label class="control-label">行政管理员联系方式：</label>
+			<div class="controls">
+				<form:input path="managerPhoneNumber" htmlEscape="false" maxlength="255" class="input-xlarge "/>
+			</div>
+		</div>
+		<div class="control-group">
+			<label class="control-label">研究院办公电话：</label>
+			<div class="controls">
+				<form:input path="graduateSchoolPhone" htmlEscape="false" maxlength="255" class="input-xlarge "/>
+			</div>
+		</div>
+		<div class="control-group">
+			<label class="control-label">工作人员数量：</label>
+			<div class="controls">
+				<form:input path="workerNumber" htmlEscape="false" maxlength="11" class="input-xlarge "/>
+			</div>
+		</div>
+		<div class="control-group">
+			<label class="control-label">研究院性质：</label>
+			<div class="controls">
+				<form:input path="graduateSchoolNature" htmlEscape="false" maxlength="255" class="input-xlarge "/>
+			</div>
+		</div>
+		<div class="control-group">
+			<label class="control-label">博物馆或美术馆名字：</label>
+			<div class="controls">
+				<form:input path="museumName" htmlEscape="false" maxlength="255" class="input-xlarge "/>
+			</div>
+		</div>
+		<div class="control-group">
+			<label class="control-label">是否免费（01 免费  02收费  ）：</label>
+			<div class="controls">
+				<form:select path="isFree" class="input-xlarge required" 
+				items="${fns:getDictList('ccm_place_free')}" itemLabel="label" 
+				itemValue="value" htmlEscape="false"></form:select>
+			</div>
+		</div>
+		<div class="control-group">
+			<label class="control-label">管理人员数量：</label>
+			<div class="controls">
+				<form:input path="managerNumber" htmlEscape="false" maxlength="100" class="input-xlarge "/>
+			</div>
+		</div>
+		<div class="control-group">
+			<label class="control-label">场所id：</label>
+			<div class="controls">
+				<form:input path="basePlaceId" htmlEscape="false" maxlength="64" class="input-xlarge "/>
+			</div>
+		</div>
+		<div class="control-group">
+			<label class="control-label">备注信息：</label>
+			<div class="controls">
+				<form:textarea path="remarks" htmlEscape="false" rows="4" maxlength="255" class="input-xxlarge "/>
+			</div>
+		</div>
+		<div class="form-actions">
+			<shiro:hasPermission name="education:ccmPlaceEducation:edit"><input id="btnSubmit" class="btn btn-primary" type="submit" value="保 存"/>&nbsp;</shiro:hasPermission>
+			<input id="btnCancel" class="btn" type="button" value="返 回" onclick="history.go(-1)"/>
+		</div>
+	</form:form>
+</body>
+</html>

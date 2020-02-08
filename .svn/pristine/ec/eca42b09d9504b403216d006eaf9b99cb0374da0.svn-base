@@ -1,0 +1,635 @@
+.inner-menu li span,.police-go i,.interaction i,.police-city ul p,.police-city ul q,.police-result ul p,.police-result ul q {
+    background-image: url('realtimeAlarmSituation/images/index2.png');
+    background-repeat: no-repeat;
+}
+.refurbish {
+ 	position: absolute;
+	bottom: 0;
+	left:71px;
+	z-index: 32;
+    text-align:center;
+	width: 50px;
+	height: 30px;
+	background: rgba(93,164,244,.75);
+	color: #fff;
+	line-height: 30px;
+	cursor: pointer;
+}
+.esriPopup .titlePane {
+    height:30px;
+    line-height:30px;
+    background-color:#0e54a9;
+}
+.esriPopup .titleButton.maximize,.esriPopup .titleButton.restore {
+    top:10px;display: none;
+}
+.toolbar {
+    position:relative;
+	position: absolute;
+    overflow: hidden;
+	z-index: 50;
+    width:200px;
+    height:200px;
+    border-radius:50%;
+    left:50%;
+    top:50%;
+    margin-left:-100px;
+    margin-top:-100px;
+    border:1px solid #2884e7;
+}
+
+.toolmenu .toolbar-border {
+    border:2px solid red;
+}
+.toolmenu {
+    position:relative;
+    position:absolute;
+    overflow: hidden;
+	z-index: -99;
+    width:300px;
+    height:300px;
+    border-radius:50%;
+    font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-size:14px;
+}
+.inner-menu {
+    position:relative;
+	position: absolute;
+    overflow: hidden;
+	z-index: 32;
+    width:300px;
+    height:300px;
+    border-radius:50%;
+}
+.toolmenu, .inner-menu ul {
+    visibility:hidden;
+    z-index:-99;
+}
+.inner-menu ul li {
+    position: absolute;
+    overflow: hidden;  
+    transform-origin: 100% 100%; 
+    left:0;
+    top:0;
+    width: 150px;
+    height: 150px;
+    background: rgba(118,195,249,.75); 
+}
+
+.toolmenu.active {
+    visibility: visible;
+    z-index:100;
+}
+.inner-menu .active {
+    z-index:100;
+    visibility: visible;
+}
+.inner-menu .toolbars li {
+    -webkit-transform: rotate(30deg) skew(60deg);
+    -moz-transform: rotate(30deg) skew(60deg);
+    -ms-transform: rotate(30deg) skew(60deg);
+    -o-transform: rotate(30deg) skew(60deg);
+    transform: rotate(30deg) skew(60deg);
+    -webkit-transition:transform 0.2s ease;
+    -moz-transition:transform 0.2s  ease;
+    -ms-transition:transform 0.2s  ease;
+    -o-transition:transform 0.2s  ease;
+    transition: transform 0.2s  ease;
+}
+.inner-menu .range-query li {
+    -webkit-transform: rotate(150deg) skew(60deg);
+    -moz-transform: rotate(150deg) skew(60deg);
+    -ms-transform: rotate(150deg) skew(60deg);
+    -o-transform: rotate(150deg) skew(60deg);
+    transform: rotate(150deg) skew(60deg);
+    -webkit-transition:transform 0.2s ease;
+    -moz-transition:transform 0.2s ease;
+    -ms-transition:transform 0.2s ease;
+    -o-transition:transform 0.2s ease;
+    transition: transform 0.2s ease;
+}
+.inner-menu .plottingbar li {
+    -webkit-transform: rotate(120deg) skew(60deg);
+    -moz-transform: rotate(120deg) skew(60deg);
+    -ms-transform: rotate(120deg) skew(60deg);
+    -o-transform: rotate(120deg) skew(60deg);
+    transform: rotate(120deg) skew(60deg);
+    -webkit-transition:transform 0.2s ease;
+    -moz-transition:transform 0.2s ease;
+    -ms-transition:transform 0.2s ease;
+    -o-transition:transform 0.2s ease;
+   transition: transform 0.2s ease;
+}
+.inner-menu .toolbars.active li:first-child {
+    -webkit-transform: rotate(60deg) skew(60deg);
+    -moz-transform: rotate(60deg) skew(60deg);
+    -ms-transform: rotate(60deg) skew(60deg);
+    -o-transform: rotate(60deg) skew(60deg);
+    transform:rotate(60deg) skew(60deg);
+}
+.inner-menu .toolbars.active li:nth-child(2) {
+    -webkit-transform: rotate(90deg) skew(60deg);
+    -moz-transform: rotate(90deg) skew(60deg);
+    -ms-transform: rotate(90deg) skew(60deg);
+    -o-transform: rotate(90deg) skew(60deg);
+    transform:rotate(90deg) skew(60deg);
+}
+.inner-menu .toolbars.active li:nth-child(3) {
+    -webkit-transform: rotate(120deg) skew(60deg);
+    -moz-transform: rotate(120deg) skew(60deg);
+    -ms-transform: rotate(120deg) skew(60deg);
+    -o-transform: rotate(120deg) skew(60deg);
+    transform:rotate(120deg) skew(60deg);
+}
+/* .inner-menu .toolbars.active li:nth-child(4) {
+    -webkit-transform: rotate(150deg) skew(60deg);
+    -moz-transform: rotate(150deg) skew(60deg);
+    -ms-transform: rotate(150deg) skew(60deg);
+    -o-transform: rotate(150deg) skew(60deg);
+    transform:rotate(150deg) skew(60deg);
+}
+.inner-menu .toolbars.active li:nth-child(5) {
+    -webkit-transform: rotate(180deg) skew(60deg);
+    -moz-transform: rotate(180deg) skew(60deg);
+    -ms-transform: rotate(180deg) skew(60deg);
+    -o-transform: rotate(180deg) skew(60deg);
+    transform:rotate(180deg) skew(60deg);
+} 
+.inner-menu .toolbars.active li:nth-child(6) {
+    -webkit-transform: rotate(210deg) skew(60deg);
+    -moz-transform: rotate(210deg) skew(60deg);
+    -ms-transform: rotate(210deg) skew(60deg);
+    -o-transform: rotate(210deg) skew(60deg);
+    transform:rotate(210deg) skew(60deg);
+}*/
+.inner-menu .toolbars.active li:nth-child(4) {
+  /*   -webkit-transform: rotate(240deg) skew(60deg);
+    -moz-transform: rotate(240deg) skew(60deg);
+    -ms-transform: rotate(240deg) skew(60deg);
+    -o-transform: rotate(240deg) skew(60deg);
+    transform:rotate(240deg) skew(60deg); */
+    -webkit-transform: rotate(150deg) skew(60deg);
+    -moz-transform: rotate(150deg) skew(60deg);
+    -ms-transform: rotate(150deg) skew(60deg);
+    -o-transform: rotate(150deg) skew(60deg);
+    transform:rotate(150deg) skew(60deg);
+    background: -o-linear-gradient(left bottom, rgba(111,188,244,.75) 1%, rgba(193,215,228,0.7)26%, transparent 50%);
+    background: -moz-linear-gradient(left bottom, rgba(111,188,244,.75) 1%, rgba(193,215,228,0.7)26%, transparent 50%);
+    background: -webkit-linear-gradient(left bottom, rgba(111,188,244,.75) 1%, rgba(193,215,228,0.7)26%, transparent 50%);
+    background: linear-gradient(left bottom, rgba(111,188,244,.75) 1%, rgba(193,215,228,0.7)26%, transparent 50%);
+}
+.inner-menu .toolbars.active li:nth-child(5) {
+    -webkit-transform: rotate(30deg) skew(60deg);
+    -moz-transform: rotate(30deg) skew(60deg);
+    -ms-transform: rotate(30deg) skew(60deg);
+    -o-transform: rotate(30deg) skew(60deg);
+    transform:rotate(30deg) skew(60deg);
+    background: -o-linear-gradient(right, rgba(111,188,244,.75) 1%, rgba(193,215,228,0.7)26%, transparent 50%);
+    background: -moz-linear-gradient(right, rgba(111,188,244,.75) 1%, rgba(193,215,228,0.7)26%, transparent 50%);
+    background: -webkit-linear-gradient(right, rgba(111,188,244,.75) 1%, rgba(193,215,228,0.7)26%, transparent 50%);
+    background: linear-gradient(right, rgba(111,188,244,.75) 1%, rgba(193,215,228,0.75)26%, transparent 50%)
+}
+.inner-menu .range-query.active li:first-child {
+    -webkit-transform: rotate(180deg) skew(60deg);
+    -moz-transform: rotate(180deg) skew(60deg);
+    -ms-transform: rotate(180deg) skew(60deg);
+    -o-transform: rotate(180deg) skew(60deg);
+    transform:rotate(180deg) skew(60deg);
+}
+.inner-menu .range-query.active li:nth-child(2) {
+    -webkit-transform: rotate(210deg) skew(60deg);
+    -moz-transform: rotate(210deg) skew(60deg);
+    -ms-transform: rotate(210deg) skew(60deg);
+    -o-transform: rotate(210deg) skew(60deg);
+    transform:rotate(210deg) skew(60deg);
+}
+.inner-menu .range-query.active li:nth-child(3) {
+    -webkit-transform: rotate(240deg) skew(60deg);
+    -moz-transform: rotate(240deg) skew(60deg);
+    -ms-transform: rotate(240deg) skew(60deg);
+    -o-transform: rotate(240deg) skew(60deg);
+    transform:rotate(240deg) skew(60deg);
+}
+.inner-menu .range-query.active li:nth-child(4) {
+    -webkit-transform: rotate(270deg) skew(60deg);
+    -moz-transform: rotate(270deg) skew(60deg);
+    -ms-transform: rotate(270deg) skew(60deg);
+    -o-transform: rotate(270deg) skew(60deg);
+    transform:rotate(270deg) skew(60deg);
+    background: -o-linear-gradient(left bottom, rgba(111,188,244,.75) 1%, rgba(193,215,228,0.7)26%, transparent 50%);
+    background: -moz-linear-gradient(left bottom, rgba(111,188,244,.75) 1%, rgba(193,215,228,0.7)26%, transparent 50%);
+    background: -webkit-linear-gradient(left bottom, rgba(111,188,244,.75) 1%, rgba(193,215,228,0.7)26%, transparent 50%);
+    background: linear-gradient(left bottom, rgba(111,188,244,.75) 1%, rgba(193,215,228,0.7)26%, transparent 50%);
+}
+.inner-menu .range-query.active li:nth-child(5) {
+    -webkit-transform: rotate(150deg) skew(60deg);
+    -moz-transform: rotate(150deg) skew(60deg);
+    -ms-transform: rotate(150deg) skew(60deg);
+    -o-transform: rotate(150deg) skew(60deg);
+    transform:rotate(150deg) skew(60deg);
+    background: -o-linear-gradient(right, rgba(111,188,244,.75) 1%, rgba(193,215,228,0.7)26%, transparent 50%);
+    background: -moz-linear-gradient(right, rgba(111,188,244,.75) 1%, rgba(193,215,228,0.7)26%, transparent 50%);
+    background: -webkit-linear-gradient(right, rgba(111,188,244,.75) 1%, rgba(193,215,228,0.7)26%, transparent 50%);
+    background: linear-gradient(right, rgba(111,188,244,.75) 1%, rgba(193,215,228,0.75)26%, transparent 50%)
+}
+.inner-menu .plottingbar.active li:first-child {
+    -webkit-transform: rotate(120deg) skew(60deg);
+    -moz-transform: rotate(120deg) skew(60deg);
+    -ms-transform: rotate(120deg) skew(60deg);
+    -o-transform: rotate(120deg) skew(60deg);
+    transform:rotate(120deg) skew(60deg);
+}
+.inner-menu .plottingbar.active li:nth-child(2) {
+    -webkit-transform: rotate(150deg) skew(60deg);
+    -moz-transform: rotate(150deg) skew(60deg);
+    -ms-transform: rotate(150deg) skew(60deg);
+    -o-transform: rotate(150deg) skew(60deg);
+    transform:rotate(150deg) skew(60deg);
+}
+.inner-menu .plottingbar.active li:nth-child(3) {
+    -webkit-transform: rotate(180deg) skew(60deg);
+    -moz-transform: rotate(180deg) skew(60deg);
+    -ms-transform: rotate(180deg) skew(60deg);
+    -o-transform: rotate(180deg) skew(60deg);
+    transform:rotate(180deg) skew(60deg);
+}
+.inner-menu .plottingbar.active li:nth-child(4) {
+    -webkit-transform: rotate(0deg) skew(60deg);
+    -moz-transform: rotate(0deg) skew(60deg);
+    -ms-transform: rotate(0deg) skew(60deg);
+    -o-transform: rotate(0deg) skew(60deg);
+    transform:rotate(210deg) skew(60deg);
+}
+.inner-menu .plottingbar.active li:nth-child(5) {
+    -webkit-transform: rotate(240deg) skew(60deg);
+    -moz-transform: rotate(240deg) skew(60deg);
+    -ms-transform: rotate(240deg) skew(60deg);
+    -o-transform: rotate(240deg) skew(60deg);
+    transform:rotate(240deg) skew(60deg);
+}
+.inner-menu .plottingbar.active li:nth-child(6) {
+    -webkit-transform: rotate(270deg) skew(60deg);
+    -moz-transform: rotate(270deg) skew(60deg);
+    -ms-transform: rotate(270deg) skew(60deg);
+    -o-transform: rotate(270deg) skew(60deg);
+    transform:rotate(270deg) skew(60deg);
+}
+.inner-menu .plottingbar.active li:nth-child(7) {
+    -webkit-transform: rotate(300deg) skew(60deg);
+    -moz-transform: rotate(300deg) skew(60deg);
+    -ms-transform: rotate(300deg) skew(60deg);
+    -o-transform: rotate(300deg) skew(60deg);
+    transform:rotate(300deg) skew(60deg);
+}
+.inner-menu .plottingbar.active li:nth-child(8) {
+    -webkit-transform: rotate(0deg) skew(60deg);
+    -moz-transform: rotate(330deg) skew(60deg);
+    -ms-transform: rotate(330deg) skew(60deg);
+    -o-transform: rotate(330deg) skew(60deg);
+    transform:rotate(330deg) skew(60deg);
+}
+.inner-menu .plottingbar.active li:nth-child(9) {
+    -webkit-transform: rotate(0deg) skew(60deg);
+    -moz-transform: rotate(0deg) skew(60deg);
+    -ms-transform: rotate(0deg) skew(60deg);
+    -o-transform: rotate(0deg) skew(60deg);
+    transform:rotate(360deg) skew(60deg);
+}
+.inner-menu .plottingbar.active li:nth-child(10) {
+    -webkit-transform: rotate(30deg) skew(60deg);
+    -moz-transform: rotate(30deg) skew(60deg);
+    -ms-transform: rotate(30deg) skew(60deg);
+    -o-transform: rotate(30deg) skew(60deg);
+    transform:rotate(390deg) skew(60deg);
+}
+.inner-menu .plottingbar.active li:nth-child(11) {
+    -webkit-transform: rotate(60deg) skew(60deg);
+    -moz-transform: rotate(60deg) skew(60deg);
+    -ms-transform: rotate(60deg) skew(60deg);
+    -o-transform: rotate(60deg) skew(60deg);
+    transform:rotate(420deg) skew(60deg);
+}
+.inner-menu .plottingbar.active li:nth-child(12) {
+    -webkit-transform: rotate(90deg) skew(60deg);
+    -moz-transform: rotate(90deg) skew(60deg);
+    -ms-transform: rotate(90deg) skew(60deg);
+    -o-transform: rotate(90deg) skew(60deg);
+    transform:rotate(450deg) skew(60deg);
+}
+
+.inner-menu li span {
+    display:block;
+    width: 40px;
+    height: 50px;
+    position:absolute;
+    text-align:center;
+    line-height:50px;
+    color:#fff;
+    z-index:100;
+    left: 50px;
+    top: 100px;
+    cursor:pointer;
+    -webkit-transform: rotate(180deg) skew(60deg);
+    -moz-transform: rotate(180deg) skew(60deg);
+    -ms-transform: rotate(180deg) skew(60deg);
+    -o-transform: rotate(180deg) skew(60deg);
+    transform:rotate(180deg) skew(-60deg);
+}
+.toolbars li:first-child span {
+    background-position: -160px -816px;
+    background:url("realtimeAlarmSituation/images/1-1.png") no-repeat center;
+}
+.toolbars li:nth-child(2) span {
+    /*   background-position: -108px -734px; */
+    background-position: -60px -553px;
+    background:url("realtimeAlarmSituation/images/1-2.png") no-repeat center;
+}
+.toolbars li:nth-child(3) span {
+    /*  background-position: -60px -553px;
+    background:url("realtimeAlarmSituation/images/1-2.png") no-repeat center; */
+    background-position: -98px -456px;
+}
+.toolbars li:nth-child(4) span{
+    background-position: -98px -456px;
+}
+.toolbars li:nth-child(5) span{
+    background-position: -60px -641px;
+    background:url("realtimeAlarmSituation/images/1-3.png") no-repeat center;
+}
+.toolbars li:nth-child(6) span{
+    background-position: -104px -352px;
+}
+.range-query li:first-child span {
+    background-position: -96px -255px;
+}
+.range-query li:nth-child(2) span {
+    background-position: -95px -162px;
+}
+.range-query li:nth-child(3) span {
+    background-position: -101px -76px;
+}
+.plottingbar li:first-child span {
+    background-position: -102px 21px;
+}
+.plottingbar li:nth-child(2) span {
+   background-position: 9px -908px;
+}
+.plottingbar li:nth-child(3) span {
+    background-position: 12px -824px;
+}
+.plottingbar li:nth-child(4) span {
+    background-position: 10px -715px;
+}
+.plottingbar li:nth-child(5) span {
+   background-position: 5px -625px;
+}
+.plottingbar li:nth-child(6) span {
+    background-position: 18px -267px;
+}
+.plottingbar li:nth-child(7) span {
+    background-position: 13px -351px;
+    -webkit-transform: rotate(180deg) skew(60deg);
+    -moz-transform: rotate(180deg) skew(60deg);
+    -ms-transform: rotate(180deg) skew(60deg);
+    -o-transform: rotate(180deg) skew(60deg);
+    transform:rotate(180deg) skew(-60deg);
+}
+.plottingbar li:nth-child(8) span {
+    background-position: 13px -351px;
+    -webkit-transform: rotate(360deg) skew(60deg);
+    -moz-transform: rotate(360deg) skew(60deg);
+    -ms-transform: rotate(360deg) skew(60deg);
+    -o-transform: rotate(360deg) skew(60deg);
+    transform:rotate(360deg) skew(-60deg);
+}
+.plottingbar li:nth-child(9) span {
+    background-position: 13px -351px;
+}
+.plottingbar li:nth-child(10) span {
+    background-position: 9px -169px;
+}
+.plottingbar li:nth-child(11) span {
+    background-position: 4px -70px;
+}
+.plottingbar li:nth-child(12) span {
+    background-position: 5px 14px;
+}
+.toolbar div span {
+    display:block;
+    width:50px;
+    height: 45px;
+    position:absolute;
+    text-align:center;
+    line-height:50px;
+    cursor:pointer;
+}
+.all-map span,.return-map span {
+    left: 30px;
+    top: 43px;
+    -webkit-transform:rotate(-40deg) skew(13deg);
+    -moz-transform:rotate(-40deg) skew(13deg);
+    -ms-transform:rotate(-40deg) skew(13deg);
+    -o-transform:rotate(-40deg) skew(13deg);
+    transform:rotate(-40deg) skew(13deg);
+}
+.historyCoordinate span {
+    left: 40px;
+    top: 46px;
+    -webkit-transform:rotate(-222deg) skew(10deg);
+    -moz-transform:rotate(-222deg) skew(10deg);
+    -ms-transform:rotate(-222deg) skew(10deg);
+    -o-transform:rotate(-222deg) skew(10deg);
+    transform:rotate(-222deg) skew(10deg);
+}
+#clear span {
+    left: 38px;
+    top: 40px;
+    -webkit-transform:rotate(-38deg) skew(-5deg);
+    -moz-transform:rotate(-38deg) skew(-5deg);
+    -ms-transform:rotate(-38deg) skew(-5deg);
+    -o-transform:rotate(-38deg) skew(-5deg);
+    transform:rotate(-38deg) skew(-5deg);
+}
+#turn-off span {
+    left: 8px;
+    top: 10px;
+}
+.range span {
+    left: 36px;
+    top: 43px;
+    -webkit-transform:rotate(-38deg) skew(0deg);
+    -moz-transform:rotate(-38deg) skew(0deg);
+    -ms-transform:rotate(-38deg) skew(0deg);
+    -o-transform:rotate(-38deg) skew(0deg);
+    transform:rotate(-38deg) skew(0deg);
+}
+.Tools span {
+    left: 31px;
+    top: 44px;
+    -webkit-transform:rotate(-40deg) skew(10deg);
+    -moz-transform:rotate(-40deg) skew(10deg);
+    -ms-transform:rotate(-40deg) skew(10deg);
+    -o-transform:rotate(-40deg) skew(10deg);
+    transform:rotate(-40deg) skew(10deg);
+}
+.plotting span {
+    left: 37px;
+    top: 41px;
+    -webkit-transform:rotate(-41deg) skew(5deg);
+    -moz-transform:rotate(-41deg) skew(5deg);
+    -ms-transform:rotate(-41deg) skew(5deg);
+    -o-transform:rotate(-41deg) skew(5deg);
+    transform:rotate(-41deg) skew(5deg);
+}
+
+.toolbar div {
+    position:absolute;
+    left:0;
+    top:0;
+    z-index: 32;
+    overflow: hidden;
+    transform-origin: 100% 100%;
+	color: #fff;
+    width: 100px;
+    height: 100px;
+    background: -webkit-linear-gradient(to top left, #5485c0 30%, #81c7fb 70%); 
+    background: -o-linear-gradient(to top left, #5485c0 30%, #81c7fb 70%); 
+    background: -moz-linear-gradient(to top left, #5485c0 30%, #81c7fb 70%); 
+    background: linear-gradient(to top left, #5485c0 30%, #81c7fb 70%); 
+    border:1px solid #fff;
+    -webkit-transition:transform 0.2s ease;
+    -moz-transition:transform 0.2s ease;
+    -ms-transition:transform 0.2s ease;
+    -o-transition:transform 0.2s ease;
+    transition: transform 0.2s ease;
+}
+.range,.Tools,#map .all-map,#map .return-map,#clear,.historyCoordinate,.plotting {
+    -webkit-transform: rotate(60deg) skew(30deg);
+    -moz-transform: rotate(60deg) skew(30deg);
+    -ms-transform: rotate(60deg) skew(30deg);
+    -o-transform: rotate(60deg) skew(30deg);
+    transform:rotate(60deg) skew(30deg);
+}
+.toolmenu.active .range {
+    -webkit-transform: rotate(180deg) skew(30deg);
+    -moz-transform: rotate(180deg) skew(30deg);
+    -ms-transform: rotate(180deg) skew(30deg);
+    -o-transform: rotate(180deg) skew(30deg);
+    transform:rotate(180deg) skew(30deg);
+}
+.toolmenu.active .Tools {
+    -webkit-transform: rotate(60deg) skew(30deg);
+    -moz-transform: rotate(60deg) skew(30deg);
+    -ms-transform: rotate(60deg) skew(30deg);
+    -o-transform: rotate(60deg) skew(30deg);
+    transform:rotate(60deg) skew(30deg);
+}
+#map .toolmenu.active .all-map,#map .toolmenu.active .return-map {
+    -webkit-transform: rotate(360deg) skew(30deg);
+    -moz-transform: rotate(360deg) skew(30deg);
+    -ms-transform: rotate(360deg) skew(30deg);
+    -o-transform: rotate(360deg) skew(30deg);
+    transform: rotate(360deg) skew(30deg);
+}
+.toolmenu.active #clear {
+    -webkit-transform: rotate(300deg) skew(30deg);
+    -moz-transform: rotate(300deg) skew(30deg);
+    -ms-transform: rotate(300deg) skew(30deg);
+    -o-transform: rotate(300deg) skew(30deg);
+    transform: rotate(300deg) skew(30deg);
+}
+#turn-off {
+	width: 70px;
+    height: 70px;
+	color: #000;
+    left: 50%;
+    top: 50%;
+    line-height:70px;
+    margin-top:-35px;
+    margin-left:-35px;
+    border-radius:50%;
+    background:#fff;
+}
+.toolmenu.active .historyCoordinate {
+    -webkit-transform: rotate(240deg) skew(30deg);
+    -moz-transform: rotate(240deg) skew(30deg);
+    -ms-transform: rotate(240deg) skew(30deg);
+    -o-transform: rotate(240deg) skew(30deg);
+    transform:rotate(240deg) skew(30deg);
+}
+.toolmenu.active .plotting {
+    -webkit-transform: rotate(120deg) skew(30deg);
+    -moz-transform: rotate(120deg) skew(30deg);
+    -ms-transform: rotate(120deg) skew(30deg);
+    -o-transform: rotate(120deg) skew(30deg);
+    transform: rotate(120deg) skew(30deg);
+}
+#map .return-map {
+	display: none;
+}
+
+.toolbar .conversion-color{
+    background:#004394;
+}
+#floatingLayer {
+	position: absolute;
+	bottom: 0;
+	right:313px;
+	z-index: 32;
+    text-align:center;
+	width: 50px;
+	height: 50px;
+    border-radius:50%;
+	background: rgba(93,164,244,.75);
+	color: #fff;
+	line-height: 50px;
+	cursor: pointer;
+}
+.esriPopup .titleButton {
+    top:7px;
+}
+.police .police-go .police-go-cut {
+    background-position:-347px 6px;
+}
+.police .interaction .interaction-cut {
+    background-position:-346px -98px;
+}
+.animation {
+    position:fixed;
+    left:50%;
+    top:50%;
+    display:none;
+    z-index:100;
+}
+.tooltip {
+    position : relative;
+    background: rgba(0, 0, 0, 0.5);
+    border-radius: 4px;
+    color: white;
+    padding: 4px 8px;
+    opacity: 0.7;
+    white-space: nowrap;
+}
+.tooltip-measure {
+    opacity: 1;
+    font-weight: bold;
+}
+.tooltip-static {
+    background-color: #ffcc33;
+    color: black;
+    border: 1px solid white;
+}
+.tooltip-measure:before,
+.tooltip-static:before {
+    border-top: 6px solid rgba(0, 0, 0, 0.5);
+    border-right: 6px solid transparent;
+    border-left: 6px solid transparent;
+    content: "";
+    position: absolute;
+    bottom: -6px;
+    margin-left: -7px;
+    left: 50%;
+}
+.tooltip-static:before {
+    border-top-color: #ffcc33;
+}

@@ -1,0 +1,313 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.arjjs.ccm.modules.plm.logistics.dao.PlmRoomApplyDao">
+    
+	<sql id="plmRoomApplyColumns">
+		a.id AS "id",
+		a.proc_ins_id AS "procInsId",
+		a.category AS "category",
+		a.code AS "code",
+		a.subject AS "subject",
+		a.type AS "type",
+		a.initiator AS "initiator.id",
+		a.initiator_tel AS "initiatorTel",
+		a.room AS "room.id",
+		a.presider AS "presider.id",
+		a.recorder AS "recorder.id",
+		a.start_time AS "startTime",
+		a.end_time AS "endTime",
+		a.details AS "details",
+		a.files AS "files",
+		a.number AS "number",
+		a.is_end AS "isEnd",
+		a.create_by AS "createBy.id",
+		u10.name AS "createBy.name",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag",
+		r.subject AS "room.subject",
+		u5.name AS "initiator.name",
+		u5.phone AS "initiator.phone",
+		u8.name AS "presider.name",
+		u9.name AS "recorder.name",
+		o.name AS "initiator.office.name"	
+	</sql>
+	
+	<sql id="plmRoomApplyJoins">
+		LEFT JOIN sys_user u5 ON u5.id = a.initiator
+		LEFT JOIN sys_user u8 ON u8.id = a.presider
+		LEFT JOIN sys_user u9 ON u9.id = a.recorder
+		LEFT JOIN sys_user u10 ON u10.id = a.create_by
+		LEFT JOIN plm_room r ON r.id = a.room
+		LEFT JOIN sys_office o ON o.id = u5.office_id
+	</sql>
+    
+	<select id="get" resultType="PlmRoomApply">
+		SELECT 
+			<include refid="plmRoomApplyColumns"/>
+		FROM plm_room_apply a
+		<include refid="plmRoomApplyJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="getByProcInsId" resultType="PlmRoomApply">
+		SELECT 
+			<include refid="plmRoomApplyColumns"/>
+		FROM plm_room_apply a
+		<include refid="plmRoomApplyJoins"/>
+		WHERE a.proc_ins_id = #{procInsId}
+	</select>
+	
+	<update id="updateProcInsId">
+		UPDATE plm_room_apply SET 
+			proc_ins_id = #{procInsId},
+			update_by = #{updateBy.id}, 
+			update_date = #{updateDate}
+		WHERE id = #{id}
+	</update>
+
+	<update id="updateIsEnd">
+		UPDATE plm_room_apply SET 
+			is_end = #{isEnd},
+			update_by = #{updateBy.id}, 
+			update_date = #{updateDate}
+		WHERE id = #{id}
+	</update>
+	<!--接待 /会议室 使用次数  以月为时间轴-->
+	<select id="findApplyCount"  parameterType="java.util.HashMap" resultType="java.util.HashMap">
+	SELECT  count(a.id) as count,
+	        month(a.create_date) as month 
+		FROM plm_room_apply a
+		LEFT JOIN plm_act act ON a.id = act.table_id
+		LEFT JOIN plm_room r ON r.id = a.room
+		<where>
+	     a.del_flag =0
+	     AND act.status=04
+	     AND a.create_date>DATE_SUB(CURDATE(), INTERVAL #{qmonth} MONTH)
+        <if test="type != null and type != ''">
+		 AND a.type = #{type}
+		</if>
+          </where>
+          group by  year(a.create_date), month(a.create_date); 
+	</select>
+	
+	<!--接待 /会议室  使用次数  -->
+	<select id="roomUseCount"  parameterType="java.util.HashMap" resultType="com.arjjs.ccm.tool.EchartType">
+	SELECT  count(a.id) as value,
+	        r.subject as  type
+		FROM plm_room_apply a
+		LEFT JOIN plm_act act ON a.id = act.table_id
+		LEFT JOIN plm_room r ON r.id = a.room
+		
+		<where>
+	     a.del_flag =0
+	     AND act.status=04
+        <if test="type != null and type != ''">
+		 AND a.category = #{type}
+		</if>
+		AND YEAR(a.create_date)=YEAR(NOW())
+          </where>
+          group by  a.room ; 
+	</select>
+	
+	
+	
+	<select id="findList" resultType="PlmRoomApply">
+		SELECT 
+			act.status AS "plmAct.status",
+			<include refid="plmRoomApplyColumns"/>
+		FROM plm_room_apply a
+		LEFT JOIN plm_act act ON a.id = act.table_id
+		<include refid="plmRoomApplyJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="code != null and code != ''">
+				AND a.subject LIKE 
+					<if test="dbName == 'oracle'">'%'||#{code}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{code}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{code},'%')</if>
+			</if>
+			<if test="subject != null and subject != ''">
+				AND a.subject LIKE 
+					<if test="dbName == 'oracle'">'%'||#{subject}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{subject}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{subject},'%')</if>
+			</if>
+			<if test="type != null and type != ''">
+				AND a.type = #{type}
+			</if>
+			<if test="category != null and category != ''">
+				AND a.category = #{category}
+			</if>
+			<if test="room != null and room.id != null and room.id != ''">
+				AND a.room = #{room.id}
+			</if>
+			<if test="plmAct != null and plmAct.status != null and plmAct.status != ''">
+				AND act.status = #{plmAct.status}
+			</if>	
+			<if test=" createBy != null ">
+				AND a.create_by = #{currentUser.id}	
+			</if>
+				
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="PlmRoomApply">
+		SELECT 
+			<include refid="plmRoomApplyColumns"/>
+		FROM plm_room_apply a
+		<include refid="plmRoomApplyJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="category != null and category != ''">
+				AND a.category = #{category}
+			</if>
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO plm_room_apply(
+			id,
+			proc_ins_id,
+			category,
+			code,
+			subject,
+			type,
+			initiator,
+			initiator_tel,
+			room,
+			presider,
+			recorder,
+			start_time,
+			end_time,
+			details,
+			files,
+			number,
+			is_end,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag
+		) VALUES (
+			#{id},
+			#{procInsId},
+			#{category},
+			#{code},
+			#{subject},
+			#{type},
+			#{initiator.id},
+			#{initiatorTel},
+			#{room.id},
+			#{presider.id},
+			#{recorder.id},
+			#{startTime},
+			#{endTime},
+			#{details},
+			#{files},
+			#{number},
+			#{isEnd},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE plm_room_apply SET 	
+			proc_ins_id = #{procInsId},
+			category = #{category},
+			code = #{code},
+			subject = #{subject},
+			type = #{type},
+			initiator = #{initiator.id},
+			initiator_tel = #{initiatorTel},
+			room = #{room.id},
+			presider = #{presider.id},
+			recorder = #{recorder.id},
+			start_time = #{startTime},
+			end_time = #{endTime},
+			details = #{details},
+			files = #{files},
+			number = #{number},
+			is_end = #{isEnd},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE plm_room_apply SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+	
+	<select id="getroombyuserId" resultType="PlmRoomApply">
+		SELECT 
+			<include refid="plmRoomApplyColumns"/>
+		FROM plm_room_apply a
+			<include refid="plmRoomApplyJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="subject != null and subject != ''">
+				AND a.subject LIKE 
+					<if test="dbName == 'oracle'">'%'||#{subject}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{subject}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{subject},'%')</if>
+			</if>
+			<if test="type != null and type != ''">
+				AND a.type = #{type}
+			</if>
+			<if test="room != null and room.id != null and room.id != ''">
+				AND a.room = #{room.id}
+			</if>
+			<if test="startTime != null and startTime != '' and (endTime == null or endTime == '')">
+				AND a.start_time &gt;= #{startTime}
+			</if>
+			<if test="endTime != null and endTime != '' and (startTime == null or startTime == '')">
+				AND a.end_time &lt;= #{endTime}
+			</if>
+			<if test="startTime != null and startTime != '' and endTime != null and endTime != ''">
+				AND ( 
+					  (a.start_time &gt;= #{startTime} and a.start_time &lt; #{endTime}) OR
+					  (a.end_time &gt; #{startTime} and a.end_time &lt;= #{endTime}) OR
+					  (a.start_time &gt;= #{startTime} and a.end_time &lt;= #{endTime}) OR
+					  (a.start_time &lt;= #{startTime} and a.end_time &gt;= #{endTime})
+					)
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>	
+	</select>
+	
+</mapper>

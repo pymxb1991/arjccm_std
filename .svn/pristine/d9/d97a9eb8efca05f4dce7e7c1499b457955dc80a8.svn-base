@@ -1,0 +1,204 @@
+$(function(){
+	initCaiJi();
+	initMaoDun();
+	DisputesStatus();
+	OfficeTeam();
+})
+function initCaiJi(){
+	/*var option = {
+		    color: ['#ff8948', '#82c9f9', '#dd80d7'],
+		    tooltip: {
+		        trigger: 'axis',
+		        axisPointer: {
+		            type: 'shadow'
+		        }
+		    },
+		    legend: {
+		        data: ['实有人口', '实有房屋', '实有单位']
+		    },
+		    grid: {
+		        left: '3%',
+		        right: '4%',
+		        bottom: '3%',
+		        containLabel: true
+		    },
+		    calculable: true,
+		    xAxis: [
+		        {
+		            type: 'category',
+		            axisTick: {show: false},
+		            data: ['一月', '二月', '三月', '四月', '五月', '六月', '七月', '八月', '九月', '十月', '十一月', '十二月']
+		        }
+		    ],
+		    
+		    yAxis: [
+		        {
+		            type: 'value'
+		        }
+		    ],
+		    series: [
+		        {
+		            name: '实有人口',
+		            type: 'bar',
+		            barGap: 0,
+		            data: [320, 332, 301, 334, 390,320, 332, 301, 334, 390, 334, 390]
+		        },
+		        {
+		            name: '实有房屋',
+		            type: 'bar',
+		            data: [220, 182, 191, 234, 290,220, 182, 191, 234, 290, 234, 290]
+		        },
+		        {
+		            name: '实有单位',
+		            type: 'bar',
+		            data: [150, 232, 201, 154, 190,150, 232, 201, 154, 190,154, 190]
+		        }
+		    ]
+		};*/
+	var option = {
+	        color:[ '#4573a7', '#89a54e'],
+	       /* title: {
+		        text: '人口变化情况',
+		        x: 'center',
+		        y: 'top',
+		        textStyle: {
+		            fontWeight: 'normal',
+		            color: '#fff',
+		            fontSize: '14'
+		        }
+		    },*/
+		    tooltip : {
+		        trigger: 'axis',
+		        axisPointer : {            // 坐标轴指示器，坐标轴触发有效
+		            type : 'shadow'        // 默认为直线，可选为：'line' | 'shadow'
+		        }
+		    },
+		 /*   legend: {
+		        data:['迁入','迁出'],
+		        textStyle: {
+	                color: '#fff',
+	                fontSize: _fontSize
+	            },
+	            itemGap: 100
+		    },*/
+		    grid: {
+		    	left: '3%',
+		        right: '4%',
+		        bottom: '3%',
+		        containLabel: true
+	        },
+		    xAxis : [
+		        {
+		            type : 'category',
+		            data : ['2018-2','2018-3','2018-4','2018-5','2018-6','2018-7','2018-8'],
+		            
+		        }
+		    ],
+		    yAxis : [
+		        {
+		            type : 'value',
+		         
+		        }
+		    ],
+		    series : [
+
+		        {
+		            name:'迁入',
+		            type:'bar',
+		            stack: '广告',
+		            barWidth : '30%',
+		            data:[420, 332, 401, 334, 490, 530, 410]
+		        },
+		        {
+		            name:'迁出',
+		            type:'bar',
+		            stack: '广告',
+		            barWidth : '30%',
+		            data:[220, 182, 191, 134, 190, 230, 210]
+		        }
+		    ]
+		};
+	// 初始化参数
+	var myChart = echarts.init(document.getElementById('CaiJi'));
+	myChart.setOption(option, true);
+}
+function initMaoDun(){
+	$.getJSON(ctx+'/index/chart/solveEvent',function(data){
+		var dataArr=[];
+		var xAxisArr=[];
+		var seriesArr=[];
+		for(var i in data){
+			/*dataArr.push({
+				'name':data[i].type,
+				'value':data[i].value
+			})*/
+			xAxisArr.push(data[i].type);
+			seriesArr.push(data[i].value)
+		}
+		var option = {
+				color:['#fd894e'],
+			    tooltip: {
+			        trigger: 'axis'
+			    },
+			    legend: {
+			        data:['事件处置']
+			    },
+			    grid: {
+			        left: '3%',
+			        right: '4%',
+			        bottom: '3%',
+			        containLabel: true
+			    },
+			    xAxis: {
+			        type: 'category',
+			        boundaryGap: false,
+			        data: xAxisArr
+			    },
+			    yAxis: {
+			        type: 'value'
+			    },
+			    series: [
+			        {
+			            name:'事件处置',
+			            type:'line',
+			            data:seriesArr
+			        }
+			    ]
+			};
+
+		// 初始化参数
+		var myChart = echarts.init(document.getElementById('MaoDun'));
+		myChart.setOption(option, true);
+	})
+	
+} 
+//矛盾纠纷排查
+function DisputesStatus(){
+	$.getJSON(ctx+'/index/chart/byStatus',function(data){
+		var numData=data.data;
+		var DisputesStatus0=0,DisputesStatus1=0,DisputesStatus2=0;
+		for (var i in numData){
+			if(numData[i].status=='01'){
+				DisputesStatus0=numData[i].count;
+				$('#DisputesStatus0').html(DisputesStatus0);
+			}else if(numData[i].status=='02'){
+				DisputesStatus1=numData[i].count;
+				$('#DisputesStatus1').html(DisputesStatus1);
+			}else if(numData[i].status=='03'){
+				DisputesStatus2=numData[i].count;
+				$('#DisputesStatus2').html(DisputesStatus2);
+			}
+		}
+		DisputesStatusAll=Number(DisputesStatus0)+Number(DisputesStatus1)+Number(DisputesStatus2);
+		$('#DisputesStatusAll').html(DisputesStatusAll);
+	})
+}
+//综治机构
+function  OfficeTeam(){
+	$.getJSON(ctx+'/index/chart/findOfficeCount',function(data){
+		$('#OfficeCount').html(data.data[0].count);
+	})
+	$.getJSON(ctx+'/index/chart/findTeamCount',function(data){
+		$('#TeamCoun').html(data.data[0].count);
+	})
+}

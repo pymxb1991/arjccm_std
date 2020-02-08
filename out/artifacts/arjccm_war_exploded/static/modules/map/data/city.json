@@ -1,0 +1,87 @@
+{
+  "type": "FeatureCollection",
+   "centpoint":[
+    106.293500,
+    38.300110
+  ],
+  "features": [
+
+    {
+      "type": "Feature",
+      "id": "C",
+      "properties": {
+        "name": "井盖B",
+        "icon": "cover.png",
+        "info": {
+          "地点": "CS社区",
+          "时间": "2016-05-08"
+        }
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          106.043500,
+          38.420110
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "D",
+      "properties": {
+        "name": "井盖C",
+        "icon": "cover.png",
+        "info": {
+          "地点": "V3小区",
+          "时间": "2018-01-05"
+        }
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          106.023500,
+          38.400110
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "E",
+      "properties": {
+        "name": "邮箱D",
+        "icon": "email.png",
+        "info": {
+          "地点": "yu小区",
+          "时间": "2018-01-06"
+        }
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          106.013500,
+          38.410110
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "F",
+      "properties": {
+        "name": "邮箱E",
+        "icon": "email.png",
+        "info": {
+          "地点": "xi小区",
+          "时间": "2018-02-14"
+        }
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          106.153500,
+          38.500110
+        ]
+      }
+    }
+  ]
+}
+

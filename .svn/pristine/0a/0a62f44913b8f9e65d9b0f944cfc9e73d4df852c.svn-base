@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.arjjs.ccm.modules.ccm.partyvoluteer.dao.CcmPartyVolunteerDao">
+    
+	<sql id="ccmPartyVolunteerColumns">
+		a.id AS "id",
+		a.name AS "name",
+		a.sex AS "sex",
+		a.community AS "community.id",
+		a4.name AS "community.name",
+		a.belone_team AS "beloneTeam",
+		a.educational_background AS "educationalBackground",
+		a.age AS "age",
+		a.nation AS "nation",
+		a.health_condition AS "healthCondition",
+		a.present_assignment AS "presentAssignment",
+		a.personal_specialty AS "personalSpecialty",
+		a.service_intention AS "serviceIntention",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag"
+	</sql>
+	
+	<sql id="ccmPartyVolunteerJoins">
+		LEFT JOIN sys_area a4 ON a4.id = a.community
+	</sql>
+    
+	<select id="get" resultType="CcmPartyVolunteer">
+		SELECT 
+			<include refid="ccmPartyVolunteerColumns"/>
+		FROM ccm_party_volunteer a
+		<include refid="ccmPartyVolunteerJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="CcmPartyVolunteer">
+		SELECT 
+			<include refid="ccmPartyVolunteerColumns"/>
+		FROM ccm_party_volunteer a
+		<include refid="ccmPartyVolunteerJoins"/>
+			<if test="officeId != null and officeId != ''">
+				LEFT JOIN sys_office office ON office.area_id = a4.id
+			</if>
+		<where>
+			<if test="officeId != null and officeId != ''">
+				(office.id = #{officeId} or office.parent_ids LIKE concat('%',#{officeId},'%')) AND 
+			</if>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="name != null and name != ''">
+				AND a.name LIKE 
+					<if test="dbName == 'oracle'">'%'||#{name}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{name}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{name},'%')</if>
+			</if>
+			<if test="sex != null and sex != ''">
+				AND a.sex = #{sex}
+			</if>
+			<if test="community != null and community.id != null and community.id != ''">
+				AND a.community = #{community.id}
+			</if>
+			<if test="educationalBackground != null and educationalBackground != ''">
+				AND a.educational_background = #{educationalBackground}
+			</if>
+			<if test="beginAge != null and endAge != null and beginAge != '' and endAge != ''">
+				AND a.age BETWEEN #{beginAge} AND #{endAge}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="CcmPartyVolunteer">
+		SELECT 
+			<include refid="ccmPartyVolunteerColumns"/>
+		FROM ccm_party_volunteer a
+		<include refid="ccmPartyVolunteerJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO ccm_party_volunteer(
+			id,
+			name,
+			sex,
+			community,
+			belone_team,
+			educational_background,
+			age,
+			nation,
+			health_condition,
+			present_assignment,
+			personal_specialty,
+			service_intention,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag
+		) VALUES (
+			#{id},
+			#{name},
+			#{sex},
+			#{community.id},
+			#{beloneTeam},
+			#{educationalBackground},
+			#{age},
+			#{nation},
+			#{healthCondition},
+			#{presentAssignment},
+			#{personalSpecialty},
+			#{serviceIntention},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE ccm_party_volunteer SET 	
+			name = #{name},
+			sex = #{sex},
+			community = #{community.id},
+			belone_team = #{beloneTeam},
+			educational_background = #{educationalBackground},
+			age = #{age},
+			nation = #{nation},
+			health_condition = #{healthCondition},
+			present_assignment = #{presentAssignment},
+			personal_specialty = #{personalSpecialty},
+			service_intention = #{serviceIntention},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE ccm_party_volunteer SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.arjjs.ccm.modules.sys.dao.SysCodesDao">
+    
+	<sql id="sysCodesColumns">
+		a.id AS "id",
+		a.code_a AS "codeA",
+		a.code_b AS "codeB",
+		a.code_c AS "codeC",
+		a.code_d AS "codeD",
+		a.code_e AS "codeE",
+		a.version AS "version",
+		a.code_type AS "codeType",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag"
+	</sql>
+	
+	<sql id="sysCodesJoins">
+	</sql>
+    
+	<select id="get" resultType="SysCodes">
+		SELECT 
+			<include refid="sysCodesColumns"/>
+		FROM sys_codes a
+		<include refid="sysCodesJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="SysCodes">
+		SELECT 
+			<include refid="sysCodesColumns"/>
+		FROM sys_codes a
+		<include refid="sysCodesJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="codeType != null and codeType != ''">
+				AND a.code_type = #{codeType}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="SysCodes">
+		SELECT 
+			<include refid="sysCodesColumns"/>
+		FROM sys_codes a
+		<include refid="sysCodesJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO sys_codes(
+			id,
+			code_a,
+			code_b,
+			code_c,
+			code_d,
+			code_e,
+			version,
+			code_type,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag
+		) VALUES (
+			#{id},
+			#{codeA},
+			#{codeB},
+			#{codeC},
+			#{codeD},
+			#{codeE},
+			#{version},
+			#{codeType},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE sys_codes SET 	
+			code_a = #{codeA},
+			code_b = #{codeB},
+			code_c = #{codeC},
+			code_d = #{codeD},
+			code_e = #{codeE},
+			version = #{version},
+			code_type = #{codeType},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE sys_codes SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="saveCodeColumn">
+		<![CDATA[
+        update sys_codes 
+        set code_e = #{codeE}, version = version + 1 
+        where id = #{id} and version = #{version} 
+     ]]> 
+	</update>
+	
+</mapper>

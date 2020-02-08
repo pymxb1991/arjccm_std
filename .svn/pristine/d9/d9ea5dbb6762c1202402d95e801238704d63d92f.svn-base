@@ -1,0 +1,302 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.arjjs.ccm.modules.kpi.score.dao.KpiFinalScoreDao">
+    
+	<sql id="kpiFinalScoreColumns">
+		a.id AS "id",
+		a.user_id AS "user.id",
+		a.scheme_id AS "schemeId",
+		a.kpi_id AS "kpiId",
+		a.kpi_name AS "kpiName",
+		a.final_score AS "finalScore",
+		a.score AS "score",
+		a.source_score AS "sourceScore",
+		a.journal_score AS "journalScore",
+		a.modify_score AS "modifyScore",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag",
+		u2.name AS "user.name"
+	</sql>
+	
+	<sql id="kpiFinalScoreJoins">
+		LEFT JOIN sys_user u2 ON u2.id = a.user_id
+	</sql>
+    
+	<select id="get" resultType="KpiFinalScore">
+		SELECT 
+			<include refid="kpiFinalScoreColumns"/>
+		FROM kpi_final_score a
+		<include refid="kpiFinalScoreJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	<!-- 添加绩效总得分，相对应的方案,各个kpi -->
+	<select id="findSumAll" resultType="KpiFinalScore">
+		SELECT
+			k.user_id AS "user.id",
+			k.scheme_id AS "schemeId",
+			k.kpi_id AS "kpiId",
+			SUM(k.score) AS "finalScore",
+			SUM(k.score) AS "score",
+			k.del_flag AS "delFlag",
+			kpi.name AS "kpiName",
+			u2.name AS "user.name"
+		FROM
+			kpi_scheme_score k
+		LEFT JOIN sys_user u2 ON u2.id = k.user_id
+		LEFT JOIN kpi_scheme_kpi kpi ON kpi.id = k.kpi_id
+		WHERE
+			k.scheme_id=#{schemeId}
+			AND k.del_flag = #{DEL_FLAG_NORMAL}
+		GROUP BY
+			k.kpi_id,
+			k.user_id
+	</select>
+	<!-- 添加绩效总得分，相对应的方案,总绩效 -->
+	<select id="findSum" resultType="KpiFinalScore">
+		SELECT
+			k.user_id AS "user.id",
+			k.scheme_id AS "schemeId",
+			'0' AS "kpiId",
+			SUM(k.score)+(case when journal.fs is null then '0' else journal.fs end) AS "finalScore",
+			SUM(k.score) AS "score",
+			(case when journal.fs is null then '0' else journal.fs end) AS "journalScore",
+			k.del_flag AS "delFlag",
+			'总绩效' AS "kpiName",
+			u2. NAME AS "user.name"
+		FROM
+			kpi_scheme_score k
+		LEFT JOIN sys_user u2 ON u2.id = k.user_id
+		LEFT JOIN (
+			SELECT
+				j.user_id AS "id",
+				SUM(j.score) AS "fs"
+			FROM
+				kpi_scheme_journal j
+			WHERE
+				j.del_flag = '0'
+			GROUP BY
+				j.user_id
+		) journal ON journal.id = k.user_id
+		WHERE
+			k.scheme_id=#{schemeId}
+			AND k.del_flag = #{DEL_FLAG_NORMAL}
+		GROUP BY
+			k.user_id
+	</select>
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	<!--  -->
+	<select id="findList" resultType="KpiFinalScore">
+		SELECT 
+			<include refid="kpiFinalScoreColumns"/>
+		FROM kpi_final_score a
+		<include refid="kpiFinalScoreJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="user != null and user.id != null and user.id != ''">
+				AND a.user_id = #{user.id}
+			</if>
+			<if test="schemeId != null and schemeId != ''">
+				AND a.scheme_id = #{schemeId}
+			</if>
+			<if test="kpiName != null and kpiName != ''">
+				AND a.kpi_name = #{kpiName}
+			</if>
+		</where>
+		ORDER BY a.kpi_id
+	</select>
+	
+	<select id="findAllList" resultType="KpiFinalScore">
+		SELECT 
+			<include refid="kpiFinalScoreColumns"/>
+		FROM kpi_final_score a
+		<include refid="kpiFinalScoreJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	
+	<select id="findKpiScheme" resultType="KpiScheme">
+		SELECT DISTINCT
+			scheme.id AS "id",
+			scheme.name AS "name"
+		FROM
+			kpi_scheme scheme,
+			sys_user usr,
+			sys_office office
+		<where>
+			scheme.office_id = office.id
+			AND usr.office_id = office.id
+			AND scheme.user_type = usr.user_type
+			AND scheme.del_flag = #{DEL_FLAG_NORMAL}
+			AND usr.del_flag = #{DEL_FLAG_NORMAL}
+			AND office.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="user != null and user.userType != null and user.userType != ''">
+				AND usr.user_type = #{user.userType}
+			</if>
+			<if test="user != null and user.name != null and user.name != ''">
+				AND usr.NAME = #{user.name}
+			</if>
+			<if test="schemeId != null and schemeId != ''">
+				AND scheme.id = #{schemeId}
+			</if>
+			<if test="office != null and office.id != null and office.id != ''">
+				AND office.id = #{office.id}
+			</if>
+		</where>
+		
+	</select>
+	
+	
+	<select id="getFinalScoreUser" resultType="KpiFinalScore">
+		
+		SELECT DISTINCT
+			usr.id AS "user.id",
+			usr.name AS "user.name",
+			usr.no AS "user.no",
+			usr.user_type AS "user.userType",
+			office.id AS "office.id",
+			office.name AS "office.name",
+			scheme.id AS "schemeId"
+		FROM
+			kpi_scheme scheme,
+			sys_user usr,
+			sys_office office
+		<where>
+			scheme.office_id = office.id
+			AND usr.office_id = office.id
+			AND scheme.user_type = usr.user_type
+			AND scheme.del_flag = #{DEL_FLAG_NORMAL}
+			AND usr.del_flag = #{DEL_FLAG_NORMAL}
+			AND office.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="user != null and user.userType != null and user.userType != ''">
+				AND usr.user_type = #{user.userType}
+			</if>
+			<if test="user != null and user.name != null and user.name != ''">
+				AND usr.NAME = #{user.name}
+			</if>
+			<if test="schemeId != null and schemeId != ''">
+				AND scheme.id = #{schemeId}
+			</if>
+			<if test="office != null and office.id != null and office.id != ''">
+				AND office.id = #{office.id}
+			</if>
+		</where>
+	</select>
+	
+	
+	<select id="getSchemeUserBySchemeID" resultType="KpiFinalScore">
+		
+		SELECT DISTINCT
+			usr.id AS "user.id",
+			usr.name AS "user.name",
+			usr.no AS "user.no",
+			usr.user_type AS "user.userType",
+			office.id AS "office.id",
+			office.name AS "office.name",
+			scheme.id AS "schemeId"
+		FROM
+			kpi_scheme scheme,
+			sys_user usr,
+			sys_office office
+		<where>
+			scheme.office_id = office.id
+			AND usr.office_id = office.id
+			AND scheme.user_type = usr.user_type
+			AND scheme.del_flag = #{DEL_FLAG_NORMAL}
+			AND usr.del_flag = #{DEL_FLAG_NORMAL}
+			AND office.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="id != null and id != ''">
+				AND scheme.id = #{id}
+			</if>
+		</where>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO kpi_final_score(
+			id,
+			user_id,
+			scheme_id,
+			kpi_id,
+			kpi_name,
+			final_score,
+			score,
+			source_score,
+			journal_score,
+			modify_score,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag
+		) VALUES (
+			#{id},
+			#{user.id},
+			#{schemeId},
+			#{kpiId},
+			#{kpiName},
+			#{finalScore},
+			#{score},
+			#{sourceScore},
+			#{journalScore},
+			#{modifyScore},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE kpi_final_score SET 	
+			user_id = #{user.id},
+			scheme_id = #{schemeId},
+			kpi_id = #{kpiId},
+			kpi_name = #{kpiName},
+			final_score = #{finalScore},
+			score = #{score},
+			source_score = #{sourceScore},
+			journal_score = #{journalScore},
+			modify_score = #{modifyScore},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE kpi_final_score SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

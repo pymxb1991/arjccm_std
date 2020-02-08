@@ -1,0 +1,170 @@
+<%@ page contentType="text/html;charset=UTF-8"%>
+<%@ include file="/WEB-INF/views/include/taglib.jsp"%>
+<%@ include file="/WEB-INF/views/include/head.jsp"%>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+<title>地图</title>
+<script type="text/javascript">
+	var ctx = '${ctx}', ctxStatic = '${ctxStatic}';
+</script>
+<link rel="stylesheet" href="${ctxStatic}/ol/ol.css" type="text/css">
+
+<link rel="stylesheet"
+	href="${ctxStatic}/modules/map/js/draw/css/p-ol3.min.css"
+	type="text/css">
+<link rel="stylesheet"
+	href="${ctxStatic}/modules/map/js/draw/css/defaults.css"
+	type="text/css">
+<link rel="stylesheet" href="${ctxStatic}/modules/map/css/map.css"
+	type="text/css">
+<link rel="stylesheet" href="${ctxStatic}/modules/map/css/house.css"
+	type="text/css">
+<script src="${ctxStatic}/jquery/jquery-1.8.3.min.js"></script>
+<link href="${ctxStatic}/jquery-jbox/2.3/Skins/Bootstrap/jbox.min.css"
+	rel="stylesheet" />
+
+<script src="${ctxStatic}/jquery-jbox/2.3/jquery.jBox-2.3.min.js"
+	type="text/javascript"></script>
+<script src="${ctxStatic}/ol/ol.js"></script>
+<script src="${ctxStatic}/modules/map/js/draw/js/p-ol3.debug.js"></script>
+<link href="${ctxStatic}/modules/map/css/pop-info-animate.css"
+	rel="stylesheet" />
+<link href="${ctxStatic}/layer-v3.1.1/layer/theme/default/layer.css"
+	rel="stylesheet" />
+<link href="${ctxStatic}/bootstrap/2.3.1/awesome/font-awesome.min.css" type="text/css" rel="stylesheet">
+<script src="${ctxStatic}/layer-v3.1.1/layer/layer.js"></script>
+<link href="${ctxStatic}/layim/layui/css/layui.css" type="text/css" rel="stylesheet">
+<script src="${ctxStatic}/layim/layui/layui.js"></script>
+<script src="${ctxStatic}/modules/map/js/mapconfig.js"></script>
+<script src="${ctxStatic}/modules/map/js/commonMap.js"></script>
+<script src="${ctxStatic}/common/common.js" type="text/javascript"></script>
+<script src="${ctxStatic}/ccm/sys/js/APPTerminal.js"></script>
+<style>
+
+</style>
+</head>
+<body  style="overflow: hidden;">
+    <div id="content" class="row-fluid">
+     <div id="left" class="accordion-group mapIndex">
+				<div class="layui-collapse" lay-accordion="">
+  <div class="layui-colla-item">
+    <h2 class="layui-colla-title">实时位置显示</h2>
+    <div class="layui-colla-content layui-show">
+      <p>实时位置显示</p>
+    </div>
+  </div>
+  <div class="layui-colla-item">
+    <h2 class="layui-colla-title">历史位置显示</h2>
+    <div class="layui-colla-content">
+      <p>历史位置显示</p>
+    </div>
+  </div>
+  <div class="layui-colla-item">
+    <h2 class="layui-colla-title">消息推送</h2>
+    <div class="layui-colla-content">
+      <p>消息推送</p>
+    </div>
+  </div>
+</div>			
+		</div>
+		<div id="openClose" class="close">&nbsp;</div>
+     <div  id="right" style="overflow: hidden;">   
+	      <div id="map" class="map" >
+	       <!--历史位置  -->
+	            <!-- 展开按钮 -->
+				<div
+					style="position: absolute; bottom: 0px; right: 3px; transition: bottom 1s;"
+					id="showDiv">
+					<input onclick="ShowDiv()"
+						style="background-color: #19a7f0 !important; display: none;"
+						class="btn btn-primary" type="button" value="展开" />
+				</div>
+				<!-- 展开按钮 -->
+				<!--历史轨迹 底部grid列表数据 -->
+				<div id="hideOrShowDiv"
+					style="position: absolute; bottom: 0px; right: 3px; height: 0px; transition: height 1s; z-index: 1992">
+					<!-- 收起按钮 -->
+					<div
+						style="position: absolute; right: 0px; bottom: -30px; transition: bottom 1s;"
+						id="hideDiv">
+						<input onclick="HideDiv()"
+							style="background-color: #3b6e8e !important; border: 0px;"
+							class="btn btn-primary" type="button" value="关闭" />
+					</div>
+					<!-- 倍速回放 -->
+					<div
+						style="position: absolute; left: 3px; bottom: -30px; transition: bottom 1s;"
+						id="playBack">
+						<input id="speed" name="" class="input-medium" type="number"
+							min="1" max="1000" value="30"
+							style="width: 55px; margin: 0; margin-right: 5px;"> <input
+							id="start"
+							style="background-color: #3b6e8e !important; border: 0px;"
+							class="btn btn-primary" type="button" value="开始" /> <input
+							id="stop"
+							style="background-color: #3b6e8e !important; border: 0px;"
+							class="btn btn-primary" type="button" value="停止" /> <input
+							id="tempstop"
+							style="background-color: #3b6e8e !important; border: 0px;"
+							class="btn btn-primary" type="button" value="暂停" /> <input
+							id="next"
+							style="background-color: #3b6e8e !important; border: 0px;"
+							class="btn btn-primary" type="button" value="前进" /> <input
+							id="prev"
+							style="background-color: #3b6e8e !important; border: 0px;"
+							class="btn btn-primary" type="button" value="后退" />
+					</div>
+					<!-- grid列表 -->
+					<div id="TableCon" style="width: 100%;"></div>
+				</div>
+				  <!--历史位置  -->
+	      
+	      </div>
+	     
+	</div>    
+     <!-- /content -->
+    </div>  
+
+	<script type="text/javascript">
+		var leftWidth = 280; // 左侧窗口大小
+		var htmlObj = $("html"), mainObj = $("#main");
+		var frameObj = $("#left, #openClose, #right, #right iframe");
+		function wSize() {
+			var strs = getWindowSize().toString().split(",");
+			htmlObj.css({
+				"overflow-x" : "auto",
+				"overflow-y" : "auto"
+			});
+			mainObj.css("width", "auto");
+			frameObj.height(strs[0] - 5);
+			var leftWidth = ($("#left").width() < 0 ? 0 : $("#left").width());
+			$("#right").width(
+					$("#content").width() - leftWidth - $("#openClose").width()
+							- 5);
+
+	
+	
+		}
+		function wSizeWidth() {
+			if (!$("#openClose").is(":hidden")) {
+				var leftWidth = ($("#left").width() < 0 ? 0 : $("#left")
+						.width());
+				$("#right").width(
+						$("#content").width() - leftWidth
+								- $("#openClose").width() - 4);
+			} else {
+				$("#right").width("100%");
+			}
+		}// <c:if test="${tabmode eq '1'}"> 
+		function openCloseClickCallBack(b) {
+			$.fn.jerichoTab.resize();
+		} // </c:if>
+		
+
+		
+	</script>
+     <script src="${ctxStatic}/common/wsize.min.js" type="text/javascript"></script>
+</body>
+</html>

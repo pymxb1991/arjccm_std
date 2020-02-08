@@ -1,0 +1,151 @@
+/**
+ * Copyright &copy; 2012-2016 <a href="https://github.com/thinkgem/jeesite">JeeSite</a> All rights reserved.
+ */
+package com.arjjs.ccm.modules.kpi.score.web;
+
+import java.util.List;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import com.arjjs.ccm.common.utils.DateUtils;
+import com.arjjs.ccm.modules.ccm.pop.entity.CcmPeople;
+import com.arjjs.ccm.tool.ExportExcel;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
+import com.arjjs.ccm.common.config.Global;
+import com.arjjs.ccm.common.persistence.Page;
+import com.arjjs.ccm.common.web.BaseController;
+import com.arjjs.ccm.common.utils.StringUtils;
+import com.arjjs.ccm.modules.kpi.scheme.entity.KpiScheme;
+import com.arjjs.ccm.modules.kpi.scheme.entity.KpiSchemeKpi;
+import com.arjjs.ccm.modules.kpi.scheme.service.KpiSchemeKpiService;
+import com.arjjs.ccm.modules.kpi.scheme.service.KpiSchemeService;
+import com.arjjs.ccm.modules.kpi.score.entity.KpiFinalScore;
+import com.arjjs.ccm.modules.kpi.score.service.KpiFinalScoreService;
+
+/**
+ * 绩效总成绩Controller
+ * @author pjq
+ * @version 2018-04-11
+ */
+@Controller
+@RequestMapping(value = "${adminPath}/score/kpiFinalScore")
+public class KpiFinalScoreController extends BaseController {
+
+	@Autowired
+	private KpiFinalScoreService kpiFinalScoreService;
+	
+	@Autowired
+	private KpiSchemeService kpiSchemeService;
+
+	@Autowired
+	private KpiSchemeKpiService kpiSchemeKpiService;
+	
+	
+	@ModelAttribute
+	public KpiFinalScore get(@RequestParam(required=false) String id) {
+		KpiFinalScore entity = null;
+		if (StringUtils.isNotBlank(id)){
+			entity = kpiFinalScoreService.get(id);
+		}
+		if (entity == null){
+			entity = new KpiFinalScore();
+		}
+		return entity;
+	}
+	
+	@RequiresPermissions("score:kpiFinalScore:view")
+	@RequestMapping(value = {"list", ""})
+	public String list(KpiFinalScore kpiFinalScore, HttpServletRequest request, HttpServletResponse response, Model model) {
+
+		//页面查询条件：方案下拉框
+		KpiScheme kpiScheme = new KpiScheme();
+		List<KpiScheme> schemeOptionList = kpiSchemeService.findList(kpiScheme);
+		model.addAttribute("schemeOptionList", schemeOptionList);
+		
+		//1、查询方案,确定具体的方案ID
+		String schemeID = "";
+		if ("".equals(kpiFinalScore.getSchemeId()) || kpiFinalScore.getSchemeId() == null) {//无确定方案,根据条件去数据库中组合查询
+			List<KpiScheme> schemeList = kpiFinalScoreService.findKpiScheme(kpiFinalScore);
+			if (schemeList != null && schemeList.size() != 1) {//方案不存在或者不唯一时
+				return "kpi/score/kpiFinalScoreList";
+			} else {
+				schemeID = schemeList.get(0).getId();
+				kpiFinalScore.setSchemeId(schemeID);
+			}
+		}
+		
+		//2、由方案id查询对应kpi
+		KpiSchemeKpi kpiSchemeKpi = new KpiSchemeKpi();
+		kpiSchemeKpi.setSchemeId(kpiFinalScore.getSchemeId());
+		List<KpiSchemeKpi> kpiList = kpiSchemeKpiService.findList(kpiSchemeKpi);
+		model.addAttribute("kpiList", kpiList);
+		kpiFinalScore.setKpiList(kpiList);
+		
+		//3、查询总分
+		Page<KpiFinalScore> page = kpiFinalScoreService.findScoreList(new Page<KpiFinalScore>(request, response), kpiFinalScore); 
+		model.addAttribute("page", page);
+		
+		return "kpi/score/kpiFinalScoreList";
+	}
+
+	@RequiresPermissions("score:kpiFinalScore:view")
+	@RequestMapping(value = "export", method = RequestMethod.POST)
+	public String exportFile(KpiFinalScore kpiFinalScore, HttpServletRequest request, HttpServletResponse response,
+							 RedirectAttributes redirectAttributes) {
+
+		try {
+
+			String fileName = "KpiExport" + DateUtils.getDate("yyyyMMddHHmmss") + ".xlsx";
+			// 查询要导出的数据
+
+			//1、查询方案,确定具体的方案ID
+			String schemeID = "";
+			if ("".equals(kpiFinalScore.getSchemeId()) || kpiFinalScore.getSchemeId() == null) {//无确定方案,根据条件去数据库中组合查询
+				List<KpiScheme> schemeList = kpiFinalScoreService.findKpiScheme(kpiFinalScore);
+				if (schemeList != null && schemeList.size() != 1) {//方案不存在或者不唯一时
+					return "kpi/score/kpiFinalScoreList";
+				} else {
+					schemeID = schemeList.get(0).getId();
+					kpiFinalScore.setSchemeId(schemeID);
+				}
+			}
+
+			//2、由方案id查询对应kpi
+			KpiSchemeKpi kpiSchemeKpi = new KpiSchemeKpi();
+			kpiSchemeKpi.setSchemeId(kpiFinalScore.getSchemeId());
+			List<KpiSchemeKpi> kpiList = kpiSchemeKpiService.findList(kpiSchemeKpi);
+			kpiFinalScore.setKpiList(kpiList);
+
+			//3、查询总分
+			Page<KpiFinalScore> page = kpiFinalScoreService.findScoreList(new Page<>(request, response), kpiFinalScore);
+
+			//4.拼接方案名称
+			String kpiName = kpiSchemeService.get(kpiFinalScore.getSchemeId()).getName();
+
+			new ExportExcel( kpiName + "绩效数据", KpiFinalScore.class).setDataList(page.getList()).write(response, fileName).dispose();
+			return null;
+		} catch (Exception e) {
+			addMessage(redirectAttributes, "导出数据失败！失败信息：" + e.getMessage());
+		}
+		return "redirect:" + adminPath + "/score/kpiFinalScore/?repage";
+	}
+	
+	@RequiresPermissions("score:kpiFinalScore:edit")
+	@RequestMapping(value = "delete")
+	public String delete(KpiFinalScore kpiFinalScore, RedirectAttributes redirectAttributes) {
+		kpiFinalScoreService.delete(kpiFinalScore);
+		addMessage(redirectAttributes, "删除绩效总成绩成功");
+		return "redirect:"+Global.getAdminPath()+"/score/kpiFinalScore/?repage";
+	}
+
+}

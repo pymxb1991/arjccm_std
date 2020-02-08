@@ -1,0 +1,106 @@
+{
+  "type": "FeatureCollection",
+   "centpoint":[
+    106.293500,
+    38.300110
+  ],
+  "features": [
+
+    {
+      "type": "Feature",
+      "id": "B",
+      "properties": {
+        "name": "楼栋A",
+        "icon": "ban.png",
+        "info": {
+          "地点": "XI社区",
+          "人数": "1"
+        }
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          106.103500,
+          38.330110
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "C",
+      "properties": {
+        "name": "楼栋B",
+        "icon": "ban.png",
+        "info": {
+          "地点": "CS社区",
+          "人数": "2"
+        }
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          106.043500,
+          38.420110
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "D",
+      "properties": {
+        "name": "楼栋C",
+        "icon": "ban.png",
+        "info": {
+          "地点": "V3小区",
+          "人数": "3"
+        }
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          106.043500,
+          38.340110
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "E",
+      "properties": {
+        "name": "楼栋D",
+        "icon": "ban.png",
+        "info": {
+          "地点": "yu小区",
+          "人数": "5"
+        }
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          106.023500,
+          38.240110
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "F",
+      "properties": {
+        "name": "楼栋E",
+        "icon": "ban.png",
+        "info": {
+          "地点": "xi小区",
+          "人数": "6"
+        }
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          106.083500,
+          38.320110
+        ]
+      }
+    }
+  ]
+}
+

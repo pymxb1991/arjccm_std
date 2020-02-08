@@ -1,0 +1,3231 @@
+body,
+html {
+    height: 100%;
+    font-size: 12px;
+}
+
+body {
+    padding: 0px;
+    margin: 0;
+    overflow: hidden;
+    behavior: url("csshover3.htc");
+}
+
+a {
+    text-decoration: none;
+}
+
+.clearfix:after, .keep-watch li:after {
+    content: " ";
+    display: block;
+    clear: both;
+}
+
+#skinSelect {
+    margin-right: 6px;
+}
+
+#pageloading {
+    position: absolute;
+    left: 0px;
+    top: 0px;
+    background: white url('loading.gif') no-repeat center;
+    width: 100%;
+    height: 100%;
+    z-index: 99999;
+}
+
+.l-link {
+    display: block;
+    height: 26px;
+    line-height: 26px;
+    padding-left: 10px;
+    text-decoration: underline;
+    color: #333;
+}
+
+.l-link2 {
+    /*text-decoration: underline;*/
+    color: white;
+    margin-left: 2px;
+    margin-right: 2px;
+}
+
+.l-layout-top {
+    background: #102A49;
+    color: White;
+}
+
+.l-layout-bottom {
+    background: #E5EDEF;
+    text-align: center;
+}
+
+.l-link {
+    display: block;
+    line-height: 22px;
+    height: 22px;
+    padding-left: 16px;
+    border: 1px solid white;
+    margin: 4px;
+}
+
+.l-link-over {
+    background: #FFEEAC;
+    border: 1px solid #DB9F00;
+}
+
+.l-winbar {
+    background: #2B5A76;
+    height: 30px;
+    position: absolute;
+    left: 0px;
+    bottom: 0px;
+    width: 100%;
+    z-index: 99999;
+}
+
+.space {
+    color: #E7E7E7;
+}
+
+/* 顶部 */
+
+.l-topmenu {
+    margin: 0;
+    padding: 0;
+    height: 54px;
+    overflow: hidden;
+    line-height: 31px;
+    position: relative;
+    /*  border-top: 1px solid #1D438B;
+    border-bottom: 2px solid #1264b4;*/
+}
+
+.l-topmenu-logo {
+    color: #E7E7E7;
+    height: 40px;
+    width: 913px;
+    background: url(../../../../Images/indexTianJin/logo.png) no-repeat;
+    background-size: 100% 100%;
+    margin: 0 auto;
+    margin-top: 10px;
+}
+
+.l-topmenu-nav {
+    position: absolute;
+    left: 35%;
+    bottom: 8px;
+}
+
+    .l-topmenu-nav ul {
+        height: 34px;
+        overflow: hidden;
+    }
+
+    .l-topmenu-nav li {
+        position: relative;
+        overflow: hidden;
+        float: left;
+        display: inline-block;
+        height: 34px;
+        line-height: 34px;
+        font-size: 14px;
+        cursor: pointer;
+    }
+
+        .l-topmenu-nav li a {
+            padding: 0 32px;
+            display: block;
+            color: #fff;
+        }
+
+        .l-topmenu-nav li i {
+            display: block;
+            position: absolute;
+            left: 0;
+        }
+
+            .l-topmenu-nav li i.Home {
+                width: 28px;
+                height: 24px;
+                top: 2px;
+                background: url(../../../images/indexTianJin/1.png) no-repeat center;
+            }
+
+            .l-topmenu-nav li i.Monitor {
+                width: 28px;
+                height: 24px;
+                top: 3px;
+                background: url(../../../images/indexTianJin/2.png) no-repeat center;
+            }
+
+            .l-topmenu-nav li i.YunService {
+                width: 28px;
+                height: 24px;
+                top: 3px;
+                background: url(../../../images/indexTianJin/3.png) no-repeat center;
+            }
+
+            .l-topmenu-nav li i.Asset {
+                width: 28px;
+                height: 24px;
+                top: 2px;
+                background: url(../../../images/indexTianJin/4.png) no-repeat center;
+            }
+
+            .l-topmenu-nav li i.Report {
+                width: 28px;
+                height: 24px;
+                top: 2px;
+                background: url(../../../images/indexTianJin/5.png) no-repeat center;
+            }
+
+            .l-topmenu-nav li i.SysManager {
+                width: 28px;
+                height: 24px;
+                top: 2px;
+                background: url(../../../images/indexTianJin/6.png) no-repeat center;
+            }
+
+        .l-topmenu-nav li a.active {
+        }
+
+        /*.l-topmenu-nav li.active a {
+    color: #fff;
+}*/
+
+        .l-topmenu-nav li a:hover {
+        }
+
+/*.l-topmenu-nav li a:hover  {
+    color: #fff;
+}*/
+
+.l-topmenu-welcome {
+    position: absolute;
+    height: 24px;
+    line-height: 24px;
+    right: 30px;
+    top: 2px;
+    color: #fff;
+}
+
+    .l-topmenu-welcome a {
+        cursor: pointer;
+    }
+
+.main-nav {
+    height: 32px;
+    background: url(../../../images/main-nav.png) no-repeat center;
+    -ms-behavior: url("../lib/backgroundsize.min.htc"); /*兼容Ie8支持background-size*/
+    -moz-background-size: 100% 100%;
+    -webkit-background-size: 100% 100%;
+    -o-background-size: 100% 100%;
+    background-size: 100% 100%;
+    color: #fff;
+}
+
+    .main-nav ul {
+        margin-left: 35%;
+        padding-top: 1px;
+        overflow: hidden;
+        zoom: 1;
+    }
+
+    .main-nav li {
+        float: left;
+        padding: 0 10px;
+        border-right: 1px solid #C6C6C6;
+        cursor: pointer;
+    }
+
+        .main-nav li a {
+            display: block;
+            padding: 6px 20px;
+            _padding: 4px 20px;
+            _margin-top: 4px;
+            text-align: center;
+            color: #fff;
+        }
+
+            .main-nav li a.active {
+                background: url(../../../images/nav-active-a.png) no-repeat center;
+                _background: #fff;
+                -ms-behavior: url("../lib/backgroundsize.min.htc"); /*兼容Ie8支持background-size*/
+                -moz-background-size: 100% 100%;
+                -webkit-background-size: 100% 100%;
+                -o-background-size: 100% 100%;
+                background-size: 100% 100%;
+                color: #136ab9;
+            }
+
+            .main-nav li a:hover {
+                background: url(../../../images/nav-active-a.png) no-repeat center;
+                _background: #fff;
+                -ms-behavior: url("../lib/backgroundsize.min.htc"); /*兼容Ie8支持background-size*/
+                -moz-background-size: 100% 100%;
+                -webkit-background-size: 100% 100%;
+                -o-background-size: 100% 100%;
+                background-size: 100% 100%;
+                color: #136ab9;
+            }
+
+.l-topmenu-welcome a {
+    color: #E7E7E7;
+    /*text-decoration: underline*/
+}
+
+.body-gray2014 #framecenter {
+    margin-top: 3px;
+}
+
+.viewsourcelink {
+    background: #B3D9F7;
+    display: block;
+    position: absolute;
+    right: 10px;
+    top: 3px;
+    padding: 6px 4px;
+    color: #333;
+    text-decoration: underline;
+}
+
+.viewsourcelink-over {
+    background: #81C0F2;
+}
+
+.l-topmenu-welcome label {
+    color: white;
+}
+
+
+
+.Logout {
+    position: absolute;
+    right: 60px;
+    top: 22px;
+    font-size: 14px;
+    color: #fff;
+}
+    .Logout span {
+        display: block;
+        float: left;
+        padding: 0px 10px;
+        margin-right: 15px;
+        background: url("../../../../images/IndexNan/tc2.png") no-repeat;
+        background-size: 100% 100%;
+    }
+
+        .Logout span a {
+            color: #fff;
+        }
+/*精密空调*/
+.mainkt {
+    height: 70%;
+    width: 70%;
+    margin: 50px auto;
+}
+
+.mainkt1 {
+    height: 90%;
+    width: 90%;
+    margin: 50px auto;
+}
+
+.mainkt p.nav {
+    height: 50px;
+    line-height: 50px;
+    cursor: pointer;
+    font-size: 18px;
+    color: #fff;
+    font-weight: bold;
+}
+
+    .mainkt p.nav b {
+        color: #fff;
+        font-weight: bold;
+    }
+
+        .mainkt p.nav b.active {
+            color: #fff;
+        }
+
+        .mainkt p.nav b a {
+            color: #fff;
+        }
+
+        .mainkt p.nav b.active a {
+            color: #eea807;
+        }
+
+.temperature {
+    width: 820px;
+    margin-left: 70px;
+    float: left;
+    margin-top: 30px;
+}
+
+    .temperature ul {
+        width: 375px;
+        height: 340px;
+        background: rgba(0,0,0,.5);
+        font-size: 18px;
+        padding-top: 10px;
+        border-radius: 5px;
+        /*box-shadow:-1px 0 2px #ccc,
+    1px 0 2px #ccc, 
+    0 -1px 2px #ccc, 
+    0 1px 2px #ccc;*/
+    }
+
+        .temperature ul:first-of-type {
+            float: left;
+        }
+
+        .temperature ul:last-of-type {
+            float: right;
+        }
+
+    .temperature li {
+        margin: 20px 0;
+        height: 30px;
+        line-height: 25px;
+        padding-left: 25px;
+    }
+
+    .temperature div {
+        float: left;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        width: 75px;
+        height: 25px;
+        padding-left: 5px;
+        margin-left: 50px;
+        color: #fff;
+        /*box-shadow:
+    0px 1px 3px #ccc inset, 
+    2px 0px 3px #ebebeb inset;*/
+    }
+
+    .temperature input {
+        float: left;
+        width: 75px;
+        height: 25px;
+        padding-left: 5px;
+        background: rgba(0,0,0,0);
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        margin-left: 50px;
+        color: #fff;
+        /*box-shadow:
+    0px 1px 3px #ccc inset, 
+    2px 0px 3px #ebebeb inset;*/
+    }
+
+    .temperature b {
+        float: left;
+        font-weight: normal;
+        color: #fff;
+    }
+
+.main .curdisplaypic {
+    width: 320px;
+    height: 728px;
+    background: rgba(0,0,0,.5);
+    float: right;
+    margin-top: 30px;
+    margin-right: 20px;
+    color: #fff;
+}
+
+.curdisplaypic div {
+    width: 200px;
+    height: 621px;
+    background: url("../../../../images/IndexNan/jiqi.png") center no-repeat;
+    background-size: 100% 100%;
+    margin: 38px auto;
+}
+
+.curdisplaypic p {
+    position: relative;
+    text-align: right;
+    padding-right: 10px;
+    padding-top: 10px;
+    font-size: 18px;
+}
+
+.curdisplaypic i {
+    display: block;
+    position: absolute;
+    width: 28px;
+    height: 18px;
+    background-color: #009a44;
+    border-radius: 5px;
+    left: 70px;
+}
+
+.current-messages {
+    width: 820px;
+    float: left;
+    margin-left: 70px;
+    font-size: 14px;
+}
+
+    .current-messages h6 {
+        height: 60px;
+        line-height: 50px;
+        margin-top: 20px;
+        padding-left: 10px;
+        font-size: 18px;
+        color: #fff;
+        font-weight: bold;
+    }
+
+    .current-messages ul {
+        width: 795px;
+        height: 100px;
+        border-radius: 10px;
+        background: rgba(0,0,0,.5);
+        padding-left: 25px;
+        padding-top: 10px;
+    }
+
+    .current-messages b {
+        float: left;
+        color: #fff;
+    }
+
+    .current-messages i {
+        display: block;
+        float: right;
+        width: 28px;
+        height: 18px;
+        border-radius: 5px;
+        background-color: #009a44;
+        margin-top: 4px;
+        margin-right: 20px;
+    }
+
+        .current-messages i.active {
+            background-color: #f55a55;
+            animation: move 2s 1s linear both infinite;
+        }
+
+
+
+
+
+@keyframes move {
+    0% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0;
+    }
+
+    100% {
+        opacity: 1;
+    }
+}
+
+.current-messages li {
+    float: left;
+    /*margin: 0 20px;
+    margin-top: 15px;*/
+    width: 20%;
+    font-size: 18px;
+    padding: 10px 18px;
+}
+
+/*.current-messages ul:nth-of-type(2) li {
+    float: left;
+    padding: 10px 18px;
+    width: 100px;
+    width: 20%;
+    font-size: 18px;
+}*/
+
+/*UPS*/
+.ups {
+    width: 100%;
+    height: 745px;
+    margin-left: 15px;
+    background: rgba(0,0,0,.5);
+    overflow: hidden;
+    margin-top: 50px;
+}
+
+.ups-center {
+    width: 1090px;
+    height: 620px;
+    margin: 0 auto;
+    margin-top: 62px;
+    position: relative;
+    font-size: 28px;
+}
+
+.common {
+    width: 160px;
+    height: 65px;
+    border: 2px solid #666;
+    border-radius: 5px;
+    line-height: 65px;
+    text-align: center;
+    position: absolute;
+    color: #fff;
+}
+
+    .common.acline {
+        top: 203px;
+    }
+
+    .common.ups1 {
+        top: 203px;
+        left: 463px;
+        z-index: 3;
+    }
+
+    .common.losd {
+        top: 203px;
+        left: 926px;
+    }
+
+    .common.battery {
+        top: 382px;
+        left: 460px;
+    }
+
+    .common.bupass {
+        border: 0;
+        background-color: #fa575b;
+        top: 56px;
+        left: 465px;
+        color: #fff;
+        z-index: 9;
+        animation: myfirst5 2s infinite 0.8s;
+        -moz-animation: myfirst5 2s infinite 0.8s;
+        -webkit-animation: myfirst5 2s infinite 0.8s;
+    }
+
+@-webkit-keyframes myfirst5 {
+    /*0%{left:-0.2px;top:0;}*/
+    100% {
+        opacity: 0;
+    }
+}
+
+.animation {
+    position: relative;
+    width: 299px;
+    height: 25px;
+    border-top: 2px solid #0e54a9;
+    border-bottom: 2px solid #0e54a9;
+    position: absolute;
+    overflow: hidden;
+}
+
+    .animation.a {
+        left: 164px;
+        top: 224px;
+    }
+
+    .animation.b {
+        left: 627px;
+        top: 224px;
+    }
+
+    .animation i {
+        display: block;
+        position: absolute;
+        width: 25px;
+        height: 25px;
+        background: url("../../../../images/IndexNan/arrow-right.png") center no-repeat;
+        background-size: 100% 100%;
+    }
+
+        .animation i:first-of-type {
+            left: 0;
+            top: 0;
+            animation: myfirst3 4s infinite;
+            -moz-animation: myfirst3 4s infinite;
+            -webkit-animation: myfirst3 4s infinite;
+        }
+
+        .animation i:nth-of-type(2) {
+            left: -20px;
+            top: 0;
+            animation: myfirst4 4s infinite 0.8s;
+            -moz-animation: myfirst4 4s infinite 0.8s;
+            -webkit-animation: myfirst4 4s infinite 0.8s;
+        }
+
+        .animation i:last-of-type {
+            left: -20px;
+            top: 0;
+            animation: myfirst4 4s infinite 1.5s;
+            -moz-animation: myfirst4 4s infinite 1.5s;
+            -webkit-animation: myfirst4 4s infinite 1.5s;
+        }
+
+.animationc {
+    width: 25px;
+    height: 110px;
+    border-left: 2px solid #0e54a9;
+    border-right: 2px solid #0e54a9;
+    position: absolute;
+    left: 528px;
+    top: 272px;
+    overflow: hidden;
+}
+
+    .animationc i {
+        display: block;
+        position: absolute;
+        width: 25px;
+        height: 25px;
+        background: url("../../../../images/IndexNan/arrow-bottom.png") center no-repeat;
+        background-size: 100% 100%;
+    }
+
+        .animationc i:first-of-type {
+            left: 0;
+            top: 0;
+            animation: myfirst1 4s infinite;
+            -moz-animation: myfirst1 4s infinite;
+            -webkit-animation: myfirst1 4s infinite;
+        }
+
+        .animationc i:last-of-type {
+            left: 0;
+            top: -20px;
+            animation: myfirst2 4s infinite 0.8s;
+            -moz-animation: myfirst2 4s infinite 0.8s;
+            -webkit-animation: myfirst2 4s infinite 0.8s;
+        }
+
+@-webkit-keyframes myfirst1 {
+    /*0%{left:0;top:0;}*/
+    100% {
+        left: 0;
+        top: 120%;
+    }
+}
+
+@-webkit-keyframes myfirst2 {
+    /*0%{left:0;top:-0.2px;}*/
+    100% {
+        left: 0;
+        top: 120%;
+    }
+}
+
+@-webkit-keyframes myfirst3 {
+    /*%{left:0;top:0;}*/
+    100% {
+        left: 120%;
+        top: 0;
+    }
+}
+
+@-webkit-keyframes myfirst4 {
+    /*0%{left:-0.2px;top:0;}*/
+    100% {
+        left: 120%;
+        top: 0;
+    }
+}
+
+.bupass-border {
+    width: 290px;
+    height: 148px;
+    border: 2px solid #0e54a9;
+    border-bottom: 0;
+    position: absolute;
+    border-radius: 0.1px 0.1px 0 0;
+    left: 400px;
+    top: 74px;
+}
+
+    .bupass-border > div {
+        width: 220px;
+        height: 118px;
+        border: 2px solid #0e54a9;
+        border-bottom: 0;
+        margin-left: 32px;
+        margin-top: 28px;
+        border-radius: 8px 8px 0 0;
+    }
+/*信息*/
+.news {
+    width: 250px;
+    position: absolute;
+    font-size: 12px;
+}
+
+    .news.a {
+        left: 0;
+        top: 0;
+    }
+
+    .news.b {
+        left: 0;
+        top: 300px;
+    }
+
+    .news.c {
+        right: 0;
+        top: 0px;
+    }
+
+    .news.d {
+        right: 0;
+        top: 300px;
+    }
+
+.news-header {
+    width: 100%;
+    height: 35px;
+    background-color: #0e54a9;
+    line-height: 35px;
+}
+
+    .news-header p {
+        margin-left: 15px;
+        color: #fff;
+        font-size: 18px;
+    }
+
+.news-center {
+    width: 100%;
+    height: auto;
+    padding-bottom: 20px;
+    border-top: 0;
+    line-height: 40px;
+    background: rgba(0,0,0,.5);
+    color: #fff;
+    font-size: 18px;
+}
+
+    .news-center > div {
+        height: 40px;
+    }
+
+        .news-center > div p {
+            height: 100%;
+            text-align: center;
+            width: 140px;
+            float: left;
+        }
+
+        .news-center > div b {
+            margin-left: 9px;
+        }
+
+.footer {
+    position: absolute;
+    font-size: 18px;
+    bottom: -30px;
+}
+
+    .footer ul {
+        width: 1140px;
+    }
+
+    .footer li {
+        float: left;
+        margin-top: 15px;
+        width: 10%;
+        position: relative;
+        padding-left: 25px;
+        color: #fff;
+    }
+
+    .footer i {
+        display: block;
+        position: absolute;
+        right: -8px;
+        top: 4px;
+        width: 28px;
+        height: 18px;
+        border-radius: 5px;
+        background-color: #009a44;
+    }
+
+        .footer i.active {
+            background-color: #f55a55;
+            animation: myfirst5 2s infinite 0.8s;
+            -moz-animation: myfirst5 2s infinite 0.8s;
+            -webkit-animation: myfirst5 2s infinite 0.8s;
+        }
+
+
+
+@-moz-keyframes rotate {
+    0% {
+        -moz-transform: rotate(0deg);
+    }
+
+    100% {
+        -moz-transform: rotate(360deg);
+    }
+}
+
+@-webkit-keyframes rotate {
+    0% {
+        -webkit-transform: rotate(0deg);
+    }
+
+    100% {
+        -webkit-transform: rotate(360deg);
+    }
+}
+
+@keyframes rotate {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+/*.DataTable li .gui1 span {
+    margin-bottom: 40.5px;
+}
+
+.DataTable li span.u1 {
+    height: 21px;
+}
+
+.DataTable li span.u2 {
+    height: 38px;
+}
+
+.DataTable li span.u4 {
+    height: 58px;
+}
+
+.DataTable li span.u5 {
+    height: 61px;
+}
+
+.DataTable li span.u6 {
+    height: 85px;
+}
+
+.DataTable li span:hover {
+    background: rgba(0,0,0,0.5);
+}*/
+
+.ca-container {
+    height: 100%;
+}
+
+.dialog {
+    display: none;
+    /*width: 600px;*/
+    /*height: 350px;*/
+    width: 304px;
+    height: auto;
+    overflow: auto;
+    position: absolute;
+    background: rgba(0,0,0,0.6);
+    z-index: 100;
+    left: 0;
+    top: 0;
+}
+
+#dialog1 {
+    width: 260px;
+    height: 50px;
+    background: rgba(0,0,0,0.6);
+}
+
+#dialog td {
+    /*color:#eea807;*/
+    text-align: right;
+}
+
+.dialog td {
+    font-size: 16px;
+}
+
+.dialog td {
+    padding: 10px;
+    overflow: hidden;
+}
+
+.feng-close:hover {
+    background: transparent;
+}
+/*最新告警样式*/
+
+.Bar, .Bar1 {
+    position: relative;
+    width: 88%;
+    height: 16px;
+    /*background-color: #3696ac;*/
+    /*background: rgba(147,169,208,0.4);*/
+    background-color: #02314b;
+    border-radius: 10px;
+    padding: 2px;
+    -webkit-box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.25), 0 1px rgba(255, 255, 255, 0.08);
+    box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.25), 0 1px rgba(255, 255, 255, 0.08);
+}
+
+.Bar1 {
+    margin: 6px auto;
+}
+
+    .Bar div, .Bar1 div {
+        display: block;
+        position: relative;
+        /*background-color: #538eda;*/
+        background-color: #4298af;
+        color: #fff;
+        height: 16px;
+        line-height: 16px;
+    }
+
+        .Bar div span, .Bar1 div span {
+            position: absolute;
+            width: 40px;
+            text-align: center;
+            font-size: 16px;
+        }
+
+.l-layout-center {
+    border: none;
+}
+
+#AlarmUL {
+    width: 95%;
+    margin: 0 auto;
+}
+
+    #AlarmUL li {
+        padding: 1% 0;
+        word-break: keep-all;
+        /* 不换行 */
+        white-space: nowrap;
+        /* 不换行 */
+        overflow: hidden;
+        /* 内容超出宽度时隐藏超出部分的内容 */
+        text-overflow: ellipsis;
+        /* 当对象内文本溢出时显示省略标记(...) ；需与overflow:hidden;一起使用。*/
+        color: #fff;
+        font-size: 14px;
+        float: initial;
+        width: 100%;
+        height: 95%;
+    }
+
+#AlarmUL1 {
+    width: 95%;
+    margin: 0 auto;
+}
+
+    #AlarmUL1 li {
+        padding: 1% 0;
+        word-break: keep-all;
+        /* 不换行 */
+        white-space: nowrap;
+        /* 不换行 */
+        overflow: hidden;
+        /* 内容超出宽度时隐藏超出部分的内容 */
+        text-overflow: ellipsis;
+        /* 当对象内文本溢出时显示省略标记(...) ；需与overflow:hidden;一起使用。*/
+        color: #fff;
+        font-size: 14px;
+        float: initial;
+        width: 100%;
+        height: 95%;
+    }
+
+.alarm-urgent b {
+    color: #fa0000;
+}
+
+.alarm-important b {
+    color: #f55400;
+}
+
+/*.alarm-pxindful b {
+    color: #ffde00;
+}*/
+.alarm-remindful b {
+    color: #ffde00;
+}
+
+/*各辖区视频设备离线排名*/
+
+/*四个块*/
+.breakdown div.echarts3 {
+    width: 100%;
+    height: 100%;
+}
+
+.breakdown .breakdown-gc {
+    background-color: #fe6262;
+    margin-left: 4%;
+}
+
+.breakdown .breakdown-gd {
+    background-color: #6293f1;
+}
+
+.breakdown .breakdown-wcs {
+    background-color: #5ac9fb;
+}
+
+.breakdown .breakdown-wcl {
+    background-color: #6ed9b3;
+}
+
+.breakdown li {
+    float: left;
+    width: 50%;
+    height: 50%;
+    position: relative;
+}
+
+    .breakdown li > div {
+        color: #eea807;
+        text-align: center;
+        width: 100%;
+        height: 100%;
+        float: left;
+    }
+
+    .breakdown li h6 {
+        position: absolute;
+        width: 20px;
+        height: 100%;
+        padding-top: 5px;
+        left: 10px;
+        top: 10px;
+        font-weight: normal;
+    }
+
+h6 {
+    color: #fff;
+    text-align: center;
+    font-size: 14px;
+}
+
+
+td {
+    /*line-height:29px;
+    height:29px;*/
+    color: #fff;
+    font-size: 14px;
+    height: 29px;
+}
+/*数据表*/
+#dialog table {
+    width: 100%;
+    margin: 0 auto;
+    max-height: 100%;
+    text-align: center;
+}
+
+tr:hover {
+    background: rgba(0,108,208,0.5);
+}
+
+.l-grid-row-alt {
+    background: rgba(0,108,208,0.2);
+}
+
+    .l-grid-row-alt td {
+        color: #fff;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+.red {
+    color: #eb0641;
+}
+
+.yelow {
+    color: #ff7200;
+}
+
+.green {
+    color: #00d423;
+}
+
+#echarts4-1 {
+    width: 100%;
+    height: 90%;
+    margin-top: 10px;
+}
+
+.shadow {
+    /*box-shadow: 1px 1px 3px #436dc0;*/
+    background: url("../../../../images/IndexNan/big.png") no-repeat center;
+    background-size: 100% 100%;
+}
+
+.shadow2 {
+    background: url("../../../../images/IndexNan/small.png") no-repeat center;
+    background-size: 100% 100%;
+}
+
+.list_lh {
+    height: 85%;
+}
+
+
+
+/*四个块*/
+
+
+
+.breakdown1 .breakdown-gc {
+    background-color: #4573a7;
+    margin-left: 4%;
+}
+
+.breakdown1 .breakdown-gd {
+    background-color: #aa4644;
+}
+
+.breakdown1 .breakdown-wcs {
+    background-color: #89a54e;
+}
+
+.breakdown1 .breakdown-wcl {
+    background-color: #71588f;
+}
+
+.breakdown1 h6 {
+    color: #fff;
+    text-align: center;
+    border-bottom: 1px dashed #fff;
+    width: 80%;
+    margin: 0 auto;
+    padding-top: 25%;
+    padding-bottom: 25%;
+    font-weight: normal;
+    font-size: 14px;
+    font-family: serif;
+}
+
+.breakdown1 p {
+    color: #fff;
+    text-align: center;
+    padding-top: 30%;
+    font-size: 25px;
+}
+
+.breakdown1 td {
+    line-height: 28px;
+    height: 28px;
+}
+
+#Barchart1 td {
+    position: relative;
+}
+
+
+/*环形进度条样式*/
+.rad-prg {
+    margin: 20px 0;
+}
+/** logo inside example **/
+#indicatorContainerWrap5,
+#indicatorContainer5 {
+    display: inline-block;
+    position: relative;
+}
+
+#prgLogo {
+    height: 60px;
+    left: 50%;
+    margin-left: -30px;
+    margin-top: -30px;
+    position: absolute;
+    top: 50%;
+}
+/** file drop example **/
+#indicatorContainerWrap6 {
+    position: relative;
+    display: inline-block;
+}
+
+.rad-cntnt {
+    position: absolute;
+    display: table;
+    vertical-align: middle;
+    text-align: center;
+    width: 100%;
+    top: 50%;
+    -webkit-transform: translateY(-50%);
+    -moz-transform: translateY(-50%);
+    -ms-transform: translateY(-50%);
+    -o-transform: translateY(-50%);
+    transform: translateY(-50%);
+    font-size: 20px;
+    line-height: 24px;
+}
+
+#prgFileSelector {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    top: 0;
+    left: 0;
+    z-index: 10;
+}
+
+
+
+/*切换样式*/
+.arrow {
+    position: absolute;
+    display: block;
+    width: 200px;
+    height: 300px;
+    z-index: 999;
+    top: 50%;
+    margin-top: -150px;
+}
+
+.arrow2 {
+    left: 0;
+}
+
+.arrow1 {
+    right: 0;
+}
+/*.arrow1 {
+    position: absolute;
+    display: block;
+    width: 13px;
+    height: 15px;
+    left: 12px;
+    top: 6px;
+    background: url("../../../../images/Index-d/arrow1.png") no-repeat center;
+    background-size: 100% 100%;
+}*/
+/*.slideTxtBox .arrow {
+    position: absolute;
+    right: 10px;
+    top: 0;
+}*/
+
+.slideTxtBox .arrow a {
+    display: block;
+    width: 40px;
+    height: 40px;
+    float: right;
+    overflow: hidden;
+    cursor: pointer;
+    z-index: 1000;
+    /*background: url("../../../../images/IndexNan/arrow.png") 0 0 no-repeat;*/
+    position: absolute;
+    top: 50%;
+    margin-top: -20px;
+    display: none;
+}
+
+    .slideTxtBox .arrow a.next {
+        background: url("../../../../images/IndexNan/right.png") center no-repeat;
+        background-size: 100% 100%;
+        right: 20px;
+    }
+
+    .slideTxtBox .arrow a.prev {
+        background: url("../../../../images/IndexNan/left.png") center no-repeat;
+        background-size: 100% 100%;
+        left: 20px;
+    }
+/*.slideTxtBox .arrow .next {
+    background-position: 0 -50px;
+}
+
+.slideTxtBox .arrow .prevStop {
+    background-position: -60px 0;
+}
+
+.slideTxtBox .arrow .nextStop {
+    background-position: -60px -50px;
+}*/
+
+
+body {
+    color: #333;
+    font-size: 12px;
+    font-family: "微软雅黑";
+    background: url("../../../../images/indexTianJin/mid.gif") no-repeat center;
+    background-size: 100% 100%;
+}
+
+h4 {
+    text-align: center;
+    font-size: 18px;
+    height: 16%;
+    line-height: 35px;
+}
+
+h5 {
+    color: #fff;
+    font-size: 15px;
+    line-height: 30px;
+    height: 30px;
+    margin-bottom: 5px;
+    text-align: center;
+}
+
+    h5 a {
+        color: #fff;
+    }
+
+h5, h4,
+b {
+    font-weight: normal;
+}
+
+h5 {
+    width: 100%;
+    margin: 0 auto;
+    background: url("../../../../images/indexTianJin/type.png") no-repeat center;
+    background-size: 100% 100%;
+}
+
+.left-hand,
+.middle,
+.right-hand {
+    height: 100%;
+    position: relative;
+}
+
+.category {
+    height: 80%;
+    margin-left: 10px;
+    margin-top: 5px;
+}
+
+.left-hand {
+    width: 25%;
+    float: left;
+}
+
+.right-hand {
+    width: 25%;
+    float: right;
+}
+
+.middle {
+    width: 48%;
+    float: left;
+    margin-left: 1%;
+}
+
+.top-half {
+    height: 56%;
+}
+
+
+.bottom-half {
+    height: 41%;
+    position: absolute;
+    bottom: 2%;
+    width: 100%;
+}
+
+.keep-watch {
+    height: 35%;
+}
+
+
+/*值班表样式*/
+
+.alarms {
+    width: 100%;
+    position: absolute;
+    bottom: 0;
+    height: 62%;
+}
+
+.video-LineChart-1 {
+    height: 100%;
+}
+
+.main {
+    padding: 10px;
+    background: none;
+}
+
+.l-layout-center {
+    background: none;
+}
+
+
+h5 i {
+    display: block;
+    width: 5px;
+    height: 18px;
+    background-color: #0078ff;
+    margin-top: 8px;
+    float: left;
+    margin-right: 10px;
+}
+
+.keep-watch h5 b {
+    float: right;
+}
+
+.keep-watch ul {
+    width: 95%;
+    margin: 0 auto;
+}
+
+.keep-watch li {
+    padding: 1% 5px;
+    float: left;
+    white-space: nowrap;
+}
+
+    .keep-watch li i {
+        display: block;
+        width: 10px;
+        height: 10px;
+        background-color: #1aa0ee;
+        float: left;
+        margin-top: 4px;
+        margin-right: 10px;
+    }
+
+    .keep-watch li p {
+        float: left;
+    }
+
+        .keep-watch li p.active {
+            margin-right: 20%;
+        }
+/*.keep-watch li b {
+	color:#a8a8a8;
+}*/
+
+
+
+/*最新告警样式*/
+
+.Bar, .Bar1 {
+    position: relative;
+    width: 88%;
+    height: 16px;
+    /*background-color: #3696ac;*/
+    /*background: rgba(147,169,208,0.4);*/
+    background-color: #02314b;
+    border-radius: 10px;
+    padding: 2px;
+    -webkit-box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.25), 0 1px rgba(255, 255, 255, 0.08);
+    box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.25), 0 1px rgba(255, 255, 255, 0.08);
+}
+
+.Bar1 {
+    margin: 6px auto;
+}
+
+    .Bar div, .Bar1 div {
+        display: block;
+        position: relative;
+        /*background-color: #538eda;*/
+        background-color: #4298af;
+        color: #fff;
+        height: 16px;
+        line-height: 16px;
+    }
+
+        .Bar div span, .Bar1 div span {
+            position: absolute;
+            width: 40px;
+            text-align: center;
+        }
+
+.l-layout-center {
+    border: none;
+}
+
+.alarms ul {
+    width: 95%;
+    margin: 0 auto;
+}
+
+.alarms li {
+    padding: 1% 0;
+    word-break: keep-all;
+    /* 不换行 */
+    white-space: nowrap;
+    /* 不换行 */
+    overflow: hidden;
+    /* 内容超出宽度时隐藏超出部分的内容 */
+    text-overflow: ellipsis;
+    /* 当对象内文本溢出时显示省略标记(...) ；需与overflow:hidden;一起使用。*/
+}
+
+.alarm-urgent b {
+    color: #fa0000;
+}
+
+.alarm-important b {
+    color: #f55400;
+}
+
+.alarm-remindful b {
+    color: #ffde00;
+}
+
+
+/*各辖区视频设备离线排名*/
+
+/*四个块*/
+.breakdown div.echarts3 {
+    width: 100%;
+    height: 85%;
+}
+
+.breakdown .breakdown-gc {
+    background-color: #fe6262;
+    margin-left: 4%;
+}
+
+.breakdown .breakdown-gd {
+    background-color: #6293f1;
+}
+
+.breakdown .breakdown-wcs {
+    background-color: #5ac9fb;
+}
+
+.breakdown .breakdown-wcl {
+    background-color: #6ed9b3;
+}
+
+.breakdown li {
+    float: left;
+    width: 50%;
+    height: 50%;
+    position: relative;
+}
+
+    .breakdown li div {
+        color: #eea807;
+        text-align: center;
+        width: 83%;
+        height: 100%;
+        margin-left: 12%;
+        float: left;
+        margin-top: 2%;
+    }
+
+    .breakdown li h6 {
+        position: absolute;
+        width: 20px;
+        height: 100%;
+        padding-top: 5px;
+        left: 30px;
+        top: 10px;
+        font-weight: normal;
+    }
+
+h6 {
+    color: #fff;
+    text-align: center;
+    font-size: 14px;
+}
+
+.breakdown p {
+    color: #fff;
+    text-align: center;
+    padding-top: 30%;
+    font-size: 25px;
+}
+
+td {
+    line-height: 30px;
+    height: 30px;
+    color: #fff;
+    font-size: 14px;
+}
+/*数据表*/
+table {
+    width: 93%;
+    margin: 0 auto;
+    max-height: 100%;
+    text-align: center;
+}
+
+tr:hover {
+    background: rgba(0,108,208,0.5);
+}
+
+.l-grid-row-alt {
+    background: rgba(0,108,208,0.2);
+}
+
+    .l-grid-row-alt td {
+        color: #fff;
+    }
+
+.red {
+    color: #eb0641;
+}
+
+.yelow {
+    color: #ff7200;
+}
+
+.green {
+    color: #00d423;
+}
+
+#echarts4-1 {
+    width: 100%;
+    height: 90%;
+    margin-top: 10px;
+}
+
+.shadow {
+    box-shadow: 1px 1px 3px #436dc0;
+}
+
+.list_lh {
+    height: 85%;
+}
+
+#DutyUL {
+    width: 95%;
+    margin: 0 auto;
+}
+
+    #DutyUL li {
+        padding: 1% 5%;
+        float: left;
+        white-space: nowrap;
+        width: 34%;
+        font-size: 14px;
+        height: 24px;
+    }
+
+        #DutyUL li i {
+            display: block;
+            width: 10px;
+            height: 10px;
+            background-color: #1aa0ee;
+            float: left;
+            margin-top: 4px;
+            margin-right: 10px;
+        }
+
+        #DutyUL li b {
+            color: #fff;
+        }
+
+.duty {
+    color: #fff;
+    font-size: 14px;
+    padding-top: 4%;
+    width: 80%;
+    margin: auto;
+    text-align: left;
+}
+
+    .duty span {
+        color: #fff;
+        font-size: 24px;
+    }
+
+    .duty i {
+        display: block;
+        width: 10px;
+        height: 10px;
+        background-color: #1aa0ee;
+        float: left;
+        margin-top: 15px;
+        margin-right: 10px;
+    }
+
+.notice {
+    text-indent: 2em;
+}
+
+
+
+/*四个块*/
+.breakdown1 div {
+    float: left;
+    width: 20%;
+    height: 70%;
+    margin-right: 4%;
+    border-radius: 5px;
+    margin-top: 6.2%;
+}
+
+    .breakdown1 div:hover {
+        opacity: 0.8;
+    }
+
+.breakdown1 .breakdown-gc {
+    background-color: #4573a7;
+    margin-left: 4%;
+}
+
+.breakdown1 .breakdown-gd {
+    background-color: #aa4644;
+}
+
+.breakdown1 .breakdown-wcs {
+    background-color: #89a54e;
+}
+
+.breakdown1 .breakdown-wcl {
+    background-color: #71588f;
+}
+
+.breakdown1 h6 {
+    color: #fff;
+    text-align: center;
+    border-bottom: 1px dashed #fff;
+    width: 80%;
+    margin: 0 auto;
+    padding-top: 26%;
+    padding-bottom: 20%;
+    font-weight: normal;
+    font-size: 14px;
+    font-family: serif;
+}
+
+.breakdown1 p {
+    color: #fff;
+    text-align: center;
+    padding-top: 42%;
+    font-size: 25px;
+}
+
+.breakdown1 td {
+    line-height: 28px;
+    height: 28px;
+}
+
+.echarts3 {
+    width: 100%;
+    height: 86%;
+    margin-top: 4%;
+}
+
+#Barchart1, #YnweiReportCent {
+    overflow: hidden;
+}
+
+    #Barchart1::-webkit-scrollbar-track {
+        -webkit-box-shadow: inset 0 0 2px rgba(0,0,0,0.6);
+        background-color: #CCCCCC;
+    }
+
+    #Barchart1::-webkit-scrollbar {
+        width: 3px;
+        background-color: #F5F5F5;
+    }
+
+    #Barchart1::-webkit-scrollbar-thumb {
+        background-color: #FFF;
+        background-image: -webkit-linear-gradient(90deg,rgba(0, 0, 0, 1) 0%, transparent);
+    }
+
+    #YnweiReportCent::-webkit-scrollbar-track {
+        -webkit-box-shadow: inset 0 0 2px rgba(0,0,0,0.6);
+        background-color: #CCCCCC;
+    }
+
+    #YnweiReportCent::-webkit-scrollbar {
+        width: 3px;
+        background-color: #F5F5F5;
+    }
+
+    #YnweiReportCent::-webkit-scrollbar-thumb {
+        background-color: #FFF;
+        background-image: -webkit-linear-gradient(90deg,rgba(0, 0, 0, 1) 0%, transparent);
+    }
+
+    #Barchart1 td {
+        position: relative;
+    }
+
+.arrowup {
+    position: absolute;
+    display: block;
+    width: 12px;
+    height: 21px;
+    background: url("../../../../images/indexTianJin/arrow.png") no-repeat center;
+    background-size: 100% 100%;
+    left: 12px;
+    top: 4px;
+}
+
+.arrowdow {
+    position: absolute;
+    display: block;
+    width: 13px;
+    height: 15px;
+    left: 12px;
+    top: 6px;
+    background: url("../../../../images/indexTianJin/arrow1.png") no-repeat center;
+    background-size: 100% 100%;
+}
+/*切换样式*/
+.arrow {
+    position: absolute;
+    display: block;
+    width: 200px;
+    height: 300px;
+    z-index: 999;
+    top: 50%;
+    margin-top: -150px;
+}
+
+.arrow2 {
+    left: 0;
+}
+
+.arrow1 {
+    right: 0;
+}
+/*.arrow1 {
+    position: absolute;
+    display: block;
+    width: 13px;
+    height: 15px;
+    left: 12px;
+    top: 6px;
+    background: url("../../../../images/indexTianJin/arrow1.png") no-repeat center;
+    background-size: 100% 100%;
+}*/
+/*.slideTxtBox .arrow {
+    position: absolute;
+    right: 10px;
+    top: 0;
+}*/
+
+.slideTxtBox .arrow a {
+    display: block;
+    width: 40px;
+    height: 40px;
+    float: right;
+    overflow: hidden;
+    cursor: pointer;
+    z-index: 1000;
+    /*background: url("../../../../images/IndexNan/arrow.png") 0 0 no-repeat;*/
+    position: absolute;
+    top: 50%;
+    margin-top: -20px;
+    display: none;
+}
+
+    .slideTxtBox .arrow a.next {
+        background: url("../../../../images/IndexNan/right.png") center no-repeat;
+        background-size: 100% 100%;
+        right: 20px;
+    }
+
+    .slideTxtBox .arrow a.prev {
+        background: url("../../../../images/IndexNan/left.png") center no-repeat;
+        background-size: 100% 100%;
+        left: 20px;
+    }
+/*环形进度条样式*/
+.rad-prg {
+    margin: 20px 0;
+}
+/** logo inside example **/
+#indicatorContainerWrap5,
+#indicatorContainer5 {
+    display: inline-block;
+    position: relative;
+}
+
+#prgLogo {
+    height: 60px;
+    left: 50%;
+    margin-left: -30px;
+    margin-top: -30px;
+    position: absolute;
+    top: 50%;
+}
+/** file drop example **/
+#indicatorContainerWrap6 {
+    position: relative;
+    display: inline-block;
+}
+
+.rad-cntnt {
+    position: absolute;
+    display: table;
+    vertical-align: middle;
+    text-align: center;
+    width: 100%;
+    top: 50%;
+    -webkit-transform: translateY(-50%);
+    -moz-transform: translateY(-50%);
+    -ms-transform: translateY(-50%);
+    -o-transform: translateY(-50%);
+    transform: translateY(-50%);
+    font-size: 20px;
+    line-height: 24px;
+}
+
+#prgFileSelector {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    top: 0;
+    left: 0;
+    z-index: 10;
+}
+
+.breakdown p.notice {
+    color: #fff;
+    font-size: 14px;
+    padding-top: 1%;
+    width: 80%;
+    margin: 4% auto;
+    text-align: left;
+    height: 55%;
+    overflow: hidden;
+}
+
+
+.icon {
+    display: block;
+    width: 30px;
+    height: 30px;
+    margin: 8px auto;
+}
+
+.icon0 {
+    background: url(../../../../Images/indexTianJin/icon/icon0.png) center no-repeat;
+    background-size: 100% 100%;
+}
+
+.icon1 {
+    background: url(../../../../Images/indexTianJin/icon/icon1.png) center no-repeat;
+    background-size: 100% 100%;
+}
+
+.icon2 {
+    background: url(../../../../Images/indexTianJin/icon/icon2.png) center no-repeat;
+    background-size: 100% 100%;
+}
+
+.icon3 {
+    background: url(../../../../Images/indexTianJin/icon/icon3.png) center no-repeat;
+    background-size: 100% 100%;
+}
+
+.icon4 {
+    background: url(../../../../Images/indexTianJin/icon/icon4.png) center no-repeat;
+    background-size: 100% 100%;
+}
+
+.icon5 {
+    background: url(../../../../Images/indexTianJin/icon/icon5.png) center no-repeat;
+    background-size: 100% 100%;
+}
+
+.icon6 {
+    background: url(../../../../Images/indexTianJin/icon/icon6.png) center no-repeat;
+    background-size: 100% 100%;
+}
+
+.icon7 {
+    background: url(../../../../Images/indexTianJin/icon/icon7.png) center no-repeat;
+    background-size: 100% 100%;
+}
+
+.icon8 {
+    background: url(../../../../Images/indexTianJin/icon/icon8.png) center no-repeat;
+    background-size: 100% 100%;
+}
+
+.icon9 {
+    background: url(../../../../Images/indexTianJin/icon/icon9.png) center no-repeat;
+    background-size: 100% 100%;
+}
+
+.icon10 {
+    background: url(../../../../Images/indexTianJin/icon/icon10.png) center no-repeat;
+    background-size: 100% 100%;
+}
+
+.icon11 {
+    background: url(../../../../Images/indexTianJin/icon/icon11.png) center no-repeat;
+    background-size: 100% 100%;
+}
+
+.icon12 {
+    background: url(../../../../Images/indexTianJin/icon/icon12.png) center no-repeat;
+    background-size: 100% 100%;
+}
+
+#Waveball2 ul li .biaozhi p {
+    width: 100%;
+    text-align: center;
+    color: #eea807;
+    font-size: 18px;
+}
+
+#Waveball2 ul li b {
+    color: #eea807;
+    font-size: 24px;
+    position: absolute;
+    left: 42px;
+    top: 75px;
+}
+
+.index-nav-common span {
+    display: block;
+    float: left;
+    padding: 0px 35px 0px 10px;
+    margin-right: 15px;
+    background: url(../../../../images/IndexNan/tc2.png) no-repeat;
+    background-size: 100% 100%;
+}
+
+.common-echarts {
+    width: 200px;
+    height: 200px;
+    position: absolute;
+}
+
+.common-line {
+    width: 100px;
+    height: 2px;
+    border: 1px solid #fff;
+    position: absolute;
+    background: #fff;
+}
+
+#Prison {
+    left: 360px;
+    top: 350px;
+}
+
+#Office {
+    left: 100px;
+    top: 100px;
+}
+
+#line1.common-line {
+    width: 219px;
+    left: 205px;
+    top: 318px;
+    transform: rotate(45deg);
+}
+
+#XingZheng {
+    left: 116px;
+    top: 305px;
+}
+
+#line2.common-line {
+    width: 104px;
+    left: 271px;
+    top: 429px;
+    transform: rotate(13deg);
+}
+
+#Close {
+    left: 44px;
+    top: 438px;
+}
+
+#line3.common-line {
+    width: 190px;
+    left: 201px;
+    top: 514px;
+    transform: rotate(-12deg);
+}
+
+#ZongHe {
+    left: 109px;
+    top: 633px;
+}
+
+#line4.common-line {
+    width: 238px;
+    left: 214px;
+    top: 605px;
+    transform: rotate(-45deg);
+}
+
+#HuiJian {
+    left: 315px;
+    top: 663px;
+}
+
+#line5.common-line {
+    width: 174px;
+    left: 358px;
+    top: 619px;
+    transform: rotate(99deg);
+}
+
+#JianQu {
+    left: 500px;
+    top: 670px;
+}
+
+#line6.common-line {
+    width: 205px;
+    left: 430px;
+    top: 621px;
+    transform: rotate(67deg);
+}
+
+#ShiTang {
+    left: 606px;
+    top: 569px;
+}
+
+#line7.common-line {
+    width: 185px;
+    left: 504px;
+    top: 562px;
+    transform: rotate(42deg);
+}
+
+#YuQiang {
+    left: 696px;
+    top: 413px;
+}
+
+#line8.common-line {
+    width: 198px;
+    left: 542px;
+    top: 473px;
+    transform: rotate(11deg);
+}
+
+#ChuiChang {
+    left: 718px;
+    top: 218px;
+}
+
+#line9.common-line {
+    width: 238px;
+    left: 529px;
+    top: 373px;
+    transform: rotate(-20deg);
+}
+
+#XiYiLou {
+    left: 600px;
+    top: 109px;
+}
+
+#line10.common-line {
+    width: 197px;
+    left: 483px;
+    top: 312px;
+    transform: rotate(-43deg);
+}
+
+#HuWai {
+    left: 350px;
+    top: 66px;
+}
+
+#line11.common-line {
+    width: 146px;
+    left: 374px;
+    top: 295px;
+    transform: rotate(-91deg);
+}
+
+body {
+    color: #333;
+    font-size: 12px;
+    font-family: "微软雅黑";
+    background: url("../../../../images/indexTianJin/mid.gif") no-repeat center;
+    background-size: 100% 100%;
+}
+
+h4 {
+    text-align: center;
+    font-size: 18px;
+    height: 16%;
+    line-height: 35px;
+}
+
+h5 {
+    color: #fff;
+    font-size: 15px;
+    line-height: 30px;
+    height: 30px;
+    margin-bottom: 5px;
+    text-align: center;
+}
+
+    h5 a {
+        color: #fff;
+    }
+
+h5, h4,
+b {
+    font-weight: normal;
+}
+
+h5 {
+    width: 100%;
+    margin: 0 auto;
+    background: url("../../../../images/indexTianJin/type.png") no-repeat center;
+    background-size: 100% 100%;
+}
+
+.left-hand,
+.middle,
+.right-hand {
+    height: 100%;
+    position: relative;
+}
+
+.category {
+    height: 80%;
+    margin-left: 10px;
+    margin-top: 5px;
+}
+
+.left-hand {
+    width: 25%;
+    float: left;
+}
+
+.right-hand {
+    width: 25%;
+    float: right;
+}
+
+.middle {
+    width: 48%;
+    float: left;
+    margin-left: 1%;
+}
+
+.top-half {
+    height: 56%;
+}
+
+
+.bottom-half {
+    height: 41%;
+    position: absolute;
+    bottom: 2%;
+    width: 100%;
+}
+
+.keep-watch {
+    height: 35%;
+}
+
+
+/*值班表样式*/
+
+.alarms {
+    width: 100%;
+    position: absolute;
+    bottom: 0;
+    height: 62%;
+}
+
+.video-LineChart-1 {
+    height: 100%;
+}
+
+.main {
+    padding: 10px;
+    background: none;
+}
+
+.l-layout-center {
+    background: none;
+}
+
+
+h5 i {
+    display: block;
+    width: 5px;
+    height: 18px;
+    background-color: #0078ff;
+    margin-top: 8px;
+    float: left;
+    margin-right: 10px;
+}
+
+.keep-watch h5 b {
+    float: right;
+}
+
+.keep-watch ul {
+    width: 95%;
+    margin: 0 auto;
+}
+
+.keep-watch li {
+    padding: 1% 5px;
+    float: left;
+    white-space: nowrap;
+}
+
+    .keep-watch li i {
+        display: block;
+        width: 10px;
+        height: 10px;
+        background-color: #1aa0ee;
+        float: left;
+        margin-top: 4px;
+        margin-right: 10px;
+    }
+
+    .keep-watch li p {
+        float: left;
+    }
+
+        .keep-watch li p.active {
+            margin-right: 20%;
+        }
+/*.keep-watch li b {
+	color:#a8a8a8;
+}*/
+.map {
+    width: 100%;
+    height: 92%;
+    margin-top: 80px;
+}
+
+
+/*最新告警样式*/
+
+.Bar, .Bar1 {
+    position: relative;
+    width: 88%;
+    height: 16px;
+    /*background-color: #3696ac;*/
+    /*background: rgba(147,169,208,0.4);*/
+    background-color: #02314b;
+    border-radius: 10px;
+    padding: 2px;
+    -webkit-box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.25), 0 1px rgba(255, 255, 255, 0.08);
+    box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.25), 0 1px rgba(255, 255, 255, 0.08);
+}
+
+
+.l-layout-center {
+    border: none;
+}
+
+.alarms ul {
+    width: 95%;
+    margin: 0 auto;
+}
+
+.alarms li {
+    padding: 1% 0;
+    word-break: keep-all;
+    /* 不换行 */
+    white-space: nowrap;
+    /* 不换行 */
+    overflow: hidden;
+    /* 内容超出宽度时隐藏超出部分的内容 */
+    text-overflow: ellipsis;
+    /* 当对象内文本溢出时显示省略标记(...) ；需与overflow:hidden;一起使用。*/
+}
+
+.alarm-urgent b {
+    color: #fa0000;
+}
+
+.alarm-important b {
+    color: #f55400;
+}
+
+.alarm-remindful b {
+    color: #ffde00;
+}
+
+
+/*各辖区视频设备离线排名*/
+
+/*四个块*/
+.breakdown div.echarts3 {
+    width: 100%;
+    height: 85%;
+}
+
+.breakdown .breakdown-gc {
+    background-color: #fe6262;
+    margin-left: 4%;
+}
+
+.breakdown .breakdown-gd {
+    background-color: #6293f1;
+}
+
+.breakdown .breakdown-wcs {
+    background-color: #5ac9fb;
+}
+
+.breakdown .breakdown-wcl {
+    background-color: #6ed9b3;
+}
+
+.breakdown li {
+    float: left;
+    width: 50%;
+    height: 50%;
+    position: relative;
+}
+
+    .breakdown li div {
+        color: #eea807;
+        text-align: center;
+        width: 83%;
+        height: 100%;
+        margin-left: 12%;
+        float: left;
+        margin-top: 2%;
+    }
+
+    .breakdown li h6 {
+        position: absolute;
+        width: 20px;
+        height: 100%;
+        padding-top: 5px;
+        left: 30px;
+        top: 10px;
+        font-weight: normal;
+    }
+
+h6 {
+    color: #fff;
+    text-align: center;
+    font-size: 14px;
+}
+
+.breakdown p {
+    color: #fff;
+    text-align: center;
+    padding-top: 30%;
+    font-size: 25px;
+}
+
+td {
+    line-height: 30px;
+    height: 30px;
+    color: #fff;
+    font-size: 14px;
+}
+/*数据表*/
+table {
+    width: 93%;
+    margin: 0 auto;
+    max-height: 100%;
+    text-align: center;
+}
+
+tr:hover {
+    background: rgba(0,108,208,0.5);
+}
+
+.l-grid-row-alt {
+    background: rgba(0,108,208,0.2);
+}
+
+    .l-grid-row-alt td {
+        color: #fff;
+    }
+
+.red {
+    color: #eb0641;
+}
+
+.yelow {
+    color: #ff7200;
+}
+
+.green {
+    color: #00d423;
+}
+
+#echarts4-1 {
+    width: 100%;
+    height: 90%;
+    margin-top: 10px;
+}
+
+.shadow {
+    box-shadow: 1px 1px 3px #436dc0;
+}
+
+.list_lh {
+    height: 85%;
+}
+
+#DutyUL {
+    width: 95%;
+    margin: 0 auto;
+}
+
+    #DutyUL li {
+        padding: 1% 5%;
+        float: left;
+        white-space: nowrap;
+        width: 34%;
+        font-size: 14px;
+        height: 24px;
+    }
+
+        #DutyUL li i {
+            display: block;
+            width: 10px;
+            height: 10px;
+            background-color: #1aa0ee;
+            float: left;
+            margin-top: 4px;
+            margin-right: 10px;
+        }
+
+        #DutyUL li b {
+            color: #fff;
+        }
+
+.duty {
+    color: #fff;
+    font-size: 14px;
+    padding-top: 4%;
+    width: 80%;
+    margin: auto;
+    text-align: left;
+}
+
+    .duty span {
+        color: #fff;
+        font-size: 24px;
+    }
+
+    .duty i {
+        display: block;
+        width: 10px;
+        height: 10px;
+        background-color: #1aa0ee;
+        float: left;
+        margin-top: 15px;
+        margin-right: 10px;
+    }
+
+.notice {
+    text-indent: 2em;
+}
+
+@media screen and (max-width: 1366px) {
+    .breakdown p.notice {
+        color: #fff;
+        font-size: 14px;
+        padding-top: 1%;
+        width: 80%;
+        margin: 4% auto;
+        text-align: left;
+        height: 40%;
+        overflow: hidden;
+    }
+
+    h4 {
+        text-align: center;
+        font-size: 14px;
+        height: 16%;
+        line-height: 35px;
+    }
+
+    h5 {
+        border-bottom: 1px solid #a4a4a4;
+        color: #0078ff;
+        font-size: 12px;
+        line-height: 28px;
+        height: 28px;
+    }
+
+        h5 i {
+            display: block;
+            width: 5px;
+            height: 18px;
+            background-color: #0078ff;
+            margin-top: 5px;
+            float: left;
+            margin-right: 6px;
+        }
+
+    .PageImg {
+        width: 20px;
+        height: 20px;
+    }
+
+    .bottom-half {
+        bottom: 0px;
+    }
+
+    .list_lh {
+        height: 110px;
+    }
+}
+
+/*四个块*/
+.breakdown1 div {
+    float: left;
+    width: 20%;
+    height: 70%;
+    margin-right: 4%;
+    border-radius: 5px;
+    margin-top: 6.2%;
+}
+
+    .breakdown1 div:hover {
+        opacity: 0.8;
+    }
+   .breakdown1 div.Bar, .breakdown1 div.Bar1{
+       width:88%;
+   }
+   .Bar1 {
+    margin: 6px auto;
+}
+
+    .Bar div, .Bar1 div {
+        display: block;
+        position: relative;
+        /*background-color: #538eda;*/
+        background-color: #4298af;
+        color: #fff;
+        height: 16px;
+        line-height: 16px;
+        margin-top: 0;
+    }
+
+        .Bar div span, .Bar1 div span {
+            position: absolute;
+            width: 40px;
+            text-align: center;
+        }
+
+.breakdown1 .breakdown-gc {
+    background-color: #4573a7;
+    margin-left: 4%;
+}
+
+.breakdown1 .breakdown-gd {
+    background-color: #aa4644;
+}
+
+.breakdown1 .breakdown-wcs {
+    background-color: #89a54e;
+}
+
+.breakdown1 .breakdown-wcl {
+    background-color: #71588f;
+}
+
+.breakdown1 h6 {
+    color: #fff;
+    text-align: center;
+    border-bottom: 1px dashed #fff;
+    width: 80%;
+    margin: 0 auto;
+    padding-top: 26%;
+    padding-bottom: 20%;
+    font-weight: normal;
+    font-size: 14px;
+    font-family: serif;
+}
+
+.breakdown1 p {
+    color: #fff;
+    text-align: center;
+    padding-top: 42%;
+    font-size: 25px;
+}
+
+.breakdown1 td {
+    line-height: 28px;
+    height: 28px;
+}
+
+.echarts3 {
+    width: 100%;
+    height: 86%;
+    margin-top: 4%;
+}
+
+#Barchart1, #YnweiReportCent {
+    overflow: hidden;
+}
+
+    #Barchart1::-webkit-scrollbar-track {
+        -webkit-box-shadow: inset 0 0 2px rgba(0,0,0,0.6);
+        background-color: #CCCCCC;
+    }
+
+    #Barchart1::-webkit-scrollbar {
+        width: 3px;
+        background-color: #F5F5F5;
+    }
+
+    #Barchart1::-webkit-scrollbar-thumb {
+        background-color: #FFF;
+        background-image: -webkit-linear-gradient(90deg,rgba(0, 0, 0, 1) 0%, transparent);
+    }
+
+    #YnweiReportCent::-webkit-scrollbar-track {
+        -webkit-box-shadow: inset 0 0 2px rgba(0,0,0,0.6);
+        background-color: #CCCCCC;
+    }
+
+    #YnweiReportCent::-webkit-scrollbar {
+        width: 3px;
+        background-color: #F5F5F5;
+    }
+
+    #YnweiReportCent::-webkit-scrollbar-thumb {
+        background-color: #FFF;
+        background-image: -webkit-linear-gradient(90deg,rgba(0, 0, 0, 1) 0%, transparent);
+    }
+
+    #Barchart1 td {
+        position: relative;
+    }
+
+.arrowup {
+    position: absolute;
+    display: block;
+    width: 12px;
+    height: 21px;
+    background: url("../../../../images/indexTianJin/arrow.png") no-repeat center;
+    background-size: 100% 100%;
+    left: 12px;
+    top: 4px;
+}
+
+.arrowdow {
+    position: absolute;
+    display: block;
+    width: 13px;
+    height: 15px;
+    left: 12px;
+    top: 6px;
+    background: url("../../../../images/indexTianJin/arrow1.png") no-repeat center;
+    background-size: 100% 100%;
+}
+/*切换样式*/
+.arrow {
+    position: absolute;
+    display: block;
+    width: 200px;
+    height: 300px;
+    z-index: 999;
+    top: 50%;
+    margin-top: -150px;
+}
+
+.arrow2 {
+    left: 0;
+}
+
+.arrow1 {
+    right: 0;
+}
+/*.arrow1 {
+    position: absolute;
+    display: block;
+    width: 13px;
+    height: 15px;
+    left: 12px;
+    top: 6px;
+    background: url("../../../../images/indexTianJin/arrow1.png") no-repeat center;
+    background-size: 100% 100%;
+}*/
+/*.slideTxtBox .arrow {
+    position: absolute;
+    right: 10px;
+    top: 0;
+}*/
+
+.slideTxtBox .arrow a {
+    display: block;
+    width: 40px;
+    height: 40px;
+    float: right;
+    overflow: hidden;
+    cursor: pointer;
+    z-index: 1000;
+    /*background: url("../../../../images/IndexNan/arrow.png") 0 0 no-repeat;*/
+    position: absolute;
+    top: 50%;
+    margin-top: -20px;
+    display: none;
+}
+
+    .slideTxtBox .arrow a.next {
+        background: url("../../../../images/IndexNan/right.png") center no-repeat;
+        background-size: 100% 100%;
+        right: 20px;
+    }
+
+    .slideTxtBox .arrow a.prev {
+        background: url("../../../../images/IndexNan/left.png") center no-repeat;
+        background-size: 100% 100%;
+        left: 20px;
+    }
+/*环形进度条样式*/
+.rad-prg {
+    margin: 20px 0;
+}
+/** logo inside example **/
+#indicatorContainerWrap5,
+#indicatorContainer5 {
+    display: inline-block;
+    position: relative;
+}
+
+#prgLogo {
+    height: 60px;
+    left: 50%;
+    margin-left: -30px;
+    margin-top: -30px;
+    position: absolute;
+    top: 50%;
+}
+/** file drop example **/
+#indicatorContainerWrap6 {
+    position: relative;
+    display: inline-block;
+}
+
+.rad-cntnt {
+    position: absolute;
+    display: table;
+    vertical-align: middle;
+    text-align: center;
+    width: 100%;
+    top: 50%;
+    -webkit-transform: translateY(-50%);
+    -moz-transform: translateY(-50%);
+    -ms-transform: translateY(-50%);
+    -o-transform: translateY(-50%);
+    transform: translateY(-50%);
+    font-size: 20px;
+    line-height: 24px;
+}
+
+#prgFileSelector {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    top: 0;
+    left: 0;
+    z-index: 10;
+}
+
+.breakdown p.notice {
+    color: #fff;
+    font-size: 14px;
+    padding-top: 1%;
+    width: 80%;
+    margin: 4% auto;
+    text-align: left;
+    height: 55%;
+    overflow: hidden;
+}
+
+
+.icon {
+    display: block;
+    width: 30px;
+    height: 30px;
+    margin: 8px auto;
+}
+
+.icon0 {
+    background: url(../../../../Images/indexTianJin/icon/icon0.png) center no-repeat;
+    background-size: 100% 100%;
+}
+
+.icon1 {
+    background: url(../../../../Images/indexTianJin/icon/icon1.png) center no-repeat;
+    background-size: 100% 100%;
+}
+
+.icon2 {
+    background: url(../../../../Images/indexTianJin/icon/icon2.png) center no-repeat;
+    background-size: 100% 100%;
+}
+
+.icon3 {
+    background: url(../../../../Images/indexTianJin/icon/icon3.png) center no-repeat;
+    background-size: 100% 100%;
+}
+
+.icon4 {
+    background: url(../../../../Images/indexTianJin/icon/icon4.png) center no-repeat;
+    background-size: 100% 100%;
+}
+
+.icon5 {
+    background: url(../../../../Images/indexTianJin/icon/icon5.png) center no-repeat;
+    background-size: 100% 100%;
+}
+
+.icon6 {
+    background: url(../../../../Images/indexTianJin/icon/icon6.png) center no-repeat;
+    background-size: 100% 100%;
+}
+
+.icon7 {
+    background: url(../../../../Images/indexTianJin/icon/icon7.png) center no-repeat;
+    background-size: 100% 100%;
+}
+
+.icon8 {
+    background: url(../../../../Images/indexTianJin/icon/icon8.png) center no-repeat;
+    background-size: 100% 100%;
+}
+
+.icon9 {
+    background: url(../../../../Images/indexTianJin/icon/icon9.png) center no-repeat;
+    background-size: 100% 100%;
+}
+
+.icon10 {
+    background: url(../../../../Images/indexTianJin/icon/icon10.png) center no-repeat;
+    background-size: 100% 100%;
+}
+
+.icon11 {
+    background: url(../../../../Images/indexTianJin/icon/icon11.png) center no-repeat;
+    background-size: 100% 100%;
+}
+
+.icon12 {
+    background: url(../../../../Images/indexTianJin/icon/icon12.png) center no-repeat;
+    background-size: 100% 100%;
+}
+
+#Waveball2 ul li .biaozhi p {
+    width: 100%;
+    text-align: center;
+    color: #eea807;
+    font-size: 18px;
+}
+
+#Waveball2 ul li b {
+    color: #eea807;
+    font-size: 24px;
+    position: absolute;
+    left: 42px;
+    top: 90px;
+}
+
+.index-nav-common span {
+    display: block;
+    float: left;
+    padding: 0px 35px 0px 10px;
+    margin-right: 15px;
+    background: url(../../../../images/IndexNan/tc2.png) no-repeat;
+    background-size: 100% 100%;
+}
+
+.radial-common {
+    margin-top: 20px;
+}
+
+.l-topmenu-logo {
+    color: #E7E7E7;
+    height: 58px;
+    width: 1431px;
+    background: url('../../../../Images/Index-D/logo1.png') no-repeat;
+    background-size: 100% 100%;
+    margin: 0 auto;
+    margin-top: 10px;
+}
+
+.bottom-half {
+    height: 32%;
+    position: absolute;
+    bottom: 2%;
+    width: 100%;
+}
+
+.top-half {
+    height: 64%;
+}
+
+.echarts3 {
+    margin-top: 1%;
+}
+
+/*#Waveball1 li {
+    margin-top: 28px;
+}*/
+
+#Waveball2 ul li {
+    width: 50%;
+    height: 100%;
+    float: left;
+    position: relative;
+}
+
+    #Waveball2 ul li div.echarts3-2 {
+        width: 80%;
+        height: 80%;
+        float: left;
+        position: absolute;
+        left: 62px;
+        top: 37px;
+    }
+
+.echarts3-2-name {
+    position: absolute;
+    bottom: 17px;
+    left: 50%;
+    font-size: 16px;
+    color: #fff;
+}
+
+.echartsAlarm-value {
+    color: #fff;
+    font-size: 14px;
+    position: absolute;
+    top: 75px;
+    left: 5%;
+}
+
+    .echartsAlarm-value ul li {
+        float: none;
+        width: 90px;
+        background-color: rgba(0,0,0,0.3);
+        border-radius: 4px;
+        margin-top: 10px;
+        height: 28px;
+        line-height: 28px;
+        overflow: hidden;
+    }
+
+.span-name {
+    display: inline-block;
+    width: 50px;
+    color: #fff;
+    text-align: center;
+}
+
+.span-name1 {
+    background: rgba(152,64,60,0.5);
+}
+
+.span-name2 {
+    background: rgba(188,114,42,0.5);
+}
+
+.span-name3 {
+    background: rgba(131,156,69,0.5);
+}
+
+.echartsAlarm-tab {
+    /*position: absolute;
+    top: 261px;
+    left: 20%;*/
+    padding: 5px;
+    z-index: 999;
+}
+
+    .echartsAlarm-tab ul {
+    }
+
+        .echartsAlarm-tab ul li {
+            width: 25%;
+            line-height: 28px;
+            text-align: center;
+            color: #fff;
+            font-size: 14px;
+            cursor: pointer;
+        }
+
+    .echartsAlarm-tab > ul > li.active, .echartsAlarm-tab > ul > li:hover {
+        background: url(../../images/IndexNan/tc2.png) no-repeat;
+        background-size: 100% 100%;
+        background-color: rgba(45,84,159,0.3);
+    }
+
+.arrow {
+    width: 115px;
+    height: 300px;
+    z-index: 999;
+}
+@media screen and (max-width: 1366px) {
+     .breakdown p.notice {
+        color: #fff;
+        font-size: 10px;
+        padding-top: 0%;
+        width: 80%;
+        margin: 0% auto;
+        text-align: left;
+        height: 45%;
+         display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    }
+
+    h4 {
+        text-align: center;
+        font-size: 14px;
+        height: 16%;
+        line-height: 35px;
+    }
+
+    h5 {
+        border-bottom: 1px solid #a4a4a4;
+        color: #0078ff;
+        font-size: 12px;
+        line-height: 28px;
+        height: 28px;
+    }
+
+        h5 i {
+            display: block;
+            width: 5px;
+            height: 18px;
+            background-color: #0078ff;
+            margin-top: 5px;
+            float: left;
+            margin-right: 6px;
+        }
+
+    .PageImg {
+        width: 20px;
+        height: 20px;
+    }
+
+    .bottom-half {
+        bottom: 0px;
+    }
+
+    .list_lh {
+        height: 110px;
+    }
+  
+}

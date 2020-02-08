@@ -1,0 +1,94 @@
+/**
+ * Copyright &copy; 2012-2016 <a href="https://github.com/thinkgem/jeesite">JeeSite</a> All rights reserved.
+ */
+package com.arjjs.ccm.modules.ccm.house.entity;
+
+import org.hibernate.validator.constraints.Length;
+
+import com.arjjs.ccm.common.persistence.DataEntity;
+
+/**
+ * 楼栋单元户信息排列Entity
+ * @author liu
+ * @version 2019-04-24
+ */
+public class CcmHouseBuildmanageUnit extends DataEntity<CcmHouseBuildmanageUnit> {
+	
+	private static final long serialVersionUID = 1L;
+	private String buildmanageId;		// 楼栋ID
+	private String residentialUnit;		//小区单元
+	private String x;		// 横向坐标x
+	private String y;		// 纵向坐标y
+	private String houseNum;		// 门牌号
+	private String userId;
+	private String doorNum;
+	
+	public String getDoorNum() {
+		return doorNum;
+	}
+
+	public void setDoorNum(String doorNum) {
+		this.doorNum = doorNum;
+	}
+
+	public String getUserId() {
+		return userId;
+	}
+
+	public void setUserId(String userId) {
+		this.userId = userId;
+	}
+
+	public CcmHouseBuildmanageUnit() {
+		super();
+	}
+
+	public CcmHouseBuildmanageUnit(String id){
+		super(id);
+	}
+
+	@Length(min=0, max=64, message="楼栋ID长度必须介于 0 和 64 之间")
+	public String getBuildmanageId() {
+		return buildmanageId;
+	}
+
+	public void setBuildmanageId(String buildmanageId) {
+		this.buildmanageId = buildmanageId;
+	}
+	
+	public String getResidentialUnit() {
+		return residentialUnit;
+	}
+
+	public void setResidentialUnit(String residentialUnit) {
+		this.residentialUnit = residentialUnit;
+	}
+
+	@Length(min=0, max=2, message="横向坐标x长度必须介于 0 和 2 之间")
+	public String getX() {
+		return x;
+	}
+
+	public void setX(String x) {
+		this.x = x;
+	}
+	
+	@Length(min=0, max=2, message="纵向坐标y长度必须介于 0 和 2 之间")
+	public String getY() {
+		return y;
+	}
+
+	public void setY(String y) {
+		this.y = y;
+	}
+	
+	@Length(min=0, max=64, message="门牌号长度必须介于 0 和 64 之间")
+	public String getHouseNum() {
+		return houseNum;
+	}
+
+	public void setHouseNum(String houseNum) {
+		this.houseNum = houseNum;
+	}
+	
+}

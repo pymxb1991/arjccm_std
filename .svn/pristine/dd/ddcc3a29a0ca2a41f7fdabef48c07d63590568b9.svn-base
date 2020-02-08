@@ -1,0 +1,232 @@
+/**
+ * Copyright &copy; 2012-2016 <a href="https://github.com/thinkgem/jeesite">JeeSite</a> All rights reserved.
+ */
+package com.arjjs.ccm.modules.ccm.sys.web;
+
+import java.util.List;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.apache.shiro.authz.annotation.RequiresPermissions;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
+import com.arjjs.ccm.common.config.Global;
+import com.arjjs.ccm.common.persistence.Page;
+import com.arjjs.ccm.common.web.BaseController;
+import com.arjjs.ccm.common.utils.StringUtils;
+import com.arjjs.ccm.modules.ccm.sys.entity.SysConfig;
+import com.arjjs.ccm.modules.ccm.sys.entity.SysMapConfig;
+import com.arjjs.ccm.modules.ccm.sys.service.SysConfigService;
+
+import net.sf.json.JSONArray;
+import net.sf.json.JSONObject;
+import net.sf.json.JsonConfig;
+import net.sf.json.util.CycleDetectionStrategy;
+
+/**
+ * 系统信息配置Controller
+ * @author liang
+ * @version 2018-05-10
+ */
+@Controller
+@RequestMapping(value = "${adminPath}/sys/sysConfig")
+public class SysConfigController extends BaseController {
+
+	@Autowired
+	private SysConfigService sysConfigService;
+	
+	@ModelAttribute
+	public SysConfig get(@RequestParam(required=false) String id) {
+		SysConfig entity = null;
+		if (StringUtils.isNotBlank(id)){
+			entity = sysConfigService.get(id);
+		}
+		if (entity == null){
+			entity = new SysConfig();
+		}
+		return entity;
+	}
+	
+	//配置listForm
+	@RequiresPermissions("sys:sysConfig:view")
+	@RequestMapping(value = "listForm")
+	public String listForm(SysConfig sysConfig, HttpServletRequest request, HttpServletResponse response, Model model) {
+		List<SysConfig> list = sysConfigService.findList(sysConfig);
+		for(SysConfig s:list){
+			//系统应用级别
+			if("system_level".equals(s.getId())){
+				SysConfig systemLevel = new SysConfig();
+				systemLevel = s;
+				model.addAttribute("systemLevel", systemLevel);
+			}
+			//日志保存天数
+			if("log_save_config".equals(s.getId())){
+				SysConfig logSaveConfig = new SysConfig();
+				logSaveConfig = s;
+				model.addAttribute("logSaveConfig", logSaveConfig);
+			}
+			//上级域系统设置
+			if("upper_system_config".equals(s.getId())){
+				SysConfig upperSystemConfig = new SysConfig();
+				upperSystemConfig = s;
+				//解JSON
+				JSONObject jsonObject = JSONObject.fromObject(upperSystemConfig.getParamStr());
+				String url = (String)jsonObject.get("url");
+				String username = (String)jsonObject.get("username");
+				String password = (String)jsonObject.get("password");
+				upperSystemConfig.setUrl(url);
+				upperSystemConfig.setUsername(username);
+				upperSystemConfig.setPassword(password);
+				
+				model.addAttribute("upperSystemConfig", upperSystemConfig);
+			}
+		}
+		return "ccm/sys/sysConfigList";
+	}
+	
+	
+	
+	
+	
+	
+	
+	
+	//
+	@RequiresPermissions("sys:sysConfig:view")
+	@RequestMapping(value = {"list", ""})
+	public String list(SysConfig sysConfig, HttpServletRequest request, HttpServletResponse response, Model model) {
+		Page<SysConfig> page = sysConfigService.findPage(new Page<SysConfig>(request, response), sysConfig); 
+		model.addAttribute("page", page);
+		return "ccm/sys/sysConfigList";
+	}
+
+	@RequiresPermissions("sys:sysConfig:view")
+	@RequestMapping(value = "form")
+	public String form(SysConfig sysConfig, Model model) {
+		model.addAttribute("sysConfig", sysConfig);
+		return "ccm/sys/sysConfigForm";
+	}
+
+	@RequiresPermissions("sys:sysConfig:edit")
+	@RequestMapping(value = "save")
+	public String save(SysConfig sysConfig, Model model, RedirectAttributes redirectAttributes) {
+		if (!beanValidator(model, sysConfig)){
+			return form(sysConfig, model);
+		}
+		//上级域系统设置
+		if("upper_system_config".equals(sysConfig.getId())){
+			//转JSON
+			JsonConfig config = new JsonConfig();
+			config.setExcludes(new String[]{"createBy","updateBy","currentUser","createDate","updateDate","remarks",
+					"paramStr","paramInt","paramDate","tableName","objId","beginParamDate","endParamDate","id",
+					"dbName","delFlag","global","isNewRecord","page","sqlMap"});//排除
+			config.setIgnoreDefaultExcludes(false);  //设置默认忽略
+			config.setCycleDetectionStrategy(CycleDetectionStrategy.LENIENT);
+			String jsonString = JSONArray.fromObject(sysConfig,config).toString(); //
+			jsonString = jsonString.substring(1, jsonString.length()-1);
+			sysConfig.setParamStr(jsonString);
+		}
+		sysConfigService.save(sysConfig);
+		addMessage(redirectAttributes, "保存系统信息配置'"+sysConfig.getRemarks()+"'成功");
+		return "redirect:"+Global.getAdminPath()+"/sys/sysConfig/listForm?repage";
+	}
+	
+	@RequiresPermissions("sys:sysConfig:edit")
+	@RequestMapping(value = "delete")
+	public String delete(SysConfig sysConfig, RedirectAttributes redirectAttributes) {
+		sysConfigService.delete(sysConfig);
+		addMessage(redirectAttributes, "删除系统信息配置成功");
+		return "redirect:"+Global.getAdminPath()+"/sys/sysConfig/?repage";
+	}
+	
+	/**
+	 * 地图配置信息表单
+	 * @param sysConfig
+	 * @param model
+	 * @return
+	 */
+	@RequiresPermissions("sys:sysConfig:view")
+	@RequestMapping(value = "mapConfigForm")
+	public String mapConfigForm(Model model) {
+		SysConfig sysConfig = sysConfigService.get(SysConfig.MAP_CONFIG_ID);
+		if (StringUtils.isNotBlank(sysConfig.getParamStr())) {
+			JSONObject jsonObject = JSONObject.fromObject(sysConfig.getParamStr());
+			if (jsonObject != null && !jsonObject.isEmpty() && !jsonObject.isNullObject()) {
+				SysMapConfig sysMapConfig = (SysMapConfig) JSONObject.toBean(jsonObject, SysMapConfig.class);
+				sysConfig.setSysMapConfig(sysMapConfig);
+			}
+		}
+		model.addAttribute("systemMapConfig", sysConfig);
+		return "ccm/sys/sysMapConfigForm";
+	}
+	
+	/**
+	 * 地图配置信息保存
+	 * @param sysMapConfig
+	 * @param model
+	 * @param redirectAttributes
+	 * @return
+	 */
+	@RequiresPermissions("sys:sysConfig:edit")
+	@RequestMapping(value = "saveMapConfigInfo")
+	public String saveMapConfigInfo(SysConfig sysConfig, Model model, RedirectAttributes redirectAttributes) {
+		SysMapConfig sysMapConfig = sysConfig.getSysMapConfig();
+		if (sysMapConfig != null) {
+			sysConfig.setParamStr(JSONObject.fromObject(sysMapConfig).toString());
+		}
+		sysConfigService.save(sysConfig);
+		addMessage(redirectAttributes, "保存'"+sysConfig.getRemarks()+"'成功");
+		return "redirect:"+Global.getAdminPath()+"/sys/sysConfig/mapConfigForm?repage";
+	}
+	
+	@RequestMapping(value = "getMapConfigWithAJAX")
+	@ResponseBody
+	public SysConfig getMapConfigWithAJAX() {
+		SysConfig sysConfig = sysConfigService.get(SysConfig.MAP_CONFIG_ID);
+		if (StringUtils.isNotBlank(sysConfig.getParamStr())) {
+			JSONObject jsonObject = JSONObject.fromObject(sysConfig.getParamStr());
+			if (jsonObject != null && !jsonObject.isEmpty() && !jsonObject.isNullObject()) {
+				SysMapConfig sysMapConfig = (SysMapConfig) JSONObject.toBean(jsonObject, SysMapConfig.class);
+				sysConfig.setSysMapConfig(sysMapConfig);
+			}
+		}
+		return sysConfig;
+	}
+
+	@RequestMapping(value = "getAlarmColorLevelConfig")
+	@ResponseBody
+	public SysConfig getAlarmColorLevelConfig() {
+		SysConfig alarmColorLevel = new SysConfig();
+		List<SysConfig> list = sysConfigService.findList(alarmColorLevel);
+		for (SysConfig s : list) {
+			alarmColorLevel = s;
+			if ("alarm_color_level".equals(s.getId())) {
+				// 解JSON
+				JSONObject jsonObject = JSONObject.fromObject(alarmColorLevel.getParamStr());
+				String green = (String) jsonObject.get("green");
+				String yellowMin = (String) jsonObject.get("yellowMin");
+				String yellowMax = (String) jsonObject.get("yellowMax");
+				String orangeMin = (String) jsonObject.get("orangeMin");
+				String orangeMax = (String) jsonObject.get("orangeMax");
+				String red = (String) jsonObject.get("red");
+				alarmColorLevel.setGreen(green);
+				alarmColorLevel.setYellowMin(yellowMin);
+				alarmColorLevel.setYellowMax(yellowMax);
+				alarmColorLevel.setOrangeMin(orangeMin);
+				alarmColorLevel.setOrangeMax(orangeMax);
+				alarmColorLevel.setRed(red);
+				return alarmColorLevel;
+			}
+		}
+		return alarmColorLevel;
+	}
+	
+}

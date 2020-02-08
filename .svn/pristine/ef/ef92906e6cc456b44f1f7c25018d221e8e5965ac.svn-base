@@ -1,0 +1,1230 @@
+﻿@charset "utf-8";
+/* CSS Document */
+html {
+	font-size: 1000%;
+}
+
+@media only screen and (min-width: 1681px) and (max-width: 1920px) {
+	html {
+		font-size: 1000% !important;
+	}
+}
+
+@media only screen and (min-width: 1601px) and (max-width: 1680px) {
+	html {
+		font-size: 880% !important;
+	}
+}
+
+@media only screen and (min-width: 1441px) and (max-width: 1600px) {
+	html {
+		font-size: 820% !important;
+	}
+}
+
+@media only screen and (min-width: 1367px) and (max-width: 1440px) {
+	html {
+		font-size: 760% !important;
+	}
+}
+
+@media only screen and (min-width: 1027px) and (max-width: 1440px) {
+	html {
+		font-size: 720% !important;
+	}
+	.header {
+		height: 1rem !important;
+	}
+}
+
+::-webkit-scrollbar {
+	width: 0px;
+}
+
+::-webkit-scrollbar {
+	height: 0px;
+}
+
+::-webkit-scrollbar-track {
+	background-color: #bee1eb;
+}
+
+::-webkit-scrollbar-thumb {
+	background-color: #00aff0;
+}
+
+::-webkit-scrollbar-thumb:hover {
+	background-color: #9c3
+}
+
+::-webkit-scrollbar-thumb:active {
+	background-color: #00aff0
+}
+
+body {
+	background-color: #000407;
+	color: #fff;
+}
+
+.container {
+	background: url(../../images/win10/bg.png) center no-repeat;
+	background-size: 100% 100%;
+	position: relative;
+	width: 100%;
+	height: 100%;
+}
+
+h3 {
+	font-size: 0.2rem;
+}
+
+.header {
+	position: absolute;
+	margin-top: 0.7rem;
+	height: 2.1rem;
+	width: 100%;
+}
+
+.header-left {
+	position: absolute;
+	top: -0.5rem;
+	margin-left: 0.5rem;
+}
+
+.header-right {
+	position: relative;
+	position: absolute;
+	margin-right: 0.4rem;
+	top: -0.9rem;
+	right: 0.07rem;
+}
+
+.dates {
+	float: left;
+	background-color: #0270c7;
+	width: 1.3rem;
+	height: 0.25rem;
+	text-align: center;
+	line-height: 0.25rem;
+	margin-right: 0.05rem;
+	font-size: 0.14rem;
+}
+
+#pTitle {
+	font-size: 0.14rem;
+}
+
+.weather {
+	float: left;
+	background-color: #005395;
+	width: 0.98rem;
+	height: 0.65rem;
+	text-align: center;
+	padding-top: 0.05rem;
+	margin-right: 0.05rem;
+}
+
+.weather-img {
+	float: left;
+	background-color: #f18401;
+	width: 0.68rem;
+	height: 0.65rem;
+	text-align: center;
+	padding-top: 0.05rem;
+	position: relative;
+}
+
+.weather-img i {
+	display: block;
+	position: absolute;
+	width: 0.48rem;
+	height: 0.5rem;
+	background: url(../../images/win10/bg1.png) center no-repeat;
+	background-size: 100% 100%;
+	left: 0.1rem;
+}
+
+.week {
+	background-color: #219dcb;
+	width: 0.85rem;
+	height: 0.32rem;
+	text-align: center;
+	line-height: 0.32rem;
+	position: absolute;
+	top: 0.7rem;
+}
+
+.header-right h1 {
+	float: left;
+	margin-right: 0.05rem;
+	line-height: 0.33rem;
+	margin-top: 0.4rem;
+}
+
+.header-right span {
+	position: relative;
+	display: inline-block;
+	height: 0.25rem;
+	width: 0.7rem;
+	line-height: 0.25rem;
+	padding-left: 0.3rem;
+	margin-top: 0.4rem;
+	font-size: 0.14rem;
+}
+
+.header-right span i {
+	display: block;
+	position: absolute;
+	left: 0.08rem;
+}
+
+.header-right span:first-of-type {
+	background-color: #0270c7;
+}
+
+.header-right span:first-of-type i {
+	height: 0.16rem;
+	width: 0.14rem;
+	background: url(../../images/win10/2.png) center no-repeat;
+	background-size: 100% 100%;
+	top: 0.06rem;
+}
+
+.header-right span:nth-of-type(2) i {
+	height: 0.16rem;
+	width: 0.16rem;
+	background: url(../../images/win10/3.png) center no-repeat;
+	background-size: 100% 100%;
+	top: 0.07rem;
+}
+
+.header-right span:nth-of-type(2) {
+	background-color: #007bb6;
+}
+
+.header-right span:nth-of-type(3) i {
+	height: 0.14rem;
+	width: 0.17rem;
+	background: url(../../images/win10/4.png) center no-repeat;
+	background-size: 100% 100%;
+	top: 0.08rem;
+}
+
+.header-right span:nth-of-type(3) {
+	background-color: #0270c7;
+}
+
+.main {
+	position: absolute;
+	margin-top: 0.8rem;
+}
+
+.main ul.page {
+	white-space: nowrap;
+	overflow-y: hidden;
+	overflow-x: auto;
+}
+
+.main .page li {
+	margin-right: 0rem;
+	position: relative;
+	display: inline-block;
+}
+
+.main .page li:first-child {
+	margin-left: 0.5rem;
+}
+
+li a {
+	width: 100%;
+	height: 100%;
+	display: block;
+	position: relative;
+	z-index: 9
+}
+
+.main div {
+	font-size: 0.18rem;
+	margin-bottom: 0.1rem;
+	background-color: transparent !important;
+}
+
+.main div b {
+	font-size: 0.14rem;
+	position: absolute;
+	color: #fff;
+}
+
+.main .synthesis-door {
+	width: 1.58rem;
+	height: 0.58rem;
+	line-height: 0.58rem;
+	margin-bottom: 0.2rem;
+}
+
+.door {
+	width: 2.05rem;
+	height: 3.7rem;
+	background: url(../../images/win10/5.png) center no-repeat;
+	background-size: 100% 100%;
+	position: relative;
+}
+
+.layui-carousel>[carousel-item]:before {
+	display: none !important;
+}
+
+.main .door b {
+	bottom: 0.2rem;
+	left: 0.25rem;
+}
+
+.main .command-list {
+	width: 7.65rem;
+	height: 0.58rem;
+	line-height: 0.58rem;
+	margin-bottom: 0.2rem;
+}
+
+.alarm {
+	position: relative;
+	width: 2.03rem;
+	height: 1.4rem;
+	background: url(../../images/win10/6.png) center no-repeat;
+	background-size: 100% 100%;
+}
+
+.alarm b {
+	left: 0.66rem;
+	top: 0.83rem;
+}
+
+.situation {
+	position: relative;
+	width: 2.03rem;
+	height: 1.4rem;
+	background: url(../../images/win10/7.png) center no-repeat;
+	background-size: 100% 100%;
+}
+
+.situation b {
+	left: 0.66rem;
+	top: 0.83rem;
+}
+
+.planning {
+	position: relative;
+	width: 2.03rem;
+	height: 1.4rem;
+	background: url(../../images/win10/8.png) center no-repeat;
+	background-size: 100% 100%;
+}
+
+.planning b {
+	left: 0.66rem;
+	top: 0.83rem;
+}
+
+.security {
+	width: 1.18rem;
+	height: 1.4rem;
+	position: absolute;
+	top: 0.78rem;
+	left: 2.13rem;
+	background: url(../../images/win10/9.png) center no-repeat;
+	background-size: 100% 100%;
+}
+
+.security b {
+	left: 0.25rem;
+	top: 0.85rem;
+}
+
+.sandbox {
+	width: 1.18rem;
+	height: 2.44rem;
+	position: absolute;
+	top: 2.08rem;
+	left: 2.13rem;
+	background: url(../../images/win10/10.png) center no-repeat;
+	background-size: 100% 100%;
+}
+
+.sandbox b {
+	bottom: 0.25rem;
+	left: 0.25rem;
+}
+
+.plotting {
+	width: 2.58rem;
+	height: 1.4rem;
+	position: absolute;
+	top: 0.78rem;
+	left: 3.75rem;
+	background: url(../../images/win10/11.png) center no-repeat;
+	background-size: 100% 100%;
+}
+
+.plotting b {
+	left: 0.2rem;
+	bottom: 0.2rem;
+}
+
+.personnel-inspection {
+	width: 1.24rem;
+	height: 1.4rem;
+	position: absolute;
+	top: 2.08rem;
+	left: 3.75rem;
+	background: url(../../images/win10/12.png) center no-repeat;
+	background-size: 100% 100%;
+}
+
+.personnel-inspection b {
+	left: 0.06rem;
+	bottom: 0.15rem;
+}
+
+.traffic-control {
+	width: 1.24rem;
+	height: 1.4rem;
+	position: absolute;
+	top: 3.36rem;
+	left: 3.75rem;
+	background: url(../../images/win10/13.png) center no-repeat;
+	background-size: 100% 100%;
+}
+
+.traffic-control b {
+	left: 0.27rem;
+	bottom: 0.15rem;
+}
+
+.vehicles {
+	width: 1.24rem;
+	height: 1.4rem;
+	position: absolute;
+	top: 2.08rem;
+	left: 5.09rem;
+	background: url(../../images/win10/14.png) center no-repeat;
+	background-size: 100% 100%;
+}
+
+.vehicles b {
+	left: 0.06rem;
+	bottom: 0.15rem;
+}
+
+.coordinated {
+	width: 1.24rem;
+	height: 1.4rem;
+	position: absolute;
+	top: 3.36rem;
+	left: 5.09rem;
+	background: url(../../images/win10/15.png) center no-repeat;
+	background-size: 100% 100%;
+}
+
+.coordinated b {
+	left: 0.27rem;
+	bottom: 0.15rem;
+}
+
+.fusion {
+	width: 1.24rem;
+	height: 1.4rem;
+	position: absolute;
+	top: 0.78rem;
+	right: 0;
+	background: url(../../images/win10/16.png) center no-repeat;
+	background-size: 100% 100%;
+}
+
+.fusion b {
+	left: 0.27rem;
+	bottom: 0.15rem;
+}
+
+.video {
+	width: 1.24rem;
+	height: 1.4rem;
+	position: absolute;
+	top: 2.08rem;
+	right: 0;
+	background: url(../../images/win10/17.png) center no-repeat;
+	background-size: 100% 100%;
+}
+
+.video b {
+	left: 0.45rem;
+	bottom: 0.15rem;
+}
+
+.satellite {
+	width: 1.24rem;
+	height: 1.4rem;
+	position: absolute;
+	top: 3.36rem;
+	right: 0;
+	background: url(../../images/win10/18.png) center no-repeat;
+	background-size: 100% 100%;
+}
+
+.satellite b {
+	left: 0.27rem;
+	bottom: 0.15rem;
+}
+
+.main .intelligence {
+	width: 3.9rem;
+	height: 0.58rem;
+	line-height: 0.58rem;
+	margin-bottom: 0.2rem;
+}
+
+.integration {
+	position: relative;
+	width: 2.58rem;
+	height: 1.4rem;
+	background: url(../../images/win10/19.png) center no-repeat;
+	background-size: 100% 100%;
+}
+
+.integration b {
+	left: 0.2rem;
+	bottom: 0.2rem;
+}
+
+.early-warning {
+	position: relative;
+	width: 1.24rem;
+	height: 1.4rem;
+	background: url(../../images/win10/20.png) center no-repeat;
+	background-size: 100% 100%;
+}
+
+.early-warning b {
+	left: 0.27rem;
+	bottom: 0.15rem;
+}
+
+.analysis {
+	position: absolute;
+	width: 1.24rem;
+	height: 1.4rem;
+	background: url(../../images/win10/22.png) center no-repeat;
+	background-size: 100% 100%;
+	left: 1.34rem;
+	top: 2.28rem;
+}
+
+.analysis b {
+	left: 0.27rem;
+	bottom: 0.15rem;
+}
+
+.population {
+	position: relative;
+	width: 1.24rem;
+	height: 1.4rem;
+	background: url(../../images/win10/21.png) center no-repeat;
+	background-size: 100% 100%;
+}
+
+.population b {
+	left: 0.06rem;
+	bottom: 0.15rem;
+}
+
+.migrate {
+	position: absolute;
+	width: 1.24rem;
+	height: 1.4rem;
+	background: url(../../images/win10/23.png) center no-repeat;
+	background-size: 100% 100%;
+	left: 1.34rem;
+	top: 3.34rem;
+}
+
+.migrate b {
+	left: 0.27rem;
+	bottom: 0.15rem;
+}
+
+.hot-spot {
+	position: absolute;
+	width: 1.24rem;
+	height: 1.4rem;
+	background: url(../../images/win10/24.png) center no-repeat;
+	background-size: 100% 100%;
+	right: 0;
+	top: 0.78rem;
+}
+
+.hot-spot b {
+	left: 0.27rem;
+	bottom: 0.15rem;
+}
+
+.inquiry {
+	position: absolute;
+	width: 1.24rem;
+	height: 2.44rem;
+	background: url(../../images/win10/25.png) center no-repeat;
+	background-size: 100% 100%;
+	right: 0;
+	top: 2.08rem;
+}
+
+.inquiry b {
+	left: 0.25rem;
+	bottom: 0.2rem;
+}
+
+.main .fatigue-duty {
+	width: 5.3rem;
+	height: 0.58rem;
+	line-height: 0.58rem;
+	margin-bottom: 0.2rem;
+}
+
+.resources {
+	position: relative;
+	width: 1.24rem;
+	height: 1.4rem;
+	background: url(../../images/win10/26.png) center no-repeat;
+	background-size: 100% 100%;
+}
+
+.resources b {
+	left: 0.25rem;
+	bottom: 0.15rem;
+}
+
+.statistics {
+	position: absolute;
+	width: 1.24rem;
+	height: 1.24rem;
+	background: url(../../images/win10/30.png) center no-repeat;
+	background-size: 100% 100%;
+	top: 1.72rem;
+}
+
+.statistics b {
+	left: 0.25rem;
+	bottom: 0.15rem;
+}
+
+.statistics img {
+	position: absolute;
+	width: 0.7rem;
+	height: 0.52rem;
+	left: 0.3rem;
+	top: 0.24rem;
+}
+
+.my_events {
+	position: absolute;
+	width: 1.24rem;
+	height: 1.24rem;
+	background: url(../../images/win10/30.png) center no-repeat;
+	background-size: 100% 100%;
+	top: 1.72rem;
+	left: 2.7rem;
+}
+
+.my_events b {
+	left: 0.25rem;
+	bottom: 0.15rem;
+}
+
+.my_events img {
+	position: absolute;
+	width: 0.7rem;
+	height: 0.52rem;
+	left: 0.3rem;
+	top: 0.24rem;
+}
+
+.email {
+	position: absolute;
+	width: 1.24rem;
+	height: 1.24rem;
+	background: url(../../images/win10/30.png) center no-repeat;
+	background-size: 100% 100%;
+	top: 1.72rem;
+	left: 5.4rem;
+}
+
+.email b {
+	left: 0.25rem;
+	bottom: 0.15rem;
+}
+
+.email img {
+	position: absolute;
+	width: 0.7rem;
+	height: 0.52rem;
+	left: 0.3rem;
+	top: 0.24rem;
+}
+
+.gis_show {
+	position: absolute;
+	width: 1.24rem;
+	height: 2.57rem;
+	background: url(../../images/win10/30.png) center no-repeat;
+	background-size: 100% 100%;
+	top: 1.72rem;
+	left: 8.1rem;
+}
+
+.gis_show b {
+	left: 0.25rem;
+	bottom: 0.15rem;
+}
+
+.gis_show img {
+	position: absolute;
+	width: 0.7rem;
+	height: 0.52rem;
+	left: 0.3rem;
+	top: 0.24rem;
+}
+
+.grid {
+	position: absolute;
+	width: 1.24rem;
+	height: 1.24rem;
+	background: url(../../images/win10/30.png) center no-repeat;
+	background-size: 100% 100%;
+	top: 3.05rem;
+}
+
+.grid b {
+	left: 0.25rem;
+	bottom: 0.15rem;
+}
+
+.grid img {
+	position: absolute;
+	width: 0.7rem;
+	height: 0.52rem;
+	left: 0.3rem;
+	top: 0.24rem;
+}
+
+.events_check {
+	position: absolute;
+	width: 1.24rem;
+	height: 1.24rem;
+	background: url(../../images/win10/30.png) center no-repeat;
+	background-size: 100% 100%;
+	top: 3.05rem;
+	left: 2.7rem;
+}
+
+.events_check b {
+	left: 0.25rem;
+	bottom: 0.15rem;
+}
+
+.events_check img {
+	position: absolute;
+	width: 0.7rem;
+	height: 0.52rem;
+	left: 0.3rem;
+	top: 0.24rem;
+}
+
+.person {
+	position: absolute;
+	width: 1.24rem;
+	height: 1.24rem;
+	background: url(../../images/win10/30.png) center no-repeat;
+	background-size: 100% 100%;
+	top: 3.05rem;
+	left: 5.4rem;
+}
+
+.person b {
+	left: 0.25rem;
+	bottom: 0.15rem;
+}
+
+.person img {
+	position: absolute;
+	width: 0.7rem;
+	height: 0.52rem;
+	left: 0.3rem;
+	top: 0.24rem;
+}
+
+.effectiveness {
+	position: absolute;
+	width: 2.55rem;
+	height: 1.15rem;
+	background: url(../../images/win10/27.png) center no-repeat;
+	background-size: 100% 100%;
+	top: 0.5rem;
+	z-index: 9;
+}
+
+.effectiveness b {
+	left: 0.25rem;
+	bottom: 0.15rem;
+}
+
+.effectiveness img {
+	position: absolute;
+	width: 0.72rem;
+	height: 0.72rem;
+	left: 1.5rem;
+	top: 0.1rem;
+}
+
+.ganged {
+	position: absolute;
+	width: 2.55rem;
+	height: 1.15rem;
+	background: url(../../images/win10/27.png) center no-repeat;
+	background-size: 100% 100%;
+	top: 0.5rem;
+	left: 2.7rem;
+	z-index: 9;
+}
+
+.ganged b {
+	left: 0.25rem;
+	bottom: 0.15rem;
+}
+
+.ganged img {
+	position: absolute;
+	width: 0.72rem;
+	height: 0.72rem;
+	left: 1.5rem;
+	top: 0.1rem;
+}
+
+.grid_platform {
+	position: absolute;
+	width: 2.55rem;
+	height: 1.15rem;
+	background: url(../../images/win10/27.png) center no-repeat;
+	background-size: 100% 100%;
+	top: 0.5rem;
+	left: 5.4rem;
+	z-index: 9;
+}
+
+.grid_platform b {
+	left: 0.25rem;
+	bottom: 0.15rem;
+}
+
+.grid_platform img {
+	position: absolute;
+	width: 0.72rem;
+	height: 0.72rem;
+	left: 1.5rem;
+	top: 0.1rem;
+}
+
+.greg_platform {
+	position: absolute;
+	width: 2.55rem;
+	height: 1.15rem;
+	background: url(../../images/win10/27.png) center no-repeat;
+	background-size: 100% 100%;
+	top: 0.5rem;
+	left: 8.1rem;
+	z-index: 9;
+}
+
+.greg_platform b {
+	left: 0.25rem;
+	bottom: 0.15rem;
+}
+
+.greg_platform img {
+	position: absolute;
+	width: 0.72rem;
+	height: 0.72rem;
+	left: 1.5rem;
+	top: 0.1rem;
+}
+
+.patrol {
+	position: absolute;
+	width: 2.39rem;
+	height: 1.4rem;
+	background: url(../../images/win10/29.png) center no-repeat;
+	background-size: 100% 100%;
+	left: 1.34rem;
+	top: 0.78rem;
+}
+
+.patrol b {
+	left: 0.25rem;
+	bottom: 0.15rem;
+}
+
+.scheduling {
+	position: absolute;
+	width: 1.24rem;
+	height: 1.24rem;
+	background: url(../../images/win10/11.png) center no-repeat;
+	background-size: 100% 100%;
+	left: 1.3rem;
+	top: 1.72rem;
+}
+
+.scheduling b {
+	left: 0.28rem;
+	bottom: 0.15rem;
+}
+
+.scheduling img {
+	position: absolute;
+	width: 0.67rem;
+	height: 0.67rem;
+	left: 0.26rem;
+	top: 0.16rem;
+}
+
+.under_events {
+	position: absolute;
+	width: 1.24rem;
+	height: 1.24rem;
+	background: url(../../images/win10/11.png) center no-repeat;
+	background-size: 100% 100%;
+	left: 4.0rem;
+	top: 1.72rem;
+}
+
+.under_events b {
+	left: 0.28rem;
+	bottom: 0.15rem;
+}
+
+.under_events img {
+	position: absolute;
+	width: 0.67rem;
+	height: 0.67rem;
+	left: 0.26rem;
+	top: 0.16rem;
+}
+
+.synthesize_business {
+	position: absolute;
+	width: 1.24rem;
+	height: 1.24rem;
+	background: url(../../images/win10/11.png) center no-repeat;
+	background-size: 100% 100%;
+	left: 6.7rem;
+	top: 1.72rem;
+}
+
+.synthesize_business b {
+	left: 0.28rem;
+	bottom: 0.15rem;
+}
+
+.synthesize_business img {
+	position: absolute;
+	width: 0.67rem;
+	height: 0.67rem;
+	left: 0.26rem;
+	top: 0.16rem;
+}
+
+.geog_count {
+	position: absolute;
+	width: 1.24rem;
+	height: 2.57rem;
+	background: url(../../images/win10/11.png) center no-repeat;
+	background-size: 100% 100%;
+	left: 9.4rem;
+	top: 1.72rem;
+}
+
+.geog_count b {
+	left: 0.28rem;
+	bottom: 0.15rem;
+}
+
+.geog_count img {
+	position: absolute;
+	width: 0.67rem;
+	height: 0.67rem;
+	left: 0.26rem;
+	top: 0.16rem;
+}
+
+.collect {
+	position: absolute;
+	width: 1.24rem;
+	height: 1.24rem;
+	background: url(../../images/win10/11.png) center no-repeat;
+	background-size: 100% 100%;
+	left: 1.3rem;
+	top: 3.05rem;
+}
+
+.collect b {
+	left: 0.28rem;
+	bottom: 0.15rem;
+}
+
+.collect img {
+	position: absolute;
+	width: 0.67rem;
+	height: 0.67rem;
+	left: 0.26rem;
+	top: 0.16rem;
+}
+
+.events_count {
+	position: absolute;
+	width: 1.24rem;
+	height: 1.24rem;
+	background: url(../../images/win10/11.png) center no-repeat;
+	background-size: 100% 100%;
+	left: 4.0rem;
+	top: 3.05rem;
+}
+
+.events_count b {
+	left: 0.28rem;
+	bottom: 0.15rem;
+}
+
+.events_count img {
+	position: absolute;
+	width: 0.67rem;
+	height: 0.67rem;
+	left: 0.26rem;
+	top: 0.16rem;
+}
+
+.flow {
+	position: absolute;
+	width: 1.24rem;
+	height: 1.24rem;
+	background: url(../../images/win10/11.png) center no-repeat;
+	background-size: 100% 100%;
+	left: 6.7rem;
+	top: 3.05rem;
+}
+
+.flow b {
+	left: 0.28rem;
+	bottom: 0.15rem;
+}
+
+.flow img {
+	position: absolute;
+	width: 0.67rem;
+	height: 0.67rem;
+	left: 0.26rem;
+	top: 0.16rem;
+}
+
+.chaqin {
+	position: absolute;
+	width: 1.5rem;
+	height: 1.4rem;
+	background: url(../../images/win10/31.png) center no-repeat;
+	background-size: 100% 100%;
+	right: 0;
+	top: 0.78rem;
+}
+
+.chaqin b {
+	left: 0.4rem;
+	bottom: 0.15rem;
+}
+
+.district {
+	position: absolute;
+	width: 2.6rem;
+	height: 1.15rem;
+	background: url(../../images/win10/32.png) center no-repeat;
+	background-size: 100% 100%;
+	right: 0;
+	top: 0.5rem;
+}
+
+.district b {
+	left: 0.4rem;
+	bottom: 0.15rem;
+}
+
+.district img {
+	position: absolute;
+	width: 0.8rem;
+	height: 0.82rem;
+	left: 1.36rem;
+	top: 0.05rem;
+}
+
+.main .system {
+	width: 3.66rem;
+	height: 0.58rem;
+	line-height: 0.58rem;
+	margin-bottom: 0.2rem;
+}
+
+.users {
+	position: relative;
+	width: 1.18rem;
+	height: 1.4rem;
+	background: url(../../images/win10/33.png) center no-repeat;
+	background-size: 100% 100%;
+}
+
+.users b {
+	left: 0.25rem;
+	bottom: 0.15rem;
+}
+
+.users img {
+	position: absolute;
+	width: 0.80rem;
+	height: 0.80rem;
+	left: 0.19rem;
+	top: 0.16rem;
+}
+
+.daily {
+	position: relative;
+	width: 2.4rem;
+	height: 1.4rem;
+	background: url(../../images/win10/34.png) center no-repeat;
+	background-size: 100% 100%;
+}
+
+.daily b {
+	left: 0.25rem;
+	bottom: 0.15rem;
+}
+
+.daily img {
+	position: absolute;
+	width: 0.75rem;
+	height: 0.75rem;
+	left: 1.29rem;
+	top: 0.2rem;
+}
+
+.install {
+	position: absolute;
+	width: 1.18rem;
+	height: 1.4rem;
+	background: url(../../images/win10/35.png) center no-repeat;
+	background-size: 100% 100%;
+	left: 3.73rem;
+	top: 0.78rem;
+}
+
+.install b {
+	left: 0.23rem;
+	bottom: 0.15rem;
+}
+
+.install img {
+	position: absolute;
+	width: 0.52rem;
+	height: 0.50rem;
+	left: 0.32rem;
+	top: 0.28rem;
+}
+
+.eoms {
+	position: absolute;
+	width: 2.4rem;
+	height: 1.4rem;
+	background: url(../../images/win10/36.png) center no-repeat;
+	background-size: 100% 100%;
+	right: 0;
+	top: 0.78rem;
+}
+
+.eoms b {
+	left: 0.25rem;
+	bottom: 0.15rem;
+}
+
+.eoms img {
+	position: absolute;
+	width: 0.55rem;
+	height: 0.55rem;
+	left: 1.32rem;
+	top: 0.26rem;
+}
+
+.authority {
+	position: absolute;
+	width: 1.18rem;
+	height: 1.4rem;
+	background: url(../../images/win10/33.png) center no-repeat;
+	background-size: 100% 100%;
+	right: 0;
+	top: 2.28rem;
+}
+
+.authority b {
+	left: 0.23rem;
+	bottom: 0.15rem;
+}
+
+.authority img {
+	position: absolute;
+	width: 0.67rem;
+	height: 0.67rem;
+	left: 0.24rem;
+	top: 0.2rem;
+}
+
+.help {
+	position: absolute;
+	width: 1.18rem;
+	height: 1.4rem;
+	background: url(../../images/win10/38.png) center no-repeat;
+	background-size: 100% 100%;
+	left: 3.73rem;
+	top: 2.28rem;
+}
+
+.help b {
+	left: 0.23rem;
+	bottom: 0.15rem;
+}
+
+.help img {
+	position: absolute;
+	width: 0.72rem;
+	height: 0.72rem;
+	left: 0.26rem;
+	top: 0.2rem;
+}
+
+li div:hover {
+	-webkit-transform: scale(1.1);
+	-moz-transform: scale(1.1);
+	-ms-transform: scale(1.1);
+	-o-transform: scale(1.1);
+	transform: scale(1.1);
+}
+
+.cp {
+	text-align: center;
+	bottom: 20px;
+	color: #778899;
+	position: absolute;
+	font-size: 12px;
+	width: 500px;
+	left: 50%;
+	margin-left: -250px;
+}

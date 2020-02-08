@@ -1,0 +1,85 @@
+<%@ page contentType="text/html;charset=UTF-8" %>
+<%@ include file="/WEB-INF/views/include/taglib.jsp"%>
+<html>
+<head>
+	<title>树管理</title>
+	<meta name="decorator" content="default"/>
+	<script type="text/javascript">
+		$(document).ready(function() {
+			$("#name").focus();
+			$("#inputForm").validate({
+				submitHandler: function(form){
+					loading('正在提交，请稍等...');
+					form.submit();
+				},
+				errorContainer: "#messageBox",
+				errorPlacement: function(error, element) {
+					$("#messageBox").text("输入有误，请先更正。");
+					if (element.is(":checkbox") || element.is(":radio") || element.parent().is(".input-append")){
+						error.appendTo(element.parent().parent());
+					} else {
+						error.insertAfter(element);
+					}
+				}
+			});
+		});
+	</script>
+</head>
+<body>
+	<ul class="nav nav-tabs">
+		<li><a href="${ctx}/tree/ccmTree/">树列表</a></li>
+		<li class="active"><a href="${ctx}/tree/ccmTree/form?id=${ccmTree.id}&parent.id=${ccmTreeparent.id}">树<shiro:hasPermission name="tree:ccmTree:edit">${not empty ccmTree.id?'修改':'添加'}</shiro:hasPermission><shiro:lacksPermission name="tree:ccmTree:edit">查看</shiro:lacksPermission></a></li>
+	</ul><br/>
+	<form:form id="inputForm" modelAttribute="ccmTree" action="${ctx}/tree/ccmTree/save" method="post" class="form-horizontal">
+		<form:hidden path="id"/>
+		<sys:message content="${message}"/>		
+		<div class="control-group">
+			<label class="control-label">上级所有父级编号:</label>
+			<div class="controls">
+				<sys:treeselect id="parent" name="parent.id" value="${ccmTree.parent.id}" labelName="parent.name" labelValue="${ccmTree.parent.name}"
+					title="所有父级编号" url="/tree/ccmTree/treeData" extId="${ccmTree.id}" cssClass="" allowClear="true"/>
+			</div>
+		</div>
+		<div class="control-group">
+			<label class="control-label">名称：</label>
+			<div class="controls">
+				<form:input path="name" htmlEscape="false" maxlength="100" class="input-xlarge "/>
+			</div>
+		</div>
+		<div class="control-group">
+			<label class="control-label">排序：</label>
+			<div class="controls">
+				<form:input path="sort" htmlEscape="false" class="input-xlarge  digits"/>
+			</div>
+		</div>
+		<div class="control-group">
+			<label class="control-label">类型：</label>
+			<div class="controls">
+				<form:input path="type" htmlEscape="false" maxlength="10" class="input-xlarge "/>
+			</div>
+		</div>
+		<div class="control-group">
+			<label class="control-label">中心点：</label>
+			<div class="controls">
+				<form:input path="areaPoint" htmlEscape="false" maxlength="40" class="input-xlarge "/>
+			</div>
+		</div>
+		<div class="control-group">
+			<label class="control-label">区域图：</label>
+			<div class="controls">
+				<form:input path="areaMap" htmlEscape="false" maxlength="2000" class="input-xlarge "/>
+			</div>
+		</div>
+		<div class="control-group">
+			<label class="control-label">备注信息：</label>
+			<div class="controls">
+				<form:textarea path="remarks" htmlEscape="false" rows="4" maxlength="255" class="input-xxlarge "/>
+			</div>
+		</div>
+		<div class="form-actions">
+			<shiro:hasPermission name="tree:ccmTree:edit"><input id="btnSubmit" class="btn btn-primary" type="submit" value="保 存"/>&nbsp;</shiro:hasPermission>
+			<input id="btnCancel" class="btn" type="button" value="返 回" onclick="history.go(-1)"/>
+		</div>
+	</form:form>
+</body>
+</html>

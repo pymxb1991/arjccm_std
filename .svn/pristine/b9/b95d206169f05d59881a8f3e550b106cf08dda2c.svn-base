@@ -1,0 +1,78 @@
+<%@ page contentType="text/html;charset=UTF-8" %>
+<%@ include file="/WEB-INF/views/include/taglib.jsp"%>
+<html>
+<head>
+	<title>预案过程管理</title>
+	<meta name="decorator" content="default"/>
+	<script type="text/javascript">
+		$(document).ready(function() {
+			$('#btnSubmit').click(function(){
+				$('#searchForm').submit();
+			});
+		});
+		function page(n,s){
+			$("#pageNo").val(n);
+			$("#pageSize").val(s);
+			$("#searchForm").submit();
+        	return false;
+        }
+	</script>
+</head>
+<body>
+	<ul class="nav nav-tabs">
+		<li class="active"><a href="${ctx}/stepinfo/bphStepInfo/">预案过程列表</a></li>
+		<shiro:hasPermission name="stepinfo:bphStepInfo:edit"><li><a href="${ctx}/stepinfo/bphStepInfo/form">预案过程添加</a></li></shiro:hasPermission>
+	</ul>
+	<form:form id="searchForm" modelAttribute="bphStepInfo" action="${ctx}/stepinfo/bphStepInfo/" method="post" class="breadcrumb form-search">
+		<input id="pageNo" name="pageNo" type="hidden" value="${page.pageNo}"/>
+		<input id="pageSize" name="pageSize" type="hidden" value="${page.pageSize}"/>
+		<ul class="ul-form">
+			<li><label>过程名称：</label>
+				<form:input path="name" htmlEscape="false" maxlength="80" class="input-medium"/>
+			</li>
+			<li><label>已关联预案：</label>
+				<form:select class="input-medium" path="bphPlanInfo.name">
+					<option value="">全部</option>
+					<c:forEach items="${planList}" var="bphPlanInfo">
+					<option  itemValue="${bphPlanInfo.name}" htmlEscape="false">${bphPlanInfo.name}</option>
+					</c:forEach>
+				</form:select>
+			</li>
+			<li class="btns">
+			<!-- <input id="btnSubmit" class="btn btn-primary" type="submit" value="查询"/> -->
+			<a id="btnSubmit" class="btn btn-primary" href="javascript:;"><i class="icon-search"></i> 查询</a>
+			</li>
+			<li class="clearfix"></li>
+		</ul>
+	</form:form>
+	<sys:message content="${message}"/>
+	<table id="contentTable" class="table table-striped table-bordered table-condensed" style="table-layout:fixed;">
+		<thead>
+			<tr>
+				<th style="width:10%">序号</th>
+				<th style="width:20%">过程名称</th>
+				<th style="width:30%">已关联预案</th>
+				<th style="width:20%">已关联执行动作</th>
+				<shiro:hasPermission name="stepinfo:bphStepInfo:edit"><th style="width:10%">操作</th></shiro:hasPermission>
+			</tr>
+		</thead>
+		<tbody>
+		<c:forEach items="${page.list}" var="bphStepInfo" varStatus="status">
+			<tr>
+				<td>${status.index+1}</td>
+				<td style="white-space: nowrap;text-overflow: ellipsis;overflow: hidden;" title="${bphStepInfo.name}"><a href="${ctx}/stepinfo/bphStepInfo/form?id=${bphStepInfo.id}">${bphStepInfo.name}</a></td>
+				<td style="white-space: nowrap;text-overflow: ellipsis;overflow: hidden;" title="${bphStepInfo.bphPlanInfo.name}">${bphStepInfo.bphPlanInfo.name}</td>
+				<td style="white-space: nowrap;text-overflow: ellipsis;overflow: hidden;" title="${bphStepInfo.bphActionInfo.name}">${bphStepInfo.bphActionInfo.name}</td>
+				<shiro:hasPermission name="stepinfo:bphStepInfo:edit">
+					<td>
+	    				<a class="btnList" href="${ctx}/stepinfo/bphStepInfo/form?id=${bphStepInfo.id}" title="修改"><i class="icon-pencil"></i></a>
+						<a class="btnList" href="${ctx}/stepinfo/bphStepInfo/delete?id=${bphStepInfo.id}" onclick="return confirmx('确认要删除该预案过程吗？', this.href)" title="删除"><i class="icon-trash"></i></a>
+					</td>
+				</shiro:hasPermission>
+			</tr>
+		</c:forEach>
+		</tbody>
+	</table>
+	<div class="pagination">${page}</div>
+</body>
+</html>

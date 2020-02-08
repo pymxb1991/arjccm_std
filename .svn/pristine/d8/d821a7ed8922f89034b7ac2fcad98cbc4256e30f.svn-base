@@ -1,0 +1,190 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.arjjs.ccm.modules.cms.dao.CmsBbsArticleDao">
+
+	<sql id="cmsBbsArticleColumns">
+		a.id AS "id",
+		a.font_user_name AS "fontUserName",
+		a.title AS "title",
+		a.type AS "type",
+		a.content_text AS "contentText",
+		a.comment_id AS "commentId",
+		a.view_num AS "viewNum",
+		a.comment_num AS "commentNum",
+		a.hot_mun AS "hotMun",
+		a.like_num AS "likeNum",
+		a.end_comment_name AS "endCommentName",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.review_date AS "reviewDate",
+		a.review_flag AS "reviewFlag",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag"
+	</sql>
+
+	<sql id="cmsBbsArticleJoins">
+	</sql>
+
+	<select id="get" resultType="CmsBbsArticle">
+		SELECT
+		<include refid="cmsBbsArticleColumns"/>
+		FROM cms_bbs_article a
+		<include refid="cmsBbsArticleJoins"/>
+		WHERE a.id = #{id}
+	</select>
+
+	<select id="findList" resultType="CmsBbsArticle">
+		SELECT
+		<include refid="cmsBbsArticleColumns"/>
+		FROM cms_bbs_article a
+		<include refid="cmsBbsArticleJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="title != null and title != ''">
+				AND a.title LIKE
+				<if test="dbName == 'oracle'">'%'||#{title}||'%'</if>
+				<if test="dbName == 'mssql'">'%'+#{title}+'%'</if>
+				<if test="dbName == 'mysql'">concat('%',#{title},'%')</if>
+			</if>
+			<if test="reviewFlag != null and reviewFlag != ''">
+				AND a.review_flag  = #{reviewFlag}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+
+	<select id="findAllList" resultType="CmsBbsArticle">
+		SELECT
+		<include refid="cmsBbsArticleColumns"/>
+		FROM cms_bbs_article a
+		<include refid="cmsBbsArticleJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+
+	<insert id="insert">
+		INSERT INTO cms_bbs_article(
+			id,
+			font_user_name,
+			title,
+			type,
+			content_text,
+			comment_id,
+			view_num,
+			comment_num,
+			hot_mun,
+			like_num,
+			end_comment_name,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag,
+			review_flag,
+			review_date
+		) VALUES (
+			#{id},
+			#{fontUserName},
+			#{title},
+			#{type},
+			#{contentText},
+			#{commentId},
+			#{viewNum},
+			#{commentNum},
+			#{hotMun},
+			#{likeNum},
+			#{endCommentName},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag},
+			#{reviewFlag},
+			#{reviewDate}
+		)
+	</insert>
+
+	<update id="update">
+		UPDATE cms_bbs_article SET
+			title = #{title},
+			type = #{type},
+			content_text = #{contentText},
+			review_flag=#{reviewFlag},
+			view_num = #{viewNum},
+			comment_num = #{commentNum},
+			hot_mun = #{hotMun},
+			like_num = #{likeNum},
+			review_date = #{reviewDate}
+		WHERE id = #{id}
+	</update>
+
+	<update id="delete">
+		UPDATE cms_bbs_article SET
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	<resultMap id="BaseResultMap" type="com.arjjs.ccm.modules.cms.entity.BbsArticleInfo">
+		<result column="id" property="id" jdbcType="VARCHAR" />
+		<result column="font_user_name" property="fontUserName" jdbcType="VARCHAR" />
+		<result column="title" property="title" jdbcType="VARCHAR" />
+		<result column="type" property="type" jdbcType="VARCHAR" />
+		<result column="content_text" property="contentText" jdbcType="VARCHAR" />
+		<result column="view_num" property="viewNum" jdbcType="INTEGER" />
+		<result column="comment_num" property="commentNum" jdbcType="INTEGER" />
+		<result column="hot_mun" property="hotMun" jdbcType="INTEGER" />
+		<result column="like_num" property="likeNum" jdbcType="INTEGER" />
+		<result column="end_comment_name" property="endCommentName" jdbcType="VARCHAR" />
+		<result column="create_date" property="createDate" jdbcType="VARCHAR" />
+		<result column="review_date" property="reviewDate" jdbcType="VARCHAR" />
+		<collection property="commentList" ofType="com.arjjs.ccm.modules.cms.entity.BbsCommentInfo">
+			<result column="comId" property="comId" jdbcType="VARCHAR" />
+			<result column="com_content" property="comContent" jdbcType="VARCHAR" />
+			<result column="article_id" property="articleId" jdbcType="VARCHAR" />
+			<result column="font_user_id" property="fontUserId" jdbcType="VARCHAR" />
+			<result column="name" property="name" jdbcType="VARCHAR" />
+			<result column="com_time" property="comTime" jdbcType="VARCHAR" />
+			<result column="photo" property="photo" jdbcType="VARCHAR" />
+		</collection>
+	</resultMap>
+	<select id="queryArticleCommentInfo" parameterType="java.lang.String" resultMap="BaseResultMap">
+		SELECT
+			t1.id,			t1.font_user_name,			t1.title,			t1.type,			t1.content_text,
+			CASE 		WHEN t1.view_num is Null THEN 0			ELSE		t1.view_num			END as view_num  ,
+			CASE 		WHEN t1.comment_num is Null THEN 0			ELSE		t1.comment_num			END as comment_num  ,
+			CASE 		WHEN t1.hot_mun is Null THEN 0			ELSE		t1.hot_mun			END as hot_mun  ,
+			CASE 		WHEN t1.like_num is Null THEN 0			ELSE		t1.like_num			END as like_num  ,
+			t1.end_comment_name,			t1.create_date,t1.review_date,
+			t2.id as comId,			t2.com_content,			t2.article_id,			t2.font_user_id,			t3.`name`,			t2.com_time,
+			t3.photo
+			FROM
+			cms_bbs_article AS t1
+			LEFT JOIN cms_bbs_comment AS t2 ON t1.id = t2.article_id
+			LEFT JOIN ccm_font_user as t3 on t2.font_user_id = t3.id
+			WHERE
+			t1.del_flag = 0
+			AND t1.review_flag = 1
+			AND	t1.id = #{articleId}
+			ORDER BY
+			t2.create_date DESC
+	</select>
+</mapper>

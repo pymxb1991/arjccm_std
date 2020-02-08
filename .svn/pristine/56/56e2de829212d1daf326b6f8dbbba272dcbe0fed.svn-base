@@ -1,0 +1,100 @@
+<%@ page contentType="text/html;charset=UTF-8"%>
+<%@ include file="/WEB-INF/views/include/taglib.jsp"%>
+<html>
+<head>
+<title>医疗卫生场所管理</title>
+<meta name="decorator" content="default" />
+<script type="text/javascript">
+	$(document).ready(function() {
+
+	});
+	function page(n, s) {
+		$("#pageNo").val(n);
+		$("#pageSize").val(s);
+		$("#searchForm").submit();
+		return false;
+	}
+</script>
+</head>
+<body>
+	<ul class="nav nav-tabs">
+		<li class="active"><a href="${ctx}/hospital/ccmPlaceHospital/">药店列表</a></li>
+		<%-- <shiro:hasPermission name="hospital:ccmPlaceHospital:edit"><li><a href="${ctx}/hospital/ccmPlaceHospital/form">医疗卫生场所添加</a></li></shiro:hasPermission> --%>
+	</ul>
+	<form:form id="searchForm" modelAttribute="ccmPlaceHospital"
+		action="${ctx}/hospital/ccmPlaceHospital/03" method="post"
+		class="breadcrumb form-search">
+		<input id="pageNo" name="pageNo" type="hidden" value="${page.pageNo}" />
+		<input id="pageSize" name="pageSize" type="hidden"
+			value="${page.pageSize}" />
+		<ul class="ul-form">
+			<li><label>场所名称：</label> <form:input path="placeName"
+					htmlEscape="false" maxlength="255" class="input-medium" /></li>
+			<li><label>负责人姓名：</label> <form:input path="leaderName"
+					htmlEscape="false" maxlength="255" class="input-medium" /></li>
+<%-- 			<li><label>创建时间：</label> <input name="beginCreateDate"
+				type="text" readonly="readonly" maxlength="20"
+				class="input-medium Wdate"
+				value="<fmt:formatDate value="${ccmPlaceHospital.beginCreateDate}" pattern="yyyy-MM-dd HH:mm:ss"/>"
+				onclick="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss',isShowClear:false});" />
+				- <input name="endCreateDate" type="text" readonly="readonly"
+				maxlength="20" class="input-medium Wdate"
+				value="<fmt:formatDate value="${ccmPlaceHospital.endCreateDate}" pattern="yyyy-MM-dd HH:mm:ss"/>"
+				onclick="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss',isShowClear:false});" />
+			</li> --%>
+			<li class="btns"><a
+				onclick="parent.LayerDialog('${ctx}/hospital/ccmPlaceHospital/form?type=03', '添加', '1200px', '900px')"
+				class="btn btn-success"> 添加 </a></li>
+			<li class="btns"><input id="btnSubmit" class="btn btn-primary"
+				type="submit" value="查询" /></li>
+			<li class="clearfix"></li>
+		</ul>
+	</form:form>
+	<sys:message content="${message}" />
+	<table id="contentTable"
+		class="table table-striped table-bordered table-condensed">
+		<thead>
+			<tr>
+				<th>场所名称</th>
+				<th>负责人姓名</th>
+				<th>负责人联系电话</th>
+				<th>证照情况</th>
+				<th>注册资金</th>
+				<th>药师人数</th>
+				<th>更新时间</th>
+				<shiro:hasPermission name="hospital:ccmPlaceHospital:edit">
+					<th>操作</th>
+				</shiro:hasPermission>
+			</tr>
+		</thead>
+		<tbody>
+			<c:forEach items="${page.list}" var="ccmPlaceHospital">
+				<tr>
+					<td><a class="btnList"
+							onclick="parent.LayerDialog('${ctx}/hospital/ccmPlaceHospital/form?id=${ccmPlaceHospital.id}', '编辑', '1200px', '900px')"
+							>${ccmPlaceHospital.placeName}</a> </td>
+					<td>${ccmPlaceHospital.leaderName}</td>
+					<td>${ccmPlaceHospital.leaderContact}</td>
+					<td>${ccmPlaceHospital.isCredentials}</td>
+					<td>${ccmPlaceHospital.registeredFund}</td>
+					<td>${ccmPlaceHospital.pharmacistNumber}</td>
+					<td><a
+						href="${ctx}/hospital/ccmPlaceHospital/form?id=${ccmPlaceHospital.id}">
+							<fmt:formatDate value="${ccmPlaceHospital.updateDate}"
+								pattern="yyyy-MM-dd HH:mm:ss" />
+					</a></td>
+					<shiro:hasPermission name="hospital:ccmPlaceHospital:edit">
+						<td><a class="btnList"
+							onclick="parent.LayerDialog('${ctx}/hospital/ccmPlaceHospital/form?id=${ccmPlaceHospital.id}', '编辑', '1200px', '900px')"
+							title="修改"><i class="icon-pencil"></i></a> <a class="btnList"
+							href="${ctx}/hospital/ccmPlaceHospital/delete?id=${ccmPlaceHospital.id}"
+							onclick="return confirmx('确认要删除该医疗卫生场所吗？', this.href)" title="删除"><i
+								class="icon-trash"></i></a></td>
+					</shiro:hasPermission>
+				</tr>
+			</c:forEach>
+		</tbody>
+	</table>
+	<div class="pagination">${page}</div>
+</body>
+</html>

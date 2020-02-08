@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.arjjs.ccm.modules.ccm.house.dao.CcmHouseEmphasisDao">
+	<select id="findTableNameByDescription" resultType="com.arjjs.ccm.modules.sys.entity.Dict">
+		SELECT
+			a.id,
+			a.value,
+			a.label,
+			a.type,
+			a.description,
+			a.sort
+		FROM
+			sys_dict a 
+		WHERE
+			a.description LIKE 
+			<if test="dbName == 'mysql'">concat('%',#{description},'%')</if>
+			AND a.del_flag = 0
+		ORDER BY
+			a.sort
+	</select>
+	<select id="findEmphasisDataByTableName" resultType="com.arjjs.ccm.modules.ccm.pop.entity.CcmPeople">
+		SELECT
+			a.id,
+			a.NAME,
+			a.sex,
+			a.birthday,
+			a.nation,
+			a.censu,
+			a.marriage,
+			a.ident,
+			a.telephone
+			<if test="tableName != null and tableName != ''">
+				,b.*
+			</if>
+		FROM
+			ccm_people a
+			<if test="tableName != null and tableName != ''">
+				LEFT JOIN ${tableName} b ON b.people_id = a.id 
+			</if>
+		WHERE
+			a.del_flag = 0 
+			<if test="tableName != null and tableName != ''">
+				AND b.del_flag = 0
+			</if>
+			LIMIT #{startIndex}, #{pageSize}
+	</select>
+	<select id="count" resultType="Integer">
+		SELECT
+		 count(1)
+		 FROM(
+		 	SELECT
+			a.NAME,
+			a.sex,
+			a.birthday,
+			a.nation,
+			a.censu,
+			a.marriage,
+			a.ident,
+			a.telephone
+			<if test="tableName != null and tableName != ''">
+				,b.*
+			</if>
+		FROM
+			ccm_people a
+			<if test="tableName != null and tableName != ''">
+				LEFT JOIN ${tableName} b ON b.people_id = a.id 
+			</if>
+		WHERE
+			a.del_flag = 0 
+			<if test="tableName != null and tableName != ''">
+				AND b.del_flag = 0
+			</if>
+		 ) tmp_count
+	</select>
+	<select id="findVisitRecord" resultType="com.arjjs.ccm.modules.ccm.log.entity.CcmLogTail">
+		SELECT
+			a.id AS "id",
+			a.relevance_id AS "relevanceId",
+			a.relevance_table AS "relevanceTable",
+			a.type AS "type",
+			a.tail_case AS "tailCase",
+			a.tail_content AS "tailContent",
+			a.tail_person AS "tailPerson",
+			IFNULL( a.tail_time, now( ) ) AS "tailTime",
+			a.more1 AS "more1",
+			a.more2 AS "more2",
+			a.more3 AS "more3",
+			a.create_by AS "createBy.id",
+			a.create_date AS "createDate",
+			a.update_by AS "updateBy.id",
+			a.update_date AS "updateDate",
+			a.remarks AS "remarks",
+			a.del_flag AS "delFlag",
+			sysU.`name` AS "createBy.name" 
+		FROM
+			ccm_log_tail a
+			LEFT JOIN sys_user sysU ON a.create_by = sysU.id 
+			<if test="relevanceTable != null and relevanceTable != ''">
+				LEFT JOIN ${relevanceTable} b ON b.id = a.relevance_id 
+			</if>
+		WHERE
+			a.del_flag = 0 
+			AND a.relevance_table = #{relevanceTable} 
+			<if test="relevanceId != null and relevanceId != '' and relevanceTable != null and relevanceTable != ''">
+				AND b.people_id = #{relevanceId}
+			</if>
+		ORDER BY
+			a.update_date DESC 
+	</select>
+</mapper>

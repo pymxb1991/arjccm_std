@@ -1,0 +1,201 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.arjjs.ccm.modules.ccm.attendanceapply.dao.CcmWorkerAttendanceApplyDao">
+
+	<sql id="ccmWorkerAttendanceApplyColumns">
+		a.id AS "id",
+		a.type AS "type",
+		a.goout_type AS "gooutType",
+		a.leave_type AS "leaveType",
+		a.workingtime_type AS "workingtimeType",
+		a.attendance_begin AS "attendanceBegin",
+		a.attendance_end AS "attendanceEnd",
+		a.days AS "days",
+		a.address AS "address",
+		a.cause AS "cause",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag",
+		a.apply_type AS "applyType"
+	</sql>
+
+	<sql id="ccmWorkerAttendanceApplyuserColumns">
+		a.id AS "id",
+		a.type AS "type",
+		a.goout_type AS "gooutType",
+		a.leave_type AS "leaveType",
+		a.workingtime_type AS "workingtimeType",
+		a.attendance_begin AS "attendanceBegin",
+		a.attendance_end AS "attendanceEnd",
+		a.days AS "days",
+		a.address AS "address",
+		a.cause AS "cause",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag",
+		a.apply_type AS "applyType"
+		,b.name AS "createByname"
+		,c.name AS "createBy.office.name"
+		,c.name AS officename
+	</sql>
+	
+	<sql id="ccmWorkerAttendanceApplyJoins">
+	</sql>
+	<sql id="ccmWorkerAttendanceJoins_User">
+		LEFT JOIN sys_user b ON a.create_by = b.id
+	</sql>
+	<sql id="ccmWorkerAttendanceJoins_Office">
+		LEFT JOIN sys_office c ON b.office_id = c.id
+	</sql>
+	<select id="get" resultType="CcmWorkerAttendanceApply">
+		SELECT 
+			<include refid="ccmWorkerAttendanceApplyColumns"/>
+		FROM ccm_worker_attendance_apply a
+		<include refid="ccmWorkerAttendanceApplyJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="CcmWorkerAttendanceApply">
+		SELECT 
+			<include refid="ccmWorkerAttendanceApplyuserColumns"/>
+		FROM ccm_worker_attendance_apply a
+		<include refid="ccmWorkerAttendanceApplyJoins"/>
+		<include refid="ccmWorkerAttendanceJoins_User"/>
+		<include refid="ccmWorkerAttendanceJoins_Office"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="id != null and id != ''">
+				AND a.id = #{id}
+			</if>
+			<if test="type != null and type != ''">
+				AND a.type = #{type}
+			</if>
+			<if test="gooutType != null and gooutType != ''">
+				AND a.goout_type = #{gooutType}
+			</if>
+			<if test="leaveType != null and leaveType != ''">
+				AND a.leave_type = #{leaveType}
+			</if>
+			<if test="workingtimeType != null and workingtimeType != ''">
+				AND a.workingtime_type = #{workingtimeType}
+			</if>
+			<if test="attendanceBegin != null and attendanceBegin != ''">
+				AND a.attendance_begin &gt;= #{attendanceBegin}
+			</if>
+			<if test="attendanceEnd != null and attendanceEnd != ''">
+				AND a.attendance_end &lt;= #{attendanceEnd}
+			</if>
+			<if test="days != null and days != ''">
+				AND a.days = #{days}
+			</if>
+			<if test="address != null and address != ''">
+				AND a.address = #{address}
+			</if>
+			<if test="cause != null and cause != ''">
+				AND a.cause = #{cause}
+			</if>
+			<if test="applyType != null and applyType != ''">
+				AND a.apply_type = #{applyType}
+			</if>
+			<!-- 数据范围过滤 -->
+			${sqlMap.dsf}
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="CcmWorkerAttendanceApply">
+		SELECT 
+			<include refid="ccmWorkerAttendanceApplyColumns"/>
+		FROM ccm_worker_attendance_apply a
+		<include refid="ccmWorkerAttendanceApplyJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO ccm_worker_attendance_apply(
+			id,
+			type,
+			goout_type,
+			leave_type,
+			workingtime_type,
+			attendance_begin,
+			attendance_end,
+			days,
+			address,
+			cause,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag,
+			apply_type
+		) VALUES (
+			#{id},
+			#{type},
+			#{gooutType},
+			#{leaveType},
+			#{workingtimeType},
+			#{attendanceBegin},
+			#{attendanceEnd},
+			#{days},
+			#{address},
+			#{cause},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag},
+			#{applyType}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE ccm_worker_attendance_apply SET 	
+			type = #{type},
+			goout_type = #{gooutType},
+			leave_type = #{leaveType},
+			workingtime_type = #{workingtimeType},
+			attendance_begin = #{attendanceBegin},
+			attendance_end = #{attendanceEnd},
+			days = #{days},
+			address = #{address},
+			cause = #{cause},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks},
+			apply_type = #{applyType}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE ccm_worker_attendance_apply SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

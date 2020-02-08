@@ -1,0 +1,283 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.arjjs.ccm.modules.ccm.pop.dao.CcmPopBehindDao">
+
+	<sql id="ccmPopBehindColumns">
+		a.id AS "id",
+		a.people_id AS "peopleId",
+		a.health AS
+		"health",
+		a.atte_type AS "atteType",
+		a.annualincome AS "annualincome",
+		a.staytype AS "staytype",
+		a.crucialcondition AS "crucialcondition",
+		a.crucialname AS
+		"crucialname",
+		a.crucialhealth AS "crucialhealth",
+		a.crucialrelation AS
+		"crucialrelation",
+		a.crucialtelephone AS "crucialtelephone",
+		a.crucialwork AS "crucialwork",
+		a.crucialmoney AS "crucialmoney",
+		a.difficult AS "difficult",
+		a.helpcase AS "helpcase",
+		a.create_by AS
+		"createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS
+		"updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag"
+	</sql>
+
+	<sql id="ccmPopBehindAllColumns">
+		a.id AS "id",
+		a.people_id AS "peopleId",
+		a.health AS
+		"health",
+		a.atte_type AS "atteType",
+		a.annualincome AS "annualincome",
+		a.staytype AS "staytype",
+		a.crucialcondition AS "crucialcondition",
+		a.crucialname AS
+		"crucialname",
+		a.crucialhealth AS "crucialhealth",
+		a.crucialrelation AS
+		"crucialrelation",
+		a.crucialtelephone AS "crucialtelephone",
+		a.crucialwork AS "crucialwork",
+		a.crucialmoney AS "crucialmoney",
+		a.difficult AS "difficult",
+		a.helpcase AS "helpcase",
+		a.create_by AS
+		"createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS
+		"updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag",
+		
+		b.ident AS "ident",
+        b. NAME AS "name",
+        b.sex AS "sex",
+        b.birthday AS "birthday",
+        b.censu AS "censu",
+        b.telephone AS "telephone",
+        b.type AS "type",
+        b.domiciledetail AS "domiciledetail",
+        b.residencedetail AS "residencedetail",
+        b.images AS "images",
+        a20.name AS "comName",
+        (case a.atte_type when 01 then '高' when 02 then '中' when 03 then '低' else '' end) "atteTypeLable"
+	</sql>
+	<sql id="ccmPopBehindJoins">
+	</sql>
+	<!--区域-->
+	<sql id="ccmPopBehindComJoins">
+		LEFT JOIN sys_area a20 ON a20.id = b.area_com_id
+	</sql>
+	<sql id="ccmPopBehindGridJoins">
+		LEFT JOIN sys_area a21 ON a21.id = b.area_grid_id
+	</sql>
+	<select id="get" resultType="CcmPopBehind">
+		SELECT
+		<include refid="ccmPopBehindAllColumns" />
+		FROM
+		ccm_people b
+		LEFT JOIN ccm_pop_behind a ON a.people_id = b.id
+		<include refid="ccmPopBehindJoins" />
+		<include refid="ccmPopBehindComJoins" />
+		<include refid="ccmPopBehindGridJoins" />
+		WHERE a.id = #{id}
+	</select>
+
+
+	<select id="getItemByPeopleId" resultType="CcmPopBehind">
+		SELECT
+		<include refid="ccmPopBehindAllColumns" />
+		FROM
+		ccm_people b
+		LEFT JOIN ccm_pop_behind a ON a.people_id = b.id
+		<include refid="ccmPopBehindJoins" />
+		<include refid="ccmPopBehindComJoins" />
+		<include refid="ccmPopBehindGridJoins" />
+		<where>
+			a.people_id = #{id}
+			and
+			a.del_flag = '0'
+		</where>
+	</select>
+
+	<select id="findList" resultType="CcmPopBehind">
+		SELECT
+		<include refid="ccmPopBehindAllColumns" />
+		FROM
+		ccm_people b
+		LEFT JOIN ccm_pop_behind a ON a.people_id = b.id
+		<include refid="ccmPopBehindJoins" />
+		<include refid="ccmPopBehindComJoins" />
+		<include refid="ccmPopBehindGridJoins" />
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="peopleId != null and peopleId != ''">
+				AND a.people_id = #{peopleId}
+			</if>
+			<if test="name != null and name != ''">
+				AND b.name LIKE
+				<if test="dbName == 'oracle'">'%'||#{name}||'%'</if>
+				<if test="dbName == 'mssql'">'%'+#{name}+'%'</if>
+				<if test="dbName == 'mysql'">concat('%',#{name},'%')</if>
+			</if>
+
+			<if test="ident != null and ident != ''">
+				AND b.ident LIKE
+				<if test="dbName == 'oracle'">'%'||#{ident}||'%'</if>
+				<if test="dbName == 'mssql'">'%'+#{ident}+'%'</if>
+				<if test="dbName == 'mysql'">concat('%',#{ident},'%')</if>
+			</if>
+			<if test="censu != null and censu != ''">
+				AND b.censu LIKE
+				<if test="dbName == 'oracle'">'%'||#{censu}||'%'</if>
+				<if test="dbName == 'mssql'">'%'+#{censu}+'%'</if>
+				<if test="dbName == 'mysql'">concat('%',#{censu},'%')</if>
+			</if>
+			<if test="telephone != null and telephone != ''">
+				AND b.telephone LIKE
+				<if test="dbName == 'oracle'">'%'||#{telephone}||'%'</if>
+				<if test="dbName == 'mssql'">'%'+#{telephone}+'%'</if>
+				<if test="dbName == 'mysql'">concat('%',#{telephone},'%')</if>
+			</if>
+			<if test="sex != null and sex != ''">
+				AND b.sex = #{sex}
+			</if>
+			<if test="health != null and health != ''">
+				AND a.health = #{health}
+			</if>
+			<if test="atteType != null and atteType != ''">
+				AND a.atte_type = #{atteType}
+			</if>
+			<if test="staytype != null and staytype != ''">
+				AND a.staytype = #{staytype}
+			</if>
+			<if test="crucialname != null and crucialname != ''">
+				AND a.crucialname LIKE
+				<if test="dbName == 'oracle'">'%'||#{crucialname}||'%'</if>
+				<if test="dbName == 'mssql'">'%'+#{crucialname}+'%'</if>
+				<if test="dbName == 'mysql'">concat('%',#{crucialname},'%')</if>
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+
+	<select id="findAllList" resultType="CcmPopBehind">
+		SELECT
+		<include refid="ccmPopBehindColumns" />
+		FROM ccm_pop_behind a
+		<include refid="ccmPopBehindJoins" />
+		<include refid="ccmPopBehindComJoins" />
+		<include refid="ccmPopBehindGridJoins" />
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+
+	<insert id="insert">
+		INSERT INTO ccm_pop_behind(
+		id,
+		people_id,
+		health,
+		atte_type,
+		annualincome,
+		staytype,
+		crucialcondition,
+		crucialname,
+		crucialhealth,
+		crucialrelation,
+		crucialtelephone,
+		crucialwork,
+		crucialmoney,
+		difficult,
+		helpcase,
+		create_by,
+		create_date,
+		update_by,
+		update_date,
+		remarks,
+		del_flag
+		) VALUES (
+		#{id},
+		#{peopleId},
+		#{health},
+		#{atteType},
+		#{annualincome},
+		#{staytype},
+		#{crucialcondition},
+		#{crucialname},
+		#{crucialhealth},
+		#{crucialrelation},
+		#{crucialtelephone},
+		#{crucialwork},
+		#{crucialmoney},
+		#{difficult},
+		#{helpcase},
+		#{createBy.id},
+		#{createDate},
+		#{updateBy.id},
+		#{updateDate},
+		#{remarks},
+		#{delFlag}
+		)
+	</insert>
+
+	<update id="update">
+		UPDATE ccm_pop_behind SET
+		people_id = #{peopleId},
+		health = #{health},
+		atte_type = #{atteType},
+		annualincome = #{annualincome},
+		staytype =
+		#{staytype},
+		crucialcondition = #{crucialcondition},
+		crucialname =
+		#{crucialname},
+		crucialhealth = #{crucialhealth},
+		crucialrelation =
+		#{crucialrelation},
+		crucialtelephone = #{crucialtelephone},
+		crucialwork
+		= #{crucialwork},
+		crucialmoney = #{crucialmoney},
+		difficult =
+		#{difficult},
+		helpcase = #{helpcase},
+		update_by = #{updateBy.id},
+		update_date = #{updateDate},
+		remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+
+	<update id="delete">
+		UPDATE ccm_pop_behind SET
+		del_flag =
+		#{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+
+</mapper>

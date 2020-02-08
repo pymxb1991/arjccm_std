@@ -1,0 +1,36 @@
+.form {
+    width: 300px;
+    position: absolute;
+    left: 500px;
+    top: 50px;
+}
+input.submit {
+    top: 15px;
+    position: relative;
+}
+
+input, label {
+    position: relative;
+    left: 30px;
+}
+.video-position {
+    /* background-color: black */
+}
+p.pop {
+    color: white;
+    top: 50px;
+    left: 50px;
+    position: relative;
+    font-size: 20px;
+}
+p.ppp {
+    position: absolute;
+    left: 211px;
+    top: 182px;
+    width: 400px;
+}
+.videoview {
+    position: relative;
+    left: 640px;
+    top: -177px;
+}

@@ -1,0 +1,280 @@
+<%@ page contentType="text/html;charset=UTF-8"%>
+<%@ include file="/WEB-INF/views/include/taglib.jsp"%>
+<html>
+<head>
+<title>预处理事件管理</title>
+<meta name="decorator" content="default" />
+<link href="${ctxStatic}/form/css/form.css" rel="stylesheet" />
+<link href="${ctxStatic}/form/css/formTable.css" rel="stylesheet" />
+<style type="text/css">
+</style>
+<script type="text/javascript">
+	$(document).ready(
+			function() {
+
+				//$("#name").focus();
+				$("#EventDetailBtn").click(function() {
+					$("#EventDetailTable").toggle();
+				});
+				$("#inputForm")
+						.validate(
+								{
+									submitHandler : function(form) {
+										loading('正在提交，请稍等...');
+										form.submit();
+									},
+									errorContainer : "#messageBox",
+									errorPlacement : function(error, element) {
+										$("#messageBox").text("输入有误，请先更正。");
+										if (element.is(":checkbox")
+												|| element.is(":radio")
+												|| element.parent().is(
+														".input-append")) {
+											error.appendTo(element.parent()
+													.parent());
+										} else {
+											error.insertAfter(element);
+										}
+									}
+								});
+			});
+</script>
+</head>
+<body>
+	<div class="container-fluid">
+		<form:form id="inputForm" modelAttribute="ccmEventIncidentPreview"
+			action="${ctx}/preview/ccmEventIncidentPreview/delete?id="
+			method="post" class="form-horizontal">
+			<form:hidden path="id" />
+			<sys:message content="${message}" />
+
+			<div class=table-responsive">
+				<table class="table">
+					<tr>
+						<td colspan="2" style=""><label class="control-label">案（事)件名称：</label>
+							<div class="controls">
+								<form:input path="caseName" htmlEscape="false" maxlength="100"
+									class="input-xlarge required" />
+								<span class="help-inline"><font color="red">*</font></span>
+							</div></td>
+						<td colspan="2" style=""><label class="control-label">案（事)件名称：</label>
+							<div class="controls">
+								<form:input path="caseName" htmlEscape="false" maxlength="100"
+									class="input-xlarge required" />
+								<span class="help-inline"><font color="red">*</font></span>
+							</div></td>
+
+					</tr>
+					<tr>
+						<td colspan="2" style=""><label class="control-label">事件内容：</label>
+							<div class="controls">
+								<form:input path="caseName" htmlEscape="false" maxlength="100"
+									class="input-xlarge required" />
+								<span class="help-inline"><font color="red">*</font></span>
+							</div></td>
+						<td colspan="2" style=""><label class="control-label">事件内容：</label>
+							<div class="controls">
+								<form:input path="caseName" htmlEscape="false" maxlength="100"
+									class="input-xlarge required" />
+								<span class="help-inline"><font color="red">*</font></span>
+							</div></td>
+
+					</tr>
+					<tr>
+						<td colspan="2" style=""><label class="control-label">所属网格：</label>
+							<div class="controls">
+								<form:input path="caseName" htmlEscape="false" maxlength="100"
+									class="input-xlarge required" />
+								<span class="help-inline"><font color="red">*</font></span>
+							</div></td>
+						<td colspan="2" style=""><label class="control-label">所属网格：</label>
+							<div class="controls">
+								<form:input path="caseName" htmlEscape="false" maxlength="100"
+									class="input-xlarge required" />
+								<span class="help-inline"><font color="red">*</font></span>
+							</div></td>
+
+					</tr>
+					<tr>
+						<td colspan="2" style=""><label class="control-label">事发地点：</label>
+							<div class="controls">
+								<form:input path="caseName" htmlEscape="false" maxlength="100"
+									class="input-xlarge required" />
+								<span class="help-inline"><font color="red">*</font></span>
+							</div></td>
+						<td colspan="2" style=""><label class="control-label">事发地点：</label>
+							<div class="controls">
+								<form:input path="caseName" htmlEscape="false" maxlength="100"
+									class="input-xlarge required" />
+								<span class="help-inline"><font color="red">*</font></span>
+							</div></td>
+
+					</tr>
+					<%-- <tr>
+				<td colspan="2"><label class="control-label">案（事)件情况：</label>
+					<div class="controls">
+						<form:textarea path="caseCondition" htmlEscape="false"
+							class="input-xlarge " />
+					</div>
+					</td>
+			</tr> --%>
+					<tr>
+						<td><label class="control-label">上报人：</label>
+							<div class="controls">
+								<form:input path="reportPerson" htmlEscape="false"
+									maxlength="15" class="input-xlarge required" />
+								<span class="help-inline"><font color="red">*</font> </span>
+							</div></td>
+						<td><label class="control-label">上报人联系电话：</label>
+							<div class="controls">
+								<form:input path="reportPersonPhone" htmlEscape="false"
+									maxlength="11" class="input-xlarge " />
+							</div></td>
+						<td><label class="control-label">上报人：</label>
+							<div class="controls">
+								<form:input path="reportPerson" htmlEscape="false"
+									maxlength="15" class="input-xlarge required" />
+								<span class="help-inline"><font color="red">*</font> </span>
+							</div></td>
+						<td><label class="control-label">上报人联系电话：</label>
+							<div class="controls">
+								<form:input path="reportPersonPhone" htmlEscape="false"
+									maxlength="11" class="input-xlarge " />
+							</div></td>
+					</tr>
+					<tr>
+						<td><label class="control-label">事件时间：</label>
+							<div class="controls">
+								<input name="happenDate" type="text" readonly="readonly"
+									maxlength="20" class="input-medium Wdate required"
+									value="<fmt:formatDate value="${ccmEventIncidentPreview.happenDate}" pattern="yyyy-MM-dd HH:mm:ss"/>"
+									onclick="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss',isShowClear:false});" />
+								<span class="help-inline"><font color="red">*</font> </span>
+							</div></td>
+						<td><label class="control-label">事件等级：</label>
+							<div class="controls">
+								<form:select path="eventType" class="input-xlarge">
+									<form:option value="" label="" />
+									<form:options items="${fns:getDictList('ccm_case_type')}"
+										itemLabel="label" itemValue="value" htmlEscape="false" />
+								</form:select>
+							</div></td>
+						<td><label class="control-label">事件时间：</label>
+							<div class="controls">
+								<input name="happenDate" type="text" readonly="readonly"
+									maxlength="20" class="input-medium Wdate required"
+									value="<fmt:formatDate value="${ccmEventIncidentPreview.happenDate}" pattern="yyyy-MM-dd HH:mm:ss"/>"
+									onclick="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss',isShowClear:false});" />
+								<span class="help-inline"><font color="red">*</font> </span>
+							</div></td>
+						<td><label class="control-label">事件等级：</label>
+							<div class="controls">
+								<form:select path="eventType" class="input-xlarge">
+									<form:option value="" label="" />
+									<form:options items="${fns:getDictList('ccm_case_type')}"
+										itemLabel="label" itemValue="value" htmlEscape="false" />
+								</form:select>
+							</div></td>
+					</tr>
+					<tr>
+						<td colspan="2"><label class="control-label">案（事）件分级：</label>
+							<div class="controls">
+								<form:checkboxes path="eventScale"
+									items="${fns:getDictList('ccm_case_grad')}" itemLabel="label"
+									itemValue="value" htmlEscape="false" class="" />
+							</div></td>
+						<td colspan="2"><label class="control-label">案（事）件分级：</label>
+							<div class="controls">
+								<form:checkboxes path="eventScale"
+									items="${fns:getDictList('ccm_case_grad')}" itemLabel="label"
+									itemValue="value" htmlEscape="false" class="" />
+							</div></td>
+					</tr>
+					<tr>
+						<td><label class="control-label">事件时间：</label>
+							<div class="controls">
+								<input name="happenDate" type="text" readonly="readonly"
+									maxlength="20" class="input-medium Wdate required"
+									value="<fmt:formatDate value="${ccmEventIncidentPreview.happenDate}" pattern="yyyy-MM-dd HH:mm:ss"/>"
+									onclick="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss',isShowClear:false});" />
+								<span class="help-inline"><font color="red">*</font> </span>
+							</div></td>
+
+						<td><label class="control-label">是否重点场所：</label>
+							<div class="controls">
+								<%-- <form:input path="isKeyPlace" htmlEscape="false" maxlength="2"
+								class="input-xlarge required" /> --%>
+								<form:checkboxes path="isKeyPlace"
+									items="${fns:getDictList('is_key_place')}" itemLabel="label"
+									itemValue="value" htmlEscape="false" class="" />
+							</div></td>
+						<td><label class="control-label">事件时间：</label>
+							<div class="controls">
+								<input name="happenDate" type="text" readonly="readonly"
+									maxlength="20" class="input-medium Wdate required"
+									value="<fmt:formatDate value="${ccmEventIncidentPreview.happenDate}" pattern="yyyy-MM-dd HH:mm:ss"/>"
+									onclick="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss',isShowClear:false});" />
+								<span class="help-inline"><font color="red">*</font> </span>
+							</div></td>
+
+						<td><label class="control-label">是否重点场所：</label>
+							<div class="controls">
+								<%-- <form:input path="isKeyPlace" htmlEscape="false" maxlength="2"
+								class="input-xlarge required" /> --%>
+								<form:checkboxes path="isKeyPlace"
+									items="${fns:getDictList('is_key_place')}" itemLabel="label"
+									itemValue="value" htmlEscape="false" class="" />
+							</div></td>
+					</tr>
+					<tr>
+						<td style=""><label class="control-label">事件类别：</label>
+							<div class="controls">
+								<form:select path="eventKind" class="input-xlarge">
+									<form:option value="" label="" />
+									<form:options items="${fns:getDictList('ccm_event_sort')}"
+										itemLabel="label" itemValue="value" htmlEscape="false" />
+								</form:select>
+								<span class="help-inline"><font color="red">*</font></span>
+							</div></td>
+						<td style=""><label class="control-label">事件规模：</label>
+							<div class="controls">
+								<form:select path="caseScope" class="input-xlarge">
+									<form:option value="" label="" />
+									<form:options items="${fns:getDictList('ccm_event_scope')}"
+										itemLabel="label" itemValue="value" htmlEscape="false" />
+								</form:select>
+								<span class="help-inline"><font color="red">*</font></span>
+							</div></td>
+						<td style=""><label class="control-label">事件类别：</label>
+							<div class="controls">
+								<form:select path="eventKind" class="input-xlarge">
+									<form:option value="" label="" />
+									<form:options items="${fns:getDictList('ccm_event_sort')}"
+										itemLabel="label" itemValue="value" htmlEscape="false" />
+								</form:select>
+								<span class="help-inline"><font color="red">*</font></span>
+							</div></td>
+						<td style=""><label class="control-label">事件规模：</label>
+							<div class="controls">
+								<form:select path="caseScope" class="input-xlarge">
+									<form:option value="" label="" />
+									<form:options items="${fns:getDictList('ccm_event_scope')}"
+										itemLabel="label" itemValue="value" htmlEscape="false" />
+								</form:select>
+								<span class="help-inline"><font color="red">*</font></span>
+							</div></td>
+					</tr>
+					</div>
+					</td>
+					</tr>
+				</table>
+			</div>
+			<div class="form-actions">
+				<shiro:hasPermission name="preview:ccmEventIncidentPreview:edit">
+					<input id="btnSubmit" class="btn btn-primary" type="submit"
+						value="移除" />&nbsp;</shiro:hasPermission>
+			</div>
+	</div>
+	</form:form>
+</body>
+</html>

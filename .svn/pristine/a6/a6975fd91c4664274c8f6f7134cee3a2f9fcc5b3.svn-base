@@ -1,0 +1,365 @@
+/**
+ * Copyright &copy; 2012-2016 <a href="https://github.com/thinkgem/jeesite">JeeSite</a> All rights reserved.
+ */
+package com.arjjs.ccm.modules.flat.handle.service;
+
+import java.util.Arrays;
+import java.util.Date;
+import java.util.List;
+
+import org.apache.commons.lang.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.arjjs.ccm.common.persistence.Page;
+import com.arjjs.ccm.common.service.CrudService;
+import com.arjjs.ccm.modules.flat.alarm.entity.BphAlarmInfo;
+import com.arjjs.ccm.modules.flat.alarm.service.BphAlarmInfoService;
+import com.arjjs.ccm.modules.flat.alarmhandlelog.entity.BphAlarmHandleInfo;
+import com.arjjs.ccm.modules.flat.alarmhandlelog.entity.BphAlarmHandleLog;
+import com.arjjs.ccm.modules.flat.alarmhandlelog.entity.BphNoticeContent;
+import com.arjjs.ccm.modules.flat.alarmhandlelog.entity.BphNoticeData;
+import com.arjjs.ccm.modules.flat.alarmhandlelog.entity.BphTaskContent;
+import com.arjjs.ccm.modules.flat.alarmhandlelog.entity.BphTaskData;
+import com.arjjs.ccm.modules.flat.alarmhandlelog.service.BphAlarmHandleLogService;
+import com.arjjs.ccm.modules.flat.handle.dao.BphAlarmHandleDao;
+import com.arjjs.ccm.modules.flat.handle.entity.BphAlarmHandle;
+import com.arjjs.ccm.modules.flat.handle.entity.BphAlarmHandleReceive;
+import com.arjjs.ccm.modules.flat.handle.entity.BphAlarmHandleTimeCount;
+import com.arjjs.ccm.modules.flat.handle.entity.BphAlarmHandleUserState;
+import com.arjjs.ccm.modules.flat.tree.dao.FlatTreeDao;
+import com.arjjs.ccm.modules.sys.dao.UserDao;
+import com.arjjs.ccm.modules.sys.entity.User;
+import com.arjjs.ccm.modules.sys.utils.DictUtils;
+import com.arjjs.ccm.modules.sys.utils.UserUtils;
+import com.arjjs.ccm.tool.CretaCode;
+import com.google.common.collect.Lists;
+
+import net.sf.json.JSONArray;
+import net.sf.json.JSONObject;
+import net.sf.json.JsonConfig;
+import net.sf.json.util.PropertyFilter;
+
+/**
+ * 出警信息Service
+ * 
+ * @author liu
+ * @version 2018-11-22
+ */
+@Service
+@Transactional(readOnly = true)
+public class BphAlarmHandleService extends CrudService<BphAlarmHandleDao, BphAlarmHandle> {
+
+	@Autowired
+	UserDao userDao;
+	@Autowired
+	FlatTreeDao flatTreeDao;
+	@Autowired
+	BphAlarmHandleLogService bphAlarmHandleLogService;
+	@Autowired
+	BphAlarmInfoService bphAlarmInfoService;
+
+	public BphAlarmHandle get(String id) {
+		return super.get(id);
+	}
+
+	public List<BphAlarmHandle> findList(BphAlarmHandle bphAlarmHandle) {
+		return super.findList(bphAlarmHandle);
+	}
+
+	public Page<BphAlarmHandle> findPage(Page<BphAlarmHandle> page, BphAlarmHandle bphAlarmHandle) {
+		return super.findPage(page, bphAlarmHandle);
+	}
+
+	@Transactional(readOnly = false)
+	public void save(BphAlarmHandle bphAlarmHandle) {
+		super.save(bphAlarmHandle);
+	}
+
+	@Transactional(readOnly = false)
+	public void delete(BphAlarmHandle bphAlarmHandle) {
+		super.delete(bphAlarmHandle);
+	}
+
+	@Transactional(readOnly = false)
+	public boolean saveHandle(BphAlarmHandleReceive bphAlarmHandleReceive) {
+		List<String> lists = Arrays.asList(bphAlarmHandleReceive.getUserId().split(","));
+		User user = new User();
+		if ("1".equals(bphAlarmHandleReceive.getType())) {// 通知类
+			BphNoticeData bphNoticeData = new BphNoticeData();
+			BphNoticeContent bphNoticeContent = new BphNoticeContent();
+			bphNoticeContent.setMessage(bphAlarmHandleReceive.getContent());
+			bphNoticeContent.setTitle(bphAlarmHandleReceive.getContent());
+			bphNoticeData.setContent(bphNoticeContent);
+			bphNoticeData.setType("1");
+			bphNoticeData.setUserId(lists);
+			JSONObject paramData = JSONObject.fromObject(bphNoticeData);
+			String retCode = bphAlarmHandleLogService.sendMessageApp(paramData);
+			if ("0".equals(retCode)) {
+				BphAlarmInfo bphAlarmInfo = bphAlarmInfoService.get(bphAlarmHandleReceive.getAlarmId());
+				if ("0".equals(bphAlarmInfo.getState()) || null == bphAlarmInfo.getState()) {
+					bphAlarmInfo.setState("1");
+					bphAlarmInfo.setOptionDesc("发送出警信息");
+					bphAlarmInfoService.updateAlarmInfo(bphAlarmInfo);
+				}
+				BphAlarmHandleLog bphAlarmHandleLog = new BphAlarmHandleLog();
+				bphAlarmHandleLog.setAlarmId(bphAlarmHandleReceive.getAlarmId());
+				bphAlarmHandleLog.setUser(UserUtils.getUser());
+				Date date = new Date();
+				date.setTime(date.getTime() + 1000);
+				bphAlarmHandleLog.setOperateTime(date);
+				bphAlarmHandleLog.setOperateDesc(bphAlarmHandleReceive.getOptionDesc());
+				bphAlarmHandleLogService.save(bphAlarmHandleLog);
+				for (String s : lists) {
+					BphAlarmHandle bphalarmHandle = new BphAlarmHandle();
+					user = userDao.get(s);
+					bphalarmHandle.setHandleCode(CretaCode.getCreateCode(user.getLoginName()));
+					bphalarmHandle.setHandlePoliceId(s);
+					bphalarmHandle.setAlarmId(bphAlarmHandleReceive.getAlarmId());
+					bphalarmHandle.setTask(bphAlarmHandleReceive.getContent());
+					bphalarmHandle.setPlanId(bphAlarmHandleReceive.getPlanId());
+					bphalarmHandle.setStepId(bphAlarmHandleReceive.getStepId());
+					bphalarmHandle.setActionId(bphAlarmHandleReceive.getActionId());
+					bphalarmHandle.setStatus("0");
+					bphalarmHandle.setDispatchTime(date);
+					save(bphalarmHandle);
+				}
+				return true;
+			} else {
+				return false;
+			}
+		} else if ("2".equals(bphAlarmHandleReceive.getType())) {// 任务类
+			BphTaskData bphTaskData = new BphTaskData();//返回的对象
+			bphTaskData.setType("2");
+			BphTaskContent bphTaskContent = new BphTaskContent();
+			bphTaskContent.setRetCode("0");
+			bphTaskContent.setRetMessage("SUCCESS");
+			List<BphAlarmHandleInfo> list = Lists.newArrayList();
+			BphAlarmInfo bphAlarmInfo = bphAlarmInfoService.get(bphAlarmHandleReceive.getAlarmId());
+			BphAlarmHandleInfo bphAlarmHandleInfo = new BphAlarmHandleInfo();
+			bphAlarmHandleInfo.setHandleTask(bphAlarmHandleReceive.getTask());
+			bphAlarmHandleInfo.setHandleDestinyX(bphAlarmHandleReceive.getDestinyX() + "");
+			bphAlarmHandleInfo.setHandleDestinyY(bphAlarmHandleReceive.getDestinyY() + "");
+			bphAlarmHandleInfo.setAlarmContent(bphAlarmHandleReceive.getContent());
+			bphAlarmHandleInfo.setAlarmId(bphAlarmHandleReceive.getAlarmId());
+			bphAlarmHandleInfo.setAlarmOrderNum(bphAlarmInfo.getOrderNum());
+			bphAlarmHandleInfo.setAlarmPoliceNum(bphAlarmInfo.getPoliceNum());
+			bphAlarmHandleInfo.setAlarmPoliceName(bphAlarmInfo.getPoliceName());
+			bphAlarmHandleInfo.setAlarmManName(bphAlarmInfo.getManName());
+			bphAlarmHandleInfo.setAlarmManSex(bphAlarmInfo.getManSex());
+			bphAlarmHandleInfo.setAlarmManTel(bphAlarmInfo.getManTel());
+			bphAlarmHandleInfo.setAlarmPlace(bphAlarmInfo.getPlace());
+			bphAlarmHandleInfo.setAlarmX(bphAlarmInfo.getX() + "");
+			bphAlarmHandleInfo.setAlarmY(bphAlarmInfo.getY() + "");
+			bphAlarmHandleInfo.setAlarmZ(bphAlarmInfo.getZ() + "");
+			bphAlarmHandleInfo.setAlarmTypeCode(bphAlarmInfo.getTypeCode());
+			bphAlarmHandleInfo.setAlarmGenreCode(bphAlarmInfo.getGenreCode());
+			bphAlarmHandleInfo.setAlarmClassCode(bphAlarmInfo.getClassCode());
+			bphAlarmHandleInfo.setAlarmOfficeId(bphAlarmInfo.getOfficeId());
+			bphAlarmHandleInfo.setAlarmFrom(bphAlarmInfo.getAlarmFrom());
+			bphAlarmHandleInfo.setAlarmTime(bphAlarmInfo.getAlarmTime().getTime() + "");
+			bphAlarmHandleInfo.setAlarmRecord(bphAlarmInfo.getAlarmRecord());
+			bphAlarmHandleInfo.setAlarmIsImportant(bphAlarmInfo.getIsImportant());
+			bphAlarmHandleInfo.setAlarmState(bphAlarmInfo.getState());
+			String officeName = bphAlarmInfo.getOffice().getName();
+			if (!officeName.isEmpty()) {
+				bphAlarmHandleInfo.setOfficeName(bphAlarmInfo.getOffice().getName());
+			}
+			bphAlarmHandleInfo.setOfficeName(bphAlarmInfo.getOffice().getName());
+			bphAlarmHandleInfo.setTypeName(DictUtils.getDictLabel(bphAlarmInfo.getTypeCode(), "bph_alarm_info_typecode", ""));
+			list.add(bphAlarmHandleInfo);
+			bphTaskContent.setResultList(list);
+			bphTaskData.setUserId(lists);
+			bphTaskData.setContent(bphTaskContent);
+			JSONObject paramData = JSONObject.fromObject(bphTaskData);
+			String retCode = bphAlarmHandleLogService.sendMessageApp(paramData);
+			if ("0".equals(retCode)) {
+				BphAlarmHandleLog bphAlarmHandleLog = new BphAlarmHandleLog();
+				bphAlarmHandleLog.setAlarmId(bphAlarmHandleReceive.getAlarmId());
+				bphAlarmHandleLog.setUser(UserUtils.getUser());
+				Date date = new Date();
+				date.setTime(date.getTime() + 1000);
+				bphAlarmHandleLog.setOperateTime(date);
+				bphAlarmHandleLog.setOperateDesc(bphAlarmHandleReceive.getOptionDesc());
+				bphAlarmHandleLogService.save(bphAlarmHandleLog);
+				if ("0".equals(bphAlarmInfo.getState()) || null == bphAlarmInfo.getState()) {
+					bphAlarmInfo.setState("1");
+					bphAlarmInfo.setOptionDesc("发送出警信息");
+					bphAlarmInfoService.updateAlarmInfo(bphAlarmInfo);
+				}
+				for (String s : lists) {
+					BphAlarmHandle bphalarmHandle = new BphAlarmHandle();
+					user = userDao.get(s);
+					bphalarmHandle.setHandleCode(CretaCode.getCreateCode(user.getLoginName()));
+					bphalarmHandle.setHandlePoliceId(s);
+					bphalarmHandle.setAlarmId(bphAlarmHandleReceive.getAlarmId());
+					bphalarmHandle.setTask(bphAlarmHandleReceive.getTask());
+					bphalarmHandle.setDestinyX(Double.valueOf(bphAlarmHandleReceive.getDestinyX()));
+					bphalarmHandle.setDestinyY(Double.valueOf(bphAlarmHandleReceive.getDestinyY()));
+					bphalarmHandle.setPlanId(bphAlarmHandleReceive.getPlanId());
+					bphalarmHandle.setStepId(bphAlarmHandleReceive.getStepId());
+					bphalarmHandle.setActionId(bphAlarmHandleReceive.getActionId());
+					bphalarmHandle.setStatus("0");
+					bphalarmHandle.setDispatchTime(date);
+					save(bphalarmHandle);
+				}
+				return true;
+			} else {
+				return false;
+			}
+		}
+		return false;
+	}
+
+	public Object fingListByAlarmId(String alarmId) {
+		BphAlarmHandle bphAlarmHandle = new BphAlarmHandle();
+		JsonConfig jsonConfig = new JsonConfig();
+		jsonConfig.setJsonPropertyFilter(new PropertyFilter() {
+			@Override
+			public boolean apply(Object source, String name, Object value) {
+				if (name.equals("area") || name.equals("createBy") || name.equals("updateBy")
+						|| name.equals("currentUser") || name.equals("page") || name.equals("sqlMap")
+						|| name.equals("global") || name.equals("updateDate") || name.equals("createDate")) {
+					return true;
+				} else {
+					return false;
+				}
+			}
+		});
+		bphAlarmHandle.setAlarmId(alarmId);
+		List<BphAlarmHandle> list = dao.fingListByAlarmId(bphAlarmHandle);
+		return JSONArray.fromObject(list, jsonConfig);
+	}
+
+	public List<BphAlarmHandleTimeCount> findHandleTimeCount() {
+		List<BphAlarmHandle> list = dao.findHandleTimeCount();
+		List<BphAlarmHandleTimeCount> lists = Lists.newArrayList();
+		for (int i = 0; i < list.size(); i++) {
+			BphAlarmHandleTimeCount bphAlarmHandleTimeCount = new BphAlarmHandleTimeCount();
+			bphAlarmHandleTimeCount.setOfficeId(list.get(i).getOfficeId());
+			bphAlarmHandleTimeCount.setOfficeName(list.get(i).getOfficeName());
+			bphAlarmHandleTimeCount.setVALUE0(list.get(i).getVALUE0());
+			bphAlarmHandleTimeCount.setVALUE1(list.get(i).getVALUE1());
+			bphAlarmHandleTimeCount.setVALUE2(list.get(i).getVALUE2());
+			bphAlarmHandleTimeCount.setVALUE3(list.get(i).getVALUE3());
+			bphAlarmHandleTimeCount.setVALUE4(list.get(i).getVALUE4());
+			bphAlarmHandleTimeCount.setVALUE5(list.get(i).getVALUE5());
+			bphAlarmHandleTimeCount.setVALUE6(list.get(i).getVALUE6());
+			lists.add(bphAlarmHandleTimeCount);
+		}
+		return lists;
+	}
+
+	public Object planManagerDetails(String actionId, String alarmId) {
+		BphAlarmHandle bphAlarmHandle = new BphAlarmHandle();
+		JsonConfig jsonConfig = new JsonConfig();
+		jsonConfig.setJsonPropertyFilter(new PropertyFilter() {
+			@Override
+			public boolean apply(Object source, String name, Object value) {
+				if (name.equals("area") || name.equals("createBy") || name.equals("updateBy")
+						|| name.equals("currentUser") || name.equals("page") || name.equals("sqlMap")
+						|| name.equals("global") || name.equals("updateDate") || name.equals("createDate")) {
+					return true;
+				} else {
+					return false;
+				}
+			}
+		});
+		bphAlarmHandle.setActionId(actionId);
+		bphAlarmHandle.setAlarmId(alarmId);
+		List<BphAlarmHandle> list = dao.planManagerDetails(bphAlarmHandle);
+		return JSONArray.fromObject(list, jsonConfig);
+	}
+
+	public List<BphAlarmHandle> findAlarmHandlePlanStepAction(String id) {
+		return dao.findAlarmHandlePlanStepAction(id);
+	}
+
+	@Transactional
+	public boolean sendAlarmInfo(BphAlarmHandleReceive bphAlarmHandleReceive) {
+		BphTaskContent bphTaskContent = new BphTaskContent();
+		BphTaskData bphTaskData = new BphTaskData();
+		BphAlarmInfo bphAlarmInfo = bphAlarmInfoService.get(bphAlarmHandleReceive.getAlarmId());
+		if ("0".equals(bphAlarmInfo.getState()) || null == bphAlarmInfo.getState()) {
+			bphAlarmInfo.setState("0");
+			bphAlarmInfo.setOptionDesc("发送出警信息");
+			bphAlarmInfoService.updateAlarmInfo(bphAlarmInfo);
+		}
+		List<String> lists = Arrays.asList(bphAlarmHandleReceive.getUserId().split(","));
+		User user = new User();
+		bphTaskContent.setRetCode("0");
+		bphTaskContent.setRetMessage("SUCCESS");
+		List<BphAlarmHandleInfo> list = Lists.newArrayList();
+		BphAlarmHandleInfo bphAlarmHandleInfo = new BphAlarmHandleInfo();
+		list.add(bphAlarmHandleInfo);
+		bphTaskContent.setResultList(list);
+		bphTaskData.setType("2");
+		bphTaskData.setUserId(lists);
+		bphTaskData.setContent(bphTaskContent);
+		for (String s : lists) {
+			BphAlarmHandle bphalarmHandle = new BphAlarmHandle();
+			user = userDao.get(s);
+			bphalarmHandle.setHandleCode(CretaCode.getCreateCode(user.getLoginName()));
+			bphalarmHandle.setHandlePoliceId(s);
+			bphalarmHandle.setAlarmId(bphAlarmHandleReceive.getAlarmId());
+			bphalarmHandle.setTask(bphAlarmHandleReceive.getTask());
+			bphalarmHandle.setDestinyX(Double.valueOf(bphAlarmHandleReceive.getDestinyX()));
+			bphalarmHandle.setDestinyY(Double.valueOf(bphAlarmHandleReceive.getDestinyY()));
+			bphalarmHandle.setPlanId(bphAlarmHandleReceive.getPlanId());
+			bphalarmHandle.setStepId(bphAlarmHandleReceive.getStepId());
+			bphalarmHandle.setActionId(bphAlarmHandleReceive.getActionId());
+			bphalarmHandle.setStatus("0");
+			bphalarmHandle.setDispatchTime(new Date());
+			bphalarmHandle.setCreateBy(new User("1"));
+			bphalarmHandle.setCreateDate(new Date());
+			bphalarmHandle.setUpdateBy(new User("1"));
+			bphalarmHandle.setUpdateDate(new Date());
+			bphalarmHandle.setDelFlag("0");
+			save(bphalarmHandle);
+		}
+		bphAlarmHandleInfo.setHandleTask(bphAlarmHandleReceive.getTask());
+		bphAlarmHandleInfo.setHandleDestinyX(bphAlarmHandleReceive.getDestinyX() + "");
+		bphAlarmHandleInfo.setHandleDestinyY(bphAlarmHandleReceive.getDestinyY() + "");
+		bphAlarmHandleInfo.setAlarmContent(bphAlarmHandleReceive.getContent());
+		bphAlarmHandleInfo.setAlarmId(bphAlarmHandleReceive.getAlarmId());
+		bphAlarmHandleInfo.setAlarmOrderNum(bphAlarmInfo.getOrderNum());
+		bphAlarmHandleInfo.setAlarmPoliceNum(bphAlarmInfo.getPoliceNum());
+		bphAlarmHandleInfo.setAlarmPoliceName(bphAlarmInfo.getPoliceName());
+		bphAlarmHandleInfo.setAlarmManName(bphAlarmInfo.getManName());
+		bphAlarmHandleInfo.setAlarmManSex(bphAlarmInfo.getManSex());
+		bphAlarmHandleInfo.setAlarmManTel(bphAlarmInfo.getManTel());
+		bphAlarmHandleInfo.setAlarmPlace(bphAlarmInfo.getPlace());
+		bphAlarmHandleInfo.setAlarmX(bphAlarmInfo.getX() + "");
+		bphAlarmHandleInfo.setAlarmY(bphAlarmInfo.getY() + "");
+		bphAlarmHandleInfo.setAlarmZ(bphAlarmInfo.getZ() + "");
+		bphAlarmHandleInfo.setAlarmTypeCode(bphAlarmInfo.getTypeCode());
+		bphAlarmHandleInfo.setAlarmGenreCode(bphAlarmInfo.getGenreCode());
+		bphAlarmHandleInfo.setAlarmClassCode(bphAlarmInfo.getClassCode());
+		bphAlarmHandleInfo.setAlarmOfficeId(bphAlarmInfo.getOfficeId());
+		bphAlarmHandleInfo.setAlarmFrom(bphAlarmInfo.getAlarmFrom());
+		bphAlarmHandleInfo.setAlarmTime(bphAlarmInfo.getAlarmTime().getTime() + "");
+		bphAlarmHandleInfo.setAlarmRecord(bphAlarmInfo.getAlarmRecord());
+		bphAlarmHandleInfo.setAlarmIsImportant(bphAlarmInfo.getIsImportant());
+		bphAlarmHandleInfo.setAlarmState(bphAlarmInfo.getState());
+		if(bphAlarmInfo.getOffice() != null) {
+			String officeName = bphAlarmInfo.getOffice().getName();
+			if (StringUtils.isNotBlank(officeName)) {
+				bphAlarmHandleInfo.setOfficeName(bphAlarmInfo.getOffice().getName());
+			}
+		}
+		bphAlarmHandleInfo.setOfficeName(bphAlarmInfo.getOffice().getName());
+		bphAlarmHandleInfo.setTypeName(DictUtils.getDictLabel(bphAlarmInfo.getTypeCode(), "bph_alarm_info_typecode", ""));
+		JSONObject paramData = JSONObject.fromObject(bphTaskData);
+		String retCode = bphAlarmHandleLogService.sendMessageApp(paramData);
+		if ("0".equals(retCode)) {
+			return true;
+		}else {
+			return false;
+		}
+	}
+
+	public List<BphAlarmHandleUserState> findUserState(BphAlarmHandleUserState bphAlarmHandleUserState) {
+		return dao.findUserState(bphAlarmHandleUserState);
+	}
+}

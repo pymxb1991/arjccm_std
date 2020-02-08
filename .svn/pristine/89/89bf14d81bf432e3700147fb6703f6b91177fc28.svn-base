@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.arjjs.ccm.modules.pbs.proposal.dao.PbsProposalareaHisDao">
+    
+	<sql id="pbsProposalareaHisColumns">
+		a.id AS "id",
+		a.s_department AS "sDepartment",
+		a.s_name AS "sName",
+		a.s_mastermem AS "sMastermem.id",
+		mem.s_name AS "sMastermem.sName",
+		a.i_version AS "iVersion",
+		a.s_showtype AS "sShowtype",
+		a.s_publish AS "sPublish",
+		a.s_description AS "sDescription",
+		a.s_spare01 AS "sSpare01",
+		a.s_spare02 AS "sSpare02",
+		a.s_spare03 AS "sSpare03",
+		a.s_spare04 AS "sSpare04",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag"
+	</sql>
+	
+	<sql id="pbsProposalareaHisJoins">
+	    LEFT JOIN sys_office o2 ON o2.id = a.s_department
+        LEFT JOIN pbs_partymem mem ON mem.id = a.s_mastermem
+	</sql>
+    
+	<select id="get" resultType="PbsProposalareaHis">
+		SELECT 
+			<include refid="pbsProposalareaHisColumns"/>
+		FROM pbs_proposalarea_his a
+		<include refid="pbsProposalareaHisJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="PbsProposalareaHis">
+		SELECT 
+			<include refid="pbsProposalareaHisColumns"/>
+		FROM pbs_proposalarea_his a
+		<include refid="pbsProposalareaHisJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="sDepartment != null and sDepartment != ''">
+				AND a.s_department = #{sDepartment}
+			</if>
+			<if test="sName != null and sName != ''">
+				AND a.s_name = #{sName}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="PbsProposalareaHis">
+		SELECT 
+			<include refid="pbsProposalareaHisColumns"/>
+		FROM pbs_proposalarea_his a
+		<include refid="pbsProposalareaHisJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO pbs_proposalarea_his(
+			id,
+			s_department,
+			s_name,
+			s_mastermem,
+			i_version,
+			s_showtype,
+			s_publish,
+			s_description,
+			s_spare01,
+			s_spare02,
+			s_spare03,
+			s_spare04,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag
+		) VALUES (
+			#{id},
+			#{sDepartment},
+			#{sName},
+			#{sMastermem.id},
+			#{iVersion},
+			#{sShowtype},
+			#{sPublish},
+			#{sDescription},
+			#{sSpare01},
+			#{sSpare02},
+			#{sSpare03},
+			#{sSpare04},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE pbs_proposalarea_his SET 	
+			s_department = #{sDepartment},
+			s_name = #{sName},
+			s_mastermem = #{sMastermem.id},
+			i_version = #{iVersion},
+			s_showtype = #{sShowtype},
+			s_publish = #{sPublish},
+			s_description = #{sDescription},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE pbs_proposalarea_his SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

@@ -1,0 +1,203 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.arjjs.ccm.modules.plm.travel.dao.PlmTravelManageDao">
+    
+	<sql id="plmTravelManageColumns">
+		a.fld_subject AS "fldSubject",
+		a.fld_dest AS "fldDest",
+		a.proc_ins_id AS "procInsId",
+		a.code AS "code",
+		a.fld_applicant AS "fldApplicant.id",
+		a.fld_dt AS "fldDt",
+		a.fld_dept AS "fldDept.id",
+		a.fld_bdt AS "fldBdt",
+		a.department_head AS "departmentHead.id",
+		a.fld_edt AS "fldEdt",
+		a.fld_transport AS "fldTransport",
+		a.fld_loan AS "fldLoan",
+		a.fld_route AS "fldRoute",
+		a.fld_reason AS "fldReason",
+		a.fld_accessory AS "fldAccessory",
+		a.fld_authorsc AS "fldAuthorsc",
+		a.id AS "id",
+		a.fld_days AS "fldDays",
+		a.extend1 AS "extend1",
+		a.extend2 AS "extend2",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag",
+		u4.name AS "fldApplicant.name",
+		o6.name AS "fldDept.name",
+		u8.name AS "departmentHead.name"
+	</sql>
+	
+	<sql id="plmTravelManageJoins">
+		LEFT JOIN sys_user u4 ON u4.id = a.fld_applicant
+		LEFT JOIN sys_office o6 ON o6.id = a.fld_dept
+		LEFT JOIN sys_user u8 ON u8.id = a.department_head
+	</sql>
+    
+	<select id="get" resultType="PlmTravelManage">
+		SELECT 
+			<include refid="plmTravelManageColumns"/>
+		FROM plm_travel_manage a
+		<include refid="plmTravelManageJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="PlmTravelManage">
+		SELECT 
+		 act.status AS "plmAct.status",
+			<include refid="plmTravelManageColumns"/>
+			
+		FROM plm_travel_manage a
+		LEFT JOIN plm_act act ON a.id = act.table_id
+		<include refid="plmTravelManageJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			 AND a.create_by = #{currentUser.id}
+			<if test="fldDest != null and fldDest != ''">
+				AND a.fld_dest LIKE 
+					<if test="dbName == 'oracle'">'%'||#{fldDest}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{fldDest}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{fldDest},'%')</if>
+			</if>
+			<if test="fldApplicant != null and fldApplicant.id != null and fldApplicant.id != ''">
+				AND a.fld_applicant = #{fldApplicant.id}
+			</if>
+			<if test="beginFldDt != null and endFldDt != null and beginFldDt != '' and endFldDt != ''">
+				AND a.fld_dt BETWEEN #{beginFldDt} AND #{endFldDt}
+			</if>
+			<if test="beginFldBdt != null and endFldBdt != null and beginFldBdt != '' and endFldBdt != ''">
+				AND a.fld_bdt BETWEEN #{beginFldBdt} AND #{endFldBdt}
+			</if>
+			<if test="departmentHead != null and departmentHead.id != null and departmentHead.id != ''">
+				AND a.department_head = #{departmentHead.id}
+			</if>
+			<if test="beginFldEdt != null and endFldEdt != null and beginFldEdt != '' and endFldEdt != ''">
+				AND a.fld_edt BETWEEN #{beginFldEdt} AND #{endFldEdt}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="PlmTravelManage">
+		SELECT 
+			<include refid="plmTravelManageColumns"/>
+		FROM plm_travel_manage a
+		<include refid="plmTravelManageJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO plm_travel_manage(
+			fld_subject,
+			fld_dest,
+			proc_ins_id,
+			code,
+			fld_applicant,
+			fld_dt,
+			fld_dept,
+			fld_bdt,
+			department_head,
+			fld_edt,
+			fld_transport,
+			fld_loan,
+			fld_route,
+			fld_reason,
+			fld_accessory,
+			fld_authorsc,
+			id,
+			fld_days,
+			extend1,
+			extend2,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag
+		) VALUES (
+			#{fldSubject},
+			#{fldDest},
+			#{procInsId},
+			#{code},
+			#{fldApplicant.id},
+			#{fldDt},
+			#{fldDept.id},
+			#{fldBdt},
+			#{departmentHead.id},
+			#{fldEdt},
+			#{fldTransport},
+			#{fldLoan},
+			#{fldRoute},
+			#{fldReason},
+			#{fldAccessory},
+			#{fldAuthorsc},
+			#{id},
+			#{fldDays},
+			#{extend1},
+			#{extend2},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE plm_travel_manage SET 	
+			proc_ins_id = #{procInsId},
+			fld_subject = #{fldSubject},
+			fld_dest = #{fldDest},
+			fld_applicant = #{fldApplicant.id},
+			code = #{code},
+			fld_dt = #{fldDt},
+			fld_dept = #{fldDept.id},
+			fld_bdt = #{fldBdt},
+			department_head = #{departmentHead.id},
+			fld_edt = #{fldEdt},
+			fld_transport = #{fldTransport},
+			fld_loan = #{fldLoan},
+			fld_route = #{fldRoute},
+			fld_reason = #{fldReason},
+			fld_accessory = #{fldAccessory},
+			fld_authorsc = #{fldAuthorsc},
+			fld_days = #{fldDays},
+			extend1 = #{extend1},
+			extend2 = #{extend2},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE plm_travel_manage SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

@@ -1,0 +1,222 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.arjjs.ccm.modules.ccm.ccmsys.dao.CcmMobileDeviceDao">
+    
+	<sql id="ccmMobileDeviceColumns">
+		a.id AS "id",
+		a.device_id AS "deviceId",
+		a.user_id AS "vCcmTeam.id",
+		a.area_point AS "areaPoint",
+		a.is_variable AS "isVariable",
+		a.icon AS "icon",
+		a.efence_point AS "efencePoint",
+		a.efence_scope AS "efenceScope",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag",
+		u3.status AS "vCcmTeam.status",
+		u3.phone AS "vCcmTeam.phone",
+		u3.mobile AS "vCcmTeam.mobile",
+		u3.name AS "vCcmTeam.name",
+		o.name As "officeName", 
+	  	(case WHEN SUBDATE(now(),interval 2 minute) &lt; a.update_date THEN "1" ELSE '0' END
+		)AS "isOnline",
+		a.is_alarm AS "isAlarm"
+	</sql>
+	
+	<sql id="ccmMobileDeviceJoins">
+		LEFT JOIN v_ccm_team u3 ON u3.id = a.user_id
+		LEFT JOIN sys_office o ON o.id = u3.office_id
+	</sql>
+    
+	<select id="get" resultType="CcmMobileDevice">
+		SELECT 
+			<include refid="ccmMobileDeviceColumns"/>
+		FROM ccm_mobile_device a
+		<include refid="ccmMobileDeviceJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="CcmMobileDevice">
+		SELECT 
+			<include refid="ccmMobileDeviceColumns"/>
+		FROM ccm_mobile_device a
+		<include refid="ccmMobileDeviceJoins"/>		
+        LEFT JOIN sys_area area ON area.id = o.area_id      
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="deviceId != null and deviceId != ''">
+				AND a.device_id LIKE 
+					<if test="dbName == 'oracle'">'%'||#{deviceId}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{deviceId}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{deviceId},'%')</if>
+			</if>
+			<if test="isVariable != null and isVariable != ''">
+				AND a.is_variable = #{isVariable}
+			</if>
+			<if test="vCcmTeam != null and vCcmTeam.id != null and vCcmTeam.id != ''">
+				AND a.user_id = #{vCcmTeam.id}
+			</if>
+			<if test="beginCreateDate != null and endCreateDate != null and beginCreateDate != '' and endCreateDate != ''">
+				AND a.create_date BETWEEN #{beginCreateDate} AND #{endCreateDate}
+			</if>			
+			<if test="userArea != null and userArea.parentIds != null and userArea.parentIds != ''">
+           AND (area.parent_ids LIKE  CONCAT('%',#{userArea.id},'%')  or o.area_id = #{userArea.id})
+             </if>
+			
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	<!-- 查询待上传的数据 -->
+	<select id="findListApp" resultType="CcmMobileDevice">
+		SELECT 
+			<include refid="ccmMobileDeviceColumns"/>
+		FROM ccm_mobile_device a
+		<include refid="ccmMobileDeviceJoins"/>
+		WHERE
+			a.del_flag = 0
+			AND(a.update_date &gt; SUBDATE(now(),interval 10 second))
+			AND(a.update_date &lt; SUBDATE(now(),interval 0 second))
+	</select>
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	<select id="findAllList" resultType="CcmMobileDevice">
+		SELECT 
+			<include refid="ccmMobileDeviceColumns"/>
+		FROM ccm_mobile_device a
+		<include refid="ccmMobileDeviceJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findByDeviceId" resultType="CcmMobileDevice" >
+		SELECT 
+			<include refid="ccmMobileDeviceColumns"/>
+		FROM ccm_mobile_device a
+		<include refid="ccmMobileDeviceJoins"/>
+		<where>
+			a.device_id = #{deviceId}
+			and
+			a.del_flag = '0'
+			
+		</where>		
+		
+	</select>
+
+
+	<select id="findByDeviceIdAndUserId" resultType="CcmMobileDevice" >
+		SELECT
+		<include refid="ccmMobileDeviceColumns"/>
+		FROM ccm_mobile_device a
+		<include refid="ccmMobileDeviceJoins"/>
+		<where>
+			a.device_id = #{deviceId}
+			and
+			a.user_id = #{userId}
+			and
+			a.del_flag = '0'
+
+		</where>
+
+	</select>
+
+	
+	<insert id="insert">
+		INSERT INTO ccm_mobile_device(
+			id,
+			device_id,
+			user_id,
+			area_point,
+			is_variable,
+			icon,
+			efence_point,
+			efence_scope,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag,
+			is_alarm
+		) VALUES (
+			#{id},
+			#{deviceId},
+			#{vCcmTeam.id},
+			#{areaPoint},
+			#{isVariable},
+			#{icon},
+			#{efencePoint},
+			#{efenceScope},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag},
+			#{isAlarm}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE ccm_mobile_device SET 	
+			device_id = #{deviceId},
+			user_id = #{vCcmTeam.id},
+			area_point = #{areaPoint},
+			is_variable = #{isVariable},
+			icon = #{icon},
+			efence_point = #{efencePoint},
+			efence_scope = #{efenceScope},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks},
+			is_alarm = #{isAlarm}
+		WHERE id = #{id}
+	</update>
+	<!-- App电子围栏updateCoordinates -->
+	<update id="updateCoordinates">
+		UPDATE ccm_mobile_device SET
+			efence_point = #{efencePoint},
+			efence_scope = #{efenceScope}
+		WHERE id = #{id}
+	</update>
+	
+	
+	<update id="delete">
+		UPDATE ccm_mobile_device SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

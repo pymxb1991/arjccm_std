@@ -1,0 +1,372 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.arjjs.ccm.modules.pbs.person.dao.PbsPartymemDao">
+
+	<sql id="pbsPartymemColumns">
+		a.id AS "id",
+		a.s_idtype AS "sIdtype",
+		a.s_idnum AS "sIdnum",
+		a.s_name AS
+		"sName",
+		a.i_sex AS "iSex",
+		a.i_nation AS "iNation",
+		a.dt_birth AS
+		"dtBirth",
+		a.s_education AS "sEducation",
+		a.i_type AS
+		"iType",
+		a.s_partybranch AS "sPartybranch",
+		a.dt_admission AS
+		"dtAdmission",
+		a.dt_correction AS "dtCorrection",
+		a.s_post AS "sPost",
+		a.s_mobilephone
+		AS "sMobilephone",
+		a.s_fixedphone AS "sFixedphone",
+		a.s_homeaddr AS
+		"sHomeaddr",
+		a.i_stat AS "iStat",
+		a.i_outcontact AS
+		"iOutcontact",
+		a.dt_outcontact AS "dtOutcontact",
+		a.i_float AS "iFloat",
+		a.s_floattopro AS "sFloattopro",
+		a.s_floattocity AS "sFloattocity",
+		a.s_floattocounty AS "sFloattocounty",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		<!-- a.s_spare01 AS "sSpare01", a.s_spare02 AS "sSpare02", a.s_spare03 
+			AS "sSpare03", a.s_spare04 AS "sSpare04", -->
+		a.del_flag AS "delFlag",
+		a.s_photo AS "sPhoto",
+		a.s_othercontact AS
+		"sOthercontact"
+
+	</sql>
+
+	<sql id="pbsPartymemJoins">
+
+	</sql>
+
+	<select id="get" resultType="PbsPartymem">
+		SELECT
+		<include refid="pbsPartymemColumns" />
+		FROM pbs_partymem a
+		<include refid="pbsPartymemJoins" />
+		WHERE a.id = #{id}
+	</select>
+
+	<select id="findList" resultType="PbsPartymem">
+		SELECT
+		<include refid="pbsPartymemColumns" />
+		,label.s_labelids AS "pbsMemlabel.sLabelids",
+		label.s_description AS "pbsMemlabel.sDescription"
+		FROM pbs_partymem a 
+		LEFT JOIN pbs_memlabel label ON a.id = label.s_memberid
+		AND label.del_flag = #{DEL_FLAG_NORMAL}
+		<include refid="pbsPartymemJoins" />
+		<if test="officeid != null and officeid != ''">
+			LEFT JOIN pbs_departmentbind departbind ON a.id =
+			departbind.s_partymemid
+		</if>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="sIdtype != null and sIdtype != ''">
+				AND a.s_idtype = #{sIdtype}
+			</if>
+			<if test="sIdnum != null and sIdnum != ''">
+				AND a.s_idnum LIKE concat('%',#{sIdnum},'%') 
+			</if>
+			<if test="sName != null and sName != ''">
+				AND a.s_name LIKE
+				<if test="dbName == 'oracle'">'%'||#{sName}||'%'</if>
+				<if test="dbName == 'mssql'">'%'+#{sName}+'%'</if>
+				<if test="dbName == 'mysql'">concat('%',#{sName},'%')</if>
+			</if>
+			<if test="iSex != null and iSex != ''">
+				AND a.i_sex = #{iSex}
+			</if>
+			<if test="iNation != null and iNation != ''">
+				AND a.i_nation = #{iNation}
+			</if>
+			<if
+				test="beginDtBirth != null and endDtBirth != null and beginDtBirth != '' and endDtBirth != ''">
+				AND a.dt_birth BETWEEN #{beginDtBirth} AND #{endDtBirth}
+			</if>
+			<if test="iType != null and iType != ''">
+				AND a.i_type = #{iType}
+			</if>
+			<if test="sPartybranch != null and sPartybranch != ''">
+				AND a.s_partybranch = #{sPartybranch}
+			</if>
+			<if test="officeid != null and officeid != ''">
+				AND departbind.s_departmentid = #{officeid}
+			</if>
+			<if test="ids != null and ids != ''">
+				AND a.id in (
+				<foreach collection="ids" item="e" open="" separator=","
+					close="">
+					#{e}
+				</foreach>
+				)
+			</if>
+
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+
+	</select>
+
+	<select id="findAllList" resultType="PbsPartymem">
+		SELECT
+		<include refid="pbsPartymemColumns" />
+		FROM pbs_partymem a
+		<include refid="pbsPartymemJoins" />
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+
+	<insert id="insert">
+		INSERT INTO pbs_partymem(
+		id,
+		s_idtype,
+		s_idnum,
+		s_name,
+		i_sex,
+		i_nation,
+		dt_birth,
+		s_education,
+		i_type,
+		s_partybranch,
+		dt_admission,
+		dt_correction,
+		s_post,
+		s_mobilephone,
+		s_fixedphone,
+		s_homeaddr,
+		i_stat,
+		i_outcontact,
+		dt_outcontact,
+		i_float,
+		s_floattopro,
+		s_floattocity,
+		s_floattocounty,
+		create_by,
+		create_date,
+		update_by,
+		update_date,
+		remarks,
+		s_spare01,
+		s_spare02,
+		del_flag,
+		s_photo,
+		s_spare03,
+		s_othercontact,
+		s_spare04
+		) VALUES (
+		#{id},
+		#{sIdtype},
+		#{sIdnum},
+		#{sName},
+		#{iSex},
+		#{iNation},
+		#{dtBirth},
+		#{sEducation},
+		#{iType},
+		#{sPartybranch},
+		#{dtAdmission},
+		#{dtCorrection},
+		#{sPost},
+		#{sMobilephone},
+		#{sFixedphone},
+		#{sHomeaddr},
+		#{iStat},
+		#{iOutcontact},
+		#{dtOutcontact},
+		#{iFloat},
+		#{sFloattopro},
+		#{sFloattocity},
+		#{sFloattocounty},
+		#{createBy.id},
+		#{createDate},
+		#{updateBy.id},
+		#{updateDate},
+		#{remarks},
+		#{sSpare01},
+		#{sSpare02},
+		#{delFlag},
+		#{sPhoto},
+		#{sSpare03},
+		#{sOthercontact},
+		#{sSpare04}
+		)
+	</insert>
+
+	<update id="update">
+		UPDATE pbs_partymem SET
+		s_idtype = #{sIdtype},
+		s_idnum
+		= #{sIdnum},
+		s_name = #{sName},
+		i_sex = #{iSex},
+		i_nation = #{iNation},
+		dt_birth = #{dtBirth},
+		s_education = #{sEducation},
+		i_type = #{iType},
+		s_partybranch = #{sPartybranch},
+		dt_admission = #{dtAdmission},
+		dt_correction = #{dtCorrection},
+		s_post = #{sPost},
+		s_mobilephone =
+		#{sMobilephone},
+		s_fixedphone = #{sFixedphone},
+		s_homeaddr =
+		#{sHomeaddr},
+		i_stat = #{iStat},
+		i_outcontact = #{iOutcontact},
+		dt_outcontact = #{dtOutcontact},
+		i_float = #{iFloat},
+		s_floattopro =
+		#{sFloattopro},
+		s_floattocity = #{sFloattocity},
+		s_floattocounty =
+		#{sFloattocounty},
+		update_by = #{updateBy.id},
+		update_date =
+		#{updateDate},
+		remarks = #{remarks},
+		s_photo = #{sPhoto},
+		s_othercontact
+		= #{sOthercontact}
+		WHERE id = #{id}
+	</update>
+
+	<update id="delete">
+		UPDATE pbs_partymem SET
+		del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+
+
+	<select id="checkExist" resultType="java.lang.Integer">
+		SELECT
+		count(1)
+		FROM
+		pbs_partymem a
+		<where>
+			<if test="id != null and id != ''">
+				AND id &lt;&gt; #{id}
+			</if>
+			and a.s_idnum = #{sIdnum}
+			and
+			a.s_idtype = #{sIdtype}
+			and del_flag =
+			#{DEL_FLAG_NORMAL}
+		</where>
+	</select>
+
+	<select id="findListByOffice" resultType="PbsPartymem">
+		SELECT
+		<include refid="pbsPartymemColumns" />
+		FROM
+		pbs_partymem a
+		LEFT JOIN pbs_departmentbind depbind ON
+		depbind.s_partymemid = a.id
+		LEFT JOIN sys_office office ON
+		office.id =
+		depbind.s_departmentid
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			and depbind.del_flag =
+			#{DEL_FLAG_NORMAL}
+			and office.del_flag = #{DEL_FLAG_NORMAL}
+			AND (
+			office.id = #{officeid}
+			OR
+			office.parent_ids LIKE CONCAT('%,',
+			#{officeid}, ',%')
+			)
+			<if test="sName != null and sName != ''">
+                AND a.s_name LIKE
+                <if test="dbName == 'oracle'">'%'||#{sName}||'%'</if>
+                <if test="dbName == 'mssql'">'%'+#{sName}+'%'</if>
+                <if test="dbName == 'mysql'">concat('%',#{sName},'%')</if>
+            </if>
+		</where>
+	</select>
+
+	<select id="findListByOfficeList" resultType="PbsPartymem">
+		SELECT
+		<include refid="pbsPartymemColumns" />
+		FROM
+		pbs_partymem a
+		LEFT JOIN pbs_departmentbind depbind ON
+		depbind.s_partymemid = a.id
+		LEFT JOIN sys_office office ON
+		office.id =
+		depbind.s_departmentid
+		<where>
+			a.del_flag = 0
+			and depbind.del_flag =0
+			and office.del_flag =0
+			<if test="list != null and list.size >0">
+				AND (
+				<foreach collection="list" open="" close="" item="item"
+					separator="or">
+					office.id = #{item}
+					OR
+					office.parent_ids LIKE CONCAT('%,',
+					#{item}, ',%')
+				</foreach>
+				)
+			</if>
+		</where>
+		GROUP BY id
+	</select>
+
+	<select id="findObjectByUser" resultType="PbsPartymem">
+		SELECT
+		<include refid="pbsPartymemColumns" />
+		FROM
+		pbs_partymem a
+		LEFT JOIN pbs_departmentbind depbind ON
+		depbind.s_partymemid = a.id
+		<where>
+			a.del_flag = 0
+			and depbind.del_flag =0
+			and depbind.s_source = "sys_user"
+			and depbind.s_primarykey01 =
+			#{userid}
+		</where>
+	</select>
+	
+	<select id="getListByName" resultType="PbsPartymem" parameterType="String">
+		SELECT 
+		<include refid="pbsPartymemColumns" />
+		FROM pbs_partymem a WHERE a.s_name = #{name}
+	</select>
+	<select id="findDepartName" resultType="String" parameterType="String">
+		select ofc.name from sys_office ofc LEFT JOIN pbs_departmentbind depart on ofc.id = depart.s_departmentid 
+		where depart.s_partymemid = #{departId}
+        AND ofc.del_flag = 0 
+        AND depart.del_flag = 0
+	</select>
+</mapper>

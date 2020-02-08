@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper
+	namespace="com.arjjs.ccm.modules.iot.configure.dao.CcmReportConfigureDao">
+
+	<sql id="ccmReportConfigureColumns">
+		a.id AS "id",
+		a.report_type AS "reportType",
+		a.report_music
+		AS "reportMusic",
+		a.report_aimages AS "reportAimages",
+		a.top_rtype AS
+		"topRtype",
+		a.top_rstype AS "topRstype",
+		a.top_color AS "topColor",
+		a.top_rimages AS "topRimages",
+		a.icon AS "icon",
+		a.create_by AS
+		"createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS
+		"updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag"
+	</sql>
+
+	<sql id="ccmReportConfigureJoins">
+	</sql>
+
+	<select id="get" resultType="CcmReportConfigure">
+		SELECT
+		<include refid="ccmReportConfigureColumns" />
+		FROM ccm_report_configure a
+		<include refid="ccmReportConfigureJoins" />
+		WHERE a.id = #{id}
+	</select>
+
+	<select id="findList" resultType="CcmReportConfigure">
+		SELECT
+		<include refid="ccmReportConfigureColumns" />
+		FROM ccm_report_configure a
+		<include refid="ccmReportConfigureJoins" />
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="reportType != null and reportType != ''">
+				AND a.report_type = #{reportType}
+			</if>
+		</where>
+		<choose>
+			<when
+				test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+
+	<select id="findAllList" resultType="CcmReportConfigure">
+		SELECT
+		<include refid="ccmReportConfigureColumns" />
+		FROM ccm_report_configure a
+		<include refid="ccmReportConfigureJoins" />
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>
+		<choose>
+			<when
+				test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+
+	<insert id="insert">
+		INSERT INTO ccm_report_configure(
+		id,
+		report_type,
+		report_music,
+		report_aimages,
+		top_rtype,
+		top_rstype,
+		top_color,
+		top_rimages,
+		icon,
+		create_by,
+		create_date,
+		update_by,
+		update_date,
+		remarks,
+		del_flag
+		) VALUES (
+		#{id},
+		#{reportType},
+		#{reportMusic},
+		#{reportAimages},
+		#{topRtype},
+		#{topRstype},
+		#{topColor},
+		#{topRimages},
+		#{icon},
+		#{createBy.id},
+		#{createDate},
+		#{updateBy.id},
+		#{updateDate},
+		#{remarks},
+		#{delFlag}
+		)
+	</insert>
+
+	<update id="update">
+		UPDATE ccm_report_configure SET
+		report_type = #{reportType},
+		report_music = #{reportMusic},
+		report_aimages = #{reportAimages},
+		top_rtype = #{topRtype},
+		top_rstype = #{topRstype},
+		top_color = #{topColor},
+		top_rimages = #{topRimages},
+		icon = #{icon},
+		remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+
+	<update id="delete">
+		UPDATE ccm_report_configure SET
+		del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+
+</mapper>

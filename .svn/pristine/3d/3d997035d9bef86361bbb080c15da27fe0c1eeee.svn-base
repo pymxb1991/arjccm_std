@@ -1,0 +1,348 @@
+/**
+ * Copyright &copy; 2012-2016 <a href="https://github.com/thinkgem/jeesite">JeeSite</a> All rights reserved.
+ */
+package com.arjjs.ccm.modules.ccm.rest.web;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import com.arjjs.ccm.common.persistence.Page;
+import com.arjjs.ccm.common.utils.Collections3;
+import com.arjjs.ccm.common.utils.StringUtils;
+import com.arjjs.ccm.common.web.BaseController;
+import com.arjjs.ccm.modules.ccm.patrol.entity.CcmPatrolPlan;
+import com.arjjs.ccm.modules.ccm.patrol.entity.CcmPatrolPoint;
+import com.arjjs.ccm.modules.ccm.patrol.entity.CcmPatrolPointsort;
+import com.arjjs.ccm.modules.ccm.patrol.entity.CcmPatrolUser;
+import com.arjjs.ccm.modules.ccm.patrol.service.CcmPatrolPlanService;
+import com.arjjs.ccm.modules.ccm.patrol.service.CcmPatrolPointService;
+import com.arjjs.ccm.modules.ccm.patrol.service.CcmPatrolPointsortService;
+import com.arjjs.ccm.modules.ccm.patrol.service.CcmPatrolUserService;
+import com.arjjs.ccm.modules.ccm.rest.entity.CcmRestResult;
+import com.arjjs.ccm.modules.ccm.rest.entity.CcmRestType;
+import com.arjjs.ccm.tool.CommUtilRest;
+import com.arjjs.ccm.tool.TimeScope;
+import com.arjjs.ccm.tool.geoJson.Features;
+import com.arjjs.ccm.tool.geoJson.GeoJSON;
+import com.arjjs.ccm.tool.geoJson.Geometry;
+import com.arjjs.ccm.tool.geoJson.Properties;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+
+/**
+ * 巡逻计划信息 Controller
+ * 
+ * @author arj
+ * @version 2018-03-17
+ */
+@Controller
+@RequestMapping(value = "${appPath}/rest/patrol/ccmRestPatrolPlan")
+public class CcmRestPatrolPlanController extends BaseController {
+
+	// 计划
+	@Autowired
+	private CcmPatrolPlanService ccmPatrolPlanService;
+	// 计划人员
+	@Autowired
+	private CcmPatrolUserService ccmPatrolUserService;
+	// 计划点位顺序
+	@Autowired
+	private CcmPatrolPointsortService ccmPatrolPointsortService;
+	// 计划点位
+	@Autowired
+	private CcmPatrolPointService ccmPatrolPointService;
+
+	/**
+	 * 
+	 * @param id
+	 *            查询巡逻计划信息
+	 * @return
+	 * @author arj
+	 * @version 2018-03-17
+	 */
+	@ResponseBody
+	@RequestMapping(value = "/get", method = RequestMethod.GET)
+	public CcmRestResult get(String userId, HttpServletRequest req, HttpServletResponse resp, String id) {
+		// 获取results
+		CcmRestResult result = CommUtilRest.getResult(userId, req, resp, id);
+		// 如果当前的 flag 为返回
+		if (result.isReturnFlag()) {
+			return result;
+		}
+		// 巡逻计划
+		CcmPatrolPlan ccmPatrolPlan = ccmPatrolPlanService.get(id);
+
+		// 查询所有的计划涉及的用户信息
+		CcmPatrolUser ccmPatrolUserDto = new CcmPatrolUser();
+		ccmPatrolUserDto.setPlanId(ccmPatrolPlan.getId());
+		List<CcmPatrolUser> ccmPatrolUserList = ccmPatrolUserService.findList(ccmPatrolUserDto);
+		// 查询所有的计划所涉及的点位信息
+		CcmPatrolPointsort ccmPatrolPointsortDto = new CcmPatrolPointsort();
+		ccmPatrolPointsortDto.setPlanId(ccmPatrolPlan.getId());
+		// 查询所有的点位顺序信息
+		List<CcmPatrolPointsort> ccmPatrolPointsortList = ccmPatrolPointsortService.findList(ccmPatrolPointsortDto);
+		// 装载用户信息 + 点位顺序信息
+		ccmPatrolPlan.setCcmPatrolUserList(ccmPatrolUserList);
+		ccmPatrolPlan.setCcmPatrolPointSortList(ccmPatrolPointsortList);
+		result.setCode(CcmRestType.OK);
+		result.setResult(ccmPatrolPlan);
+		return result;
+	}
+
+	/**
+	 * @see 查询所有巡逻计划信息
+	 * @param type 1 当前用户 2 当前用户当前日期 3当周日期 4 当月日期所涉及的
+	 * @return
+	 * @author arj
+	 * @version 2018-03-12
+	 */
+	@ResponseBody
+	@RequestMapping(value = "/query", method = RequestMethod.GET)
+	public CcmRestResult query(String userId, HttpServletRequest req, HttpServletResponse resp,
+			CcmPatrolPlan ccmPatrolPlan, @RequestParam(required = false) String type) {
+		// 获取结果
+		CcmRestResult result = CommUtilRest.queryResult(userId, req, resp);
+		// 如果当前的 flag 为返回
+		if (result.isReturnFlag()) {
+			return result;
+		}
+		// 添加当前用户的 用户ID
+		if (("1").equals(type)) {
+			ccmPatrolPlan.setCurUser(userId);
+		}
+		// 查询当前用户当天涉及的计划
+		if (("2").equals(type)) {
+			ccmPatrolPlan.setCurUser(userId);
+			ccmPatrolPlan.setCurDate(new Date());
+		}
+		// 查询当前用户当周涉及的计划
+		if (("3").equals(type)) {
+			ccmPatrolPlan.setCurUser(userId);
+			// 当周开始的日期
+			ccmPatrolPlan.setCurBegin(TimeScope.getWeekBegin());
+			// 当周结束的日期
+			ccmPatrolPlan.setCurEnd(TimeScope.getWeekEnd());
+		}
+		if (("4").equals(type)) {
+			ccmPatrolPlan.setCurUser(userId);
+			// 当月开始的日期
+			ccmPatrolPlan.setCurBegin(TimeScope.getMonthBegin());
+			// 当月结束的日期
+			ccmPatrolPlan.setCurEnd(TimeScope.getMonthEnd());
+		}
+		Page<CcmPatrolPlan> page = ccmPatrolPlanService.findPage(new Page<CcmPatrolPlan>(req, resp),
+				(null == ccmPatrolPlan) ? new CcmPatrolPlan() : ccmPatrolPlan);
+		result.setCode(CcmRestType.OK);
+		result.setResult(page);
+		// 输出结果
+		return result;
+	}
+
+	/**
+	 * 所有巡逻点位信息列表
+	 * 
+	 * @param userId
+	 * @param req
+	 * @param resp
+	 * @param ccmPatrolPoint
+	 *            可以添加指定计划的ID
+	 * @return
+	 * @throws IOException
+	 */
+	@ResponseBody
+	@RequestMapping(value = "/patrolpointlist", method = RequestMethod.GET)
+	public CcmRestResult patrolpointlist(String userId, HttpServletRequest req, HttpServletResponse resp,
+			CcmPatrolPoint ccmPatrolPoint) {
+		// 获取结果
+		CcmRestResult result = CommUtilRest.queryResult(userId, req, resp);
+		// 如果当前的 flag 为返回
+		if (result.isReturnFlag()) {
+			return result;
+		}
+		Page<CcmPatrolPoint> page = ccmPatrolPointService.findPage(new Page<CcmPatrolPoint>(req, resp),
+				(null == ccmPatrolPoint) ? new CcmPatrolPoint() : ccmPatrolPoint);
+		result.setCode(CcmRestType.OK);
+		result.setResult(page);
+		// 输出结果
+		return result;
+	}
+	/**
+	 * 所有巡逻点位详情
+	 * 
+	 * @param userId
+	 * @param req
+	 * @param resp
+	 * @param ccmPatrolPoint 可以添加指定计划的ID
+	 * @return
+	 * @throws IOException
+	 */
+	@ResponseBody
+	@RequestMapping(value = "/getpatrolpoint", method = RequestMethod.GET)
+	public CcmRestResult getpatrolpoint(String userId, HttpServletRequest req, HttpServletResponse resp, String id) {
+		// 获取结果
+		CcmRestResult result = CommUtilRest.queryResult(userId, req, resp);
+		// 如果当前的 flag 为返回
+		if (result.isReturnFlag()) {
+			return result;
+		}
+		CcmPatrolPoint ccmPatrolPoin = ccmPatrolPointService.get(id);
+		result.setCode(CcmRestType.OK);
+		result.setResult(ccmPatrolPoin);
+		// 输出结果
+		return result;
+	}
+
+	// 每周 与每月 查询 列表
+	@ResponseBody
+	@RequestMapping(value = "treeData")
+	public List<Map<String, Object>> treeData(@RequestParam(required = false) String extId,
+			@RequestParam(required = false) String selectIds, @RequestParam(required = false) String module,
+			@RequestParam(required = false) Boolean isAll, HttpServletResponse response) {
+		List<Map<String, Object>> mapList = Lists.newArrayList();
+		// 每周
+		if ("02".equals(module)) {
+			// 获取 周
+			for (int i = 1; i <= 7; i++) {
+				// 一周的时间
+				String[] weeks = { "一", "二", "三", "四", "五", "六", "日" };
+				Map<String, Object> map = Maps.newHashMap();
+				map.put("id", "W" + i);
+				map.put("pId", "ccm_week_data");
+				map.put("name", "周" + weeks[i - 1]);
+				mapList.add(map);
+			}
+			// 获取全周
+			Map<String, Object> mapWeek = Maps.newHashMap();
+			mapWeek.put("id", "ccm_week_data");
+			mapWeek.put("pId", "0");
+			mapWeek.put("name", "全周");
+			mapList.add(mapWeek);
+		}
+		// 每月
+		if ("03".equals(module)) {
+			for (int i = 1; i <= 31; i++) {
+				Map<String, Object> map = Maps.newHashMap();
+				map.put("id", i + "M");
+				map.put("pId", "ccm_month_data");
+				map.put("name", i + "日");
+				mapList.add(map);
+			}
+			// 获取全月
+			Map<String, Object> mapMonth = Maps.newHashMap();
+			mapMonth.put("id", "ccm_month_data");
+			mapMonth.put("pId", "0");
+			mapMonth.put("name", "全月");
+			mapList.add(mapMonth);
+		}
+		return mapList;
+	}
+
+	/**
+	 * 计划涉及的点位信息
+	 * 
+	 * @param ccmPatrolPlan
+	 * @param model
+	 * @return
+	 */
+	@ResponseBody
+	@RequestMapping(value = "patrolPlanMap")
+	public GeoJSON patrolPlanMap(CcmPatrolPlan ccmPatrolPlan, Model model) {
+		// 获取点位顺序信息
+		CcmPatrolPointsort ccmPatrolPointsortDto = new CcmPatrolPointsort();
+		ccmPatrolPointsortDto.setPlanId(ccmPatrolPlan.getId());
+		List<CcmPatrolPointsort> sortList = ccmPatrolPointsortService.findList(ccmPatrolPointsortDto);
+
+		String pointSort = Collections3.extractToString(sortList, "id", ";");
+		// 对象信息进行分割
+		String[] Points = (StringUtils.isNotBlank(pointSort) ? pointSort : "").split(";");
+		// 顺序值
+		Map<String, String> pointSortMap = Maps.newHashMap();
+		if (Points.length > 0) {
+			for (int i = 0; i < Points.length; i++) {
+				pointSortMap.put(Points[i], "" + (i + 1));
+			}
+		}
+		// 查询地图点位信息
+		List<CcmPatrolPoint> ccmPatrolPointist = ccmPatrolPointService.findList(new CcmPatrolPoint());
+		// 返回对象
+		GeoJSON geoJSON = new GeoJSON();
+		List<Features> featureList = new ArrayList<Features>();
+		// 数组
+		for (CcmPatrolPoint PatrolPoint : ccmPatrolPointist) {
+			// 特征,属性
+			Features featureDto = new Features();
+			Properties properties = new Properties();
+			// 2 id 添加
+			featureDto.setId(PatrolPoint.getId());
+			// 3 properties 展示属性信息
+			properties.setName(PatrolPoint.getName());
+			// 点击后展示详细属性值
+			Map<String, Object> map_P = new HashMap<String, Object>();
+			// 创建附属信息
+			map_P.put("name", PatrolPoint.getName());
+			// 如果当前的点 为 包含改点
+			if (pointSort.contains(PatrolPoint.getId())) {
+				map_P.put("flag", true);
+				map_P.put("sort", pointSortMap.get(PatrolPoint.getId()));
+			} else {
+				map_P.put("flag", false);
+			}
+			properties.addInfo(map_P);
+			featureList.add(featureDto);
+			featureDto.setProperties(properties);
+			// 4 geometry 配置参数
+			Geometry geometry = new Geometry();
+			featureDto.setGeometry(geometry);
+			// 点位信息 测试为点
+			geometry.setType("Point");
+			// 为中心点赋值
+			if (!StringUtils.isEmpty(PatrolPoint.getAreaPoint())) {
+				// 获取中心点的值
+				String[] centpoint = PatrolPoint.getAreaPoint().split(",");
+				// 图层中心的
+				geoJSON.setCentpoint(centpoint);
+				// 图形中心点
+				properties.setCoordinateCentre(centpoint);
+			}
+			// 添加具体数据
+			// 封装的list
+			List<String> Coordinateslist = new ArrayList<>();
+			// 当前是否为空如果为空则进行添加空数组 ，否则进行拆分添加数据
+			String[] a = (StringUtils.isEmpty(PatrolPoint.getAreaPoint()) ? (",") : PatrolPoint.getAreaPoint())
+					.split(",");
+			// 填充数据
+			if (a.length < 2) {
+				Coordinateslist.add("");
+				Coordinateslist.add("");
+			} else {
+				Coordinateslist.add(a[0]);
+				Coordinateslist.add(a[1]);
+			}
+			// 装配点位
+			geometry.setCoordinates(Coordinateslist);
+		}
+		// 添加数据
+		geoJSON.setFeatures(featureList);
+		// 如果无数据
+		if (featureList.size() == 0) {
+			return null;
+		}
+		return geoJSON;
+	}
+
+}

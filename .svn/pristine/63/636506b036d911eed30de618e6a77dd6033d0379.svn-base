@@ -1,0 +1,200 @@
+<%@ page contentType="text/html;charset=UTF-8" %>
+<%@ include file="/WEB-INF/views/include/taglib.jsp"%>
+<html>
+<head>
+	<title>布控管理</title>
+	<meta name="decorator" content="default"/>
+	<script type="text/javascript">
+		$(document).ready(function() {
+			
+		});
+		function page(n,s){
+			$("#pageNo").val(n);
+			$("#pageSize").val(s);
+			$("#searchForm").submit();
+        	return false;
+        }
+	</script>
+	<script src="${ctxStatic}/ccm/event/js/ccmEventIncident.js"
+			type="text/javascript"></script>
+</head>
+<body>
+<%--	<ul class="nav nav-tabs">--%>
+<%--		<li class="active"><a href="${ctx}/device/ccmDeviceControl?controlBy=${controlBy}">--%>
+<%--			<c:choose>--%>
+<%--				<c:when test="${controlBy==1}">--%>
+<%--					探针布控列表--%>
+<%--				</c:when>--%>
+<%--				<c:when test="${controlBy==2}">--%>
+<%--					RFID布控列表--%>
+<%--				</c:when>--%>
+<%--				<c:when test="${controlBy==3}">--%>
+<%--					人员预警列表--%>
+<%--				</c:when>--%>
+<%--				<c:when test="${controlBy==4}">--%>
+<%--					手机布控列表--%>
+<%--				</c:when>--%>
+<%--				<c:otherwise>--%>
+<%--					布控列表--%>
+<%--				</c:otherwise>--%>
+<%--			</c:choose>--%>
+<%--			</a></li>--%>
+<%--&lt;%&ndash;		<shiro:hasPermission name="device:ccmDeviceControl:edit"><li><a href="${ctx}/device/ccmDeviceControl/form">探针布控添加</a></li></shiro:hasPermission>&ndash;%&gt;--%>
+<%--	</ul>--%>
+<%--	<form:form id="searchForm" modelAttribute="ccmDeviceControl" action="${ctx}/device/ccmDeviceControl/" method="post" class="breadcrumb form-search">--%>
+<%--		<input id="pageNo" name="pageNo" type="hidden" value="${page.pageNo}"/>--%>
+<%--		<input id="pageSize" name="pageSize" type="hidden" value="${page.pageSize}"/>--%>
+<%--		<input id="controlBy" name="controlBy" type="hidden" value="${ccmDeviceControl.controlBy}"/>--%>
+<%--		<ul class="ul-form">--%>
+<%--			<li><label>姓名：</label>--%>
+<%--				<form:input path="name" htmlEscape="false" maxlength="64" class="input-medium"/>--%>
+<%--			</li>--%>
+<%--			<li><label>身份证：</label>--%>
+<%--				<form:input path="idCard" htmlEscape="false" maxlength="18" class="input-medium"/>--%>
+<%--			</li>--%>
+<%--&lt;%&ndash;			<li><label>人员类型：</label>&ndash;%&gt;--%>
+<%--&lt;%&ndash;				<form:input path="peopleType" htmlEscape="false" maxlength="64" class="input-medium"/>&ndash;%&gt;--%>
+<%--&lt;%&ndash;			</li>&ndash;%&gt;--%>
+<%--			<li><label>布控类型：</label>--%>
+<%--				<form:select path="controlType" class="input-large">--%>
+<%--					<form:option value="" label="请选择" />--%>
+<%--					<form:options items="${fns:getDictList('ccm_people_controller')}"--%>
+<%--								  itemLabel="label" itemValue="value" htmlEscape="false"/>--%>
+<%--				</form:select>--%>
+<%--			</li>--%>
+<%--&lt;%&ndash;			<li><label>布控开始时间：</label>&ndash;%&gt;--%>
+<%--&lt;%&ndash;				<input name="startDate" type="text" readonly="readonly" maxlength="20" class="input-medium Wdate"&ndash;%&gt;--%>
+<%--&lt;%&ndash;					value="<fmt:formatDate value="${ccmDeviceControl.startDate}" pattern="yyyy-MM-dd HH:mm:ss"/>"&ndash;%&gt;--%>
+<%--&lt;%&ndash;					onclick="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss',isShowClear:false});"/>&ndash;%&gt;--%>
+<%--&lt;%&ndash;			</li>&ndash;%&gt;--%>
+<%--&lt;%&ndash;			<li><label>布控结束时间：</label>&ndash;%&gt;--%>
+<%--&lt;%&ndash;				<input name="endDate" type="text" readonly="readonly" maxlength="20" class="input-medium Wdate"&ndash;%&gt;--%>
+<%--&lt;%&ndash;					value="<fmt:formatDate value="${ccmDeviceControl.endDate}" pattern="yyyy-MM-dd HH:mm:ss"/>"&ndash;%&gt;--%>
+<%--&lt;%&ndash;					onclick="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss',isShowClear:false});"/>&ndash;%&gt;--%>
+<%--&lt;%&ndash;			</li>&ndash;%&gt;--%>
+<%--			<li><label>布控等级：</label>--%>
+<%--&lt;%&ndash;				<form:input path="grade" htmlEscape="false" maxlength="2" class="input-medium"/>&ndash;%&gt;--%>
+<%--				<form:select path="grade" class="input-large">--%>
+<%--					<form:option value="" label="请选择" />--%>
+<%--					<form:options items="${fns:getDictList('ccm_control_level')}"--%>
+<%--								  itemLabel="label" itemValue="value" htmlEscape="false"/>--%>
+<%--				</form:select>--%>
+<%--			</li>--%>
+<%--			<li class="btns"><a--%>
+<%--					onclick="parent.LayerDialog('${ctx}/device/ccmDeviceControl/form?controlBy=${controlBy}', '添加', '1100px', '700px')"--%>
+<%--					class="btn btn-success"><i class="icon-plus"></i> 添加</a></li>--%>
+<%--			<li class="btns"><a href="javascript:;" id="btnSubmit"--%>
+<%--								class="btn btn-primary"> <i class="icon-search"></i> 查询--%>
+<%--			</a></li>--%>
+<%--&lt;%&ndash;			<li class="btns"><input id="btnSubmit" class="btn btn-primary" type="submit" value="查询"/></li>&ndash;%&gt;--%>
+<%--			<li class="clearfix"></li>--%>
+<%--		</ul>--%>
+<%--	</form:form>--%>
+	<sys:message content="${message}"/>
+	<table id="contentTable" class="table table-striped table-bordered table-condensed">
+		<thead>
+			<tr>
+				<th>姓名</th>
+				<th>性别</th>
+				<th>年龄</th>
+				<th>证件号码</th>
+<%--				<th>布控开始时间</th>--%>
+<%--				<th>布控结束时间</th>--%>
+                <th>人员类型</th>
+                <c:choose>
+                    <c:when test="${controlBy==1}">
+                        <th>MAC地址</th>
+                    </c:when>
+                    <c:when test="${controlBy==2}">
+                        <th>RFID</th>
+                    </c:when>
+                    <c:when test="${controlBy==3}">
+                        <th>GPS</th>
+                    </c:when>
+                    <c:when test="${controlBy==4}">
+                        <th>手机号</th>
+                    </c:when>
+                    <c:otherwise>
+                    </c:otherwise>
+                </c:choose>
+				<th>预警时间</th>
+				<th>是否核实</th>
+<%--				<th>备注信息</th>--%>
+				<shiro:hasPermission name="device:ccmDeviceControl:edit"><th>操作</th></shiro:hasPermission>
+			</tr>
+		</thead>
+		<tbody>
+		<c:forEach items="${page.list}" var="ccmEarlyWarning">
+            <c:if test="${(controlBy==1 && not empty ccmEarlyWarning.macAddress)||(controlBy==2 && not empty ccmEarlyWarning.rfid)||(controlBy==3 && not empty ccmEarlyWarning.imei)||(controlBy==4 && not empty ccmEarlyWarning.phone)}">
+                <tr>
+                    <td>
+                            <%--					<a href="${ctx}/device/ccmDeviceControl/form?id=${ccmDeviceControl.id}">--%>
+                            ${ccmEarlyWarning.name}
+                            <%--				</a>--%>
+                    </td>
+                    <td>
+                            ${ccmEarlyWarning.sex}
+                    </td>
+                    <td>
+                            ${ccmEarlyWarning.age}
+                    </td>
+                    <td>
+                            ${ccmEarlyWarning.idCard}
+                    </td>
+                        <%--				<td>--%>
+                        <%--					<fmt:formatDate value="${ccmDeviceControl.startDate}" pattern="yyyy-MM-dd HH:mm:ss"/>--%>
+                        <%--				</td>--%>
+                        <%--				<td>--%>
+                        <%--					<fmt:formatDate value="${ccmDeviceControl.endDate}" pattern="yyyy-MM-dd HH:mm:ss"/>--%>
+                        <%--				</td>--%>
+                    <td>
+                            ${ccmEarlyWarning.peopleType}
+                    </td>
+                    <c:choose>
+                        <c:when test="${controlBy==1}">
+                            <td>
+                                    ${ccmEarlyWarning.macAddress}
+                            </td>
+                        </c:when>
+                        <c:when test="${controlBy==2}">
+                            <td>
+                                    ${ccmEarlyWarning.rfid}
+                            </td>
+                        </c:when>
+                        <c:when test="${controlBy==3}">
+                            <td>
+                                    ${ccmEarlyWarning.imei}
+                            </td>
+                        </c:when>
+                        <c:when test="${controlBy==4}">
+                            <td>
+                                    ${ccmEarlyWarning.phone}
+                            </td>
+                        </c:when>
+                        <c:otherwise>
+                        </c:otherwise>
+                    </c:choose>
+                    <td>
+                        <fmt:formatDate value="${ccmEarlyWarning.alarmDate}" pattern="yyyy-MM-dd HH:mm:ss"/>
+                    </td>
+                    <td>
+                            ${ccmEarlyWarning.isCheck}
+                    </td>
+                        <%--				<td>--%>
+                        <%--					${ccmDeviceControl.remarks}--%>
+                        <%--				</td>--%>
+                    <shiro:hasPermission name="device:ccmDeviceControl:edit"><td>
+                            <%--					<a class="btnList" onclick="parent.parent.LayerDialog('${ctx}/device/ccmDeviceControl/form?id=${ccmDeviceControl.id}&hide1=true', '详情', '1200px', '800px')" title="详情"><i class="icon-list-alt"></i></a>--%>
+                            <%--    				<a href="${ctx}/device/ccmDeviceControl/form?id=${ccmDeviceControl.id}">修改</a>--%>
+                            <%--					<a class="btnList" onclick="parent.parent.LayerDialog('${ctx}/house/ccmHouseKym/form?id=${ccmHouseKym.id}&hide1=false&hide2=true', '预警列表', '1200px', '500px')" title="预警列表"><i class="icon-list-ul"></i></a>--%>
+                        <a class="btnList" href="${ctx}/device/ccmDeviceControl/earlyWarningDelete?id=${ccmEarlyWarning.id}&idCard=${ccmEarlyWarning.idCard}&controlBy=${controlBy}" onclick="return confirmx('确认要删除该预警记录吗？', this.href)" title="删除"><i class="icon-remove-sign"></i></a>
+                    </td></shiro:hasPermission>
+                </tr>
+            </c:if>
+
+		</c:forEach>
+		</tbody>
+	</table>
+	<div class="pagination">${page}</div>
+</body>
+</html>

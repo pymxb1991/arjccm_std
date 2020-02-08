@@ -1,0 +1,178 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper
+	namespace="com.arjjs.ccm.modules.ccm.live.dao.CcmPlaceLiveDao">
+
+	<sql id="ccmPlaceLiveColumns">
+		a.id AS "id",
+		a.create_by AS "createBy.id",
+		a.create_date AS
+		"createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS
+		"updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag",
+		a.type AS
+		"type",
+		a.certification AS "certification",
+		a.business_scope AS
+		"businessScope",
+		a.open_property AS "openProperty",
+		a.is_free AS
+		"isFree",
+		a.sanitationman_number AS "sanitationmanNumber",
+		a.base_place_id AS "basePlaceId",
+		s.name AS "ccmBasePlace.area.name"
+	</sql>
+
+
+	<sql id="ccmPlaceLiveAllColumns">
+		a.id AS "id",
+		a.create_by AS "createBy.id",
+		a.create_date AS
+		"createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS
+		"updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag",
+		a.type AS
+		"type",
+		a.certification AS "certification",
+		a.business_scope AS
+		"businessScope",
+		a.open_property AS "openProperty",
+		a.is_free AS
+		"isFree",
+		a.sanitationman_number AS "sanitationmanNumber",
+		a.base_place_id AS "basePlaceId",
+		b.place_name AS "placeName",
+		b.leader_name AS "leaderName",
+		b.address AS "address",
+		b.leader_contact
+		AS "leaderContact",
+		b.relevance_org AS "relevanceOrg"
+	</sql>
+
+	<sql id="ccmPlaceLiveJoins">
+	LEFT JOIN sys_area s ON s.id = b.administrative_division
+	</sql>
+
+	<select id="get" resultType="CcmPlaceLive">
+		SELECT
+		<include refid="ccmPlaceLiveColumns" />
+		FROM ccm_place_live a 
+		LEFT JOIN ccm_base_place b ON a.base_place_id = b.id
+		<include refid="ccmPlaceLiveJoins" />
+		WHERE a.id = #{id}
+	</select>
+	<select id="findList" resultType="CcmPlaceLive">
+		SELECT
+		<include refid="ccmPlaceLiveAllColumns" />
+		FROM ccm_place_live a LEFT JOIN ccm_base_place b ON a.base_place_id = b.id
+		<include refid="ccmPlaceLiveJoins" />
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="type != null and type != ''">
+				AND a.type = #{type}
+			</if>
+			<if test="placeName != null and placeName != ''">
+				AND b.place_name LIKE
+				<if test="dbName == 'oracle'">'%'||#{placeName}||'%'</if>
+				<if test="dbName == 'mssql'">'%'+#{placeName}+'%'</if>
+				<if test="dbName == 'mysql'">concat('%',#{placeName},'%')</if>
+			</if>
+			<if test="leaderName != null and leaderName != ''">
+				AND b.leader_name LIKE
+				<if test="dbName == 'oracle'">'%'||#{leaderName}||'%'</if>
+				<if test="dbName == 'mssql'">'%'+#{leaderName}+'%'</if>
+				<if test="dbName == 'mysql'">concat('%',#{leaderName},'%')</if>
+			</if>
+		</where>
+		<choose>
+			<when
+				test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+
+	<select id="findAllList" resultType="CcmPlaceLive">
+		SELECT
+		<include refid="ccmPlaceLiveColumns" />
+		FROM ccm_place_live a
+		<include refid="ccmPlaceLiveJoins" />
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>
+		<choose>
+			<when
+				test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+
+	<insert id="insert">
+		INSERT INTO ccm_place_live(
+		id,
+		create_by,
+		create_date,
+		update_by,
+		update_date,
+		remarks,
+		del_flag,
+		type,
+		certification,
+		business_scope,
+		open_property,
+		is_free,
+		sanitationman_number,
+		base_place_id
+		) VALUES (
+		#{id},
+		#{createBy.id},
+		#{createDate},
+		#{updateBy.id},
+		#{updateDate},
+		#{remarks},
+		#{delFlag},
+		#{type},
+		#{certification},
+		#{businessScope},
+		#{openProperty},
+		#{isFree},
+		#{sanitationmanNumber},
+		#{basePlaceId}
+		)
+	</insert>
+
+	<update id="update">
+		UPDATE ccm_place_live SET
+		update_by = #{updateBy.id},
+		update_date = #{updateDate},
+		remarks = #{remarks},
+		type = #{type},
+		certification = #{certification},
+		business_scope = #{businessScope},
+		open_property = #{openProperty},
+		is_free = #{isFree},
+		sanitationman_number = #{sanitationmanNumber},
+		base_place_id = #{basePlaceId}
+		WHERE id = #{id}
+	</update>
+
+	<update id="delete">
+		UPDATE ccm_place_live SET
+		del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+
+</mapper>

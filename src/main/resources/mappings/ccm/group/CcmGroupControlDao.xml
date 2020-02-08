@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.arjjs.ccm.modules.ccm.group.dao.CcmGroupControlDao">
+    
+	<sql id="ccmGroupControlColumns">
+		a.id AS "id",
+		a.community AS "community",
+		area.name AS "areaName",
+		a.name AS "name",
+		a.master AS "master",
+		a.number AS "number",
+		a.isapprove AS "isapprove",
+		a.property AS "property",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag"
+	</sql>
+	
+	<sql id="ccmGroupControlJoins">
+		LEFT JOIN sys_area area ON area.id = a.community
+	</sql>
+    
+	<select id="get" resultType="CcmGroupControl">
+		SELECT 
+			<include refid="ccmGroupControlColumns"/>
+		FROM ccm_group_control a
+		<include refid="ccmGroupControlJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="CcmGroupControl">
+		SELECT 
+			<include refid="ccmGroupControlColumns"/>
+		FROM ccm_group_control a
+		<include refid="ccmGroupControlJoins"/>
+			<if test="officeId != null and officeId != ''">
+				LEFT JOIN sys_office office ON office.area_id = area.id
+			</if>
+		<where>
+			<if test="officeId != null and officeId != ''">
+				(office.id = #{officeId} or office.parent_ids LIKE concat('%',#{officeId},'%')) AND 
+			</if>
+				a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="name != null and name != ''">
+				AND a.name LIKE 
+					<if test="dbName == 'oracle'">'%'||#{name}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{name}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{name},'%')</if>
+			</if>
+			<if test="number != null and number != ''">
+				AND a.number LIKE 
+					<if test="dbName == 'oracle'">'%'||#{number}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{number}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{number},'%')</if>
+			</if>
+			<if test="isapprove != null and isapprove != ''">
+				AND a.isapprove = #{isapprove}
+			</if>
+			<if test="property != null and property != ''">
+				AND a.property = #{property}
+			</if>
+			<if test="createDate != null and createDate != ''">
+				AND a.create_date LIKE 
+					<if test="dbName == 'oracle'">'%'||#{createDate}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{createDate}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{createDate},'%')</if>
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="CcmGroupControl">
+		SELECT 
+			<include refid="ccmGroupControlColumns"/>
+		FROM ccm_group_control a
+		<include refid="ccmGroupControlJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO ccm_group_control(
+			id,
+			community,
+			name,
+			master,
+			number,
+			isapprove,
+			property,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag
+		) VALUES (
+			#{id},
+			#{community},
+			#{name},
+			#{master},
+			#{number},
+			#{isapprove},
+			#{property},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE ccm_group_control SET 	
+			community = #{community},
+			name = #{name},
+			master = #{master},
+			number = #{number},
+			isapprove = #{isapprove},
+			property = #{property},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE ccm_group_control SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.arjjs.ccm.modules.pbs.vote.dao.PbsVoteUserDao">
+
+	<sql id="pbsVoteUserColumns">
+		a.id AS "id",
+		a.topid AS "topid",
+		a.userid AS "user.id",
+		a.s_ip AS "sIp",
+		a.score AS "score",
+		a.s_spare01 AS "sSpare01",
+		a.s_spare02 AS "sSpare02",
+		a.s_spare03 AS "sSpare03",
+		a.s_spare04 AS
+		"sSpare04",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks
+		AS "remarks",
+		a.del_flag AS "delFlag"
+	</sql>
+
+	<sql id="pbsVoteUserJoins">
+	</sql>
+
+	<select id="get" resultType="PbsVoteUser">
+		SELECT
+		<include refid="pbsVoteUserColumns" />
+		FROM pbs_vote_user a
+		<include refid="pbsVoteUserJoins" />
+		WHERE a.id = #{id}
+	</select>
+
+	<select id="findList" resultType="PbsVoteUser">
+		SELECT
+		<include refid="pbsVoteUserColumns" />
+		FROM pbs_vote_user a
+		<include refid="pbsVoteUserJoins" />
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="topid != null and topid != ''">
+				AND a.topid = #{topid}
+			</if>
+			<if
+				test="user != null and user != '' and user.id !=null and user.id != ''">
+				AND a.userid = #{user.id}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+
+	<select id="findAllList" resultType="PbsVoteUser">
+		SELECT
+		<include refid="pbsVoteUserColumns" />
+		FROM pbs_vote_user a
+		<include refid="pbsVoteUserJoins" />
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+
+	<insert id="insert">
+		INSERT INTO pbs_vote_user(
+		id,
+		topid,
+		userid,
+		s_ip,
+		score,
+		s_spare01,
+		s_spare02,
+		s_spare03,
+		s_spare04,
+		create_by,
+		create_date,
+		update_by,
+		update_date,
+		remarks,
+		del_flag
+		) VALUES (
+		#{id},
+		#{topid},
+		#{user.id},
+		#{sIp},
+		#{score},
+		#{sSpare01},
+		#{sSpare02},
+		#{sSpare03},
+		#{sSpare04},
+		#{createBy.id},
+		#{createDate},
+		#{updateBy.id},
+		#{updateDate},
+		#{remarks},
+		#{delFlag}
+		)
+	</insert>
+
+	<update id="update">
+		UPDATE pbs_vote_user SET
+		topid = #{topid},
+		userid =
+		#{user.id},
+		s_ip = #{sIp},
+		score = #{score},
+		s_spare01 = #{sSpare01},
+		s_spare02 = #{sSpare02},
+		s_spare03 = #{sSpare03},
+		s_spare04 =
+		#{sSpare04},
+		update_by = #{updateBy.id},
+		update_date = #{updateDate},
+		remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+
+	<update id="delete">
+		UPDATE pbs_vote_user SET
+		del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+
+	<select id="getSum" resultType="java.lang.Integer">
+		SELECT
+		count(1)
+		FROM pbs_vote_user a
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="topid != null and topid != ''">
+				AND a.topid = #{topid}
+			</if>
+		</where>
+	</select>
+
+</mapper>

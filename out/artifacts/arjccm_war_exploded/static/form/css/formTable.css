@@ -1,0 +1,16 @@
+td{
+	padding: 8px;
+	border : 0px dashed #CCCCCC;
+}
+table{
+ border: 0px #CCCCCC  solid;
+  padding: 10px; 
+  width: 100%;
+}
+#administrativeDivisionName{
+	width:227px;
+}
+textarea{
+	padding: 4px 6px;
+}
+    

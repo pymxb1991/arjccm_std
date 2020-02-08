@@ -1,0 +1,152 @@
+body{
+/* background-color: #f6f6f6; */
+margin: 0px;
+padding: 0px;
+
+}
+table{
+width: 100%
+}
+#portletcontainer
+{ position: relative;
+	clear:both;
+	width:96%;
+	margin:0 3%;
+	
+	padding:0px 0px 100px 0;
+	
+}
+.portletcontent{
+margin :3px 2% 3px 2%;
+  width:96%;
+  overflow: hidden;
+}
+.portletcolumn
+{   position: absolute;
+	
+	margin-right:10px;
+	/* border:1px solid #d4d4d4; */
+	background-color:white;
+	border-radius: 5px;
+	 overflow: hidden;
+	 
+}
+
+.portletcolumn2
+{   position: absolute;
+	
+	margin-right:10px;
+	 border:5px solid #d4dddd; 
+	/* background-color:white; */
+	border-radius: 5px;
+	 overflow: hidden;
+}
+.portletcolumn3
+{   
+  z-index: 100;
+}
+
+.portletdelimiter
+{   
+	clear:both;
+	height:1px;
+	width:100%;
+	_font-size:0px;
+}
+
+.portlettitle{
+ height: 29px;
+/*  border-bottom:1px solid #d4d4d4; */
+  /* background-color:#fafafa; */
+ /*  background-image: linear-gradient(to bottom,#fff,#f2f2f2); */
+  line-height: 30px;
+  /* border-radius: 5px; */
+  overflow: hidden;
+  min-height: 0; 
+   padding-right: 0;
+   padding-left:0; 
+}
+
+
+.portletcolumnheight{
+  height: 200px;
+}
+
+ .titlespan{
+   font-size: 130%;
+    font-weight:900;
+    font-family: "微软雅黑","仿宋", "Arial", "Verdana", "Helvetica", "sans-serif";
+    line-height: 27px;
+   
+   padding :0 3px;
+    width: auto;
+    color: #08c!important;
+    border-bottom: 2px solid #08c; 
+ }
+ 
+ .titlemore{
+    line-height: 27px; font-size: 12px;
+    float: right;
+ }
+ 
+ #bodydiv{
+  width: 100%;
+    position: relative;
+    left: 0;
+    top: 0;
+    /* background-attachment: fixed;
+    background-size: contain; *//*ȫ���Ǳ�������*/
+    background-color: transparent; 
+ }
+ 
+
+ .form-search .formlabel{
+     margin-left: 0px;
+   font-weight: 900;
+ }
+ .carOn{
+	width: 23%;
+    height: 35px;
+    line-height:35px;
+    float: left;
+    margin-left: 10px;
+    margin-top: 10px;
+    text-align: center;
+    background-color: #80caf5;
+    color:white;
+    font-size:15px;
+}
+.carOff{
+	width: 23%;
+    height: 35px;
+    line-height:35px;
+    float: left;
+    margin-left: 10px;
+    margin-top: 10px;
+    text-align: center;
+    background-color: #cbcfd2;
+    color:white;
+    font-size:15px;
+}
+
+
+.table th, .table td {
+	/* color: #333; */
+/* 	background-color: white; */
+	background-image: none;
+	font-weight: normal;
+	border: 0px;
+	height: auto;
+}
+.table-striped tbody > tr:nth-child(2n) > td, .table-striped tbody > tr:nth-child(2n) > th{
+	background-color: white;
+	
+}
+.table-bordered th, .table-bordered td{
+	 border-left: 0px;
+}
+.table-bordered{
+	border: 0px;
+	
+}
+ 

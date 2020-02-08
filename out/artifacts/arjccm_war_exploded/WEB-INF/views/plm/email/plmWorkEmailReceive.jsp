@@ -1,0 +1,134 @@
+<%@ page contentType="text/html;charset=UTF-8"%>
+<%@ include file="/WEB-INF/views/include/taglib.jsp"%>
+<html>
+<head>
+<title>收件箱详情</title>
+<meta name="decorator" content="default" />
+<link rel="stylesheet" href="${ctxStatic}/plm/email/emailReceive.css">
+<script type="text/javascript"
+	src="${ctxStatic}/plm/email/plmWorkEmailinfo.js"></script>
+<script type="text/javascript">
+	$(document).ready(function() {
+		$("#btnReply,#xbtnReply").on("click", function(){
+			$("#inputForm").attr("action","${ctx}/email/plmWorkEmail/reply");
+			$("#inputForm").submit();
+		});
+		
+		$("#btnReplyAll,#xbtnReplyAll").on("click", function(){
+			$("#inputForm").attr("action","${ctx}/email/plmWorkEmail/reply?all=true");
+			$("#inputForm").submit();
+		});
+		$("#btnRepeat,#xbtnRepeat").on("click", function(){
+			$("#inputForm").attr("action","${ctx}/email/plmWorkEmail/reply?repeat=true");
+			$("#inputForm").submit();
+		});		
+		$("#btnDelete,#xbtnDelete").on("click", function(){
+			$("#inputForm").attr("action","${ctx}/email/plmWorkEmail/self/delete?fromForm=true&reportId=${plmWorkEmail.id}");
+			$("#inputForm").submit();
+		});		
+		$("#btnReedit ,#xbtnReedit").on("click", function(){
+			$("#inputForm").attr("action","${ctx}/email/plmWorkEmail/form?reedit=true");
+			$("#inputForm").submit();
+		});			
+		$("#btnDelete2 ,#xbtnDelete2").on("click", function(){
+			confirmx("彻底删除后邮件将无法恢复，您确定要删除吗？",function(){
+				$('#flag').val('yes');
+				$("#inputForm").attr("action","${ctx}/email/plmWorkEmail/self/delete2?fromForm=true&reportId=${plmWorkEmail.id}");
+				$("#inputForm").submit();
+			});
+		});			
+	});
+</script>	
+</head>
+<body>
+	<ul class="nav nav-tabs">
+			<%-- <li><a href="${ctx}/email/plmWorkEmail/self?readStatus=1">收件箱</a></li> --%>
+			<li class="active"><a
+				href="${ctx}/email/plmWorkEmail/receive?id=${plmWorkEmail.id}">邮件<shiro:hasPermission
+						name="email:plmWorkEmail:edit">${plmWorkEmail.status eq '0'?'查看':'添加'}</shiro:hasPermission>
+					<shiro:lacksPermission name="email:plmWorkEmail:edit">查看</shiro:lacksPermission></a></li>
+	</ul>
+
+	<form:form id="inputForm" modelAttribute="plmWorkEmail"
+		action="${ctx}/email/plmWorkEmail/save" method="post"
+		class="form-horizontal">
+		<form:hidden path="id" />
+		<form:hidden path="status" />
+		<sys:message content="${message}" />
+		<div class="control-group blue" style="height: 29px;">
+			<%--<c:if test="${isSent}">
+				<a id="btnReedit" class="btn" href="javascript:;" ><i class="icon-file"></i>再次编辑</a>&nbsp;
+			</c:if>
+			<c:if test="${!isSent}">
+				<a id="btnReply" class="btn" href="javascript:;"><i class="icon-share"></i>回复</a>&nbsp;
+				<a id="btnReplyAll" class="btn" href="javascript:;"><i class="icon-signin"></i>全部回复</a>&nbsp;
+			</c:if>
+			<a id="btnRepeat" class="btn" href="javascript:;"><i class=" icon-external-link"></i>转发</a>&nbsp;
+			<c:if test="${empty isDel}">
+				<a id="btnDelete" class="btn" href="javascript:;"><i class="icon-remove-circle"></i>删除</a>&nbsp;
+			</c:if>
+			<a id="btnDelete2" class="btn" href="javascript:;"><i class="icon-remove-sign"></i>彻底删除</a>&nbsp;
+			<a id="btnCancel" class="btn"  onclick="history.go(-1);location.replace(document.referrer);"><i class="icon-reply"></i>返回</a>--%>
+		</div>
+		<div class="control-group gray">
+			<div class="email-title">
+			<h4 style="margin-left:107px">${plmWorkEmail.title}</h4>
+			</div>
+			<div class="email-receive" style="font-size: 15px;color: #000000">
+				<label class="control-label">发件人：</label>
+				<div class="controls">${plmWorkEmail.createBy.name}</div>
+			</div>
+			<div class="email-receive" style="font-size: 15px;color: #000000">
+				<label class="control-label">时间：</label>
+				<div class="controls"><fmt:formatDate value="${plmWorkEmail.createDate}" pattern="yyyy-MM-dd HH:mm:ss"/></div>
+			</div>
+			<div class="email-receive" style="font-size: 15px;color: #000000">
+				<label class="control-label">收件人：</label>
+				<div class="controls">${plmWorkEmail.plmWorkEmailSReadNames}</div>
+			</div>
+			<c:if test="${fn:length(plmWorkEmail.plmWorkEmailCReadList)>0}">
+				<div class="email-receive">
+					<label class="control-label">抄送人：</label>
+					<div class="controls">${plmWorkEmail.plmWorkEmailCReadNames}</div>
+				</div>
+			</c:if>
+			<c:forEach items="${plmWorkEmail.plmWorkEmailMReadList}" var="mr">
+				<c:if test="${fns:getUser().id eq mr.user.id}">
+					<div class="email-receive">
+						<label class="control-label">密送人：</label>
+						<div class="controls">${fns:getUser().name}</div>
+					</div>				
+				</c:if>
+			</c:forEach>
+			<div class="email-receive">
+				<label class="control-label">附件：</label>
+				<div class="controls">
+					<form:hidden id="files" path="files" htmlEscape="false"
+						maxlength="1000" class="input-xlarge" />
+					<sys:ckfinder input="files" type="files"
+						uploadPath="/email/plmWorkEmail" selectMultiple="true" readonly="true"/>
+				</div>
+			</div>
+		</div>
+		<div class="control-group" style="background-color: #eff5fb">
+			<div style="margin-left:107px;margin-top: 10px;color: rgba(85,85,89,1)">${plmWorkEmail.content}</div>
+		</div>
+
+		<div class="control-group blue">
+			<c:if test="${isSent}">
+				<a id="btnReedit" class="btn" href="javascript:;" ><i class="icon-file"></i>再次编辑</a>&nbsp;
+			</c:if>
+			<c:if test="${!isSent}">
+				<a id="btnReply" class="btn" href="javascript:;"><i class="icon-share"></i>回复</a>&nbsp;
+				<a id="btnReplyAll" class="btn" style="width: 75px!important;" href="javascript:; "><i class="icon-signin"  ></i>全部回复</a>&nbsp;
+			</c:if>
+			<a id="btnRepeat" class="btn" href="javascript:;"><i class=" icon-external-link"></i>转发</a>&nbsp;
+			<c:if test="${empty isDel}">
+				<a id="btnDelete" class="btn" href="javascript:;"><i class="icon-remove-circle"></i>删除</a>&nbsp;
+			</c:if>
+			<a id="btnDelete2" class="btn" style="width: 75px!important;" href="javascript:;"><i class="icon-trash"  ></i>彻底删除</a>&nbsp;
+			<a id="btnCancel" class="btn"  onclick="history.go(-1);location.replace(document.referrer);"><i class="icon-reply"></i>返回</a>
+		</div>
+	</form:form>
+</body>
+</html>

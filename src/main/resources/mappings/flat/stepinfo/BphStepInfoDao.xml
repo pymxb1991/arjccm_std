@@ -1,0 +1,258 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.arjjs.ccm.modules.flat.stepinfo.dao.BphStepInfoDao">
+	<sql id="viewColumns">
+		a.id AS "id",
+		a.NAME AS "name",
+		a.content AS "content",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag",
+		a.baiName AS "bphActionInfo.name",
+		b.bpiName AS "bphPlanInfo.name"
+	</sql>
+	
+    <sql id="baiColumns">
+		bsi.id AS "id",
+		bsi.NAME AS "name",
+		bsi.content AS "content",
+		bsi.create_by AS "create_by",
+		bsi.create_date AS "create_date",
+		bsi.update_by AS "update_by",
+		bsi.update_date AS "update_date",
+		bsi.remarks AS "remarks",
+		bsi.del_flag AS "del_flag",
+		GROUP_CONCAT( bai.NAME ) AS "baiName"
+    </sql>
+    
+    <sql id="bpiColumns">
+		bsi.id AS id,
+		bsi.NAME AS "name",
+		GROUP_CONCAT(bpi.name) AS "bpiName"
+    </sql>
+    
+	<sql id="bphStepInfoColumns">
+		a.id AS "id",
+		a.name AS "name",
+		a.content AS "content",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag"
+	</sql>
+	
+	
+	<sql id="bphStepInfoJoins">
+	</sql>
+    
+    <select id="getStepData" resultType="BphStepInfo">
+    	SELECT
+		bps.id AS "bpsId",
+		bps.plan_id AS "bpsPlanId",
+		bps.step_id AS "bpsStepId",
+		bsi.name AS "bsiName",
+		bsi.content AS "bsiContent"
+		FROM
+			bph_plan_step bps
+			LEFT JOIN bph_step_info bsi ON bps.step_id = bsi.id
+		WHERE 
+		bps.del_flag = 0
+		AND bsi.del_flag = 0
+		<if test="planId != null and planId != ''">
+			AND bps.plan_id = #{planId}
+		</if>
+    </select>
+    
+    <select id="getListStep" resultType="BphStepInfo">
+    	SELECT
+    		a.id AS "id",
+			a.name AS "name",
+			a.content AS "content"
+    	FROM bph_step_info a
+    	<where>
+    		a.del_flag = 0
+    	</where>
+    </select>
+    
+	<select id="get" resultType="BphStepInfo">
+		SELECT 
+			<include refid="bphStepInfoColumns"/>
+		FROM bph_step_info a
+		<include refid="bphStepInfoJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="BphStepInfo">
+		SELECT 
+			<include refid="viewColumns"/>
+		FROM 
+		(SELECT 
+			<include refid="baiColumns"/>
+		 FROM
+		  bph_step_info bsi
+	 	LEFT JOIN bph_step_action bsa ON bsi.id = bsa.step_id AND bsa.del_flag = 0
+		LEFT JOIN bph_action_info bai ON bsa.action_id = bai.id AND bai.del_flag = 0
+		where bsi.del_flag = 0
+		GROUP BY bsi.id
+		) a
+		LEFT JOIN (
+		SELECT 
+			<include refid="bpiColumns"/>
+		 FROM
+		  bph_step_info bsi
+		LEFT JOIN bph_plan_step bps ON bsi.id = bps.step_id
+		LEFT JOIN bph_plan_info bpi ON bps.plan_id = bpi.id
+		where bps.del_flag = 0
+		GROUP BY bsi.id
+		) b ON 	a.id=b.id
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="name != null and name != ''">
+				AND a.name LIKE 
+					<if test="dbName == 'oracle'">'%'||#{name}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{name}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{name},'%')</if>
+			</if>
+			<if test="bphPlanInfo != null and bphPlanInfo !='' ">
+			<if test="bphPlanInfo.name != null and bphPlanInfo.name !=''">
+			  	AND b.bpiName LIKE 
+			  		<if test="dbName == 'oracle'">'%'||#{bphPlanInfo.name}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{bphPlanInfo.name}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{bphPlanInfo.name},'%')</if>
+			</if>
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="BphStepInfo">
+		SELECT 
+			<include refid="bphStepInfoColumns"/>
+		FROM bph_step_info a
+		<include refid="bphStepInfoJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="checkStepName" resultType="BphStepInfo">
+	 	SELECT
+			a.name AS "name"
+		FROM bph_step_info a
+	<where>
+	  		a.del_flag = #{DEL_FLAG_NORMAL}
+	  		AND
+	  		a.name=#{name}
+	</where>
+	</select>
+	
+	<sql id="bphStepIdNameInfoColumns">
+		a.id AS "id",
+		a.name AS "name",
+		a.content AS "content",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag"
+	</sql>
+	
+	<select id="findListByPlanInfoId" resultType="BphStepInfo">
+		SELECT
+			<include refid="bphStepIdNameInfoColumns"/>
+		FROM bph_step_info a
+		LEFT JOIN bph_plan_step ps ON ps.step_id = a.id
+		WHERE
+			a.del_flag = 0
+			AND ps.plan_id = #{id}
+			AND ps.del_flag = 0
+		order by ps.sort
+	</select>
+	
+	<sql id="bphStepIdInfoColumns">
+		ac.id AS "bphActionInfo.id",
+		ac.name AS "bphActionInfo.name",
+		ac.type AS "bphActionInfo.type",
+		ac.title AS "bphActionInfo.title",
+		ac.content AS "bphActionInfo.content",
+		ac.create_by AS "createBy.id",
+		ac.create_date AS "createDate",
+		ac.update_by AS "updateBy.id",
+		ac.update_date AS "updateDate",
+		ac.remarks AS "bphActionInfo.remarks",
+		ac.del_flag AS "bphActionInfo.delFlag"
+	</sql>
+	
+	<select id="findListBySteId" resultType="BphStepInfo">
+		SELECT
+			<include refid="bphStepIdInfoColumns"/>
+		FROM bph_action_info ac
+		LEFT JOIN bph_step_action sa ON sa.action_id = ac.id
+		WHERE
+			ac.del_flag = 0
+			AND sa.del_flag = 0
+			AND sa.step_id = #{id}
+		order by sa.sort
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO bph_step_info(
+			id,
+			name,
+			content,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag
+		) VALUES (
+			#{id},
+			#{name},
+			#{content},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE bph_step_info SET 	
+			name = #{name},
+			content = #{content},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE bph_step_info SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

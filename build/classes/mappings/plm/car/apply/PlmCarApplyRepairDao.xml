@@ -1,0 +1,197 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.arjjs.ccm.modules.plm.car.dao.apply.PlmCarApplyRepairDao">
+    
+	<sql id="plmCarApplyRepairColumns">
+		a.id AS "id",
+		a.proc_ins_id AS "procInsId",
+		a.title AS "title",
+		a.user_id AS "user.id",
+		a.car_id AS "car.id",
+		a.repair_com_id AS "repairCom.id",
+		a.repair_date AS "repairDate",
+		a.is_end AS "isEnd",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag",
+		u4.name AS "user.name",
+		u4.phone AS "user.phone",
+		o.name AS "user.office.name",
+		b.vehicle AS "car.vehicle",
+		b.brand AS "car.brand",
+		b.vmodel AS "car.vmodel",
+		c.name AS "repairCom.name",
+		c.leader AS "repairCom.leader",
+		c.phone AS "repairCom.phone"
+	</sql>
+	
+	<sql id="plmCarApplyRepairJoins">
+		LEFT JOIN sys_user u4 ON u4.id = a.user_id
+		LEFT JOIN sys_office o ON o.id = u4.office_id
+		LEFT JOIN plm_car b ON b.id = a.car_id
+		LEFT JOIN plm_car_repair c ON c.id = a.repair_com_id
+	</sql>
+	<select id="get" resultType="PlmCarApplyRepair">
+		SELECT 
+			<include refid="plmCarApplyRepairColumns"/>
+		FROM plm_car_apply_repair a
+		<include refid="plmCarApplyRepairJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	<select id="getByProcInsId" resultType="PlmCarApplyRepair">
+		SELECT 
+			<include refid="plmCarApplyRepairColumns"/>
+		FROM plm_car_apply_repair a
+		<include refid="plmCarApplyRepairJoins"/>
+		WHERE a.proc_ins_id = #{procInsId}
+	</select>
+	
+	<update id="updateProcInsId">
+		UPDATE plm_car_apply_repair SET 
+			proc_ins_id = #{procInsId},
+			update_by = #{updateBy.id}, 
+			update_date = #{updateDate}
+		WHERE id = #{id}
+	</update>
+
+	<update id="updateIsEnd">
+		UPDATE plm_car_apply_repair SET 
+			is_end = #{isEnd},
+			update_by = #{updateBy.id}, 
+			update_date = #{updateDate}
+		WHERE id = #{id}
+	</update>
+		
+	<select id="findList" resultType="PlmCarApplyRepair">
+		SELECT 
+			act.status AS "plmAct.status",
+			<include refid="plmCarApplyRepairColumns"/>
+		FROM plm_car_apply_repair a
+		LEFT JOIN plm_act act ON a.id = act.table_id
+		<include refid="plmCarApplyRepairJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="title != null and title != ''">
+				AND a.title LIKE 
+					<if test="dbName == 'oracle'">'%'||#{title}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{title}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{title},'%')</if>
+			</if>
+			<if test="user != null and user.id != null and user.id != ''">
+				AND a.user_id = #{user.id}
+			</if>
+			<if test="car != null and car.id != null and car.id != ''">
+				AND a.car_id = #{car.id}
+			</if>
+			<if test="repairCom != null and repairCom.id != null and repairCom.id != ''">
+				AND a.repair_com_id = #{repairCom.id}
+			</if>
+			<if test="isEnd != null and isEnd != ''">
+				AND a.is_end = #{isEnd}
+			</if>				
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+
+	<select id="findSelect2Type" resultType="com.arjjs.ccm.tool.Select2Type">
+		SELECT 
+			a.id AS "id",
+			CONCAT(a.title,'(',u3.name,')') 	 AS "text"
+		FROM plm_car_apply_repair a
+		LEFT JOIN plm_act c ON c.table_id = a.id
+			LEFT JOIN sys_user u3 ON u3.id = a.user_id
+		<where>
+			a.del_flag = '0'
+			AND c.status = '04'
+		</where>		
+		<choose>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="PlmCarApplyRepair">
+		SELECT 
+			<include refid="plmCarApplyRepairColumns"/>
+		FROM plm_car_apply_repair a
+		<include refid="plmCarApplyRepairJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO plm_car_apply_repair(
+			id,
+			proc_ins_id,
+			title,
+			user_id,
+			car_id,
+			repair_com_id,
+			repair_date,
+			is_end,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag
+		) VALUES (
+			#{id},
+			#{procInsId},
+			#{title},
+			#{user.id},
+			#{car.id},
+			#{repairCom.id},
+			#{repairDate},
+			#{isEnd},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE plm_car_apply_repair SET 	
+			proc_ins_id = #{procInsId},
+			title = #{title},
+			user_id = #{user.id},
+			car_id = #{car.id},
+			repair_com_id = #{repairCom.id},
+			repair_date = #{repairDate},
+			is_end = #{isEnd},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE plm_car_apply_repair SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

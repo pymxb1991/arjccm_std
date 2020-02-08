@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.arjjs.ccm.modules.ccm.ccmsys.dao.CcmUploadLogDao">
+    
+	<sql id="ccmUploadLogColumns">
+		a.id AS "id",
+		a.table_name AS "tableName",
+		a.data_id AS "dataId",
+		a.operate_type AS "operateType",
+		a.param AS "param",
+		a.upload_status AS "uploadStatus",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag"
+	</sql>
+	
+	<sql id="ccmUploadLogJoins">
+	</sql>
+    
+	<select id="get" resultType="CcmUploadLog">
+		SELECT 
+			<include refid="ccmUploadLogColumns"/>
+		FROM ccm_upload_log a
+		<include refid="ccmUploadLogJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="CcmUploadLog">
+		SELECT 
+			<include refid="ccmUploadLogColumns"/>
+		FROM ccm_upload_log a
+		<include refid="ccmUploadLogJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="tableName != null and tableName != ''">
+				AND a.table_name LIKE 
+					<if test="dbName == 'oracle'">'%'||#{tableName}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{tableName}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{tableName},'%')</if>
+			</if>
+			<if test="operateType != null and operateType != ''">
+				AND a.operate_type = #{operateType}
+			</if>
+			<if test="uploadStatus != null and uploadStatus != ''">
+				AND a.upload_status = #{uploadStatus}
+			</if>
+			<if test="beginUpdateDate != null and endUpdateDate != null and beginUpdateDate != '' and endUpdateDate != ''">
+				AND a.update_date BETWEEN #{beginUpdateDate} AND #{endUpdateDate}
+			</if>
+			<if test="remarks != null and remarks != ''">
+				AND a.remarks LIKE 
+					<if test="dbName == 'oracle'">'%'||#{remarks}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{remarks}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{remarks},'%')</if>
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date ASC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="CcmUploadLog">
+		SELECT 
+			<include refid="ccmUploadLogColumns"/>
+		FROM ccm_upload_log a
+		<include refid="ccmUploadLogJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO ccm_upload_log(
+			id,
+			table_name,
+			data_id,
+			operate_type,
+			param,
+			upload_status,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag
+		) VALUES (
+			#{id},
+			#{tableName},
+			#{dataId},
+			#{operateType},
+			#{param},
+			#{uploadStatus},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE ccm_upload_log SET 	
+			table_name = #{tableName},
+			data_id = #{dataId},
+			operate_type = #{operateType},
+			param = #{param},
+			upload_status = #{uploadStatus},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE ccm_upload_log SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

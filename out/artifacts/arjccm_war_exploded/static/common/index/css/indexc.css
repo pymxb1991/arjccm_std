@@ -1,0 +1,420 @@
+
+
+
+.row-fluid [class*="span"] {
+    
+    margin-left: 1%;
+   
+}
+
+
+
+ p.notice {
+    color: #fff;
+    text-align: left;
+    height: 55%;
+    overflow: hidden;
+     text-indent: 2em;
+     display: -webkit-box;
+     -webkit-line-clamp: 3;
+     -webkit-box-orient: vertical;
+}
+#DutyUL .span6{
+    padding-left: 5%;
+}
+#DutyUL  i {
+    display: block;
+    width: 10px;
+    height: 10px;
+    background-color: #1aa0ee;
+    float: left;
+    margin-top: 4px;
+    margin-right: 10px;
+}
+#DutyUL  b {
+   font-weight: normal;
+}
+.echartsAlarm-value  li {
+    float: none;
+    width: 114px;
+    background-color: rgba(0,0,0,0.3);
+    border-radius: 4px;
+    margin-top: 10px;
+    height: 28px;
+    line-height: 28px;
+    overflow: hidden;
+    margin-left: 14px;
+}
+
+.alarm-value{
+    margin-left: 10%;
+}
+ .alarm-name {
+    display: inline-block;
+    width: 60px;
+    text-align: center;
+}
+ .alarm-name1 {
+    background: #aa4644;
+}
+.alarm-name2 {
+    background: #cc7b33;
+}
+.alarm-name3 {
+    background: #89a54e;
+}
+.alarm-name4 {
+    background: #18a73e;
+}
+
+/* #echartsAlarm {
+    width: 100%;
+    height: 200px;
+} */
+.echartsAlarm-tab  li {
+    width: 25%;
+    float: left;
+    line-height: 28px;
+    text-align: center;
+    cursor: pointer;
+}
+.echartsAlarm-tab > li.active, .echartsAlarm-tab > li:hover {
+    background: url('../../tc2.png') no-repeat center;
+    background-size: 100% 100%;
+    background-color: rgba(45,84,159,0.3);
+}
+
+ #alarmTable {
+     margin-top: 12px;
+ }
+.results{
+    margin-top: 5%;
+}
+.results .span4{
+    text-align: center;
+}
+.list_lh {
+    height: 104%;
+}
+#AlarmUL {
+    width: 100%;
+    margin: 0 auto;
+}
+#AlarmUL li {
+    padding: 1% 0;
+    word-break: keep-all;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    cursor: pointer;
+}
+.alarm1 b {
+    color: #aa4644;
+    font-weight: normal;
+}
+.alarm2 b {
+    color: #cc7b33;
+    font-weight: normal;
+}
+.alarm3 b{
+    color: #89a54e;
+    font-weight: normal;
+}
+ .alarm4 b{
+     color: #18a73e;
+     font-weight: normal;
+ }
+
+@media (max-width: 1366px) {
+    p.notice {
+        height: 47%;
+    }
+    #DutyUL .span6 {
+         padding-left: 0%;
+        min-height: 24px;
+    }
+
+    #echartsAlarm{
+        height:140px
+    }
+    .echartsAlarm-value li {
+        height: 20px;
+        line-height: 20px;
+        width: 91px;
+    }
+    .alarm-name {
+        width: 50px;
+    }
+    #alarmTable td {
+        line-height: 18px;
+    }
+    .echartsAlarm-tab li {
+        line-height: 20px;
+    }
+    #alarmTable {
+        margin-top: 5px;
+    }
+}
+@media (min-width: 1367px) and (max-width:1440px) {
+
+}
+@media (min-width: 1441px)  {
+
+}
+
+
+
+/* --------------------------------- */
+.datespan{
+font-size:115%;
+position: absolute;
+top: 40px;
+left: 23%
+}
+.timespan{
+font-size:165%;
+color:#FFD700 ;
+position: absolute;
+top: 40px;
+left: 68%
+}
+.datespan span{
+font-size:165%;
+color:#FFD700 ;
+
+}
+.countFont{
+font-size:160%;
+  color: white;
+  text-align: center;
+}
+.countBigFont{
+font-size: 290%;
+  color:#eea807 ;
+  margin-right: 2%;
+  font-family: myFirstFont; 
+  
+}
+#countStorage{
+  font-size: 23px;
+  color: white;
+  padding-left:10px;
+}
+#countCar{
+  font-size: 20px;
+  color: white;
+  padding-left:10px;
+}
+#countStorageSpan1{
+font-size: 35px;
+  color: #eea807;
+  margin-right: 20px;
+}
+#countCarSpan
+{
+font-size: 35px;
+  color: #eea807;
+}
+.titleecharts{
+font-size: 12px;
+  color: white;
+  text-align: center;
+}
+.height50{
+  height: 50%
+}
+.height33{
+    height:33%;
+}
+.height30{
+    height:30%;
+}
+.height40{
+    height:40%;
+}
+.height60{
+    height:59%;
+}
+.height90{
+ height:90%;
+}
+.aside-nav {
+ height: 200px;
+}
+.aside-nav .aside-menu {
+  top:50;
+}
+.common-header {
+    display: inline-block;
+    padding: 5px 30px;
+    border: 1px solid #0343a3;
+    transform: skew(-20deg);
+    background: #0343a3;
+    color: #fff;
+    font-weight: bold;
+    position: relative;
+    z-index: 9999;
+}
+.common-header {
+    position: relative;
+    top: -15px;
+    left: 32px;
+    padding: 5px 16px;
+    
+}
+.common-header div {
+    transform: skew(20deg);
+    white-space: nowrap;
+    font-size: 15px;
+}
+
+.show {
+   
+     
+    box-shadow: 0px 0px 1px 0px #436dc0;
+}
+
+.common-center {
+    padding: 20px 2px 2px 2px;
+}
+.show {
+    display: block!important;
+}
+.ActByType{
+text-align: center;
+font-size:23px;
+ height: 19%;
+
+}
+
+.ActByType:hover{
+
+font-size:30px;
+ 
+
+}
+.ActByType div{
+text-align: center;
+font-size:10px;
+overflow: hidden;
+width: 100%;
+max-height: 20px;
+ color: white;
+}
+
+.alarm-num {
+    position: absolute;
+    margin: auto;
+    left: 3;
+    top: 3;
+    width: 68px;
+    height:68px;;
+    text-align: center;
+    line-height: 68px;
+}
+.alarm-name {
+    text-align: center;
+    line-height: 68px;
+}
+.alarm-name {
+    display: inline-block;
+    width: 68px;
+    text-align: center;
+}
+
+.alarm-rotate-div {
+	  width: 68px;
+    height:68px;
+	position: relative;
+	margin: auto;
+}
+
+.alarm-rotate-div .alarm-rotate-img {
+	position: absolute;
+	left: 0;
+	top: 0;
+}
+
+.alarm-rotate-div .alarm-rotate-img1 {
+	 width: 68px;
+    height:68px;
+	margin: 0px;
+	border: 3px solid;
+	border-left-color: #93a9d0;
+	border-right-color: #93a9d0;
+	border-top-color: transparent;
+	border-bottom-color: transparent;
+	border-radius: 50%;
+	-webkit-animation: rotateAnimation1 4s infinite linear;
+	-moz-animation: rotateAnimation1 4s infinite linear;
+	-o-animation: rotateAnimation1 4s infinite linear;
+	-os-animation: rotateAnimation1 4s infinite linear;
+	animation: rotateAnimation1 4s infinite linear;
+}
+
+.alarm-rotate-img2 {
+	 width:80px;
+    height: 80px;
+	margin: -6px;
+	border: 3px solid #4573a7;
+	border-radius: 50%;
+	/* -webkit-animation: rotateAnimation 5s infinite  linear;
+	-moz-animation: rotateAnimation 5s infinite  linear;
+	-o-animation: rotateAnimation 5s infinite  linear;
+	-os-animation: rotateAnimation 5s infinite  linear;
+	animation: rotateAnimation 5s infinite  linear; */
+}
+@-webkit-keyframes rotateAnimation { 
+0% {
+	-ms-transform: rotate(0deg); /* IE 9 */
+	-moz-transform: rotate(0deg); /* Firefox */
+	-webkit-transform: rotate(0deg); /* Safari 鍜� Chrome */
+	-o-transform: rotate(0deg); /* Opera */
+	transform: rotate(0deg);
+}
+
+100%{
+-ms-transform:rotate(-360deg); /* IE 9 */
+-moz-transform:rotate(-360deg); /* Firefox */
+-webkit-transform:rotate(-360deg); /* Safari 鍜� Chrome */
+-o-transform:rotate(-360deg); /* Opera */
+transform:rotate(-360deg);
+}
+}
+@-webkit-keyframes rotateAnimation1 { 
+	0% {
+	-ms-transform: rotate(0deg); /* IE 9 */
+	-moz-transform: rotate(0deg); /* Firefox */
+	-webkit-transform: rotate(0deg); /* Safari 鍜� Chrome */
+	-o-transform: rotate(0deg); /* Opera */
+	transform: rotate(0deg);
+}
+100%{
+-ms-transform:rotate(360deg); /* IE 9 */
+-moz-transform:rotate(360deg); /* Firefox */
+-webkit-transform:rotate(360deg); /* Safari 鍜� Chrome */
+-o-transform:rotate(360deg); /* Opera */
+transform:rotate(360deg);
+
+}
+}
+.common-color {
+	color: #eea807;
+	font-size: 30px;
+	font-family: myFirstFont;
+	font-weight: normal;
+}
+.common-color-common {
+	color: #eea807;
+	font-size: 20px;
+	font-weight: normal;
+}
+.common-color1{
+	color:#25cf71;
+}
+.common-color2{
+	color:#f83d3d;
+}
+.common-color3{
+	color:#FFD700;
+}

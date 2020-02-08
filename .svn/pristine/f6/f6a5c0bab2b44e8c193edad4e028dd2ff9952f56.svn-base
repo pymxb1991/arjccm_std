@@ -1,0 +1,86 @@
+/**
+ * Copyright &copy; 2012-2016 <a href="https://github.com/thinkgem/jeesite">JeeSite</a> All rights reserved.
+ */
+package com.arjjs.ccm.modules.ccm.log.service;
+
+import java.util.Arrays;
+import java.util.Date;
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.arjjs.ccm.common.persistence.Page;
+import com.arjjs.ccm.common.service.CrudService;
+import com.arjjs.ccm.common.utils.IdGen;
+import com.arjjs.ccm.modules.ccm.log.dao.CcmLogTailDao;
+import com.arjjs.ccm.modules.ccm.log.entity.CcmLogTail;
+import com.arjjs.ccm.modules.sys.utils.UserUtils;
+import com.google.common.collect.Lists;
+
+/**
+ * 跟踪信息Service
+ * @author arj
+ * @version 2018-01-23
+ */
+@Service
+@Transactional(readOnly = true)
+public class CcmLogTailService extends CrudService<CcmLogTailDao, CcmLogTail> {
+
+	@Autowired
+	private CcmLogTailDao ccmLogTailDao;
+	
+	
+	public CcmLogTail get(String id) {
+		return super.get(id);
+	}
+	
+	public List<CcmLogTail> findList(CcmLogTail ccmLogTail) {
+		return super.findList(ccmLogTail);
+	}
+	
+	public Page<CcmLogTail> findPage(Page<CcmLogTail> page, CcmLogTail ccmLogTail) {
+		return super.findPage(page, ccmLogTail);
+	}
+	
+	@Transactional(readOnly = false)
+	public void save(CcmLogTail ccmLogTail) {
+		super.save(ccmLogTail);
+	}
+	
+	@Transactional(readOnly = false)
+	public void delete(CcmLogTail ccmLogTail) {
+		super.delete(ccmLogTail);
+	}
+	
+	@Transactional(readOnly = false)
+	public int insertLogTail(CcmLogTail ccmLogTail,String ids) {
+		String[] logTailIds = ids.split(",");
+		List<String> idList =  Arrays.asList(logTailIds);
+		List<CcmLogTail> list = Lists.newArrayList();
+		for (String strId : idList) {
+			CcmLogTail ccmLogTailCP = new CcmLogTail();
+			ccmLogTailCP.setId(IdGen.uuid());
+			ccmLogTailCP.setRelevanceId(strId);
+			ccmLogTailCP.setRelevanceTable(ccmLogTail.getRelevanceTable());
+			ccmLogTailCP.setTailPerson(ccmLogTail.getTailPerson());
+			ccmLogTailCP.setMore1(ccmLogTail.getMore1());
+			ccmLogTailCP.setTailContent(ccmLogTail.getTailContent());
+			ccmLogTailCP.setTailCase(ccmLogTail.getTailCase());
+			ccmLogTailCP.setTailTime(new Date());
+			ccmLogTailCP.setCreateBy(UserUtils.getUser());
+			ccmLogTailCP.setCreateDate(new Date());
+			ccmLogTailCP.setUpdateBy(UserUtils.getUser());
+			ccmLogTailCP.setUpdateDate(new Date());
+			ccmLogTailCP.setDelFlag("0");
+			list.add(ccmLogTailCP);
+		}
+		return dao.insertLogTail(list);
+	}
+	
+	public List<CcmLogTail> findListByObject(CcmLogTail ccmLogTail) {
+		return ccmLogTailDao.findListByObject(ccmLogTail);
+	}
+	
+}

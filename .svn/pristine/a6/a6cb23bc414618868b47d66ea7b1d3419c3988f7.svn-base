@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.arjjs.ccm.modules.flat.tree.dao.FlatTreeDao">
+	<sql id="userColumns">
+    	a.id,
+    	a.id AS "user.id",
+    	a.company_id AS "user.company.id",
+    	a.office_id AS "user.office.id",
+    	a.login_name AS "user.loginName",
+    	a.password,
+    	a.no,
+		a.name AS "user.name",
+		a.email,
+		a.phone,
+		a.mobile,
+		a.user_type,
+		a.login_ip,
+		a.login_date,
+		a.remarks,
+		a.login_flag,
+		a.has_permission,
+		a.permission_key,
+		a.photo,
+		a.create_by AS "createBy.id",
+		a.create_date,
+		a.update_by AS "updateBy.id",
+		a.update_date,
+		a.del_flag
+    </sql>
+    
+	<select id="findAllUser" resultType="CcmOrgTeam">
+		SELECT
+			<include refid="userColumns"/>,
+			b.team_type AS "teamType"
+		FROM sys_user a
+		left join ccm_org_team b on a.id = b.user_id and b.del_flag = 0
+		WHERE a.del_flag = 0
+		ORDER BY a.name
+	</select>
+	<select id="findUserById" resultType="CcmOrgTeam">
+		SELECT
+			<include refid="userColumns"/>,
+			b.team_type AS "teamType"
+		FROM sys_user a
+		left join ccm_org_team b on a.id = b.user_id and b.del_flag = 0
+		WHERE a.del_flag = 0
+		<if test="id != null and id != ''">
+		AND a.id = #{id}
+		</if>
+		ORDER BY a.name
+	</select>
+</mapper>

@@ -1,0 +1,586 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.arjjs.ccm.modules.ccm.sys.dao.CcmWorkReportDao">
+
+	<sql id="ccmWorkReportColumns">
+		a.id AS "id",
+		a.type AS "type",
+		a.begin_date AS "beginDate",
+		a.end_date AS "endDate",
+		a.title AS "title",
+		a.content AS "content",
+		a.files AS "files",
+		a.status AS "status",
+		a.area_point AS "areaPoint",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks
+		AS "remarks",
+		a.del_flag AS "delFlag",
+		b.read_num,
+		b.un_read_num,
+		(case a.type 
+			when 01 then '日常办公' 
+			when 02 then '日常走访' 
+			when 03 then '事件处理'
+			else '' end) "typeLable"
+	</sql>
+	<sql id="ccmWorkReportJoinsUser">
+		LEFT JOIN sys_user sysU on a.create_by = sysU.id
+	</sql>
+	<sql id="ccmWorkReportJoins">
+		LEFT JOIN (
+		SELECT r.report_id,
+		sum(case when r.read_flag =
+		'1' then 1 else 0 end) read_num,
+		sum(case when r.read_flag != '1' then
+		1 else 0 end) un_read_num
+		FROM ccm_work_report_read r GROUP BY
+		r.report_id
+		) b ON b.report_id = a.id
+	</sql>
+
+	<select id="get" resultType="CcmWorkReport">
+		SELECT
+		<include refid="ccmWorkReportColumns" />
+		FROM ccm_work_report a
+		<include refid="ccmWorkReportJoins" />
+		WHERE a.id = #{id}
+	</select>
+	
+	
+	
+	<!-- 报表:日常工作数据统计 -->
+	<select id="findLogBook" resultType="CcmWorkReportCount">
+		SELECT
+			selUser.id AS "user.id", 
+			selUser.username AS "user.name", 
+			selUser.usertype AS "user.userType", 
+			selUser.userid AS "user.id", 
+			selUser.officeid AS "office.id", 
+			selUser.officename AS "office.name", 
+		    report.reportCount, 
+  			eventIncident.eventIncidentCount, 
+  			eventAmbi.eventAmbiCount, 
+  			eventRequest.eventRequestCount, 
+  			eventDeal.eventDealCount,
+  			eventScore.eventDealScore,
+  			<!-- pop.popUpdateCount, -->
+  			popSpecialTail.popSpecialTailCount,
+  			houseTail.houseTailCount,
+  			orgTail.orgTailCount
+		FROM
+			(
+				SELECT
+					usr.id AS "id",
+					usr. NAME AS "username",
+					usr.user_type AS "usertype",
+					usr.id AS "userid",
+					office.id AS "officeid",
+					office. NAME AS "officename"
+				FROM
+					sys_office office,
+					sys_user usr
+				WHERE
+					office.del_flag = #{DEL_FLAG_NORMAL}
+					AND usr.del_flag = #{DEL_FLAG_NORMAL}
+					AND office.id = usr.office_id
+					<if test="office != null and office.id != null and office.id != ''">
+						AND office.id = #{office.id}
+					</if>
+					<if test="user != null and user.userType != null and user.userType != ''">
+						AND usr.user_type = #{user.userType}
+					</if>
+			) selUser
+		LEFT JOIN (
+			SELECT<!-- 日报 -->
+				r.create_by AS "userId",
+				COUNT(r.id) AS "reportCount"
+			FROM
+				ccm_work_report r
+			WHERE
+				r.del_flag = #{DEL_FLAG_NORMAL}
+				<if test="beginDate != null and beginDate != ''">
+					AND r.create_date &gt;= #{beginDate}
+				</if>
+				<if test="endDate != null and endDate != ''">
+					AND r.create_date &lt;= #{endDate}
+				</if>
+			GROUP BY
+				r.create_by
+		) report ON report.userId = selUser.userid
+		LEFT JOIN (
+			SELECT<!-- 上传案事件 -->
+				event_incident.create_by AS "userId",
+				COUNT(event_incident.id) AS "eventIncidentCount"
+			FROM
+				ccm_event_incident event_incident
+			WHERE
+				event_incident.del_flag = #{DEL_FLAG_NORMAL}
+				<if test="beginDate != null and beginDate != ''">
+					AND event_incident.create_date &gt;= #{beginDate}
+				</if>
+				<if test="endDate != null and endDate != ''">
+					AND event_incident.create_date &lt;= #{endDate}
+				</if>
+			GROUP BY
+				event_incident.create_by
+		) eventIncident ON eventIncident.userId = selUser.userid
+		LEFT JOIN (
+			SELECT<!-- 上传矛盾纠纷 -->
+				event_ambi.create_by AS "userId",
+				COUNT(event_ambi.id) AS "eventAmbiCount"
+			FROM
+				ccm_event_ambi event_ambi
+			WHERE
+				event_ambi.del_flag = #{DEL_FLAG_NORMAL}
+				<if test="beginDate != null and beginDate != ''">
+					AND event_ambi.create_date &gt;= #{beginDate}
+				</if>
+				<if test="endDate != null and endDate != ''">
+					AND event_ambi.create_date &lt;= #{endDate}
+				</if>
+			GROUP BY
+				event_ambi.create_by
+		) eventAmbi ON eventAmbi.userId = selUser.userid
+		LEFT JOIN (
+			SELECT<!-- 上传请求 -->
+				event_request.create_by AS "userId",
+				COUNT(event_request.id) AS "eventRequestCount"
+			FROM
+				ccm_event_request event_request
+			WHERE
+				event_request.del_flag = #{DEL_FLAG_NORMAL}
+				<if test="beginDate != null and beginDate != ''">
+					AND event_request.create_date &gt;= #{beginDate}
+				</if>
+				<if test="endDate != null and endDate != ''">
+					AND event_request.create_date &lt;= #{endDate}
+				</if>
+			GROUP BY
+				event_request.create_by
+		) eventRequest ON eventRequest.userId = selUser.userid
+		LEFT JOIN (
+			SELECT<!-- 事件处理 -->
+				event_deal.handle_user AS "handleUserId",
+				COUNT(event_deal.id) AS "eventDealCount"
+			FROM
+				ccm_event_casedeal event_deal
+			WHERE
+				event_deal.del_flag = #{DEL_FLAG_NORMAL}
+				AND event_deal.handle_status = '03'
+				<if test="beginDate != null and beginDate != ''">
+					AND event_deal.update_date &gt;= #{beginDate}
+				</if>
+				<if test="endDate != null and endDate != ''">
+					AND event_deal.update_date &lt;= #{endDate}
+				</if>
+			GROUP BY
+				event_deal.handle_user
+		) eventDeal ON eventDeal.handleUserId = selUser.userid
+		LEFT JOIN (
+			SELECT<!-- 事件考核得分 -->
+				event_deal.handle_user AS "handleUserId",
+				SUM(event_deal.check_score) AS "eventDealScore"
+			FROM
+				ccm_event_casedeal event_deal
+			WHERE
+				event_deal.del_flag = #{DEL_FLAG_NORMAL}
+				<if test="beginDate != null and beginDate != ''">
+					AND event_deal.update_date &gt;= #{beginDate}
+				</if>
+				<if test="endDate != null and endDate != ''">
+					AND event_deal.update_date &lt;= #{endDate}
+				</if>
+			GROUP BY
+				event_deal.handle_user
+		) eventScore ON eventScore.handleUserId = selUser.userid
+		<!-- 人口更新数 
+		LEFT JOIN (
+			SELECT
+				people.update_by AS "userId",
+				COUNT(people.id) AS "popUpdateCount"
+			FROM
+				ccm_people people
+			WHERE
+				people.del_flag = #{DEL_FLAG_NORMAL}
+				<if test="beginDate != null and beginDate != ''">
+					AND people.update_date &gt;= #{beginDate}
+				</if>
+				<if test="endDate != null and endDate != ''">
+					AND people.update_date &lt;= #{endDate}
+				</if>
+			GROUP BY
+				people.update_by
+		) pop ON pop.userId = selUser.userid
+		-->
+		LEFT JOIN (
+			SELECT<!-- 特殊人员跟进次数 -->
+				tail.update_by AS "userId",
+				COUNT(tail.id) AS "popSpecialTailCount"
+			FROM
+				ccm_log_tail tail
+			WHERE
+				tail.del_flag = #{DEL_FLAG_NORMAL}
+				AND tail.relevance_table in ('ccm_house_aids','ccm_house_dangerous','ccm_house_drugs','ccm_house_heresy','ccm_house_kym','ccm_house_petition','ccm_house_psychogeny','ccm_house_rectification','ccm_house_release')
+				<if test="beginDate != null and beginDate != ''">
+					AND tail.update_date &gt;= #{beginDate}
+				</if>
+				<if test="endDate != null and endDate != ''">
+					AND tail.update_date &lt;= #{endDate}
+				</if>
+			GROUP BY
+				tail.update_by
+		) popSpecialTail ON popSpecialTail.userId = selUser.userid
+		LEFT JOIN (
+			SELECT<!-- 房屋楼栋跟进次数 -->
+				tail.update_by AS "userId",
+				COUNT(tail.id) AS "houseTailCount"
+			FROM
+				ccm_log_tail tail
+			WHERE
+				tail.del_flag = #{DEL_FLAG_NORMAL}
+				AND tail.relevance_table in ('ccm_house_buildmanage','ccm_pop_tenant')
+				<if test="beginDate != null and beginDate != ''">
+					AND tail.update_date &gt;= #{beginDate}
+				</if>
+				<if test="endDate != null and endDate != ''">
+					AND tail.update_date &lt;= #{endDate}
+				</if>
+			GROUP BY
+				tail.update_by
+		) houseTail ON houseTail.userId = selUser.userid
+		LEFT JOIN (
+			SELECT<!-- 重点场所跟进次数 -->
+				tail.update_by AS "userId",
+				COUNT(tail.id) AS "orgTailCount"
+			FROM
+				ccm_log_tail tail
+			WHERE
+				tail.del_flag = #{DEL_FLAG_NORMAL}
+				AND tail.relevance_table in ('ccm_house_schoolrim','ccm_org_npse')
+				<if test="beginDate != null and beginDate != ''">
+					AND tail.update_date &gt;= #{beginDate}
+				</if>
+				<if test="endDate != null and endDate != ''">
+					AND tail.update_date &lt;= #{endDate}
+				</if>
+			GROUP BY
+				tail.update_by
+		) orgTail ON orgTail.userId = selUser.userid
+		
+		
+		
+		
+	</select>
+	
+	
+	
+	
+	<!--  -->
+	<select id="findList" resultType="CcmWorkReport">
+		SELECT
+		<include refid="ccmWorkReportColumns" />
+		,sysU.`name` as "createBy.name"
+		,sysU.`name` as "createName"
+		<if test="isSelf">
+			,r.read_flag
+			,(case when r.read_flag is NOT null AND r.read_flag = '1' then '已读' else '未读' end) AS "readFlagLable"
+		</if>
+		FROM ccm_work_report a
+		<include refid="ccmWorkReportJoinsUser" />
+		<include refid="ccmWorkReportJoins" />
+		<if test="isSelf">
+			JOIN ccm_work_report_read r ON r.report_id = a.id AND
+			r.user_id =
+			#{currentUser.id}
+		</if>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="beginDate != null and beginDate != ''">
+				AND a.create_date &gt;= #{beginDate}
+			</if>
+			<if test="endDate != null and endDate != ''">
+				AND a.create_date &lt;= #{endDate}
+			</if>
+			<if test="type != null and type != ''">
+				AND a.type = #{type}
+			</if>
+			<if test="title != null and title != ''">
+				AND a.title LIKE
+				<if test="dbName == 'oracle'">'%'||#{title}||'%'</if>
+				<if test="dbName == 'mssql'">'%'+#{title}+'%'</if>
+				<if test="dbName == 'mysql'">concat('%',#{title},'%')</if>
+			</if>
+			<if test="isSelf and readFlag !=null and readFlag != ''">
+				AND r.read_flag = #{readFlag}
+			</if>
+			<!-- a.create_by AS "createBy.id" -->
+			<if test="createBy !=null and createBy.id != ''">
+				AND a.create_by = #{createBy.id}
+			</if>
+
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.create_date DESC
+			</otherwise>
+		</choose>
+	</select>
+
+	<select id="findAllList" resultType="CcmWorkReport">
+		SELECT
+		<include refid="ccmWorkReportColumns" />
+		FROM ccm_work_report a
+		<include refid="ccmWorkReportJoins" />
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+
+	<insert id="insert">
+		INSERT INTO ccm_work_report(
+		id,
+		type,
+		begin_date,
+		end_date,
+		title,
+		content,
+		files,
+		status,
+		area_point,
+		create_by,
+		create_date,
+		update_by,
+		update_date,
+		remarks,
+		del_flag
+		) VALUES (
+		#{id},
+		#{type},
+		#{beginDate},
+		#{endDate},
+		#{title},
+		#{content},
+		#{files},
+		#{status},
+		#{areaPoint},
+		#{createBy.id},
+		#{createDate},
+		#{updateBy.id},
+		#{updateDate},
+		#{remarks},
+		#{delFlag}
+		)
+	</insert>
+
+	<update id="update">
+		UPDATE ccm_work_report SET
+		type = #{type},
+		begin_date =
+		#{beginDate},
+		end_date = #{endDate},
+		title = #{title},
+		content =
+		#{content},
+		files = #{files},
+		status = #{status},
+		area_point =
+		#{areaPoint},
+		update_by = #{updateBy.id},
+		update_date = #{updateDate},
+		remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+
+	<update id="delete">
+		UPDATE ccm_work_report SET
+		del_flag =
+		#{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+
+	<select id="findCount" resultType="Long">
+		SELECT
+		count(1)
+		FROM ccm_work_report a
+		<if test="isSelf">
+			JOIN ccm_work_report_read r ON r.report_id = a.id AND r.user_id =
+			#{currentUser.id}
+			<if test="readFlag != null and readFlag != ''">
+				AND r.read_flag = #{readFlag}
+			</if>
+		</if>
+		WHERE a.del_flag = #{DEL_FLAG_NORMAL}
+		<if test="isSelf">
+			AND a.STATUS = '1'
+		</if>
+	</select>
+	
+	<!-- 日常工作列表展示及条件查询 -->
+	<select id="findJobPage" resultType="ccmWorkReport">
+		SELECT
+		b.id as id,
+		c.name as name, 
+		a.name as create_name, 
+		b.title as title,
+		b.begin_date as beginDate,
+		b.end_date as endDate,
+		b.create_date as createDate,
+		b.place as place
+		FROM sys_user a, ccm_work_report b, sys_area c, sys_office d 
+		where a.id=b.create_by
+		<if test="title != null and title != ''">
+			AND b.title = #{title}
+		</if> 
+		<if test="beginDate != null and beginDate != '' and endDate != null and endDate != ''">
+			AND b.create_date between #{beginDate} and #{endDate}
+		</if>
+		AND a.office_id=d.id 
+		AND d.area_id=c.id 
+		<if test="createName != null and createName != ''">
+			AND a.name like 
+			<if test="dbName == 'oracle'">'%'||#{createName}||'%'</if>
+			<if test="dbName == 'mssql'">'%'+#{createName}+'%'</if>
+			<if test="dbName == 'mysql'">concat('%',#{createName},'%')</if>
+		</if>
+		AND b.type= '01' 
+		ORDER BY b.create_date DESC
+	</select>
+	
+	<!-- 日常走访列表展示及条件查询 -->
+	<select id="findVisitPage" resultType="ccmWorkReport">
+		SELECT
+		b.id as id,
+		c.name as name, 
+		a.name as create_name, 
+		b.title as title,
+		b.begin_date as beginDate,
+		b.end_date as endDate,
+		b.create_date as createDate,
+		b.place as place 
+		FROM sys_user a, ccm_work_report b, sys_area c, sys_office d 
+		where a.id=b.create_by
+		<if test="title != null and title != ''">
+			AND b.title = #{title}
+		</if> 
+		<if test="beginDate != null and beginDate != '' and endDate != null and endDate != ''">
+			AND b.create_date between #{beginDate} and #{endDate}
+		</if>
+		AND a.office_id=d.id 
+		AND d.area_id=c.id 
+		<if test="createName != null and createName != ''">
+			AND a.name like 
+			<if test="dbName == 'oracle'">'%'||#{createName}||'%'</if>
+			<if test="dbName == 'mssql'">'%'+#{createName}+'%'</if>
+			<if test="dbName == 'mysql'">concat('%',#{createName},'%')</if>
+		</if> 
+		AND b.type= '02'
+		ORDER BY b.create_date DESC  
+	</select>
+	
+	<!-- 事件处理列表展示及条件查询 -->
+	<select id="findEventProcessPage" resultType="ccmWorkReport">
+		SELECT
+		b.id as id,
+		c.name as name, 
+		a.name as create_name, 
+		b.title as title,
+		b.begin_date as beginDate,
+		b.end_date as endDate,
+		b.create_date as createDate,
+		b.place as place 
+		FROM sys_user a, ccm_work_report b, sys_area c, sys_office d 
+		where a.id=b.create_by
+		<if test="title != null and title != ''">
+			AND b.title = #{title}
+		</if> 
+		<if test="beginDate != null and beginDate != '' and endDate != null and endDate != ''">
+			AND b.create_date between #{beginDate} and #{endDate}
+		</if>
+		AND a.office_id=d.id 
+		AND d.area_id=c.id
+		<if test="createName != null and createName != ''">
+			AND a.name like 
+			<if test="dbName == 'oracle'">'%'||#{createName}||'%'</if>
+			<if test="dbName == 'mssql'">'%'+#{createName}+'%'</if>
+			<if test="dbName == 'mysql'">concat('%',#{createName},'%')</if>
+		</if> 
+		AND b.type= '03'
+		ORDER BY b.create_date DESC
+	</select>
+	
+	<!-- 日志统计列表展示及条件查询 -->
+	<select id="findCountPage" resultType="ccmWorkReport">
+		SELECT 
+		c.name as name, 
+		a.name as create_name,
+		count(case when b.type='01' then b.type else null end) as jobnum,
+		count(case when b.type='02' then b.type else null end) as visitnum,
+		count(case when b.type='03' then b.type else null end) as eventnum,
+		count(*) as sum
+		FROM sys_user a, ccm_work_report b, sys_area c, sys_office d 
+		where a.id=b.create_by
+		AND a.office_id=d.id 
+		AND d.area_id=c.id
+		<if test="createName != null and createName != ''">
+			AND a.name like 
+			<if test="dbName == 'oracle'">'%'||#{createName}||'%'</if>
+			<if test="dbName == 'mssql'">'%'+#{createName}+'%'</if>
+			<if test="dbName == 'mysql'">concat('%',#{createName},'%')</if>
+		</if> 
+		GROUP BY b.create_by
+	</select>
+	
+	<!-- 详情展示查询 -->
+	<select id="findByID" resultType="ccmWorkReport">
+		SELECT c.name as name, a.name as create_name, b.* 
+		FROM sys_user a, ccm_work_report b, sys_area c, sys_office d 
+		where a.id=b.create_by
+		AND a.office_id=d.id 
+		AND d.area_id=c.id 
+		AND b.id= #{id}
+	</select>
+	
+	<update id="updateByID" >
+		UPDATE ccm_work_report SET
+		<if test="type != null and type != ''">
+			type = #{type}
+		</if>
+		<if test="beginDate != null and beginDate != ''">
+			,begin_date = #{beginDate}
+		</if>
+		<if test="endDate != null and endDate != ''">
+			,end_date = #{endDate}
+		</if>
+		<if test="title != null and title != ''">
+			,title = #{title}
+		</if>
+		<if test="content != null and content != ''">
+			,content = #{content}
+		</if>
+		<if test="place != null and place != ''">
+			,place = #{place}
+		</if>
+		<if test="telephone != null and telephone != ''">
+			,telephone = #{telephone}
+		</if>
+		<if test="eventtypeid != null and eventtypeid != ''">
+			,event_type_id = #{eventtypeid}
+		</if>
+		WHERE id = #{id}
+	</update>
+</mapper>

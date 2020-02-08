@@ -1,0 +1,217 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.arjjs.ccm.modules.ccm.pop.dao.CcmPopHRDao">
+    
+	<sql id="ccmPopHRColumns">
+		a.id AS "id",
+		a.identity AS "identity",
+		a.name AS "name",
+		a.usedname AS "usedname",
+		a.sex AS "sex",
+		a.birthday AS "birthday",
+		a.nation AS "nation",
+		a.censuregister AS "censuregister",
+		a.marriage AS "marriage",
+		a.politics AS "politics",
+		a.education AS "education",
+		a.belief AS "belief",
+		a.professiontype AS "professiontype",
+		a.profession AS "profession",
+		a.serviceplace AS "serviceplace",
+		a.telephone AS "telephone",
+		a.domicile AS "domicile",
+		a.domiciledetail AS "domiciledetail",
+		a.residence AS "residence",
+		a.residencedetail AS "residencedetail",
+		a.uniformlogo AS "uniformlogo",
+		a.account AS "account",
+		a.accountidentity AS "accountidentity",
+		a.accountname AS "accountname",
+		a.accountrelation AS "accountrelation",
+		a.accounttelephone AS "accounttelephone",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag"
+	</sql>
+	
+	<sql id="ccmPopHRJoins">
+	</sql>
+    	<!--区域 没有对应的表-->
+	<sql id="ccmPopHRComJoins">
+		LEFT JOIN sys_area a20 ON a20.id = b.area_com_id
+	</sql>
+	<sql id="ccmPopHRGridJoins">
+		LEFT JOIN sys_area a21 ON a21.id = b.area_grid_id
+	</sql>
+	<select id="get" resultType="CcmPopHR">
+		SELECT 
+			<include refid="ccmPopHRColumns"/>
+		FROM ccm_pop_h_r a
+		<include refid="ccmPopHRJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="CcmPopHR">
+		SELECT 
+			<include refid="ccmPopHRColumns"/>
+		FROM ccm_pop_h_r a
+		<include refid="ccmPopHRJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="identity != null and identity != ''">
+				AND a.identity LIKE '%${identity}%'
+			</if>
+			<if test="name != null and name != ''">
+				AND a.name LIKE 
+					<if test="dbName == 'oracle'">'%'||#{name}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{name}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{name},'%')</if>
+			</if>
+			<if test="beginBirthday != null and endBirthday != null and beginBirthday != '' and endBirthday != ''">
+				AND a.birthday BETWEEN #{beginBirthday} AND #{endBirthday}
+			</if>
+			<if test="nation != null and nation != ''">
+				AND a.nation = #{nation}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="CcmPopHR">
+		SELECT 
+			<include refid="ccmPopHRColumns"/>
+		FROM ccm_pop_h_r a
+		<include refid="ccmPopHRJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO ccm_pop_h_r(
+			id,
+			identity,
+			name,
+			usedname,
+			sex,
+			birthday,
+			nation,
+			censuregister,
+			marriage,
+			politics,
+			education,
+			belief,
+			professiontype,
+			profession,
+			serviceplace,
+			telephone,
+			domicile,
+			domiciledetail,
+			residence,
+			residencedetail,
+			uniformlogo,
+			account,
+			accountidentity,
+			accountname,
+			accountrelation,
+			accounttelephone,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag
+		) VALUES (
+			#{id},
+			#{identity},
+			#{name},
+			#{usedname},
+			#{sex},
+			#{birthday},
+			#{nation},
+			#{censuregister},
+			#{marriage},
+			#{politics},
+			#{education},
+			#{belief},
+			#{professiontype},
+			#{profession},
+			#{serviceplace},
+			#{telephone},
+			#{domicile},
+			#{domiciledetail},
+			#{residence},
+			#{residencedetail},
+			#{uniformlogo},
+			#{account},
+			#{accountidentity},
+			#{accountname},
+			#{accountrelation},
+			#{accounttelephone},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE ccm_pop_h_r SET 	
+			identity = #{identity},
+			name = #{name},
+			usedname = #{usedname},
+			sex = #{sex},
+			birthday = #{birthday},
+			nation = #{nation},
+			censuregister = #{censuregister},
+			marriage = #{marriage},
+			politics = #{politics},
+			education = #{education},
+			belief = #{belief},
+			professiontype = #{professiontype},
+			profession = #{profession},
+			serviceplace = #{serviceplace},
+			telephone = #{telephone},
+			domicile = #{domicile},
+			domiciledetail = #{domiciledetail},
+			residence = #{residence},
+			residencedetail = #{residencedetail},
+			uniformlogo = #{uniformlogo},
+			account = #{account},
+			accountidentity = #{accountidentity},
+			accountname = #{accountname},
+			accountrelation = #{accountrelation},
+			accounttelephone = #{accounttelephone},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE ccm_pop_h_r SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

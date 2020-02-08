@@ -1,0 +1,131 @@
+
+<html>
+<head>
+
+	<title>政府项目采购申请管理</title>
+	<meta name="decorator" content="default"/>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<style type="text/css">
+	body{
+	margin-left: 45px;
+	margin-right: 45px;
+	font-family: Arial Unicode MS;
+	font-size: 10px;
+	}
+	h2{
+		margin:0 auto;
+		text-align: center;
+	}	
+	table {
+	
+    border-spacing: 0;
+    margin: auto;
+	width: 100%;
+	border-collapse: collapse;
+	border: 1px solid #444444;
+	}
+	.table td {
+	height: 40px;	
+}
+  .table .shenpi{
+	height: auto;	
+}
+	#table td{
+	 border: 1px solid black;
+	 word-wrap:break-word; 
+	 max-width: 80%;
+	  word-break:break-all;
+     word-wrap:break-word;
+	}
+	#tabletop { 
+	border: 0px
+	}
+	#tabletop .tabletop {
+	border-top: 0px  ;
+	}		
+	.table .trtop{		
+		text-align:center;
+		font-weight:800 ;
+		
+	}	
+	
+	</style>
+	
+</head>
+<body>
+	
+	<form id="inputForm"  class="form-horizontal" >
+		
+		
+		
+		
+		  <h2>政府项目采购申请单</h2>	  	  	  	
+	    <table  id="tabletop" class="table  ">
+		
+		<tr>
+		<td class="tabletop" colspan="2" >申请人： <u> <span>${createBy.name!''}</span></u>  </td>			
+			<td class="tabletop" colspan="2" > 采购项目部门： <u> <span>${office.name!''} </span></u>      </td>
+			<td  class="tabletop" colspan="2" >申请日期： <u> <span>${applyDate!''} </span></u>  </td>	
+			<td class="tabletop" colspan="2" >项目编号： <u> <span>${applyId!''}</span></u>  </td>			
+		</tr>
+		</table>
+		<table id="table" class="table   table-condensed">
+		<tr>
+			<td class="trtop">经费项目名称</td>
+			<td colspan="5" >${fundingName!''}</td>			
+		</tr>
+		<tr>
+			<td class="trtop">经费卡号</td>
+			<td colspan="2" >${fundingCard!''}</td>
+			<td class="trtop">经费类型</td>
+			<td colspan="2" >${fundingType!''}</td>	
+		</tr>
+		
+		<tr>
+			<td class="trtop">采购项目名称</td>
+			<td colspan="2" >${name!''}</td>		
+			<td class="trtop">采购项目预算</td>
+			<td colspan="2" >${purBudget!''}	万元</td>			
+		</tr>
+		<tr>
+			<td rowspan="2" class="trtop tabletd1">采购项目负责人</td>
+			<td class="tabletd2 trtop">姓名</td>
+			<td class="tabletd3 ">${userPur.name!''}
+					</td>
+			<td rowspan="2" class="trtop tabletd2">项目技术负责人</td>
+			<td class="tabletd5 trtop">姓名</td>
+			<td class="tabletd6 ">${userTech.name!''} 				
+				</td>
+		</tr>
+		<tr>		
+			<td class=" trtop">联系电话</td>
+			<td>${userPur.phone!''}</td>			
+			<td class=" trtop">联系电话/手机/邮箱</td>
+			<td>${userTechphone!''}</td>
+		</tr> 
+		<tr>
+			<td class="trtop">采购项目概括</td>
+			<td class="pingshen" colspan="5"> ${describes!''}</td>
+			
+		</tr>
+		<tr>
+				<td class="trtop" colspan="1" style="width: 20%">是否督办</td>
+				<td colspan="2" style="width: 30%">${isSup!''}</td>
+				<td class="trtop" colspan="1" style="width: 20%">督办人</td>
+				<td colspan="2" style="width: 30%">${plmAct.supExe.name!''}</td>
+			</tr>		
+			<tr>
+				<td class="trtop" colspan="1">督办明细</td>
+				<td colspan="5">${plmAct.supDetail!''}</td>
+			</tr>			
+		     ${actProcIns!''}
+		
+	
+	</table>
+		
+	</form>
+	
+	
+	
+</body>
+</html>

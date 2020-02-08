@@ -1,0 +1,212 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.arjjs.ccm.modules.ccm.book.dao.CcmDatabaseBookDao">
+    
+	<sql id="ccmDatabaseBookColumns">
+		a.id AS "id",
+		a.code AS "code",
+		a.name AS "name",
+		a.parent_id AS "parent.id",
+		a.parent_ids AS "parentIds",
+		a.sort AS "sort",
+		a.type AS "type",
+		a.examine AS "examine",
+		a.is_key_book AS "isKeyBook",
+		a.content AS "content",
+		a.imageurl AS "imageurl",
+		a.remarks AS "remarks",
+		a.create_date AS "createDate",
+		a.create_by AS "createBy.id",
+		a.update_date AS "updateDate",
+		a.update_by AS "updateBy.id",
+		a.del_flag AS "delFlag"
+	</sql>
+	
+	<sql id="ccmDatabaseBookJoins">
+	</sql>
+    
+	<select id="get" resultType="CcmDatabaseBook">
+		SELECT 
+			<include refid="ccmDatabaseBookColumns"/>
+		FROM ccm_database_book a
+		<include refid="ccmDatabaseBookJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="CcmDatabaseBook">
+		SELECT 
+			<include refid="ccmDatabaseBookColumns"/>
+		FROM ccm_database_book a
+		<include refid="ccmDatabaseBookJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="name != null and name != ''">
+				AND a.name LIKE 
+					<if test="dbName == 'oracle'">'%'||#{name}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{name}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{name},'%')</if>
+			</if>
+			<if test="beginCreateDate != null and beginCreateDate != ''">
+				AND a.create_date &gt;= #{beginCreateDate}
+			</if>
+			<if test="endCreateDate != null and endCreateDate != ''">
+				AND a.create_date &lt;= #{endCreateDate}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="com.arjjs.ccm.modules.ccm.book.entity.CcmDatabaseBook">
+		SELECT 
+			<include refid="ccmDatabaseBookColumns"/>
+		FROM ccm_database_book a
+		<include refid="ccmDatabaseBookJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+
+	<select id="findListById" resultType="com.arjjs.ccm.modules.ccm.book.entity.CcmDatabaseBook">
+		SELECT
+		<include refid="ccmDatabaseBookColumns"/>
+		FROM ccm_database_book a
+		<include refid="ccmDatabaseBookJoins"/>
+		<where>
+			a.del_flag = 0 and (a.id = #{id} or a.parent_ids like concat('%',#{id},'%'))
+		</where>
+	</select>
+
+	<insert id="insert">
+		INSERT INTO ccm_database_book(
+			id,
+			code,
+			name,
+			parent_id,
+			parent_ids,
+			sort,
+			type,
+			examine,
+			is_key_book,
+			content,
+			imageurl,
+			remarks,
+			create_date,
+			create_by,
+			update_date,
+			update_by,
+			del_flag
+		) VALUES (
+			#{id},
+			#{code},
+			#{name},
+			#{parent.id},
+			#{parentIds},
+			#{sort},
+			#{type},
+			#{examine},
+			#{isKeyBook},
+			#{content},
+			#{imageurl},
+			#{remarks},
+			#{createDate},
+			#{createBy.id},
+			#{updateDate},
+			#{updateBy.id},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE ccm_database_book SET 	
+			code = #{code},
+			name = #{name},
+			parent_id = #{parent.id},
+			parent_ids = #{parentIds},
+			sort = #{sort},
+			type = #{type},
+			examine = #{examine},
+			is_key_book = #{isKeyBook},
+			content = #{content},
+			imageurl = #{imageurl},
+			remarks = #{remarks},
+			update_date = #{updateDate},
+			update_by = #{updateBy.id}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE ccm_database_book SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+
+
+	<select id="findByParentIdsLike" resultType="com.arjjs.ccm.modules.ccm.book.entity.CcmDatabaseBook">
+		SELECT
+			a.id,
+			a.parent_id AS "parent.id",
+			a.parent_ids
+		FROM ccm_database_book a
+		WHERE a.del_flag = #{DEL_FLAG_NORMAL} AND a.parent_ids LIKE #{parentIds}
+		ORDER BY a.sort
+	</select>
+
+	<select id="findByUserId" resultType="com.arjjs.ccm.modules.ccm.book.entity.CcmDatabaseBook">
+		SELECT DISTINCT
+		<include refid="ccmDatabaseBookColumns"/>
+		FROM ccm_database_book a
+		LEFT JOIN ccm_database_book p ON p.id = a.parent_id
+		JOIN sys_role_menu rm ON rm.menu_id = a.id
+		JOIN sys_role r ON r.id = rm.role_id AND r.useable='1'
+		JOIN sys_user_role ur ON ur.role_id = r.id
+		JOIN sys_user u ON u.id = ur.user_id AND u.id = #{userId}
+		WHERE a.del_flag = #{DEL_FLAG_NORMAL} AND r.del_flag = #{DEL_FLAG_NORMAL} AND u.del_flag = #{DEL_FLAG_NORMAL}
+		ORDER BY a.sort
+	</select>
+
+	<select id="findByUserIdPid" resultType="com.arjjs.ccm.modules.ccm.book.entity.CcmDatabaseBook">
+		SELECT DISTINCT
+		<include refid="ccmDatabaseBookColumns"/>
+		FROM ccm_database_book a
+		LEFT JOIN ccm_database_book p ON p.id = a.parent_id
+		JOIN sys_role r ON r.id = rm.role_id AND r.useable='1'
+		JOIN sys_user_role ur ON ur.role_id = r.id
+		JOIN sys_user u ON u.id = ur.user_id AND u.id = #{userId}
+		WHERE a.del_flag = #{DEL_FLAG_NORMAL} AND r.del_flag = #{DEL_FLAG_NORMAL} AND u.del_flag = #{DEL_FLAG_NORMAL}
+		AND a.parent_ids like
+		<if test="dbName == 'oracle'">'%,'||#{parent.id}||',%')</if>
+		<if test="dbName == 'mssql'">'%,'+#{parent.id}+',%')</if>
+		<if test="dbName == 'mysql'">CONCAT('%,', #{parent.id}, ',%')</if>
+		ORDER BY a.sort
+	</select>
+	<select id="findAllListByPid" resultType="com.arjjs.ccm.modules.ccm.book.entity.CcmDatabaseBook"></select>
+
+	<update id="updateParentIds">
+		UPDATE ccm_database_book SET
+			parent_id = #{parent.id},
+			parent_ids = #{parentIds}
+		WHERE id = #{id}
+	</update>
+
+	<update id="updateSort">
+		UPDATE ccm_database_book SET
+			sort = #{sort}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

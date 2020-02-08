@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.arjjs.ccm.modules.ccm.rest.dao.AlarmNotifyDao">
+
+	<select id="queryAlarmNotifyList"  resultType="com.arjjs.ccm.modules.ccm.rest.entity.AlarmNotify">
+		SELECT
+		t1.id,t1.alarm_id,t1.type,t1.title,t1.content,t1.`status`,t1.create_by,
+		t1.create_date,t1.update_by,t1.update_date,t1.remarks,t1.del_flag,
+		t2.content alarm_content ,t2.create_date alarm_create_date,t2.is_important
+		FROM
+			bph_alarm_notify   t1
+		LEFT JOIN bph_alarm_info   t2 on t1.alarm_id = t2.id
+		WHERE
+			1 = 1
+		<if test="handlePoliceId != null "> and  t1.receive_user_id = #{handlePoliceId}</if>
+		ORDER BY t1.create_date desc
+    </select>
+
+	<select id="selectAlarmNotifyTotal" resultType="int">
+
+			SELECT	count(*)	FROM	bph_alarm_notify  t1 where t1.receive_user_id = #{userId}
+	</select>
+	<select id="selectAlarmNotifyTodoCount" resultType="int">
+
+			SELECT	count(*)	FROM	bph_alarm_notify  as t1 where t1.status = '0'  AND  t1.receive_user_id = #{userId}
+	</select>
+
+	<update id="updateSatausByIdAndUserId" parameterType="String">
+		UPDATE bph_alarm_notify t1 SET t1.`status` = '1' WHERE t1.id = #{id} and  t1.receive_user_id = #{userId}
+	</update>
+</mapper>

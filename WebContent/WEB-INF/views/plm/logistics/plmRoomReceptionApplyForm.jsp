@@ -1,0 +1,171 @@
+<%@ page contentType="text/html;charset=UTF-8" %>
+<%@ include file="/WEB-INF/views/include/taglib.jsp"%>
+<html>
+<head>
+	<title>接待申请管理</title>
+	<meta name="decorator" content="default"/>
+	<link type="text/css" href="${ctxStatic}/common/zztable.css" rel="stylesheet">
+	<%-- <link type="text/css" href="${ctxStatic}/common/zzformtable.css" rel="stylesheet"> --%>
+	<link href="${ctxStatic}/form/css/formTable.css" rel="stylesheet" />
+	<script type="text/javascript" src="${ctxStatic}/plm/room/plmRoomReceptionApplyForm.js"></script> 
+	<script type="text/javascript" src="${ctxStatic}/plm/act/supervise.js"></script> 	
+	<script type="text/javascript">
+		$(document).ready(function() {
+			$("#btnCancel").on("click", function(){
+				$('#flag').val('no');
+				$("#inputForm").attr("action","${ctx}/logistics/plmRoomReceptionApply/apply");
+				$("#inputForm").submit();
+			});
+			$("#btnSubmit").on("click", function(){
+				$("#inputForm").attr("action","${ctx}/logistics/plmRoomReceptionApply/save");
+				$("#inputForm").submit();
+				
+			});
+			$("#btnApply").on("click", function(){
+				confirmx("提交申请后无法修改申请信息",function(){
+					$('#flag').val('yes');
+					$("#inputForm").attr("action","${ctx}/logistics/plmRoomReceptionApply/apply");
+					$("#inputForm").submit();
+				});
+			});			
+		});
+	</script>
+</head>
+<body>
+	<form:form target="_parent" id="inputForm" style="margin: 30px 100px;" modelAttribute="plmRoomApply" action="${ctx}/logistics/plmRoomReceptionApply/save" method="post" class="form-horizontal">
+		<form:hidden path="id"/>
+		<form:hidden path="category"/>
+		<form:hidden path="plmAct.id"/>
+		<form:hidden path="plmAct.title"/>
+		<form:hidden path="plmAct.tableName"/>
+		<form:hidden path="plmAct.tableId"/>
+		<form:hidden path="plmAct.formUrl"/>
+		<form:hidden path="act.taskId"/>
+		<form:hidden path="act.taskName"/>
+		<form:hidden path="act.taskDefKey"/>
+		<form:hidden path="act.procInsId"/>
+		<form:hidden path="act.procDefId"/>
+		<form:hidden id="flag" path="act.flag"/>
+		<sys:message content="${message}"/>		
+		
+		<h2>接待申请单</h2>	
+	    <table id="tabletop" class="table">
+			<tr>
+				<td class="tabletop" colspan="2">申请人:
+					<sys:treeselect id="initiator" name="initiator.id" value="${plmRoomApply.initiator.id}" labelName="" labelValue="${plmRoomApply.initiator.name}"
+					title="用户" url="/sys/office/treeData?type=3" cssClass="" allowClear="true" notAllowSelectParent="true" disabled="disabled"/>
+				</td>
+				<td class="tabletop" colspan="2">所属部门:
+					<form:input path="initiator.office.name" htmlEscape="false"  class="input-xlarge " readonly="true"/>
+				</td>
+				<td class="tabletop" colspan="2">申请编号:
+					<form:input path="code" htmlEscape="false" maxlength="64" class="input-xlarge " readonly="true" placeholder="保存后自动生成"/>
+				</td>
+			</tr>
+		</table>	
+		<table id="table" class="table table-condensed">
+			<tr>
+				<td class="trtop" colspan="2" style="width: 20%">接待名称<font color="red">*</font></td>
+				<td colspan="2" style="width: 30%"><form:input path="subject" htmlEscape="false" maxlength="100" class="input-xlarge required"/></td>
+				<td class="trtop" colspan="2" style="width: 20%">接待类型<font color="red">*</font></td>
+				<td colspan="2" style="width: 30%">
+					<form:select path="type" class="input-xlarge required" >
+						<form:option value="" label=""/>
+						<form:options items="${fns:getDictList('plm_room_rec_apply_type')}" itemLabel="label" itemValue="value" htmlEscape="false"/>
+					</form:select>					
+				</td>
+			</tr>	
+			<tr>
+				<td class="trtop" colspan="2">接待地点<font color="red">*</font></td>
+				<td colspan="6"><form:input type="hidden" id="roomIds" path="room.id" class="input-xlarge required" /></td>
+			</tr>				
+			<tr>
+				<td class="trtop" colspan="2" style="width: 20%">接待主持人</td>
+				<td colspan="2" style="width: 30%">
+					<sys:treeselect id="presider" name="presider.id" value="${plmRoomApply.presider.id}" labelName="" labelValue="${plmRoomApply.presider.name}"
+					title="用户" url="/sys/office/treeData?type=3" cssClass="" allowClear="true" notAllowSelectParent="true" isAll="true"/>
+				</td>
+				<td class="trtop" colspan="2" style="width: 20%">接待记录人</td>
+				<td colspan="2" style="width: 30%">
+					<sys:treeselect id="recorder" name="recorder.id" value="${plmRoomApply.recorder.id}" labelName="" labelValue="${plmRoomApply.recorder.name}"
+					title="用户" url="/sys/office/treeData?type=3" cssClass="" allowClear="true" notAllowSelectParent="true" isAll="true"/>
+				</td>
+			</tr>
+			<tr>
+				<td class="trtop" colspan="2" style="width: 20%">开始时间<font color="red">*</font></td>
+				<td colspan="2" style="width: 30%">
+					<input id="startTime" name="startTime" type="text" readonly="readonly" maxlength="20" class="input-medium Wdate required"
+					value="<fmt:formatDate value="${plmRoomApply.startTime}" pattern="yyyy-MM-dd HH:mm:ss"/>"
+					onclick="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss',isShowClear:false});"/>
+				</td>
+				<td class="trtop" colspan="2" style="width: 20%">结束时间<font color="red">*</font></td>
+				<td colspan="2" style="width: 30%">
+					<input name="endTime" type="text" readonly="readonly" maxlength="20" class="input-medium Wdate required"
+					compareDate="#startTime"
+					value="<fmt:formatDate value="${plmRoomApply.endTime}" pattern="yyyy-MM-dd HH:mm:ss"/>"
+					onclick="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss',isShowClear:false});"/>
+				</td>
+			</tr>							
+			<tr>
+				<td class="trtop" colspan="2">详细内容</td>
+				<td colspan="6"><form:textarea path="details" htmlEscape="false" rows="4" maxlength="1000" class="input-xxlarge "/></td>
+			</tr>
+			<tr>
+				<td class="trtop" colspan="2">附件</td>
+				<td colspan="6">
+					<form:hidden id="files" path="files" htmlEscape="false" maxlength="256" class="input-xlarge"/> 
+					<sys:ckfinder  input="files" type="files" uploadPath="/contract/plmContractSign" selectMultiple="true"/>
+				</td>
+			</tr>
+			<tr>
+				<td class="trtop" colspan="2">参与人员<font color="red">*</font></td>
+				<td colspan="6">
+					<sys:treeselect id="roomAttendee" name="roomAttendeeIds" value="${plmRoomApply.roomAttendeeIds}" labelName="roomAttendeeNames" labelValue="${plmRoomApply.roomAttendeeNames}"
+						title="用户" url="/sys/office/treeData?type=3" cssClass="input-xxlarge required" notAllowSelectParent="true" checked="true" isAll="true"/>
+				</td>
+			</tr>		
+			<tr>
+				<td class="trtop" colspan="2" style="width: 20%">是否督办</td>
+				<td id="isSubTd" colspan="6">
+					<form:radiobuttons path="plmAct.isSup" items="${fns:getDictList('yes_no')}" itemLabel="label" itemValue="value" htmlEscape="false" class=""/>
+				</td>
+				<td class="trtop isSup" colspan="2" style="width: 20%">督办人</td>
+				<td class="isSup" colspan="2" style="width: 30%">
+					<sys:treeselect id="supExe" name="plmAct.supExe.id" value="${plmRoomApply.plmAct.supExe.id}" labelName="plmAct.supExe.name" labelValue="${plmRoomApply.plmAct.supExe.name}"
+					title="用户" url="/sys/office/treeData?type=3" cssClass="" allowClear="true" notAllowSelectParent="true" isAll="true"/>
+				</td>
+			</tr>		
+			<tr class="isSup">
+				<td class="trtop" colspan="2">督办明细</td>
+				<td colspan="6">
+					<form:textarea path="plmAct.supDetail" htmlEscape="false" rows="4" maxlength="256" class="input-xxlarge "/>
+				</td>
+			</tr>			
+			<act:histoicTable procInsId="${plmRoomApply.procInsId}" colspan="6" titleColspan="2"/>
+			<c:if test="${not empty plmRoomApply.procInsId}">
+				<tr>
+					<td class="trtop" colspan="2">修改备注</td>
+					<td colspan="6">
+					   <form:textarea path="act.comment" htmlEscape="false" rows="5" maxlength="255" class="input-xxlarge "/>
+					</td>				
+				</tr>			
+			</c:if>
+		</table>			
+		<div class="form-actions">
+			<a id="btnApply" class="btn btn-primary" href="javascript:;"><i class="icon-print"></i>提交申请</a>&nbsp;
+			<c:if test="${ empty plmRoomApply.procInsId}">
+			<a id="btnSubmit" class="btn btn-primary" href="javascript:;"><i class="icon-ok"></i>保存</a>&nbsp;
+			</c:if>
+			<c:if test="${not empty plmRoomApply.procInsId}">
+				<a id="btnCancel" class="btn btn-primary" href="javascript:;"><i class="icon-minus-sign"></i>作废</a>&nbsp;
+			</c:if>
+			<c:if test="${not empty plmEquApply.id}">
+			<a id="btnCancel" class="btn" href="javascript:;" onclick="history.go(-1)" ><i class="icon-reply"></i>返回</a>
+			</c:if>
+			<c:if test="${empty plmEquApply.id}">
+			<a id="btnCancelf" class="btn btn-primary" href="javascript:;" onclick="parent.layer.closeAll();" ><i class="icon-remove-circle"></i>关闭</a>
+			</c:if>
+		</div>
+	</form:form>
+</body>
+</html>

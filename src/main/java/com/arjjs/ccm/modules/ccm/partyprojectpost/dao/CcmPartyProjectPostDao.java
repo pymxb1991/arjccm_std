@@ -1,0 +1,29 @@
+/**
+ * Copyright &copy; 2012-2016 <a href="https://github.com/thinkgem/jeesite">JeeSite</a> All rights reserved.
+ */
+package com.arjjs.ccm.modules.ccm.partyprojectpost.dao;
+
+import com.arjjs.ccm.common.persistence.CrudDao;
+import com.arjjs.ccm.common.persistence.annotation.MyBatisDao;
+import com.arjjs.ccm.modules.ccm.partyprojectpost.entity.CcmPartyProjectPost;
+import org.apache.ibatis.annotations.Param;
+
+import java.util.List;
+
+/**
+ * 认领功能DAO接口
+ * @author cby
+ * @version 2019-08-15
+ */
+@MyBatisDao
+public interface CcmPartyProjectPostDao extends CrudDao<CcmPartyProjectPost> {
+
+    /**
+     *  查询 服务项目，岗位认领数量
+     * @param id
+     * @return
+     */
+    int countProPostNum(@Param("proPost") String proPost);
+
+    int batchSave(List<CcmPartyProjectPost> ccmPartyProjectPostList);
+}

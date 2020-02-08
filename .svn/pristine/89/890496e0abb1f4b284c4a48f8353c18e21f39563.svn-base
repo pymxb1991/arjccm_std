@@ -1,0 +1,214 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.arjjs.ccm.modules.ccm.education.dao.CcmPlaceEducationDao">
+    
+	<sql id="ccmPlaceEducationColumns">
+		a.id AS "id",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.type AS "type",
+		a.school_code AS "schoolCode",
+		a.school_net AS "schoolNet",
+		a.school_rank AS "schoolRank",
+		a.school_type AS "schoolType",
+		a.school_phone AS "schoolPhone",
+		a.fax_number AS "faxNumber",
+		a.manager_name AS "managerName",
+		a.manager_phone_number AS "managerPhoneNumber",
+		a.graduate_school_phone AS "graduateSchoolPhone",
+		a.worker_number AS "workerNumber",
+		a.graduate_school_nature AS "graduateSchoolNature",
+		a.museum_name AS "museumName",
+		a.is_free AS "isFree",
+		a.manager_number AS "managerNumber",
+		a.base_place_id AS "basePlaceId",
+		a.del_flag AS "delFlag"
+	</sql>
+	<sql id="ccmPlaceEducationAllColumns">
+		a.id AS "id",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.type AS "type",
+		a.school_code AS "schoolCode",
+		a.school_net AS "schoolNet",
+		a.school_rank AS "schoolRank",
+		a.school_type AS "schoolType",
+		a.school_phone AS "schoolPhone",
+		a.fax_number AS "faxNumber",
+		a.manager_name AS "managerName",
+		a.manager_phone_number AS "managerPhoneNumber",
+		a.graduate_school_phone AS "graduateSchoolPhone",
+		a.worker_number AS "workerNumber",
+		a.graduate_school_nature AS "graduateSchoolNature",
+		a.museum_name AS "museumName",
+		a.is_free AS "isFree",
+		a.manager_number AS "managerNumber",
+		a.base_place_id AS "basePlaceId",
+		a.del_flag AS "delFlag",
+		b.place_name AS "placeName",
+		b.leader_name AS "leaderName",
+		b.leader_id_card  AS"leaderIdCard",
+		b.leader_contact  AS"leaderContact",
+		b.relevance_org  AS"relevanceOrg"
+	</sql>
+	
+	<sql id="ccmPlaceEducationJoins">
+	</sql>
+    
+	<select id="get" resultType="CcmPlaceEducation">
+		SELECT 
+			<include refid="ccmPlaceEducationAllColumns"/>
+		FROM ccm_place_education a LEFT JOIN ccm_base_place b ON a.base_place_id =	b.id
+		<include refid="ccmPlaceEducationJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="CcmPlaceEducation">
+		SELECT 
+			<include refid="ccmPlaceEducationAllColumns"/>
+		FROM ccm_place_education a  LEFT JOIN ccm_base_place b ON a.base_place_id =	b.id
+		<include refid="ccmPlaceEducationJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="placeName != null and placeName != ''">
+				AND b.place_name LIKE
+				<if test="dbName == 'oracle'">'%'||#{placeName}||'%'</if>
+				<if test="dbName == 'mssql'">'%'+#{placeName}+'%'</if>
+				<if test="dbName == 'mysql'">concat('%',#{placeName},'%')</if>
+			</if>
+			<if test="leaderName != null and leaderName != ''">
+				AND b.leader_name LIKE
+				<if test="dbName == 'oracle'">'%'||#{leaderName}||'%'</if>
+				<if test="dbName == 'mssql'">'%'+#{leaderName}+'%'</if>
+				<if test="dbName == 'mysql'">concat('%',#{leaderName},'%')</if> 
+			</if>
+			<if test="leaderContact != null and leaderContact != ''">
+				AND b.leader_contact LIKE
+				<if test="dbName == 'oracle'">'%'||#{leaderContact}||'%'</if>
+				<if test="dbName == 'mssql'">'%'+#{leaderContact}+'%'</if>
+				<if test="dbName == 'mysql'">concat('%',#{leaderContact},'%')</if>
+			</if>
+			<if test="beginCreateDate != null and endCreateDate != null and beginCreateDate != '' and endCreateDate != ''">
+				AND a.create_date BETWEEN #{beginCreateDate} AND #{endCreateDate}
+			</if>
+			<if test="type != null and type != ''">
+				AND a.type = #{type}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="CcmPlaceEducation">
+		SELECT 
+			<include refid="ccmPlaceEducationAllColumns"/>
+		FROM ccm_place_education a LEFT JOIN ccm_base_place b ON a.base_place_id =	b.id
+		<include refid="ccmPlaceEducationJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO ccm_place_education(
+			id,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			type,
+			school_code,
+			school_net,
+			school_rank,
+			school_type,
+			school_phone,
+			fax_number,
+			manager_name,
+			manager_phone_number,
+			graduate_school_phone,
+			worker_number,
+			graduate_school_nature,
+			museum_name,
+			is_free,
+			manager_number,
+			base_place_id,
+			del_flag
+		) VALUES (
+			#{id},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{type},
+			#{schoolCode},
+			#{schoolNet},
+			#{schoolRank},
+			#{schoolType},
+			#{schoolPhone},
+			#{faxNumber},
+			#{managerName},
+			#{managerPhoneNumber},
+			#{graduateSchoolPhone},
+			#{workerNumber},
+			#{graduateSchoolNature},
+			#{museumName},
+			#{isFree},
+			#{managerNumber},
+			#{basePlaceId},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE ccm_place_education SET 	
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks},
+			type = #{type},
+			school_code = #{schoolCode},
+			school_net = #{schoolNet},
+			school_rank = #{schoolRank},
+			school_type = #{schoolType},
+			school_phone = #{schoolPhone},
+			fax_number = #{faxNumber},
+			manager_name = #{managerName},
+			manager_phone_number = #{managerPhoneNumber},
+			graduate_school_phone = #{graduateSchoolPhone},
+			worker_number = #{workerNumber},
+			graduate_school_nature = #{graduateSchoolNature},
+			museum_name = #{museumName},
+			is_free = #{isFree},
+			manager_number = #{managerNumber},
+			base_place_id = #{basePlaceId}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE ccm_place_education SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

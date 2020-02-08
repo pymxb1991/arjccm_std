@@ -1,0 +1,137 @@
+/**
+ * Copyright &copy; 2012-2016 <a href="https://github.com/thinkgem/jeesite">JeeSite</a> All rights reserved.
+ */
+package com.arjjs.ccm.modules.ccm.event.web.preview;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.apache.shiro.authz.annotation.RequiresPermissions;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
+import com.arjjs.ccm.common.config.Global;
+import com.arjjs.ccm.common.persistence.Page;
+import com.arjjs.ccm.common.web.BaseController;
+import com.arjjs.ccm.modules.ccm.event.entity.preview.CcmEventIncidentPreview;
+import com.arjjs.ccm.modules.ccm.event.service.preview.CcmEventIncidentPreviewService;
+import com.arjjs.ccm.common.utils.StringUtils;
+
+/**
+ * 事件预处理Controller
+ * 
+ * @author lgh
+ * @version 2019-05-06
+ */
+@Controller
+@RequestMapping(value = "${adminPath}/preview/ccmEventIncidentPreview")
+public class CcmEventIncidentPreviewController extends BaseController {
+
+	@Autowired
+	private CcmEventIncidentPreviewService ccmEventIncidentPreviewService;
+
+	@ModelAttribute
+	public CcmEventIncidentPreview get(@RequestParam(required = false) String id) {
+		CcmEventIncidentPreview entity = null;
+		if (StringUtils.isNotBlank(id)) {
+			entity = ccmEventIncidentPreviewService.get(id);
+		}
+		if (entity == null) {
+			entity = new CcmEventIncidentPreview();
+		}
+		return entity;
+	}
+
+	@RequiresPermissions("preview:ccmEventIncidentPreview:view")
+	@RequestMapping(value = { "{reportType}" })
+	public String list(CcmEventIncidentPreview ccmEventIncidentPreview, HttpServletRequest request,
+			HttpServletResponse response, Model model, @PathVariable("reportType") String reportType,
+			@RequestParam(required = false) String status) {
+		ccmEventIncidentPreview.setStatus(status);
+		Page<CcmEventIncidentPreview> page = ccmEventIncidentPreviewService
+				.findPage(new Page<CcmEventIncidentPreview>(request, response), ccmEventIncidentPreview);
+		model.addAttribute("page", page);
+		// App上报页面
+		if ("1".equals(reportType)) {
+			return "ccm/event/preview/ccmEventIncidentPreviewList";
+		}
+		// 短信预处理页面
+		if ("2".equals(reportType)) {
+			return "ccm/event/preview/ccmEventIncidentPreviewList";
+		}
+		// 热线预处理
+		if ("3".equals(reportType)) {
+			return "ccm/event/preview/ccmEventIncidentPreviewList";
+		}
+		// 网站预处理
+		if ("4".equals(reportType)) {
+			return "ccm/event/preview/ccmEventIncidentPreviewList";
+		}
+		return "ccm/event/preview/ccmEventIncidentPreviewList";
+	}
+
+	@RequiresPermissions("preview:ccmEventIncidentPreview:view")
+	@RequestMapping(value = "form/{reportType}")
+	public String form(CcmEventIncidentPreview ccmEventIncidentPreview, Model model,
+			@PathVariable("reportType") String reportType) {
+		model.addAttribute("ccmEventIncidentPreview", ccmEventIncidentPreview);
+		// App上报页面
+		if ("1".equals(reportType)) {
+			return "ccm/event/preview/ccmEventIncidentPreviewForm";
+		}
+		// 短信预处理页面
+		if ("2".equals(reportType)) {
+			return "ccm/event/preview/ccmEventIncidentPreviewForm";
+		}
+		// 热线预处理
+		if ("3".equals(reportType)) {
+			return "ccm/event/preview/ccmEventIncidentPreviewForm";
+		} // 网站预处理
+		if ("4".equals(reportType)) {
+			return "ccm/event/preview/ccmEventIncidentPreviewForm";
+		}
+		return "ccm/event/preview/ccmEventIncidentPreviewForm";
+	}
+
+	@RequiresPermissions("preview:ccmEventIncidentPreview:edit")
+	@RequestMapping(value = "save")
+	public String save(CcmEventIncidentPreview ccmEventIncidentPreview, Model model,
+			RedirectAttributes redirectAttributes) {
+		if (!beanValidator(model, ccmEventIncidentPreview)) {
+			return form(ccmEventIncidentPreview, model, ccmEventIncidentPreview.getReportType());
+		}
+		ccmEventIncidentPreviewService.save(ccmEventIncidentPreview);
+		addMessage(redirectAttributes, "保存预处理事件成功");
+		return "redirect:" + Global.getAdminPath() + "preview/ccmEventIncidentPreview/?repage";
+	}
+	
+	@RequiresPermissions("preview:ccmEventIncidentPreview:edit")
+	@RequestMapping(value = "pass")
+	public void IsPass(CcmEventIncidentPreview ccmEventIncidentPreview, Model model,
+			RedirectAttributes redirectAttributes, @RequestParam(required = true) String status) {
+		/*
+		 * if (!beanValidator(model, ccmEventIncidentPreview)) { return
+		 * form(ccmEventIncidentPreview, model,
+		 * ccmEventIncidentPreview.getReportType()); }
+		 */
+		ccmEventIncidentPreview.setStatus(status);
+		ccmEventIncidentPreviewService.save(ccmEventIncidentPreview);
+		addMessage(redirectAttributes, "事件处理成功");
+		// return "redirect:" + Global.getAdminPath() + "preview/ccmEventIncidentPreview/?repage";
+	}
+
+	@RequiresPermissions("preview:ccmEventIncidentPreview:edit")
+	@RequestMapping(value = "delete")
+	public String delete(CcmEventIncidentPreview ccmEventIncidentPreview, RedirectAttributes redirectAttributes) {
+		ccmEventIncidentPreviewService.delete(ccmEventIncidentPreview);
+		addMessage(redirectAttributes, "删除预处理事件成功");
+		return "redirect:" + Global.getAdminPath() + "preview/ccmEventIncidentPreview/?repage";
+	}
+
+}

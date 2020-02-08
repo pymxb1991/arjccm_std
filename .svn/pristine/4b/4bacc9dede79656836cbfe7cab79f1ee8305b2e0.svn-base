@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.arjjs.ccm.modules.ccm.partyteam.dao.CcmPartyVolunteerTeamDao">
+    
+	<sql id="ccmPartyVolunteerTeamColumns">
+		a.id AS "id",
+		a.name AS "name",
+		a.community AS "community.id",
+		a3.name AS "community.name",
+		a.super_team AS "superTeam",
+		a.found_time AS "foundTime",
+		a.user_id AS "user.id",
+		a.telphone AS "telphone",
+		a.address AS "address",
+		a.server_matters AS "serverMatters",
+		a.server_deeds AS "serverDeeds",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag"
+	</sql>
+	
+	<sql id="ccmPartyVolunteerTeamJoins">
+		LEFT JOIN sys_area a3 ON a3.id = a.community
+	</sql>
+    
+	<select id="get" resultType="CcmPartyVolunteerTeam">
+		SELECT 
+			<include refid="ccmPartyVolunteerTeamColumns"/>
+		FROM ccm_party_volunteer_team a
+		<include refid="ccmPartyVolunteerTeamJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="CcmPartyVolunteerTeam">
+		SELECT 
+			<include refid="ccmPartyVolunteerTeamColumns"/>
+		FROM ccm_party_volunteer_team a
+		<include refid="ccmPartyVolunteerTeamJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="name != null and name != ''">
+				AND a.name LIKE 
+					<if test="dbName == 'oracle'">'%'||#{name}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{name}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{name},'%')</if>
+			</if>
+			<if test="foundTime != null and foundTime != ''">
+				AND a.found_time = #{foundTime}
+			</if>
+			<if test="user != null and user.id != null and user.id != ''">
+				AND a.user_id LIKE 
+					<if test="dbName == 'oracle'">'%'||#{user.id}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{user.id}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{user.id},'%')</if>
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="CcmPartyVolunteerTeam">
+		SELECT 
+			<include refid="ccmPartyVolunteerTeamColumns"/>
+		FROM ccm_party_volunteer_team a
+		<include refid="ccmPartyVolunteerTeamJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO ccm_party_volunteer_team(
+			id,
+			name,
+			community,
+			super_team,
+			found_time,
+			user_id,
+			telphone,
+			address,
+			server_matters,
+			server_deeds,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag
+		) VALUES (
+			#{id},
+			#{name},
+			#{community.id},
+			#{superTeam},
+			#{foundTime},
+			#{user.id},
+			#{telphone},
+			#{address},
+			#{serverMatters},
+			#{serverDeeds},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE ccm_party_volunteer_team SET 	
+			name = #{name},
+			community = #{community.id},
+			super_team = #{superTeam},
+			found_time = #{foundTime},
+			user_id = #{user.id},
+			telphone = #{telphone},
+			address = #{address},
+			server_matters = #{serverMatters},
+			server_deeds = #{serverDeeds},
+			create_by = #{createBy.id},
+			create_date = #{createDate},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE ccm_party_volunteer_team SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

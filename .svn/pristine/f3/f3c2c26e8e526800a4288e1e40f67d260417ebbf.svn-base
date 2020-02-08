@@ -1,0 +1,205 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.arjjs.ccm.modules.ccm.religion.dao.CcmPlaceReligionDao">
+    
+	<sql id="ccmPlaceReligionColumns">
+		a.id AS "id",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.type AS "type",
+		a.religion_type AS "religionType",
+		a.base_place_id AS "basePlaceId",
+		a.active_address AS "activeAddress",
+		a.normal_people_number AS "normalPeopleNumber",
+		a.festival_name AS "festivalName",
+		a.festival_peo_number AS "festivalPeoNumber",
+		a.safe_status AS "safeStatus",
+		a.is_monitor AS "isMonitor",
+		a.is_pass AS "isPass",
+		a.is_annihilator AS "isAnnihilator",
+		a.is_sign AS "isSign",
+		a.is_lighting AS "isLighting",
+		a.del_flag AS "delFlag",
+		s.name AS "ccmBasePlace.area.name"
+	</sql>
+	<sql id="ccmPlaceReligionAllColumns">
+		a.id AS "id",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.type AS "type",
+		a.religion_type AS "religionType",
+		a.base_place_id AS "basePlaceId",
+		a.active_address AS "activeAddress",
+		a.normal_people_number AS "normalPeopleNumber",
+		a.festival_name AS "festivalName",
+		a.festival_peo_number AS "festivalPeoNumber",
+		a.safe_status AS "safeStatus",
+		a.is_monitor AS "isMonitor",
+		a.is_pass AS "isPass",
+		a.is_annihilator AS "isAnnihilator",
+		a.is_sign AS "isSign",
+		a.is_lighting AS "isLighting",
+		a.del_flag AS "delFlag",
+		b.place_name AS "placeName",
+		b.leader_name AS "leaderName",
+		b.leader_id_card  AS"leaderIdCard",
+		b.leader_contact  AS"leaderContact",
+		b.relevance_org  AS"relevanceOrg"
+	</sql>
+	
+	<sql id="ccmPlaceReligionJoins">
+	LEFT JOIN sys_area s ON s.id = b.administrative_division
+	</sql>
+    
+	<select id="get" resultType="CcmPlaceReligion">
+		SELECT 
+			<include refid="ccmPlaceReligionAllColumns"/>
+		FROM ccm_place_religion a
+		LEFT JOIN ccm_base_place b ON a.base_place_id = b.id
+		<include refid="ccmPlaceReligionJoins"/>
+		WHERE a.id = #{id} OR a.base_place_id = #{basePlaceId}
+	</select>
+	
+	<select id="findList" resultType="CcmPlaceReligion">
+		SELECT 
+			<include refid="ccmPlaceReligionAllColumns"/>
+		FROM ccm_place_religion a LEFT JOIN ccm_base_place b ON a.base_place_id = b.id
+		<include refid="ccmPlaceReligionJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="placeName != null and placeName != ''">
+				AND b.place_name LIKE
+				<if test="dbName == 'oracle'">'%'||#{placeName}||'%'</if>
+				<if test="dbName == 'mssql'">'%'+#{placeName}+'%'</if>
+				<if test="dbName == 'mysql'">concat('%',#{placeName},'%')</if>
+			</if>
+			<if test="leaderName != null and leaderName != ''">
+				AND b.leader_name LIKE
+				<if test="dbName == 'oracle'">'%'||#{leaderName}||'%'</if>
+				<if test="dbName == 'mssql'">'%'+#{leaderName}+'%'</if>
+				<if test="dbName == 'mysql'">concat('%',#{leaderName},'%')</if>
+			</if>
+			<if test="leaderContact != null and leaderContact != ''">
+				AND b.leader_contact LIKE
+				<if test="dbName == 'oracle'">'%'||#{leaderContact}||'%'</if>
+				<if test="dbName == 'mssql'">'%'+#{leaderContact}+'%'</if>
+				<if test="dbName == 'mysql'">concat('%',#{leaderContact},'%')</if>
+			</if>
+			<if test="id != null and id != ''">
+				AND a.id = #{id}
+			</if>
+			<if test="type != null and type != ''">
+				AND a.type = #{type}
+			</if>
+			<if test="beginCreateDate != null and endCreateDate != null and beginCreateDate != '' and endCreateDate != ''">
+				AND a.create_date BETWEEN #{beginCreateDate} AND #{endCreateDate}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="CcmPlaceReligion">
+		SELECT 
+			<include refid="ccmPlaceReligionColumns"/>
+		FROM ccm_place_religion a
+		<include refid="ccmPlaceReligionJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO ccm_place_religion(
+			id,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			type,
+			religion_type,
+			base_place_id,
+			active_address,
+			normal_people_number,
+			festival_name,
+			festival_peo_number,
+			safe_status,
+		    is_monitor,
+		    is_pass,
+		    is_annihilator,
+		    is_sign,
+		    is_lighting,
+			del_flag
+		) VALUES (
+			#{id},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{type},
+			#{religionType},
+			#{basePlaceId},
+			#{activeAddress},
+			#{normalPeopleNumber},
+			#{festivalName},
+			#{festivalPeoNumber},
+			#{safeStatus},
+			#{isMonitor},
+			#{isPass},
+			#{isAnnihilator},
+			#{isSign},
+			#{isLighting},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE ccm_place_religion SET 	
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks},
+			type = #{type},
+			religion_type = #{religionType},
+			base_place_id = #{basePlaceId},
+			active_address = #{activeAddress},
+			normal_people_number = #{normalPeopleNumber},
+			festival_name = #{festivalName},
+			festival_peo_number = #{festivalPeoNumber},
+			safe_status = #{safeStatus},
+			is_monitor = #{isMonitor},
+			is_pass = #{isPass},
+			is_annihilator = #{isAnnihilator},
+			is_sign = #{isSign},
+			is_lighting = #{isLighting}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE ccm_place_religion SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

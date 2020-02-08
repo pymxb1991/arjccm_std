@@ -1,0 +1,294 @@
+
+ p.notice {
+    color: #fff;
+    text-align: left;
+    height: 55%;
+    overflow: hidden;
+     text-indent: 2em;
+     display: -webkit-box;
+     -webkit-line-clamp: 3;
+     -webkit-box-orient: vertical;
+}
+#DutyUL .span6{
+    padding-left: 5%;
+}
+#DutyUL  i {
+    display: block;
+    width: 10px;
+    height: 10px;
+    background-color: #1aa0ee;
+    float: left;
+    margin-top: 4px;
+    margin-right: 10px;
+}
+#DutyUL  b {
+   font-weight: normal;
+}
+.echartsAlarm-value  li {
+    float: none;
+    width: 114px;
+    background-color: rgba(0,0,0,0.3);
+    border-radius: 4px;
+    margin-top: 10px;
+    height: 28px;
+    line-height: 28px;
+    overflow: hidden;
+    margin-left: 14px;
+}
+
+.alarm-value{
+    margin-left: 10%;
+}
+ .alarm-name {
+    display: inline-block;
+    width: 60px;
+    text-align: center;
+}
+ .alarm-name1 {
+    background: #aa4644;
+}
+.alarm-name2 {
+    background: #cc7b33;
+}
+.alarm-name3 {
+    background: #89a54e;
+}
+.alarm-name4 {
+    background: #18a73e;
+}
+
+/* #echartsAlarm {
+    width: 100%;
+    height: 200px;
+} */
+.echartsAlarm-tab  li {
+    width: 25%;
+    float: left;
+    line-height: 28px;
+    text-align: center;
+    cursor: pointer;
+}
+.echartsAlarm-tab > li.active, .echartsAlarm-tab > li:hover {
+    background: url('../../tc2.png') no-repeat center;
+    background-size: 100% 100%;
+    background-color: rgba(45,84,159,0.3);
+}
+
+ #alarmTable {
+     margin-top: 12px;
+ }
+.results{
+    margin-top: 5%;
+}
+.results .span4{
+    text-align: center;
+}
+.list_lh {
+    height: 104%;
+}
+#AlarmUL {
+    width: 100%;
+    margin: 0 auto;
+}
+#AlarmUL li {
+    padding: 1% 0;
+    word-break: keep-all;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    cursor: pointer;
+}
+.alarm1 b {
+    color: #aa4644;
+    font-weight: normal;
+}
+.alarm2 b {
+    color: #cc7b33;
+    font-weight: normal;
+}
+.alarm3 b{
+    color: #89a54e;
+    font-weight: normal;
+}
+ .alarm4 b{
+     color: #18a73e;
+     font-weight: normal;
+ }
+
+@media (max-width: 1366px) {
+    p.notice {
+        height: 47%;
+    }
+    #DutyUL .span6 {
+         padding-left: 0%;
+        min-height: 24px;
+    }
+
+    #echartsAlarm{
+        height:140px
+    }
+    .echartsAlarm-value li {
+        height: 20px;
+        line-height: 20px;
+        width: 91px;
+    }
+    .alarm-name {
+        width: 50px;
+    }
+    #alarmTable td {
+        line-height: 18px;
+    }
+    .echartsAlarm-tab li {
+        line-height: 20px;
+    }
+    #alarmTable {
+        margin-top: 5px;
+    }
+}
+@media (min-width: 1367px) and (max-width:1440px) {
+
+}
+@media (min-width: 1441px)  {
+
+}
+/* 安顺新加 */
+.container-fluid {
+    padding-right: 15px;
+    padding-left: 15px;
+    *zoom: 1;
+}
+ul li {
+    list-style: none;
+    line-height: 28px;
+}
+.header {
+    color: #fff;
+    font-size: 40px;
+    font-weight: bold;
+    text-align: center;
+    width: 100%;
+    padding-top: 10px;
+    position: relative;
+}
+.header-logo {
+    width: 1560px;
+    height: 54px;
+    margin: auto;
+}
+.header h5 {
+    background: url(../images/headerLogo1.png) no-repeat center;
+    background-size: 100% 100%;
+    line-height: 21px;
+    letter-spacing: 10px;
+    line-height: 40px;
+    letter-spacing: 8px;
+    font-size: 26px;
+    font-family: Helvetica, Georgia, Arial, sans-serif, ºÚÌå;
+    font-weight: 500;
+        text-align: left;
+    padding-left: 99px;
+}
+.header .Logout {
+    margin-right: 0;
+    float: right;
+
+}
+
+.header .Logout span {
+    background: url(../images/header-right.png) no-repeat center;
+    background-size: 100% 100%;
+    float: left;
+    margin-top:14px;
+}
+.height33,.height66{
+	position: relative;
+	padding: 8px 0;
+}
+.common-header {
+    display: inline-block;
+    padding: 5px 30px;
+    border: 1px solid #0343a3;
+    transform: skew(-20deg);
+    background: #0343a3;
+    color: #fff;
+    font-weight: bold;
+    position: absolute;
+    z-index: 9999;
+    top: -5px;
+    left: 80px;
+}
+.common-header div {
+    transform: skew(20deg);
+    white-space: nowrap;
+    font-size: 15px;
+}
+.common-pading{
+	padding: 20px 10px 5px 10px;
+	height:90%;
+}
+.shadow{
+	    border: 1px solid #10559a;
+	    box-shadow:none;
+}
+/* .header-nav{
+ position: absolute;
+ top: 37px;
+ left: 13%;
+}
+.header-nav1{
+ position: absolute;
+ top: 37px;
+ right: 11.5%;
+} */
+.header-nav{
+ position: absolute;
+ top: 37px;
+ left: 35%;
+}
+.header-nav1 {
+    position: absolute;
+    top: 37px;
+    right: 32%;
+}
+.header-nav ul li,.header-nav1 ul li{
+float: left;
+background: url(../images/weixuan.png);
+background-size: 100% 100%;
+font-size: 15px;
+padding: 2px 5px;
+margin: 0px 5px;
+cursor: pointer;
+}
+.header-nav ul li.active,.header-nav1 ul li.active{
+background: url(../images/xuanzhong.png);
+background-size: 100% 100%;
+}
+.height33 {
+    height: 32%;
+}
+.row-fluid .span1{
+	    width: 8.33333333%;
+	 position: relative;
+    min-height: 1px;
+    padding-right: 15px;
+    padding-left: 15px;
+        margin-left: 0%;
+}
+.row-fluid .span10,.row-fluid .span11{
+	width: 83.33333333%;
+	 position: relative;
+    min-height: 1px;
+    padding-right: 15px;
+    padding-left: 15px;
+    margin-left: 0%;
+}
+.row-fluid .span11{
+    width: 91.66666667%;
+}
+.header a {
+    font-size: 15px;
+    font-weight: normal;
+}
+.list_lh {
+    height: 100%;
+}

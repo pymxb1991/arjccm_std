@@ -1,0 +1,123 @@
+<%@ page contentType="text/html;charset=UTF-8" %>
+<%@ include file="/WEB-INF/views/include/taglib.jsp"%>
+<html>
+<head>
+	<title>群防群治队伍管理</title>
+	<meta name="decorator" content="default"/>
+	<script type="text/javascript">
+		$(document).ready(function() {
+			$("#btnSubmit").on("click" ,function(){
+				$("#searchForm").submit();
+			})
+		});
+		function page(n,s){
+			$("#pageNo").val(n);
+			$("#pageSize").val(s);
+			$("#searchForm").submit();
+        	return false;
+        }
+	</script>
+</head>
+<body>
+	<ul class="nav nav-tabs">
+		<li class="active"><a href="${ctx}/org/ccmOrgGropprevent/">数据列表</a></li>
+		<%-- <shiro:hasPermission name="org:ccmOrgGropprevent:edit"><li><a href="${ctx}/org/ccmOrgGropprevent/form">数据添加</a></li></shiro:hasPermission> --%>
+	</ul>
+	<form:form id="searchForm" modelAttribute="ccmOrgGropprevent" action="${ctx}/org/ccmOrgGropprevent/" method="post" class="breadcrumb form-search">
+		<input id="pageNo" name="pageNo" type="hidden" value="${page.pageNo}"/>
+		<input id="pageSize" name="pageSize" type="hidden" value="${page.pageSize}"/>
+		<ul class="ul-form">
+			<li><label>姓名：</label>
+				<form:input path="name" htmlEscape="false" maxlength="50" class="input-medium"/>
+			</li>
+			<li><label>组织名称：</label>
+				<form:select path="orgpreventId.id" class="input-medium">
+					<form:option value="" label="全部"/>
+					<form:options items="${ccmOrgOrgpreventList}" itemLabel="comName" itemValue="id" htmlEscape="false"/>
+				</form:select>
+			</li>
+			<li><label>性别：</label>
+				<form:select path="sex" class="input-medium">
+					<form:option value="" label="全部"/>
+					<form:options items="${fns:getDictList('sex')}" itemLabel="label" itemValue="value" htmlEscape="false"/>
+				</form:select>
+			</li>
+			<li><label>学历：</label>
+				<form:select path="education" class="input-medium">
+					<form:option value="" label="全部"/>
+					<form:options items="${fns:getDictList('sys_ccm_degree')}" itemLabel="label" itemValue="value" htmlEscape="false"/>
+				</form:select>
+			</li>
+			<li><label>出生日期：</label>
+                <input name="beginBirthday" type="text" readonly="readonly" maxlength="20" class="input-medium Wdate"
+                    value="<fmt:formatDate value="${ccmOrgGropprevent.beginBirthday}" pattern="yyyy-MM-dd"/>"
+                    onclick="WdatePicker({dateFmt:'yyyy-MM-dd',isShowClear:false});"/> - 
+                <input name="endBirthday" type="text" readonly="readonly" maxlength="20" class="input-medium Wdate"
+                    value="<fmt:formatDate value="${ccmOrgGropprevent.endBirthday}" pattern="yyyy-MM-dd"/>"
+                    onclick="WdatePicker({dateFmt:'yyyy-MM-dd',isShowClear:false});"/>
+            </li>
+            <li class="btns">
+            <a onclick="parent.parent.LayerDialog('${ctx}/org/ccmOrgGropprevent/form', '添加', '1330px', '600px')"
+				class="btn btn-success"><i class="icon-plus"></i> 添加</a>
+			</li>
+			<!-- <li class="btns"><input id="btnSubmit" class="btn btn-primary" type="submit" value="查询"/></li> -->
+			<li class="btns">
+			<a href="javascript:;" id="btnSubmit" class="btn btn-primary">
+                <i class="icon-search"></i> 查询 </a>
+			</li>
+			<li class="clearfix"></li>
+		</ul>
+	</form:form>
+	<sys:message content="${message}"/>
+	<table id="contentTable" class="table table-striped table-bordered table-condensed">
+		<thead>
+			<tr>
+				<th>人员照片</th>
+				<th>姓名</th>
+				<th>组织名称</th>
+				<th>性别</th>
+				<th>职务</th>
+				<th>出生日期</th>
+				<th>学历</th>
+				<th>手机号码</th>
+				<shiro:hasPermission name="org:ccmOrgGropprevent:edit"><th>操作</th></shiro:hasPermission>
+			</tr>
+		</thead>
+		<tbody>
+		<c:forEach items="${page.list}" var="ccmOrgGropprevent">
+			<tr>
+				<td>
+					<img src="${ccmOrgGropprevent.images}" style="height:100px;"/>
+				</td>
+				<td><a onclick="parent.parent.LayerDialog('${ctx}/org/ccmOrgGropprevent/form?id=${ccmOrgGropprevent.id}', '修改', '1330px', '600px')">
+					${ccmOrgGropprevent.name}
+				</a></td>
+				<td>
+					${ccmOrgGropprevent.orgpreventId.comName}
+				</td>
+				<td>
+					${fns:getDictLabel(ccmOrgGropprevent.sex, 'sex', '')}
+				</td>
+				<td>
+					${ccmOrgGropprevent.service}
+				</td>
+				<td>
+					<fmt:formatDate value="${ccmOrgGropprevent.birthday}" pattern="yyyy-MM-dd"/>
+				</td>
+				<td>
+					${fns:getDictLabel(ccmOrgGropprevent.education, 'sys_ccm_degree', '')}
+				</td>
+				<td>
+					${ccmOrgGropprevent.telephone}
+				</td>
+				<shiro:hasPermission name="org:ccmOrgGropprevent:edit"><td>
+    				<a class="btnList" onclick="parent.parent.LayerDialog('${ctx}/org/ccmOrgGropprevent/form?id=${ccmOrgGropprevent.id}', '修改', '1330px', '600px')" title="修改"><i class="icon-pencil"></i></a>
+					<a class="btnList" href="${ctx}/org/ccmOrgGropprevent/delete?id=${ccmOrgGropprevent.id}" onclick="return confirmx('确认要删除该人员信息吗？', this.href)"  title="删除"><i class="icon-trash"></i></a>
+				</td></shiro:hasPermission>
+			</tr>
+		</c:forEach>
+		</tbody>
+	</table>
+	<div class="pagination">${page}</div>
+</body>
+</html>

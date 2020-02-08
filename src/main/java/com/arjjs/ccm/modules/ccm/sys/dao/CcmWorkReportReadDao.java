@@ -1,0 +1,37 @@
+/**
+ * Copyright &copy; 2012-2016 <a href="https://github.com/thinkgem/jeesite">JeeSite</a> All rights reserved.
+ */
+package com.arjjs.ccm.modules.ccm.sys.dao;
+
+import java.util.List;
+
+import com.arjjs.ccm.common.persistence.CrudDao;
+import com.arjjs.ccm.common.persistence.annotation.MyBatisDao;
+import com.arjjs.ccm.modules.ccm.sys.entity.CcmWorkReportRead;
+
+/**
+ * 工作日志记录DAO接口
+ * @author arj
+ * @version 2018-03-08
+ */
+@MyBatisDao
+public interface CcmWorkReportReadDao extends CrudDao<CcmWorkReportRead> {
+	
+	/**
+	 * 插入工作记录
+	 * @param oaNotifyRecordList
+	 * @return
+	 */
+	public int insertAll(List<CcmWorkReportRead> ccmWorkReportReadList);
+	
+	/**
+	 * 根据通知ID删除工作记录
+	 * @param oaNotifyId 通知ID
+	 * @return
+	 */
+	public int deleteByWorkReportId(String ccmWorkReportId);
+	
+	
+	public void updateRead(CcmWorkReportRead ccmWorkReportRead);
+	
+}

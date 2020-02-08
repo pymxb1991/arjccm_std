@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta http-equiv='Content-Type' content='text/html; charset=utf-8'>
+<meta http-equiv="x-ua-compatible" content="IE=edge, chrome=1">
+<meta http-equiv="X-UA-Compatible" content="IE=9; IE=8;">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link href='http://fonts.googleapis.com/css?family=Roboto' rel='stylesheet' type='text/css'>
+<title>jQuery事件日历插件Calendar</title>
+<link rel="stylesheet" href="calendar.css">
+<style type="text/css">
+html {
+	font: 500 14px 'roboto';
+	color: #333;
+	background-color: #fafafa;
+}
+a {
+	text-decoration: none;
+}
+ul, ol, li {
+	list-style: none;
+	padding: 0;
+	margin: 0;
+}
+#demo {
+	width: 300px;
+	margin: 150px auto;
+}
+p {
+	margin: 0;
+}
+#dt {
+	margin: 30px auto;
+	height: 28px;
+	width: 200px;
+	padding: 0 6px;
+	border: 1px solid #ccc;
+	outline: none;
+}
+</style>
+</head>
+<body>
+<div id="demo">
+  <div id="ca"></div>
+</div>
+<script src="js/jquery.js"></script> 
+<script src="js/calendar.js"></script> 
+<script>
+    $('#ca').calendar({
+        width: 400,
+        height: 270,
+        
+        onSelected: function (view, date, data) {
+            console.log('view:' + view)
+            alert('date:' + date)
+            console.log('data:' + (data || 'None'));
+        }
+    });
+
+   
+</script>
+
+
+</body>
+</html>

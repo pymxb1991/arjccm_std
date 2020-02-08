@@ -1,0 +1,148 @@
+/**
+ * Copyright &copy; 2012-2016 <a href="https://github.com/thinkgem/jeesite">JeeSite</a> All rights reserved.
+ */
+package com.arjjs.ccm.modules.ccm.view.web;
+
+import java.util.List;
+import java.util.Map;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.apache.shiro.authz.annotation.RequiresPermissions;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import com.arjjs.ccm.common.config.Global;
+import com.arjjs.ccm.common.web.BaseController;
+import com.arjjs.ccm.common.utils.StringUtils;
+import com.arjjs.ccm.modules.ccm.view.entity.VCcmOrg;
+import com.arjjs.ccm.modules.ccm.view.entity.VCcmTeam;
+import com.arjjs.ccm.modules.ccm.view.service.VCcmOrgService;
+import com.arjjs.ccm.modules.ccm.view.service.VCcmTeamService;
+
+/**
+ * 综治队伍Controller
+ * @author liang
+ * @version 2018-01-12
+ */
+@Controller
+@RequestMapping(value = "${adminPath}/view/vCcmTeam")
+public class VCcmTeamController extends BaseController {
+
+	@Autowired
+	private VCcmTeamService vCcmTeamService;
+	@Autowired
+	private VCcmOrgService vCcmOrgService;
+	
+	@ModelAttribute
+	public VCcmTeam get(@RequestParam(required=false) String id) {
+		VCcmTeam entity = null;
+		if (StringUtils.isNotBlank(id)){
+			entity = vCcmTeamService.get(id);
+		}
+		if (entity == null){
+			entity = new VCcmTeam();
+		}
+		return entity;
+	}
+	
+	@RequiresPermissions("view:vCcmTeam:view")
+	@RequestMapping(value = {"index", ""})
+	public String index(VCcmTeam vCcmTeam,Model model) {
+		return "ccm/view/vCcmTeamIndex";
+	}
+	
+	@RequiresPermissions("view:vCcmTeam:view")
+	@RequestMapping(value = {"list", ""})
+	public String list(VCcmTeam vCcmTeam, HttpServletRequest request, HttpServletResponse response, Model model) {
+		List<VCcmTeam> list = vCcmTeamService.findList(vCcmTeam); 
+		model.addAttribute("list", list);
+		model.addAttribute("vCcmTeam", vCcmTeam);
+		return "ccm/view/vCcmTeamList";
+	}
+
+	//新填findform查询
+	@RequiresPermissions("view:vCcmTeam:view")
+	@RequestMapping(value = {"findform", ""})
+	public String findform(VCcmTeam vCcmTeam, HttpServletRequest request, HttpServletResponse response, Model model) {
+		List<VCcmTeam> list = vCcmTeamService.findform(vCcmTeam); 
+		model.addAttribute("list", list);
+		model.addAttribute("vCcmTeam", vCcmTeam);
+		return "ccm/view/vCcmTeamList";
+	}
+	
+	@RequiresPermissions("view:vCcmTeam:view")
+	@RequestMapping(value = "form")
+	public String form(VCcmTeam vCcmTeam, Model model) {
+		if (vCcmTeam.getParent()!=null && StringUtils.isNotBlank(vCcmTeam.getParent().getId())){
+			vCcmTeam.setParent(vCcmTeamService.get(vCcmTeam.getParent().getId()));
+			// 获取排序号，最末节点排序号+30
+			if (StringUtils.isBlank(vCcmTeam.getId())){
+				VCcmTeam vCcmTeamChild = new VCcmTeam();
+				vCcmTeamChild.setParent(new VCcmTeam(vCcmTeam.getParent().getId()));
+				List<VCcmTeam> list = vCcmTeamService.findList(vCcmTeam); 
+				if (list.size() > 0){
+					vCcmTeam.setSort(list.get(list.size()-1).getSort());
+					if (vCcmTeam.getSort() != null){
+						vCcmTeam.setSort(vCcmTeam.getSort() + 30);
+					}
+				}
+			}
+		}
+		if (vCcmTeam.getSort() == null){
+			vCcmTeam.setSort(30);
+		}
+		model.addAttribute("vCcmTeam", vCcmTeam);
+		return "ccm/view/vCcmTeamForm";
+	}
+
+	@RequiresPermissions("view:vCcmTeam:edit")
+	@RequestMapping(value = "save")
+	public String save(VCcmTeam vCcmTeam, Model model, RedirectAttributes redirectAttributes) {
+		if (!beanValidator(model, vCcmTeam)){
+			return form(vCcmTeam, model);
+		}
+		vCcmTeamService.save(vCcmTeam);
+		addMessage(redirectAttributes, "保存综治队伍成功");
+		return "redirect:"+Global.getAdminPath()+"/view/vCcmTeam/?repage";
+	}
+	
+	@RequiresPermissions("view:vCcmTeam:edit")
+	@RequestMapping(value = "delete")
+	public String delete(VCcmTeam vCcmTeam, RedirectAttributes redirectAttributes) {
+		vCcmTeamService.delete(vCcmTeam);
+		addMessage(redirectAttributes, "删除综治队伍成功");
+		return "redirect:"+Global.getAdminPath()+"/view/vCcmTeam/?repage";
+	}
+
+	@RequiresPermissions("user")
+	@ResponseBody
+	@RequestMapping(value = "treeData")
+	public List<Map<String, Object>> treeData(@RequestParam(required=false) String extId, HttpServletResponse response) {
+		List<Map<String, Object>> mapList = Lists.newArrayList();
+		//List<VCcmTeam> list = vCcmTeamService.findList(new VCcmTeam());
+		List<VCcmOrg> list = vCcmOrgService.findList(new VCcmOrg());
+		for (int i=0; i<list.size(); i++){
+			//VCcmTeam e = list.get(i);
+			VCcmOrg e = list.get(i);
+			if (StringUtils.isBlank(extId) || (extId!=null && !extId.equals(e.getId()) && e.getParentIds().indexOf(","+extId+",")==-1)){
+				Map<String, Object> map = Maps.newHashMap();
+				map.put("id", e.getId());
+				map.put("pId", e.getParentId());
+				map.put("name", e.getName());
+				mapList.add(map);
+			}
+		}
+		return mapList;
+	}
+	
+}

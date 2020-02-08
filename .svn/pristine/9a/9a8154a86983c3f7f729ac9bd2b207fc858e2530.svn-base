@@ -1,0 +1,290 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.arjjs.ccm.modules.ccm.org.dao.CcmOrgComPopDao">
+    
+	<sql id="ccmOrgComPopColumns">
+		a.id AS "id",
+		a.commonality_id AS "commonalityId.id",
+		a.code AS "code",
+		a.name AS "name",
+		a.sex AS "sex",
+		a.nation AS "nation",
+		a.politics AS "politics",
+		a.iden_code AS "idenCode",
+		a.iden_num AS "idenNum",
+		a.birthday AS "birthday",
+		a.service AS "service",
+		a.prof_expertise AS "profExpertise",
+		a.education AS "education",
+		a.telephone AS "telephone",
+		a.fix_tel AS "fixTel",
+		a.images AS "images",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag",
+		c.name AS "commonalityId.name"
+	</sql>
+	
+	<sql id="ccmOrgComPopJoins">
+		LEFT JOIN ccm_org_commonality c ON c.id = a.commonality_id
+	</sql>
+    
+	<select id="get" resultType="CcmOrgComPop">
+		SELECT 
+			<include refid="ccmOrgComPopColumns"/>
+		FROM ccm_org_com_pop a
+		<include refid="ccmOrgComPopJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<!-- 社区民警/辅警 -->
+	<select id="findPop" resultType="int">
+		SELECT
+			COUNT(a.id)
+		FROM
+			ccm_org_com_pop a
+		LEFT JOIN ccm_org_commonality c ON c.id = a.commonality_id
+		WHERE
+			a.del_flag = '0'
+		AND c.del_flag = '0'
+		AND c.type = '01'
+	</select>
+
+
+
+
+	<!--  -->
+	<select id="findList" resultType="CcmOrgComPop">
+		SELECT 
+			<include refid="ccmOrgComPopColumns"/>
+		FROM ccm_org_com_pop a
+		<include refid="ccmOrgComPopJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="commonalityId != null and commonalityId.id != null and commonalityId.id != ''">
+				AND a.commonality_id = #{commonalityId.id}
+			</if>
+			<if test="code != null and code != ''">
+				AND a.code LIKE 
+					<if test="dbName == 'oracle'">'%'||#{code}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{code}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{code},'%')</if>
+			</if>
+			<if test="name != null and name != ''">
+				AND a.name LIKE 
+					<if test="dbName == 'oracle'">'%'||#{name}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{name}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{name},'%')</if>
+			</if>
+			<if test="sex != null and sex != ''">
+				AND a.sex = #{sex}
+			</if>
+			<if test="nation != null and nation != ''">
+				AND a.nation = #{nation}
+			</if>
+			<if test="politics != null and politics != ''">
+				AND a.politics = #{politics}
+			</if>
+			<if test="idenNum != null and idenNum != ''">
+				AND a.iden_num LIKE 
+					<if test="dbName == 'oracle'">'%'||#{idenNum}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{idenNum}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{idenNum},'%')</if>
+			</if>
+			<if test="beginBirthday != null and endBirthday != null and beginBirthday != '' and endBirthday != ''">
+				AND a.birthday BETWEEN #{beginBirthday} AND #{endBirthday}
+			</if>
+			<if test="service != null and service != ''">
+				AND a.service LIKE 
+					<if test="dbName == 'oracle'">'%'||#{service}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{service}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{service},'%')</if>
+			</if>
+			<if test="profExpertise != null and profExpertise != ''">
+				AND a.prof_expertise LIKE 
+					<if test="dbName == 'oracle'">'%'||#{profExpertise}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{profExpertise}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{profExpertise},'%')</if>
+			</if>
+			<if test="education != null and education != ''">
+				AND a.education = #{education}
+			</if>
+			<if test="telephone != null and telephone != ''">
+				AND a.telephone LIKE 
+					<if test="dbName == 'oracle'">'%'||#{telephone}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{telephone}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{telephone},'%')</if>
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="CcmOrgComPop">
+		SELECT 
+			<include refid="ccmOrgComPopColumns"/>
+		FROM ccm_org_com_pop a
+		<include refid="ccmOrgComPopJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO ccm_org_com_pop(
+			id,
+			commonality_id,
+			code,
+			name,
+			sex,
+			nation,
+			politics,
+			iden_code,
+			iden_num,
+			birthday,
+			service,
+			prof_expertise,
+			education,
+			telephone,
+			fix_tel,
+			images,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag
+		) VALUES (
+			#{id},
+			#{commonalityId.id},
+			#{code},
+			#{name},
+			#{sex},
+			#{nation},
+			#{politics},
+			#{idenCode},
+			#{idenNum},
+			#{birthday},
+			#{service},
+			#{profExpertise},
+			#{education},
+			#{telephone},
+			#{fixTel},
+			#{images},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE ccm_org_com_pop SET 	
+			commonality_id = #{commonalityId.id},
+			code = #{code},
+			name = #{name},
+			sex = #{sex},
+			nation = #{nation},
+			politics = #{politics},
+			iden_code = #{idenCode},
+			iden_num = #{idenNum},
+			birthday = #{birthday},
+			service = #{service},
+			prof_expertise = #{profExpertise},
+			education = #{education},
+			telephone = #{telephone},
+			fix_tel = #{fixTel},
+			images = #{images},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE ccm_org_com_pop SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+	<select id="getnumOfWorkPower" resultType="com.arjjs.ccm.tool.SearchTab">
+		SELECT
+			a.id AS `type`,
+			a.`name` AS `value`,
+			ifnull( b.num, 0 ) AS `value1` 
+		FROM
+			sys_area a
+			LEFT JOIN (
+		SELECT
+			t6.id AS id,
+			count( * ) AS num 
+		FROM
+			sys_area t5
+			LEFT JOIN sys_office t4 ON t4.area_id = t5.id
+			LEFT JOIN sys_user t1 ON t1.office_id = t4.id
+			LEFT JOIN sys_user_role t2 ON t1.id = t2.user_id
+			LEFT JOIN sys_role t3 ON t2.role_id = t3.id
+			LEFT JOIN sys_area t6 ON t5.parent_id = t6.id 
+		WHERE
+			t3.enname = 'normalWork'
+			AND t1.del_flag = 0
+			AND t5.type = 7 
+		GROUP BY
+			t5.parent_id 
+			) b ON a.id = b.id 
+		WHERE
+			a.type = 6 
+			AND a.del_flag = 0
+	</select>
+	<select id="getnumOfWorkPowerForOne" resultType="com.arjjs.ccm.tool.SearchTab">
+		SELECT
+			t5.id AS type,
+			t5.name AS value,
+			count(*) AS value1 
+		FROM
+			sys_area t5
+			LEFT JOIN sys_office t4 ON t4.area_id = t5.id
+			LEFT JOIN sys_user t1 ON t1.office_id = t4.id
+			LEFT JOIN sys_user_role t2 ON t1.id = t2.user_id
+			LEFT JOIN sys_role t3 ON t2.role_id = t3.id
+		WHERE
+			t3.enname = 'normalWork'
+			AND t1.del_flag = 0
+			AND t5.type = 6 
+		GROUP BY
+			t5.id 
+	</select>
+	<select id="getnumOfWorkPowerForTwo" resultType="com.arjjs.ccm.tool.SearchTab">
+		SELECT
+			ifnull( count(*), 0 ) AS value1 
+		FROM
+			sys_user t1
+			LEFT JOIN sys_user_role t2 ON t1.id = t2.user_id
+			LEFT JOIN sys_role t3 ON t2.role_id = t3.id
+			LEFT JOIN sys_office t4 ON t4.id = t1.office_id
+			LEFT JOIN sys_area t5 ON t5.id = t4.area_id
+		WHERE
+			t3.name LIKE '%网格员%'
+			AND t1.del_flag = 0
+			AND (t5.id = #{id} or t5.parent_ids LIKE concat('%',#{id},'%'))
+	</select>
+</mapper>

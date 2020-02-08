@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.arjjs.ccm.modules.ccm.bayonet.dao.CcmCarBayonetDao">
+    
+	<sql id="ccmCarBayonetColumns">
+		a.id AS "id",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag",
+		a.bayonet_name AS "bayonetName",
+		a.use_type AS "useType",
+		a.organization_number AS "organizationNumber",
+		a.police_number AS "policeNumber",
+		a.gb_code AS "gbCode",
+		a.address AS "address",
+		a.front_type AS "frontType",
+		a.bayonet_type AS "bayonetType",
+		a.bayonet_pattern AS "bayonetPattern",
+		a.is_one_to_more AS "isOneToMore"
+	</sql>
+	
+	<sql id="ccmCarBayonetJoins">
+	</sql>
+    
+	<select id="get" resultType="CcmCarBayonet">
+		SELECT 
+			<include refid="ccmCarBayonetColumns"/>
+		FROM ccm_car_bayonet a
+		<include refid="ccmCarBayonetJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="CcmCarBayonet">
+		SELECT 
+			<include refid="ccmCarBayonetColumns"/>
+		FROM ccm_car_bayonet a
+		<include refid="ccmCarBayonetJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="bayonetName != null and bayonetName != ''">
+				AND a.bayonet_name LIKE 
+					<if test="dbName == 'oracle'">'%'||#{bayonetName}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{bayonetName}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{bayonetName},'%')</if>
+			</if>
+			<if test="useType != null and useType != ''">
+				AND a.use_type = #{useType}
+			</if>
+			<if test="gbCode != null and gbCode != ''">
+				AND a.gb_code = #{gbCode}
+			</if>
+			<if test="bayonetType != null and bayonetType != ''">
+				AND a.bayonet_type = #{bayonetType}
+			</if>
+			<if test="bayonetPattern != null and bayonetPattern != ''">
+				AND a.bayonet_pattern = #{bayonetPattern}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="CcmCarBayonet">
+		SELECT 
+			<include refid="ccmCarBayonetColumns"/>
+		FROM ccm_car_bayonet a
+		<include refid="ccmCarBayonetJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO ccm_car_bayonet(
+			id,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag,
+			bayonet_name,
+			use_type,
+			organization_number,
+			police_number,
+			gb_code,
+			address,
+			front_type,
+			bayonet_type,
+			bayonet_pattern,
+			is_one_to_more
+		) VALUES (
+			#{id},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag},
+			#{bayonetName},
+			#{useType},
+			#{organizationNumber},
+			#{policeNumber},
+			#{gbCode},
+			#{address},
+			#{frontType},
+			#{bayonetType},
+			#{bayonetPattern},
+			#{isOneToMore}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE ccm_car_bayonet SET 	
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks},
+			bayonet_name = #{bayonetName},
+			use_type = #{useType},
+			organization_number = #{organizationNumber},
+			police_number = #{policeNumber},
+			gb_code = #{gbCode},
+			address = #{address},
+			front_type = #{frontType},
+			bayonet_type = #{bayonetType},
+			bayonet_pattern = #{bayonetPattern},
+			is_one_to_more = #{isOneToMore}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE ccm_car_bayonet SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+</update>
+
+	<select id="getCount" resultType="Integer">
+		SELECT
+			count(1)
+		FROM ccm_car_bayonet a
+		<include refid="ccmCarBayonetJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>
+	</select>
+
+</mapper>

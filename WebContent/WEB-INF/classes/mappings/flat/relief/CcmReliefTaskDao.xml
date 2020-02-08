@@ -1,0 +1,168 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.arjjs.ccm.modules.flat.relief.dao.CcmReliefTaskDao">
+
+    <sql id="ccmReliefTaskColumns">
+		a.id AS "id",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag",
+		a.task_name AS "taskName",
+		a.relief_level AS "reliefLevel",
+		a.relief_type AS "reliefType",
+		a.start_time AS "startTime",
+		a.mass_address AS "massAddress",
+		a.end_time AS "endTime",
+		a.relief_dept AS "reliefDept",
+		a.relief_dept_name AS "reliefDeptName",
+		a.relief_number AS "reliefNumber",
+		a.review_status AS "reviewStatus",
+		a.road_line AS "roadLine",
+		a.area_id AS "area.id",
+	  	a.auditing_status as "auditingStatus",
+		a18.name AS "area.name"
+	</sql>
+
+    <sql id="ccmReliefTaskJoins">
+		LEFT JOIN sys_area a18 ON a18.id = a.area_id
+	</sql>
+
+    <select id="get" resultType="CcmReliefTask">
+        SELECT
+        <include refid="ccmReliefTaskColumns"/>
+        FROM ccm_relief_task a
+        <include refid="ccmReliefTaskJoins"/>
+        WHERE a.id = #{id}
+    </select>
+
+    <select id="findList" resultType="CcmReliefTask">
+        SELECT
+        <include refid="ccmReliefTaskColumns"/>
+        FROM ccm_relief_task a
+        <include refid="ccmReliefTaskJoins"/>
+        <where>
+            a.del_flag = #{DEL_FLAG_NORMAL}
+            <if test="taskName != null and taskName != ''">
+                AND a.task_name LIKE
+                <if test="dbName == 'oracle'">'%'||#{taskName}||'%'</if>
+                <if test="dbName == 'mssql'">'%'+#{taskName}+'%'</if>
+                <if test="dbName == 'mysql'">concat('%',#{taskName},'%')</if>
+            </if>
+            <if test="startTime != null and startTime != ''">
+                AND a.start_time &gt; #{startTime}
+            </if>
+            <if test="endTime != null and endTime != ''">
+                AND a.end_time &lt; #{endTime}
+            </if>
+			<if test="reliefDept != null and reliefDept != ''">
+				AND a.relief_dept LIKE
+				<if test="dbName == 'oracle'">'%'||#{reliefDept}||'%'</if>
+				<if test="dbName == 'mssql'">'%'+#{reliefDept}+'%'</if>
+				<if test="dbName == 'mysql'">concat('%',#{reliefDept},'%')</if>
+			</if>
+        </where>
+        <choose>
+            <when test="page !=null and page.orderBy != null and page.orderBy != ''">
+                ORDER BY ${page.orderBy}
+            </when>
+            <otherwise>
+                ORDER BY a.update_date DESC
+            </otherwise>
+        </choose>
+    </select>
+
+    <select id="findAllList" resultType="CcmReliefTask">
+        SELECT
+        <include refid="ccmReliefTaskColumns"/>
+        FROM ccm_relief_task a
+        <include refid="ccmReliefTaskJoins"/>
+        <where>
+            a.del_flag = #{DEL_FLAG_NORMAL}
+        </where>
+        <choose>
+            <when test="page !=null and page.orderBy != null and page.orderBy != ''">
+                ORDER BY ${page.orderBy}
+            </when>
+            <otherwise>
+                ORDER BY a.update_date DESC
+            </otherwise>
+        </choose>
+    </select>
+
+    <insert id="insert">
+		INSERT INTO ccm_relief_task(
+			id,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag,
+			task_name,
+			relief_level,
+			relief_type,
+			start_time,
+			mass_address,
+			end_time,
+			relief_dept,
+			relief_dept_name,
+			relief_number,
+			review_status,
+			road_line,
+			area_id,
+			auditing_status
+		) VALUES (
+			#{id},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag},
+			#{taskName},
+			#{reliefLevel},
+			#{reliefType},
+			#{startTime},
+			#{massAddress},
+			#{endTime},
+			#{reliefDept},
+			#{reliefDeptName},
+			#{reliefNumber},
+			#{reviewStatus},
+			#{roadLine},
+			#{area.id},
+			#{auditingStatus}
+		)
+	</insert>
+
+    <update id="update">
+		UPDATE ccm_relief_task SET 	
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks},
+			task_name = #{taskName},
+			relief_level = #{reliefLevel},
+			relief_type = #{reliefType},
+			start_time = #{startTime},
+			mass_address = #{massAddress},
+			end_time = #{endTime},
+			relief_dept = #{reliefDept},
+			relief_dept_name = #{reliefDeptName},
+			relief_number = #{reliefNumber},
+			review_status = #{reviewStatus},
+			road_line = #{roadLine},
+			area_id = #{area.id},
+			auditing_status = #{auditingStatus}
+		WHERE id = #{id}
+	</update>
+
+    <update id="delete">
+		UPDATE ccm_relief_task SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+
+</mapper>

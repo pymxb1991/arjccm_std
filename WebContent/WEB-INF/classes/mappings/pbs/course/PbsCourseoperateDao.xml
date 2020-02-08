@@ -1,0 +1,239 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.arjjs.ccm.modules.pbs.course.dao.PbsCourseoperateDao">
+
+	<sql id="pbsCourseoperateColumns">
+		a.id AS "id",
+		a.s_parentid AS "sParentid",
+		a.s_type AS
+		"sType",
+		a.s_optype AS "sOptype",
+		a.s_opflag AS "sOpflag",
+		a.s_opresult
+		AS "sOpresult",
+		a.i_time AS "iTime",
+		a.s_userid AS "sUserid.id",
+		a.s_bindmember AS "sBindmember.id",
+		mem.s_name AS "sBindmember.sName",
+		a.s_content AS "sContent",
+		a.s_spare01 AS "sSpare01",
+		a.s_spare02 AS
+		"sSpare02",
+		a.s_spare03 AS "sSpare03",
+		a.s_spare04 AS "sSpare04",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks
+		AS "remarks",
+		a.del_flag AS "delFlag",
+		u8.name AS "username",
+		course.s_name AS "coursename",
+		u8.photo AS "sUserid.photo"
+	</sql>
+
+	<sql id="pbsCourseoperateJoins">
+		LEFT JOIN sys_user u8 ON u8.id = a.s_userid
+		LEFT JOIN
+		pbs_partymem mem on mem.id =a.s_bindmember
+		LEFT JOIN pbs_courseinfo course ON course.id= a.s_parentid
+	</sql>
+
+	<select id="get" resultType="PbsCourseoperate">
+		SELECT
+		<include refid="pbsCourseoperateColumns" />
+		FROM pbs_courseoperate a
+		<include refid="pbsCourseoperateJoins" />
+		WHERE a.id = #{id}
+	</select>
+
+	<select id="findList" resultType="PbsCourseoperate">
+		SELECT
+		<include refid="pbsCourseoperateColumns" />
+		FROM pbs_courseoperate a
+		<include refid="pbsCourseoperateJoins" />
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="sParentid != null and sParentid != ''">
+				AND a.s_parentid = #{sParentid}
+			</if>
+			<if test="sType != null and sType != ''">
+				AND a.s_type = #{sType}
+			</if>
+			<if test="sOptype != null and sOptype != ''">
+				AND a.s_optype = #{sOptype}
+			</if>
+			<if test="sOpflag != null and sOpflag != ''">
+				AND a.s_opflag = #{sOpflag}
+			</if>
+			<!-- coursename -->
+			<if test="coursename != null and coursename != ''">
+				and course.s_name like
+				<if test="dbName == 'oracle'">'%'||#{coursename}||'%'</if>
+				<if test="dbName == 'mssql'">'%'+#{coursename}+'%'</if>
+				<if test="dbName == 'mysql'">concat('%',#{coursename},'%')</if>
+			</if>
+
+			<if
+				test="sUserid !=null and sUserid !='' and  sUserid.id !=null and sUserid.id !=''">
+				AND a.s_userid = #{sUserid.id}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+
+	<select id="findAllList" resultType="PbsCourseoperate">
+		SELECT
+		<include refid="pbsCourseoperateColumns" />
+		FROM pbs_courseoperate a
+		<include refid="pbsCourseoperateJoins" />
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+
+	<!-- 按部门统计学时 -->
+	<select id="getDepartmentPeriod" resultType="PbsCourseoperate">
+		SELECT
+			o.id AS "id",
+			ifnull( sum(a.i_time), 0 ) AS "iTime",
+			o.`name` AS "oName"
+		FROM
+			sys_office o 
+			LEFT JOIN pbs_departmentbind d ON d.s_departmentid = o.id AND d.del_flag = 0
+			LEFT JOIN pbs_partymem mem ON d.s_partymemid = mem.id AND d.del_flag = 0
+			LEFT JOIN pbs_courseoperate a ON mem.id = a.s_bindmember AND a.del_flag = 0
+			<if test="beginTime != null and beginTime != '' and endTime != null and endTime != ''">
+				AND (a.create_date BETWEEN #{beginTime} AND #{endTime})
+			</if> 
+			WHERE
+				o.del_flag = '0'
+				AND o.parent_id != '0'
+				AND o.type = '2'
+		GROUP BY o.id
+	</select>
+
+	<!-- 按人员统计学时 -->
+	<select id="getPersonnelPeriod" resultType="PbsCourseoperate">
+		SELECT
+			o.name AS "oName",
+			IFNULL(SUM(a.i_time),0) AS "iTime",
+			mem.s_name AS "u8Name"
+		FROM
+			pbs_courseoperate a
+			LEFT JOIN pbs_partymem mem ON mem.id = a.s_bindmember AND mem.del_flag = 0
+			LEFT JOIN pbs_departmentbind bi ON mem.id = bi.s_partymemid AND bi.del_flag = 0
+			LEFT JOIN pbs_partymembind b ON b.s_primarykey01 = bi.s_partymemid AND b.del_flag = 0
+			LEFT JOIN sys_office o ON o.id = bi.s_departmentid AND o.del_flag = 0
+			WHERE
+			a.del_flag = 0
+			<if test="beginTime != null and beginTime != '' and endTime != null and endTime != ''">
+				AND (a.create_date BETWEEN #{beginTime} AND #{endTime})
+			</if>
+			AND bi.s_departmentid = #{oId}
+		GROUP BY mem.id
+	</select>
+
+	<insert id="insert">
+		INSERT INTO pbs_courseoperate(
+		id,
+		s_parentid,
+		s_type,
+		s_optype,
+		s_opflag,
+		s_opresult,
+		i_time,
+		s_userid,
+		s_bindmember,
+		s_content,
+		create_by,
+		create_date,
+		update_by,
+		update_date,
+		remarks,
+		del_flag
+		) VALUES (
+		#{id},
+		#{sParentid},
+		#{sType},
+		#{sOptype},
+		#{sOpflag},
+		#{sOpresult},
+		#{iTime},
+		#{sUserid.id},
+		#{sBindmember.id},
+		#{sContent},
+		#{createBy.id},
+		#{createDate},
+		#{updateBy.id},
+		#{updateDate},
+		#{remarks},
+		#{delFlag}
+		)
+	</insert>
+
+	<update id="update">
+		UPDATE pbs_courseoperate SET
+		s_parentid =
+		#{sParentid},
+		s_type = #{sType},
+		s_optype = #{sOptype},
+		s_opflag =
+		#{sOpflag},
+		s_opresult = #{sOpresult},
+		i_time = #{iTime},
+		s_userid =
+		#{sUserid.id},
+		s_bindmember=#{sBindmember.id},
+		s_content = #{sContent},
+		update_by = #{updateBy.id},
+		update_date = #{updateDate},
+		remarks =
+		#{remarks}
+		WHERE id = #{id}
+	</update>
+
+	<update id="delete">
+		UPDATE pbs_courseoperate SET
+		del_flag =
+		#{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+
+	<select id="getSumByUser" resultType="java.lang.Integer">
+		SELECT
+		count(DISTINCT(s_userid))
+		FROM pbs_courseoperate
+		WHERE s_parentid =
+		#{sParentid}
+	</select>
+
+	<select id="getCounts" resultType="java.lang.Integer">
+		SELECT count(1) from
+		pbs_courseoperate
+		WHERE s_parentid = #{sParentid} and s_content is not null
+	</select>
+	<select id="getSumByMemberId" resultType="PbsCourseoperate">
+		SELECT
+		<include refid="pbsCourseoperateColumns" />
+		FROM pbs_courseoperate a
+		<include refid="pbsCourseoperateJoins" />
+		WHERE a.s_bindmember = #{sBindmember}
+	</select>
+</mapper>

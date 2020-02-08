@@ -1,0 +1,188 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.arjjs.ccm.modules.plm.car.dao.PlmCarDriverDao">
+    
+	<sql id="plmCarDriverColumns">
+		a.id AS "id",
+		a.name AS "name",
+		a.photo AS "photo",
+		a.licensePic AS "licensePic",
+		a.status AS "status",
+		a.sex AS "sex",
+		a.did_type AS "didType",
+		a.birthday AS "birthday",
+		a.dexp_date AS "dexpDate",
+		a.did_num AS "didNum",
+		a.did_avldate AS "didAvldate",
+		a.did_valdate AS "didValdate",
+		a.tel AS "tel",
+		a.phone AS "phone",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag"
+	</sql>
+	
+	<sql id="plmCarDriverJoins">
+	</sql>
+    
+	<select id="get" resultType="PlmCarDriver">
+		SELECT 
+			<include refid="plmCarDriverColumns"/>
+		FROM plm_car_driver a
+		<include refid="plmCarDriverJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="PlmCarDriver">
+		SELECT 
+			<include refid="plmCarDriverColumns"/>
+		FROM plm_car_driver a
+		<include refid="plmCarDriverJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="name != null and name != ''">
+				AND a.name LIKE 
+					<if test="dbName == 'oracle'">'%'||#{name}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{name}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{name},'%')</if>
+			</if>
+			<if test="status != null and status != ''">
+				AND a.status = #{status}
+			</if>
+			<if test="didType != null and didType != ''">
+				AND a.did_type = #{didType}
+			</if>
+			<if test="phone != null and phone != ''">
+				AND a.phone LIKE 
+					<if test="dbName == 'oracle'">'%'||#{phone}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{phone}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{phone},'%')</if>
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="PlmCarDriver">
+		SELECT 
+			<include refid="plmCarDriverColumns"/>
+		FROM plm_car_driver a
+		<include refid="plmCarDriverJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findSelect2Type" resultType="com.arjjs.ccm.tool.Select2Type">
+		SELECT 
+			a.id AS "id",
+			a.name AS "text"
+		FROM plm_car_driver a
+		<include refid="plmCarDriverJoins"/>
+		<where>
+			a.del_flag = '0'
+			<if test="status != null and status != ''">
+				AND a.status = #{status}
+			</if>			
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO plm_car_driver(
+			id,
+			name,
+			photo,
+			licensePic,
+			status,
+			sex,
+			did_type,
+			birthday,
+			dexp_date,
+			did_num,
+			did_avldate,
+			did_valdate,
+			tel,
+			phone,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag
+		) VALUES (
+			#{id},
+			#{name},
+			#{photo},
+			#{licensePic},
+			#{status},
+			#{sex},
+			#{didType},
+			#{birthday},
+			#{dexpDate},
+			#{didNum},
+			#{didAvldate},
+			#{didValdate},
+			#{tel},
+			#{phone},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE plm_car_driver SET 	
+			name = #{name},
+			photo = #{photo},
+			licensePic = #{licensePic},
+			status = #{status},
+			sex = #{sex},
+			did_type = #{didType},
+			birthday = #{birthday},
+			dexp_date = #{dexpDate},
+			did_num = #{didNum},
+			did_avldate = #{didAvldate},
+			did_valdate = #{didValdate},
+			tel = #{tel},
+			phone = #{phone},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE plm_car_driver SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

@@ -1,0 +1,219 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper
+	namespace="com.arjjs.ccm.modules.pbs.task.dao.PbsTaskrecDao">
+
+	<sql id="pbsTaskrecColumns">
+		a.id AS "id",
+		a.s_superiorid AS "sSuperiorid.id",
+		taskrec.s_resume AS "sSuperiorid.sResume",
+		a.s_type AS "sType.id",
+		tasktyp.s_name AS "sType.sName",
+		a.s_resume AS "sResume",
+		a.s_content AS "sContent",
+		a.s_execdepartment AS "sExecdepartment.id",
+		office.`name` AS "sExecdepartment.name",
+		a.s_executor AS "sExecutor.id",
+		mem2.s_name AS "sExecutor.sName",
+		a.s_bindmember AS "sBindmember.id",
+		mem.s_name AS "sBindmember.sName",
+		a.s_status AS "sStatus",
+		<!-- a.s_spare01 AS "sSpare01",
+		a.s_spare02 AS "sSpare02",
+		a.s_spare03 AS "sSpare03",
+		a.s_spare04 AS "sSpare04", -->
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag",
+		a.s_deadline AS "sDeadline",
+		a.s_optstatus AS "sOptstatus"
+	</sql>
+
+	<sql id="pbsTaskrecJoins">
+		LEFT JOIN pbs_taskrec taskrec ON taskrec.id =
+		a.s_superiorid
+		LEFT JOIN pbs_tasktype tasktyp ON tasktyp.id = a.s_type
+		LEFT JOIN sys_office office ON office.id = a.s_execdepartment
+		LEFT JOIN
+		pbs_partymem mem ON mem.id = a.s_bindmember
+		LEFT JOIN pbs_partymem mem2 ON
+		mem2.id = a.s_executor
+	</sql>
+
+	<select id="get" resultType="PbsTaskrec">
+		SELECT
+		<include refid="pbsTaskrecColumns" />
+		FROM pbs_taskrec a
+		<include refid="pbsTaskrecJoins" />
+		WHERE a.id = #{id}
+	</select>
+
+	<select id="findList" resultType="PbsTaskrec">
+		SELECT
+		<include refid="pbsTaskrecColumns" />
+		FROM pbs_taskrec a
+		<include refid="pbsTaskrecJoins" />
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if
+				test="sSuperiorid !=null and sSuperiorid !='' and sSuperiorid.id != null and sSuperiorid.id != ''">
+				AND a.s_superiorid = #{sSuperiorid.id}
+			</if>
+			<if
+				test="sSuperiorid !=null and sSuperiorid !='' and sSuperiorid.sResume != null and sSuperiorid.sResume != ''">
+				AND taskrec.s_resume LIKE CONCAT('%',#{sSuperiorid.sResume},'%')
+			</if>
+			<if
+				test="sType != null and sType != '' and sType.id != null and sType.id != ''">
+				AND a.s_type = #{sType.id}
+			</if>
+			<if test="sResume != null and sResume != ''">
+				AND a.s_resume LIKE
+				<if test="dbName == 'oracle'">'%'||#{sResume}||'%'</if>
+				<if test="dbName == 'mssql'">'%'+#{sResume}+'%'</if>
+				<if test="dbName == 'mysql'">concat('%',#{sResume},'%')</if>
+			</if>
+			<if test="createDate != null and createDate != ''">
+				AND a.create_date &gt;= #{createDate}
+			</if>
+			<if test="sDeadline != null and sDeadline != ''">
+				AND a.s_deadline &lt;= #{sDeadline}
+			</if>
+			<if test="sOptstatus != null and sOptstatus != ''">
+				AND a.s_optstatus = #{sOptstatus}
+			</if>
+			<if test="sStatus != null and sStatus != ''">
+				AND a.s_status = #{sStatus}
+			</if>
+			<if test=" isrelevance eq false">
+				<if
+					test="sExecutor != null and sExecutor != '' and sExecutor.id != null and sExecutor.id != ''">
+					AND a.s_executor = #{sExecutor.id}
+				</if>
+				<if
+					test="sExecutor != null and sExecutor != '' and sExecutor.sName != null and sExecutor.sName != ''">
+					AND mem2.s_name LIKE CONCAT('%',#{sExecutor.sName},'%') 
+				</if>
+				<if
+					test="sBindmember != null and sBindmember != '' and sBindmember.id != null and sBindmember.id != ''">
+					AND a.s_bindmember = #{sBindmember.id}
+				</if>
+			</if>
+			<if test="isrelevance eq true">
+				AND (a.s_executor = #{sExecutor.id} or a.s_bindmember =
+				#{sBindmember.id})
+			</if>
+			<if
+				test="sBindmember != null and sBindmember != '' and sBindmember.sName != null and sBindmember.sName != ''">
+				AND mem.s_name LIKE CONCAT('%',#{sBindmember.sName},'%')
+			</if>
+		</where>
+		<choose>
+			<when
+				test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+
+	<select id="findAllList" resultType="PbsTaskrec">
+		SELECT
+		<include refid="pbsTaskrecColumns" />
+		FROM pbs_taskrec a
+		<include refid="pbsTaskrecJoins" />
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>
+		<choose>
+			<when
+				test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+
+	<insert id="insert">
+		INSERT INTO pbs_taskrec(
+		id,
+		s_superiorid,
+		s_type,
+		s_resume,
+		s_content,
+		s_execdepartment,
+		s_executor,
+		s_bindmember,
+		s_status,
+		s_spare01,
+		s_spare02,
+		s_spare03,
+		s_spare04,
+		create_by,
+		create_date,
+		update_by,
+		update_date,
+		remarks,
+		del_flag,
+		s_deadline,
+		s_optstatus
+		) VALUES (
+		#{id},
+		#{sSuperiorid.id},
+		#{sType.id},
+		#{sResume},
+		#{sContent},
+		#{sExecdepartment.id},
+		#{sExecutor.id},
+		#{sBindmember.id},
+		#{sStatus},
+		#{sSpare01},
+		#{sSpare02},
+		#{sSpare03},
+		#{sSpare04},
+		#{createBy.id},
+		#{createDate},
+		#{updateBy.id},
+		#{updateDate},
+		#{remarks},
+		#{delFlag},
+		#{sDeadline},
+		#{sOptstatus}
+		)
+	</insert>
+
+	<update id="update">
+		UPDATE pbs_taskrec SET
+		s_superiorid =
+		#{sSuperiorid.id},
+		s_type = #{sType.id},
+		s_resume = #{sResume},
+		s_content = #{sContent},
+		s_execdepartment = #{sExecdepartment.id},
+		s_executor = #{sExecutor.id},
+		s_bindmember = #{sBindmember.id},
+		s_status = #{sStatus},
+		update_by = #{updateBy.id},
+		update_date =
+		#{updateDate},
+		remarks = #{remarks},
+		s_deadline =#{sDeadline},
+		s_optstatus =#{sOptstatus}
+		WHERE id =
+		#{id}
+	</update>
+
+	<update id="delete">
+		UPDATE pbs_taskrec SET
+		del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+
+</mapper>

@@ -1,0 +1,205 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.arjjs.ccm.modules.ccm.event.dao.CcmEventRequestDao">
+
+	<sql id="ccmEventRequestColumns">
+		a.id AS "id",
+		a.case_name AS "caseName",
+		a.happen_date AS
+		"happenDate",
+		a.case_place AS "area.id",
+		a.happen_place AS
+		"happenPlace",
+		a.area_map AS "areaMap",
+		a.area_point AS "areaPoint",
+		a.icon AS "icon",
+		a.event_kind AS "eventKind",
+		a.case_condition AS
+		"caseCondition",
+		a.type AS "type",
+		a.file AS "file",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS
+		"delFlag",
+		a4.name AS "area.name",
+		(case a.type 
+			when 01 then '未处理' 
+			when 02 then '处理中' 
+			when 03 then '已完成'
+			else '' end) "typeLable"
+	</sql>
+	
+	<sql id="ccmEventRequestAllColumns">
+        a.id AS "id",
+        a.case_name AS "caseName",
+        a.happen_date AS
+        "happenDate",
+        a.case_place AS "area.id",
+        a.happen_place AS
+        "happenPlace",
+        a.area_map AS "areaMap",
+        a.area_point AS "areaPoint",
+        a.icon AS "icon",
+        a.event_kind AS "eventKind",
+        a.case_condition AS
+        "caseCondition",
+        a.type AS "type",
+        a.file AS "file",
+        a.create_by AS "createBy.id",
+        a.create_date AS "createDate",
+        a.update_by AS "updateBy.id",
+        a.update_date AS "updateDate",
+        a.remarks AS "remarks",
+        a.del_flag AS "delFlag",
+        b.name AS "createName",
+        a4.name AS "area.name",
+        (case a.type 
+			when 01 then '未处理' 
+			when 02 then '处理中' 
+			when 03 then '已完成'
+			else '' end) "typeLable"
+        
+    </sql>
+
+	<sql id="ccmEventRequestJoinsUser">
+		LEFT JOIN sys_user b ON b.id = a.create_by
+	</sql>
+	<sql id="ccmEventRequestJoins">
+		LEFT JOIN sys_area a4 ON a4.id = a.case_place
+	</sql>
+
+	<select id="get" resultType="CcmEventRequest">
+		SELECT
+		<include refid="ccmEventRequestAllColumns" />
+		FROM ccm_event_request a
+		<include refid="ccmEventRequestJoins" />
+		<include refid="ccmEventRequestJoinsUser" />
+		WHERE a.id = #{id}
+	</select>
+
+	<select id="findList" resultType="CcmEventRequest">
+		SELECT
+		<include refid="ccmEventRequestAllColumns" />
+		FROM ccm_event_request a
+		<include refid="ccmEventRequestJoins" />
+        <include refid="ccmEventRequestJoinsUser" />
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="caseName != null and caseName != ''">
+				AND a.case_name LIKE
+				<if test="dbName == 'oracle'">'%'||#{caseName}||'%'</if>
+				<if test="dbName == 'mssql'">'%'+#{caseName}+'%'</if>
+				<if test="dbName == 'mysql'">concat('%',#{caseName},'%')</if>
+			</if>
+			<if
+				test="beginHappenDate != null and endHappenDate != null and beginHappenDate != '' and endHappenDate != ''">
+				AND a.happen_date BETWEEN #{beginHappenDate} AND
+				#{endHappenDate}
+			</if>
+			<if test="area != null and area.id != null and area.id != ''">
+				AND a.case_place = #{area.id}
+			</if>
+			<if test="type != null and type != ''">
+				AND a.type = #{type}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+
+	<select id="findAllList" resultType="CcmEventRequest">
+		SELECT
+		<include refid="ccmEventRequestColumns" />
+		FROM ccm_event_request a
+		<include refid="ccmEventRequestJoins" />
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+
+	<insert id="insert">
+		INSERT INTO ccm_event_request(
+		id,
+		case_name,
+		happen_date,
+		case_place,
+		happen_place,
+		area_map,
+		area_point,
+		icon,
+		event_kind,
+		case_condition,
+		type,
+		file,
+		create_by,
+		create_date,
+		update_by,
+		update_date,
+		remarks,
+		del_flag
+		) VALUES (
+		#{id},
+		#{caseName},
+		#{happenDate},
+		#{area.id},
+		#{happenPlace},
+		#{areaMap},
+		#{areaPoint},
+		#{icon},
+		#{eventKind},
+		#{caseCondition},
+		#{type},
+		#{file},
+		#{createBy.id},
+		#{createDate},
+		#{updateBy.id},
+		#{updateDate},
+		#{remarks},
+		#{delFlag}
+		)
+	</insert>
+
+	<update id="update">
+		UPDATE ccm_event_request SET
+		case_name = #{caseName},
+		happen_date = #{happenDate},
+		case_place = #{area.id},
+		happen_place = #{happenPlace},
+		area_map = #{areaMap},
+		area_point = #{areaPoint},
+		icon = #{icon},
+		event_kind = #{eventKind},
+		case_condition = #{caseCondition},
+		type = #{type},
+		file = #{file},
+		update_by = #{updateBy.id},
+		update_date = #{updateDate},
+		remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+
+	<update id="delete">
+		UPDATE ccm_event_request SET
+		del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+
+</mapper>

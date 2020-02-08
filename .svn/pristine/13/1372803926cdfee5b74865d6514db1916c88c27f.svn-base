@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+
+<%@ page pageEncoding="UTF-8"%>
+<%@ page contentType="text/html; charset=UTF-8"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
+<%@ taglib prefix="form" uri="http://www.springframework.org/tags/form"%>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
+<%@ include file="/WEB-INF/views/include/taglib.jsp"%>
+
+<html lang="en">
+<head>
+<style type="text/css">
+.layui-carousel {
+	/* opacity: 0.8; */
+	
+}
+</style>
+<meta charset="UTF-8" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="renderer" content="webkit|ie-comp|ie-stand" />
+<title>杭州道街综合信息指挥系统</title>
+
+<link rel="stylesheet"
+	href="${ctxStatic}/common/index/css/win10/reset.css">
+<link rel="stylesheet"
+	href="${ctxStatic}/common/index/css/win10/menu-1.css">
+<link rel="stylesheet" href="${ctxStatic}/layui/css/layui.css"
+	media="all">
+<!--[if lt IE 9]>
+     <script src="/arjccm/static/jquery/html5shiv.js" type="text/javascript"></script>
+  <![endif]-->
+
+<script language="javascript">
+	function videoSubmit() {
+		document.getElementById("loginForm").action = "${dz_hangzhoudao_link_video}";
+		document.getElementById("loginForm").submit();
+	}
+	function pbsSubmit() {
+		document.getElementById("loginForm").action = "${dz_hangzhoudao_link_pbs}";
+		document.getElementById("loginForm").submit();
+	}
+</script>
+
+</head>
+<body>
+	<div class="container">
+		<div class="header">
+			<div class="header-left clearfix">
+				<div class="dates">2017年12月07日</div>
+			</div>
+			<div class="header-right clearfix">
+				<div></div>
+				<q id="pTitle">您好,欢迎来到${fns:getConfig('showName')}综合信息指挥系统！</q> <span><a
+					href="${ctx}/logout" style="text-decoration: none"><i></i><font
+						style="color: #FFF;">退出</font></a></span>
+			</div>
+			<div>
+				<form id="loginForm" class="form-signin" action="" method="post">
+					<input type="hidden" id="username" name="username"
+						value="${user.loginName}"> <input type="hidden"
+						id="password" name="password" value="${user.newPassword}">
+				</form>
+			</div>
+		</div>
+		<div class="main">
+
+			<div class="layui-carousel" id="lunbo">
+				<div carousel-item>
+					<div>
+						<ul class="page">
+
+							<li>
+								<h3 class="fatigue-duty">综治网格化管理系统</h3>
+								<div class="effectiveness">
+									<img
+										src="${ctxStatic}/common/index/images/win10/shehuiguanxi.png" /><a
+									onclick="TiaoZhuan('70a1747ee8334e439b2b24ebe947ecdd','${ctx}/report/ccmPeopleStat/statisticsPage?title=ccmPeopleStatPerson')" ><b>社会信息采集平台</b>
+									</a>
+								</div>
+								<div class="statistics">
+									<img
+										src="${ctxStatic}/common/index/images/win10/shipinronghe.png" /><a
+										href="#" target="_blank" onclick="videoSubmit();"><b>组织信息</b></a>
+								</div>
+								<div class="grid">
+									<img
+										src="${ctxStatic}/common/index/images/win10/shipinronghe.png" /><a
+										href="#" target="_blank" onclick="videoSubmit();"><b>网格信息</b></a>
+								</div>
+								<div class="scheduling">
+									<img src="${ctxStatic}/common/index/images/win10/dangjian.png" /><a
+										href="#" target="_blank" onclick="pbsSubmit();"><b>民情民意</b></a>
+								</div>
+								<div class="collect">
+									<img src="${ctxStatic}/common/index/images/win10/dangjian.png" /><a
+										href="#" target="_blank" onclick="pbsSubmit();"><b>采集考核</b></a>
+								</div>
+
+								<div class="ganged">
+									<img src="${ctxStatic}/common/index/images/win10/wanggehua.png" /><a
+										onclick="TiaoZhuan('4d834769daac4011ac0fad2c41e74722','${ctx}/event/ccmEventIncident/list')" ><b>大联动业务协同平台</b></a>
+								</div>
+								<div class="my_events">
+									<img
+										src="${ctxStatic}/common/index/images/win10/shipinronghe.png" /><a
+										href="#" target="_blank" onclick="videoSubmit();"><b>我的事项</b></a>
+								</div>
+								<div class="events_check">
+									<img
+										src="${ctxStatic}/common/index/images/win10/shipinronghe.png" /><a
+										href="#" target="_blank" onclick="videoSubmit();"><b>事件考核</b></a>
+								</div>
+								<div class="under_events">
+									<img src="${ctxStatic}/common/index/images/win10/dangjian.png" /><a
+										href="#" target="_blank" onclick="pbsSubmit();"><b>下辖事项</b></a>
+								</div>
+								<div class="events_count">
+									<img src="${ctxStatic}/common/index/images/win10/dangjian.png" /><a
+										href="#" target="_blank" onclick="pbsSubmit();"><b>事件统计</b></a>
+								</div>
+
+								<div class="grid_platform">
+									<img src="${ctxStatic}/common/index/images/win10/wanggehua.png" /><a
+										onclick="TiaoZhuan('3b3a641046be4558b92178d07f93b280','${ctx}/work/ccmWorkBeonduty')" ><b>网格事务管理平台</b></a>
+								</div>
+								<div class="person">
+									<img
+										src="${ctxStatic}/common/index/images/win10/shipinronghe.png" /><a
+										href="#" target="_blank" onclick="videoSubmit();"><b>邮件</b></a>
+								</div>
+								<div class="email">
+									<img
+										src="${ctxStatic}/common/index/images/win10/shipinronghe.png" /><a
+										href="#" target="_blank" onclick="videoSubmit();"><b>个人门户</b></a>
+								</div>
+								<div class="synthesize_business">
+									<img src="${ctxStatic}/common/index/images/win10/dangjian.png" /><a
+										href="#" target="_blank" onclick="pbsSubmit();"><b>综合业务</b></a>
+								</div>
+								<div class="flow">
+									<img src="${ctxStatic}/common/index/images/win10/dangjian.png" /><a
+										href="#" target="_blank" onclick="pbsSubmit();"><b>流程</b></a>
+								</div>
+								<div class="greg_platform">
+									<img src="${ctxStatic}/common/index/images/win10/wanggehua.png" /><a
+										onclick="TiaoZhuan('4e82723fc2f2413ab1cede093d550c8c','${ctx}/report/ccmReportOthers/houseAndBuild')" ><b>地理信息平台</b></a>
+								</div>
+								<div class="gis_show">
+									<img
+										src="${ctxStatic}/common/index/images/win10/shipinronghe.png" /><a
+										href="#" target="_blank" onclick="videoSubmit();"><b>Gis展现</b></a>
+								</div>
+								<div class="geog_count">
+									<img
+										src="${ctxStatic}/common/index/images/win10/shipinronghe.png" /><a
+										href="#" target="_blank" onclick="videoSubmit();"><b>数据统计</b></a>
+								</div>
+
+							</li>
+							<%-- 							<li>
+								<h3 class="system">${fns:getConfig('showName')}"六大板块"</h3>
+								<div class="users">
+									<img src="${ctxStatic}/common/index/images/win10/minsheng.png" /><a
+										href="${ctx}/sys/map/statLivelihood" target="_self"><b>民计民生</b></a>
+								</div>
+								<div class="daily">
+									<img src="${ctxStatic}/common/index/images/win10/pingan.png" /><a
+										href="${ctx}/sys/map/statPublicSecurity" target="_self"><b>平安建设</b></a>
+								</div>
+								<div class="install">
+									<img src="${ctxStatic}/common/index/images/win10/shengchan.png" /><a
+										href="${ctx}/sys/map/statNpseSafe" target="_self"><b>安全生产</b></a>
+								</div>
+								<div class="eoms">
+									<img src="${ctxStatic}/common/index/images/win10/jingji.png" /><a
+										href="${ctx}/sys/map/statConstructionEconomics" target="_self"><b>经济建设</b></a>
+								</div>
+								<div class="authority">
+									<img src="${ctxStatic}/common/index/images/win10/chengshi.png" /><a
+										href="${ctx}/sys/map/statCityManage" target="_self"><b>城市管理</b></a>
+								</div>
+								<div class="help">
+									<img src="${ctxStatic}/common/index/images/win10/dangjian2.png" /><a
+										href="${ctx}/sys/map/statParty" target="_self"><b>智慧党建</b></a>
+								</div>
+							</li> --%>
+						</ul>
+					</div>
+					<div>
+						<ul class="page">
+
+							<li>
+							<li>
+								<h3 class="fatigue-duty">综治网格化管理系统</h3>
+								<div class="effectiveness">
+									<img src="${ctxStatic}/common/index/images/win10/wanggehua.png" /><a
+										onclick="TiaoZhuan('b2337d901d1145c9bf1f2aea9eb9865c','${ctx}/report/ccmReportOthers/houseAndBuild')" ><b>民生服务平台</b></a>
+								</div>
+								<div class="statistics">
+									<img
+										src="${ctxStatic}/common/index/images/win10/shipinronghe.png" /><a
+										href="#" target="_blank" onclick="videoSubmit();"><b>组织信息</b></a>
+								</div>
+								<div class="grid">
+									<img
+										src="${ctxStatic}/common/index/images/win10/shipinronghe.png" /><a
+										href="#" target="_blank" onclick="videoSubmit();"><b>网格信息</b></a>
+								</div>
+								<div class="scheduling">
+									<img src="${ctxStatic}/common/index/images/win10/dangjian.png" /><a
+										href="#" target="_blank" onclick="pbsSubmit();"><b>民情民意</b></a>
+								</div>
+								<div class="collect">
+									<img src="${ctxStatic}/common/index/images/win10/dangjian.png" /><a
+										href="#" target="_blank" onclick="pbsSubmit();"><b>采集考核</b></a>
+								</div>
+
+								<div class="ganged">
+									<img src="${ctxStatic}/common/index/images/win10/wanggehua.png" /><a
+										onclick="TiaoZhuan('1170ab0e36aa4d9eb73ba32baedfc639','${ctx}/report/ccmReportOthers/houseAndBuild')" ><b>物联网感知平台</b></a>
+								</div>
+								<div class="my_events">
+									<img
+										src="${ctxStatic}/common/index/images/win10/shipinronghe.png" /><a
+										href="#" target="_blank" onclick="videoSubmit();"><b>我的事项</b></a>
+								</div>
+								<div class="events_check">
+									<img
+										src="${ctxStatic}/common/index/images/win10/shipinronghe.png" /><a
+										href="#" target="_blank" onclick="videoSubmit();"><b>事件考核</b></a>
+								</div>
+								<div class="under_events">
+									<img src="${ctxStatic}/common/index/images/win10/dangjian.png" /><a
+										href="#" target="_blank" onclick="pbsSubmit();"><b>下辖事项</b></a>
+								</div>
+								<div class="events_count">
+									<img src="${ctxStatic}/common/index/images/win10/dangjian.png" /><a
+										href="#" target="_blank" onclick="pbsSubmit();"><b>事件统计</b></a>
+								</div>
+
+								<div class="grid_platform">
+									<img src="${ctxStatic}/common/index/images/win10/wanggehua.png" /><a
+										onclick="TiaoZhuan('85e52cbaad074fc4af50aa6b95d0784a','${ctx}/report/ccmReportOthers/houseAndBuild')" ><b>大数据中心</b></a>
+								</div>
+								<div class="person">
+									<img
+										src="${ctxStatic}/common/index/images/win10/shipinronghe.png" /><a
+										href="#" target="_blank" onclick="videoSubmit();"><b>邮件</b></a>
+								</div>
+								<div class="email">
+									<img
+										src="${ctxStatic}/common/index/images/win10/shipinronghe.png" /><a
+										href="#" target="_blank" onclick="videoSubmit();"><b>个人门户</b></a>
+								</div>
+								<div class="synthesize_business">
+									<img src="${ctxStatic}/common/index/images/win10/dangjian.png" /><a
+										href="#" target="_blank" onclick="pbsSubmit();"><b>综合业务</b></a>
+								</div>
+								<div class="flow">
+									<img src="${ctxStatic}/common/index/images/win10/dangjian.png" /><a
+										href="#" target="_blank" onclick="pbsSubmit();"><b>流程</b></a>
+								</div>
+								<div class="greg_platform">
+									<img src="${ctxStatic}/common/index/images/win10/wanggehua.png" /><a
+										onclick="TiaoZhuan('ef61dbc7960f4272b360de7ad7d59a07','${ctx}/sys/map/statIndexCom')" ><b>综治大脑</b></a>
+								</div>
+								<div class="gis_show">
+									<img
+										src="${ctxStatic}/common/index/images/win10/shipinronghe.png" /><a
+										href="#" target="_blank" onclick="videoSubmit();"><b>Gis展现</b></a>
+								</div>
+								<div class="geog_count">
+									<img
+										src="${ctxStatic}/common/index/images/win10/shipinronghe.png" /><a
+										href="#" target="_blank" onclick="videoSubmit();"><b>数据统计</b></a>
+								</div>
+						</ul>
+					</div>
+				</div>
+
+			</div>
+		</div>
+	</div>
+	<!-- <script src="/cas/js/jquery-2.2.4.min.js"></script> -->
+	<script src="${ctxStatic}/jquery/jquery-2.2.4.min.js"></script>
+	<script src="${ctxStatic}/layui/layui.js"></script>
+	<script>
+		layui.use('carousel', function() {
+			var carousel = layui.carousel;
+			//建造实例
+			carousel.render({
+				elem : '#lunbo',
+				width : '1900px' //设置容器宽度
+				,
+				arrow : 'always' //始终显示箭头
+				,
+				autoplay : false,
+				height : '730px'
+			});
+		});
+	</script>
+	<script type="text/javascript">
+		$(document).ready(function(e) {
+			$('.container').height($(document).height());
+			$('.main ul').width($(window).width());
+			$('.main ul').height(720);
+
+			/*   $('#pTitle').text("您好" + "李川" + "，欢迎来到杭州道街综合智慧指挥系统！"); */
+			$('.dates').text(showTime())
+
+		});
+		function showTime() {
+			var str, time, month, getDate, getHours, getMinutes, getSeconds;
+			time = new Date();
+			month = (time.getMonth() + 1);
+			getDate = time.getDate();
+			getHours = time.getHours();
+			getMinutes = time.getMinutes();
+			getSeconds = time.getSeconds();
+			if (month < 10) {
+				month = '0' + month;
+			}
+			if (getDate < 10) {
+				getDate = '0' + getDate;
+			}
+			if (getHours < 10) {
+				getHours = '0' + getHours;
+			}
+			if (getMinutes < 10) {
+				getMinutes = '0' + getMinutes;
+			}
+			if (getSeconds < 10) {
+				getSeconds = '0' + getSeconds;
+			}
+			str = time.getFullYear() + "年" + month + "月" + getDate + "日";
+			return str;
+		}
+		function TiaoZhuan(id,url){
+			
+			//href="${ctx}/view/vCcmOrg/index" 
+			 window.location.href="${ctx}/sys/map/indexJump?id="+id+"&url="+url;
+			 
+		}
+	</script>

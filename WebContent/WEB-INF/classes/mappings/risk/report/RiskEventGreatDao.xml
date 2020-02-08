@@ -1,0 +1,404 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.arjjs.ccm.modules.risk.report.dao.RiskEventGreatDao">
+    
+	<sql id="riskEventGreatColumns">
+		a.id AS "id",
+		a.name AS "name",
+		a.department AS "department",
+		a.description AS "description",
+		a.influence AS "influence",
+		a.process AS "process",
+		a.resp_name AS "respName",
+		a.is_reserve AS "isReserve",
+		a.file AS "file",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag"
+	</sql>
+	
+	<sql id="riskEventGreatJoins">
+	</sql>
+    
+	<select id="get" resultType="RiskEventGreat">
+		SELECT 
+			<include refid="riskEventGreatColumns"/>
+		FROM risk_event_great a
+		<include refid="riskEventGreatJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	<!-- 入库查询 -->
+	<select id="findListDatabasePage" resultType="RiskEventGreat">
+		SELECT 
+			<include refid="riskEventGreatColumns"/>
+		FROM risk_event_great a
+		<include refid="riskEventGreatJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			AND a.is_reserve = "1"
+			<if test="name != null and name != ''">
+				AND a.name LIKE 
+					<if test="dbName == 'oracle'">'%'||#{name}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{name}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{name},'%')</if>
+			</if>
+			<if test="department != null and department != ''">
+				AND a.department LIKE 
+					<if test="dbName == 'oracle'">'%'||#{department}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{department}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{department},'%')</if>
+			</if>
+			<if test="respName != null and respName != ''">
+				AND a.resp_name LIKE 
+					<if test="dbName == 'oracle'">'%'||#{respName}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{respName}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{respName},'%')</if>
+			</if>
+			<if test="beginCreateDate != null and endCreateDate != null and beginCreateDate != '' and endCreateDate != ''">
+				AND a.create_date BETWEEN #{beginCreateDate} AND #{endCreateDate}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	<!-- 查询list重大事项数据分析 -->
+	<select id="findListNum" resultType="com.arjjs.ccm.tool.SearchTab">
+		SELECT
+			a1.typeO,
+			a1.type,
+			a1.value1,
+			a2.value2
+		FROM
+		(
+			SELECT
+				a.id AS "typeO",
+				a.name AS "type",
+				b.value1 AS "value1"
+			FROM
+				risk_event_great a
+			LEFT JOIN 
+			(
+				SELECT
+					o.event_id AS "typeO",
+					COUNT(o.id) AS "value1"
+				FROM
+					risk_masses_opinion o
+				WHERE
+					o.del_flag='0'
+				GROUP BY
+					o.event_id
+			) b ON b.typeO=a.id
+			WHERE
+				a.del_flag='0'
+		) a1
+		LEFT JOIN
+		(
+			SELECT
+				a.id AS "typeO",
+				a.name AS "type",
+				c.value1 AS "value2"
+			FROM
+				risk_event_great a
+			LEFT JOIN 
+			(
+				SELECT
+					r.event_id AS "typeO",
+					COUNT(r.id) AS "value1"
+				FROM
+					risk_report r
+				WHERE
+					r.del_flag='0'
+				GROUP BY
+					r.event_id
+			) c ON c.typeO=a.id
+			WHERE
+				a.del_flag='0'
+		)a2 ON a2.typeO=a1.typeO
+		ORDER BY
+			a1.type	
+	</select>
+	<!-- 查询list重大事项近几个月事项报备趋势图 -->
+	<select id="findListTrend" resultType="com.arjjs.ccm.tool.EchartType">
+		SELECT
+			concat(
+				YEAR (create_date),
+				"-",
+				MONTH (create_date)
+			) AS "type",
+			COUNT(a.id) AS "value"
+		FROM
+			risk_event_great a
+		WHERE
+			a.del_flag = '0'
+		AND (
+			a.create_date &gt; date_format(
+				DATE_SUB(curdate(), INTERVAL 5 MONTH),
+				'%Y-%m'
+			)
+			AND a.create_date &lt; date_format(
+				DATE_SUB(curdate(), INTERVAL - 1 MONTH),
+				'%Y-%m'
+			)
+		)
+		GROUP BY
+			concat(
+				YEAR (create_date),
+				MONTH (create_date)
+			)
+		ORDER BY
+			concat(
+				YEAR (create_date),
+		
+			IF (
+				MONTH (create_date) &gt; 9,
+				MONTH (create_date),
+				concat("0", MONTH(create_date))
+			)
+			) ASC
+		LIMIT 6
+	</select>	
+	<select id="findSum1" resultType="int">
+		SELECT
+			COUNT(*)
+		FROM
+			(
+				SELECT
+					a.id AS "typeO",
+					a. NAME AS "type",
+					b.value1 AS "value1"
+				FROM
+					risk_event_great a
+				LEFT JOIN (
+					SELECT
+						o.event_id AS "typeO",
+						COUNT(o.id) AS "value1"
+					FROM
+						risk_masses_opinion o
+					WHERE
+						o.del_flag = '0'
+					GROUP BY
+						o.event_id
+				) b ON b.typeO = a.id
+				WHERE
+					a.del_flag = '0'
+			) c
+		WHERE
+		c.value1 is null
+	</select>		
+	<select id="findSum2" resultType="int">
+		SELECT
+			COUNT(*)
+		FROM
+			(
+				SELECT
+					a.id AS "typeO",
+					a. NAME AS "type",
+					b.value1 AS "value1"
+				FROM
+					risk_event_great a
+				LEFT JOIN (
+					SELECT
+						o.event_id AS "typeO",
+						COUNT(o.id) AS "value1"
+					FROM
+						risk_masses_opinion o
+					WHERE
+						o.del_flag = '0'
+					GROUP BY
+						o.event_id
+				) b ON b.typeO = a.id
+				WHERE
+					a.del_flag = '0'
+			) c
+		WHERE
+		c.value1 is not null
+	</select>	
+	<select id="findSum3" resultType="int">
+		SELECT
+			COUNT(*) AS "value"
+		FROM
+			(
+				SELECT
+					a.id AS "typeO",
+					a. NAME AS "type",
+					c.value1 AS "value2"
+				FROM
+					risk_event_great a
+				LEFT JOIN (
+					SELECT
+						r.event_id AS "typeO",
+						COUNT(r.id) AS "value1"
+					FROM
+						risk_report r
+					WHERE
+						r.del_flag = '0'
+					GROUP BY
+						r.event_id
+				) c ON c.typeO = a.id
+				WHERE
+					a.del_flag = '0'
+			) c
+		WHERE
+			c.value2 IS NULL
+	</select>
+	<select id="findSum4" resultType="int">
+		SELECT
+			COUNT(*) AS "value"
+		FROM
+			(
+				SELECT
+					a.id AS "typeO",
+					a. NAME AS "type",
+					c.value1 AS "value2"
+				FROM
+					risk_event_great a
+				LEFT JOIN (
+					SELECT
+						r.event_id AS "typeO",
+						COUNT(r.id) AS "value1"
+					FROM
+						risk_report r
+					WHERE
+						r.del_flag = '0'
+					GROUP BY
+						r.event_id
+				) c ON c.typeO = a.id
+				WHERE
+					a.del_flag = '0'
+			) c
+		WHERE
+			c.value2 IS NOT NULL
+	</select>
+	
+	
+	
+	
+	
+	
+	
+	<!--  -->
+	<select id="findList" resultType="RiskEventGreat">
+		SELECT 
+			<include refid="riskEventGreatColumns"/>
+		FROM risk_event_great a
+		<include refid="riskEventGreatJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="name != null and name != ''">
+				AND a.name LIKE 
+					<if test="dbName == 'oracle'">'%'||#{name}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{name}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{name},'%')</if>
+			</if>
+			<if test="department != null and department != ''">
+				AND a.department LIKE 
+					<if test="dbName == 'oracle'">'%'||#{department}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{department}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{department},'%')</if>
+			</if>
+			<if test="respName != null and respName != ''">
+				AND a.resp_name LIKE 
+					<if test="dbName == 'oracle'">'%'||#{respName}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{respName}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{respName},'%')</if>
+			</if>
+			<if test="beginCreateDate != null and endCreateDate != null and beginCreateDate != '' and endCreateDate != ''">
+				AND a.create_date BETWEEN #{beginCreateDate} AND #{endCreateDate}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="RiskEventGreat">
+		SELECT 
+			<include refid="riskEventGreatColumns"/>
+		FROM risk_event_great a
+		<include refid="riskEventGreatJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO risk_event_great(
+			id,
+			name,
+			department,
+			description,
+			influence,
+			process,
+			resp_name,
+			is_reserve,
+			file,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag
+		) VALUES (
+			#{id},
+			#{name},
+			#{department},
+			#{description},
+			#{influence},
+			#{process},
+			#{respName},
+			#{isReserve},
+			#{file},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE risk_event_great SET 	
+			name = #{name},
+			department = #{department},
+			description = #{description},
+			influence = #{influence},
+			process = #{process},
+			resp_name = #{respName},
+			is_reserve = #{isReserve},
+			file = #{file},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE risk_event_great SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

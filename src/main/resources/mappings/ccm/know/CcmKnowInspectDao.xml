@@ -1,0 +1,189 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.arjjs.ccm.modules.ccm.know.dao.CcmKnowInspectDao">
+    
+	<sql id="ccmKnowInspectColumns">
+		a.id AS "id",
+		a.name AS "name",
+		a.inspect_data AS "inspectData",
+		a.type AS "type",
+		a.num AS "num",
+		a.file AS "file",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag"
+	</sql>
+	
+	<sql id="ccmKnowInspectJoins">
+	</sql>
+    
+	<select id="get" resultType="CcmKnowInspect">
+		SELECT 
+			<include refid="ccmKnowInspectColumns"/>
+		FROM ccm_know_inspect a
+		<include refid="ccmKnowInspectJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	<!-- 安全生产防范检查 -->
+	<select id="getTypeSafeData" resultType="com.arjjs.ccm.tool.EchartType">
+		SELECT
+			concat(
+				YEAR (inspect_data),
+				"-",
+				MONTH (inspect_data)
+			) AS "type",
+			SUM(a.num) AS "value"
+		FROM ccm_know_inspect a
+		WHERE
+			a.del_flag = '0'
+		AND a.type = '01'
+		AND (
+			a.inspect_data &gt; date_format(
+				DATE_SUB(curdate(), INTERVAL 11 MONTH),
+				'%Y-%m'
+			)
+			AND a.inspect_data &lt; date_format(
+				DATE_SUB(curdate(), INTERVAL - 1 MONTH),
+				'%Y-%m'
+			)
+		)
+		GROUP BY
+			concat(
+				YEAR (inspect_data),
+				MONTH (inspect_data)
+			)
+		ORDER BY
+			concat(
+				YEAR (inspect_data),
+		
+			IF (
+				MONTH (inspect_data) &gt; 9,
+				MONTH (inspect_data),
+				concat("0", MONTH(inspect_data))
+			)
+			) ASC
+		LIMIT 12
+	</select>
+
+
+	<select id="getTypeSafeDataecharts" resultType="com.arjjs.ccm.tool.EchartType">
+		SELECT
+			date_format(inspect_data, '%Y-%m') AS 'type',
+			SUM(a.num) AS "value"
+		FROM ccm_know_inspect a
+		WHERE
+			a.del_flag = '0'
+		AND a.type = '01'
+		GROUP BY
+			date_format(inspect_data, '%Y-%m')
+	</select>
+
+	
+	
+
+	<!--  -->
+	<select id="findList" resultType="CcmKnowInspect">
+		SELECT 
+			<include refid="ccmKnowInspectColumns"/>
+		FROM ccm_know_inspect a
+		<include refid="ccmKnowInspectJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="name != null and name != ''">
+				AND a.name LIKE 
+					<if test="dbName == 'oracle'">'%'||#{name}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{name}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{name},'%')</if>
+			</if>
+
+			<if  test="beginInspectData != null and beginInspectData != ''">
+				AND a.inspect_data &gt;= #{beginInspectData}
+			</if>
+			<if  test="endInspectData != null and endInspectData != ''">
+				AND a.inspect_data &lt;= #{endInspectData}
+			</if>
+			<if test="type != null and type != ''">
+				AND a.type = #{type}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="CcmKnowInspect">
+		SELECT 
+			<include refid="ccmKnowInspectColumns"/>
+		FROM ccm_know_inspect a
+		<include refid="ccmKnowInspectJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO ccm_know_inspect(
+			id,
+			name,
+			inspect_data,
+			type,
+			num,
+			file,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag
+		) VALUES (
+			#{id},
+			#{name},
+			#{inspectData},
+			#{type},
+			#{num},
+			#{file},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE ccm_know_inspect SET 	
+			name = #{name},
+			inspect_data = #{inspectData},
+			type = #{type},
+			num = #{num},
+			file = #{file},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE ccm_know_inspect SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

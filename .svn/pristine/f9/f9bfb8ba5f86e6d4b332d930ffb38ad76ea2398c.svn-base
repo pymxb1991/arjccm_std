@@ -1,0 +1,52 @@
+/**
+ * Copyright &copy; 2012-2016 <a href="https://github.com/thinkgem/jeesite">JeeSite</a> All rights reserved.
+ */
+package com.arjjs.ccm.modules.flat.handle.dao;
+
+import com.arjjs.ccm.common.persistence.CrudDao;
+import com.arjjs.ccm.common.persistence.annotation.MyBatisDao;
+import com.arjjs.ccm.modules.ccm.rest.entity.*;
+import com.arjjs.ccm.modules.dma.eventheme.entity.CountOfficeEventEntity;
+import com.arjjs.ccm.modules.flat.export.entity.WordAlarmHandleFilePlanStepActionData;
+import com.arjjs.ccm.modules.flat.handle.entity.AlarmHandleDayInfo;
+import com.arjjs.ccm.modules.flat.handle.entity.BphAlarmHandle;
+import com.arjjs.ccm.modules.flat.handle.entity.BphAlarmHandleUserState;
+import org.apache.ibatis.annotations.Param;
+
+import java.util.List;
+
+/**
+ * 出警信息DAO接口
+ * @author liu
+ * @version 2018-11-22
+ */
+@MyBatisDao
+public interface BphAlarmHandleDao extends CrudDao<BphAlarmHandle> {
+	List<BphAlarmHandle> fingListByAlarmId(BphAlarmHandle bphAlarmHandle);
+	List<BphAlarmHandle> findHandleTimeCount();
+	List<BphAlarmHandle> planManagerDetails(BphAlarmHandle bphAlarmHandle);
+	List<BphAlarmHandle> findAlarmHandle(String id);
+	List<WordAlarmHandleFilePlanStepActionData> findAlarmHandleFilePlanStepAction(String id);
+	List<BphAlarmHandle> findAlarmHandlePlanStepAction(String id);
+	List<BphAlarmHandleUserState> findUserState(BphAlarmHandleUserState bphAlarmHandleUserState);
+	List<CountOfficeEventEntity> queryPoliceAlarm();
+	List<String> queryOfficeInfo();
+	List<BphAlarmHandle> fingListByAlarmIdAndpoliceId(BphAlarmHandle bphAlarmHandle);
+	//App 接处警，查询用户当天警情列表
+	List<AlarmHandleDayInfo> queryDayAlarmList(CcmBphReceiveAlarmVo receiveAlarmVo);
+	//App 接处警，更新警情任务状态
+	int updateAlarmHandleById(BphAlarmHandle alarmHandle);
+	//App 接处警，查询当前用户部门的所有警情
+	List<CurrentOffAlarmHandleInfo> queryCurrentOffHandleByAlarmIdAndOffId(@Param("alarmId")String alarmId, @Param("userId") String userId, @Param("offId") String offId);
+	//App 接处警，查询警情详情
+	AlarmHandleInfo queryAlarmHandleInfo(@Param("alarmId") String alarmId,@Param("handleId") String handleId, @Param("handlePoliceId") String handlePoliceId);
+	//App 接处警，查询警情反馈明细
+	List<AlarmHandle> selectAlarmHandleByAlarmIdAndhandlePoliceId(@Param("alarmId") String alarmId, @Param("handlePoliceId") String handlePoliceId);
+	//App 接处警，查询警情反馈明细
+	AlarmHandleFeedBack alarmHandleFeedback(@Param("handleId") String handleId);
+
+	List<AlarmHandlEntity> queryAlarmList(CcmBphQueryAlarmVo queryAlarmVo);
+
+	//App 接处警，统计24小时内用户收到的警情数量
+	int queryAlarmCount(@Param("handlePoliceId")String handlePoliceId, @Param("status")List<String> status);
+}

@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.arjjs.ccm.modules.kpi.score.dao.KpiSchemeScoreDao">
+    
+	<sql id="kpiSchemeScoreColumns">
+		a.id AS "id",
+		a.user_id AS "userId.id",
+		a.scorer_id AS "scorerId.id",
+		a.kpi_id AS "kpiId",
+		a.score AS "score",
+		a.scheme_id AS "schemeId",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag",
+		u2.name AS "userId.name",
+		u3.name AS "scorerId.name"
+	</sql>
+	
+	<sql id="kpiSchemeScoreJoins">
+		LEFT JOIN sys_user u2 ON u2.id = a.user_id
+		LEFT JOIN sys_user u3 ON u3.id = a.scorer_id
+	</sql>
+    
+	<select id="get" resultType="KpiSchemeScore">
+		SELECT 
+			<include refid="kpiSchemeScoreColumns"/>
+		FROM kpi_scheme_score a
+		<include refid="kpiSchemeScoreJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="KpiSchemeScore">
+		SELECT 
+			<include refid="kpiSchemeScoreColumns"/>
+		FROM kpi_scheme_score a
+		<include refid="kpiSchemeScoreJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="userId != null and userId.id != null and userId.id != ''">
+				AND a.user_id = #{userId.id}
+			</if>
+			<if test="scorerId != null and scorerId.id != null and scorerId.id != ''">
+				AND a.scorer_id = #{scorerId.id}
+			</if>
+			<if test="kpiId != null and kpiId != ''">
+				AND a.kpi_id = #{kpiId}
+			</if>
+			<if test="schemeId != null and schemeId != ''">
+				AND a.scheme_id = #{schemeId}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="KpiSchemeScore">
+		SELECT 
+			<include refid="kpiSchemeScoreColumns"/>
+		FROM kpi_scheme_score a
+		<include refid="kpiSchemeScoreJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO kpi_scheme_score(
+			id,
+			user_id,
+			scorer_id,
+			kpi_id,
+			score,
+			scheme_id,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag
+		) VALUES (
+			#{id},
+			#{userId.id},
+			#{scorerId.id},
+			#{kpiId},
+			#{score},
+			#{schemeId},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag}
+		)
+	</insert>
+	
+	
+	
+	<select id="getSchemeScore" resultType="KpiSchemeScore">
+		SELECT 
+			a.id AS "id",
+			a.user_id AS "userId.id",
+			a.scorer_id AS "scorerId.id",
+			a.kpi_id AS "kpiId",
+			a.score AS "score",
+			a.scheme_id AS "schemeId"
+		FROM kpi_scheme_score a,
+	         kpi_scheme_kpi kpi
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			AND kpi.del_flag = #{DEL_FLAG_NORMAL}
+			AND a.kpi_id = kpi.id
+			AND kpi.type = '01'
+			AND a.scheme_id = #{schemeId}
+			AND a.user_id = #{userId.id}
+		</where>
+		ORDER BY a.kpi_id
+	</select>
+	
+	
+	<update id="update">
+		UPDATE kpi_scheme_score SET 	
+			user_id = #{userId.id},
+			scorer_id = #{scorerId.id},
+			kpi_id = #{kpiId},
+			score = #{score},
+			scheme_id = #{schemeId},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE kpi_scheme_score SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

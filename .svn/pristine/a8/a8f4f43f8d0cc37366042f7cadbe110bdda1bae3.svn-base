@@ -1,0 +1,193 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.arjjs.ccm.modules.plm.allot.dao.PlmAllotDao">
+    
+	<sql id="plmAllotColumns">
+		a.id AS "id",
+		a.proc_ins_id AS "procInsId",
+		a.code AS "code",
+		a.title AS "title",
+		a.applyer AS "applyer.id",
+		a.add_date AS "addDate",
+		a.sum_cap AS "sumCap",
+		a.sum_low AS "sumLow",
+		a.out_dep AS "outDep.id",
+		a.in_dep AS "inDep.id",
+		a.out_manager AS "outManager.id",
+		a.in_manager AS "inManager.id",
+		a.out_operator AS "outOperator.id",
+		a.in_operator AS "inOperator.id",
+		a.out_date AS "outDate",
+		a.in_date AS "inDate",
+		a.extend1 AS "extend1",
+		a.extend2 AS "extend2",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag",
+		u5.name AS "applyer.name",
+		o9.name AS "outDep.name",
+		o10.name AS "inDep.name",
+		u11.name AS "outManager.name",
+		u12.name AS "inManager.name",
+		u13.name AS "outOperator.name",
+		u14.name AS "inOperator.name"
+	</sql>
+	
+	<sql id="plmAllotJoins">
+		LEFT JOIN sys_user u5 ON u5.id = a.applyer
+		LEFT JOIN sys_office o9 ON o9.id = a.out_dep
+		LEFT JOIN sys_office o10 ON o10.id = a.in_dep
+		LEFT JOIN sys_user u11 ON u11.id = a.out_manager
+		LEFT JOIN sys_user u12 ON u12.id = a.in_manager
+		LEFT JOIN sys_user u13 ON u13.id = a.out_operator
+		LEFT JOIN sys_user u14 ON u14.id = a.in_operator
+	</sql>
+    
+	<select id="get" resultType="PlmAllot">
+		SELECT 
+			<include refid="plmAllotColumns"/>
+		FROM plm_allot a
+		<include refid="plmAllotJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="PlmAllot">
+		SELECT 
+			<include refid="plmAllotColumns"/>
+		FROM plm_allot a
+		<include refid="plmAllotJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="title != null and title != ''">
+				AND a.title LIKE 
+					<if test="dbName == 'oracle'">'%'||#{title}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{title}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{title},'%')</if>
+			</if>
+			<if test="beginAddDate != null and endAddDate != null and beginAddDate != '' and endAddDate != ''">
+				AND a.add_date BETWEEN #{beginAddDate} AND #{endAddDate}
+			</if>
+			<if test="outDep != null and outDep.id != null and outDep.id != ''">
+				AND a.out_dep = #{outDep.id}
+			</if>
+			<if test="inDep != null and inDep.id != null and inDep.id != ''">
+				AND a.in_dep = #{inDep.id}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="PlmAllot">
+		SELECT 
+			<include refid="plmAllotColumns"/>
+		FROM plm_allot a
+		<include refid="plmAllotJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO plm_allot(
+			id,
+			proc_ins_id,
+			code,
+			title,
+			applyer,
+			add_date,
+			sum_cap,
+			sum_low,
+			out_dep,
+			in_dep,
+			out_manager,
+			in_manager,
+			out_operator,
+			in_operator,
+			out_date,
+			in_date,
+			extend1,
+			extend2,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag
+		) VALUES (
+			#{id},
+			#{procInsId},
+			#{code},
+			#{title},
+			#{applyer.id},
+			#{addDate},
+			#{sumCap},
+			#{sumLow},
+			#{outDep.id},
+			#{inDep.id},
+			#{outManager.id},
+			#{inManager.id},
+			#{outOperator.id},
+			#{inOperator.id},
+			#{outDate},
+			#{inDate},
+			#{extend1},
+			#{extend2},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE plm_allot SET 	
+			proc_ins_id = #{procInsId},
+			code = #{code},
+			title = #{title},
+			applyer = #{applyer.id},
+			add_date = #{addDate},
+			sum_cap = #{sumCap},
+			sum_low = #{sumLow},
+			out_dep = #{outDep.id},
+			in_dep = #{inDep.id},
+			out_manager = #{outManager.id},
+			in_manager = #{inManager.id},
+			out_operator = #{outOperator.id},
+			in_operator = #{inOperator.id},
+			out_date = #{outDate},
+			in_date = #{inDate},
+			extend1 = #{extend1},
+			extend2 = #{extend2},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE plm_allot SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

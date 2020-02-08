@@ -1,0 +1,337 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper
+	namespace="com.arjjs.ccm.modules.ccm.event.dao.preview.CcmEventIncidentPreviewDao">
+
+	<sql id="ccmEventIncidentPreviewColumns">
+		a.id AS "id",
+		a.case_name AS "caseName",
+		a.happen_date AS
+		"happenDate",
+		a.case_place AS "casePlace",
+		a.happen_place AS
+		"happenPlace",
+		a.area_map AS "areaMap",
+		a.area_point AS "areaPoint",
+		a.image AS "image",
+		a.event_kind AS "eventKind",
+		a.other_id AS
+		"otherId",
+		a.event_scale AS "eventScale",
+		a.event_type AS "eventType",
+		a.number AS "number",
+		a.property AS "property",
+		a.case_condition AS
+		"caseCondition",
+		a.cul_papercode AS "culPapercode",
+		a.cul_paperid AS
+		"culPaperid",
+		a.cul_name AS "culName",
+		a.type_solve AS "typeSolve",
+		a.num_crime AS "numCrime",
+		a.num_flee AS "numFlee",
+		a.num_arrest AS
+		"numArrest",
+		a.case_over_day AS "caseOverDay",
+		a.case_solve AS
+		"caseSolve",
+		a.file1 AS "file1",
+		a.file2 AS "file2",
+		a.file3 AS "file3",
+		a.status AS "status",
+		a.create_by AS "createBy.id",
+		a.create_date AS
+		"createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS
+		"updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag",
+		a.report_person AS "reportPerson",
+		a.report_person_phone AS
+		"reportPersonPhone",
+		a.is_key_place AS "isKeyPlace",
+		a.case_scope AS
+		"caseScope",
+		a.report_type AS "reportType",
+		a.event_kind_parent_type AS
+		"eventKindParentType",
+		a20.name AS "area.name"
+	</sql>
+	<sql id="ccmEventIncidentPreviewColumnsWithUser">
+		a.id AS "id",
+		a.case_name AS "caseName",
+		a.happen_date AS
+		"happenDate",
+		a.case_place AS "casePlace",
+		a.happen_place AS
+		"happenPlace",
+		a.area_map AS "areaMap",
+		a.area_point AS "areaPoint",
+		a.image AS "image",
+		a.event_kind AS "eventKind",
+		a.other_id AS
+		"otherId",
+		a.event_scale AS "eventScale",
+		a.event_type AS "eventType",
+		a.number AS "number",
+		a.property AS "property",
+		a.case_condition AS
+		"caseCondition",
+		a.cul_papercode AS "culPapercode",
+		a.cul_paperid AS
+		"culPaperid",
+		a.cul_name AS "culName",
+		a.type_solve AS "typeSolve",
+		a.num_crime AS "numCrime",
+		a.num_flee AS "numFlee",
+		a.num_arrest AS
+		"numArrest",
+		a.case_over_day AS "caseOverDay",
+		a.case_solve AS
+		"caseSolve",
+		a.file1 AS "file1",
+		a.file2 AS "file2",
+		a.file3 AS "file3",
+		a.status AS "status",
+		a.create_by AS "createBy.id",
+		a.create_date AS
+		"createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS
+		"updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag",
+		a.report_person AS "reportPerson",
+		a.report_person_phone AS
+		"reportPersonPhone",
+		a.is_key_place AS "isKeyPlace",
+		a.case_scope AS
+		"caseScope",
+		a.report_type AS "reportType",
+		a.event_kind_parent_type AS
+		"eventKindParentType",
+		b.name AS "createName",
+		IFNULL( a20.name ,"") AS "area.name"
+	</sql>
+
+	<sql id="ccmEventIncidentPreviewJoins">
+		LEFT JOIN sys_area a20 ON a20.id = a.case_place
+	</sql>
+	<sql id="ccmEventIncidentPreviewJoinsUser">
+		LEFT JOIN sys_user b ON b.id = a.create_by
+	</sql>
+
+	<select id="get" resultType="CcmEventIncidentPreview">
+		SELECT
+		<include refid="ccmEventIncidentPreviewColumns" />
+		FROM ccm_event_incident_preview a
+		<include refid="ccmEventIncidentPreviewJoins" />
+		WHERE a.id = #{id}
+	</select>
+
+	<select id="findList" resultType="CcmEventIncidentPreview">
+		SELECT
+		<include refid="ccmEventIncidentPreviewColumns" />
+		FROM ccm_event_incident_preview a
+		<include refid="ccmEventIncidentPreviewJoinsUser" />
+		<include refid="ccmEventIncidentPreviewJoins" />
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			 <if test="userArea != null and userArea.parentIds != null and userArea.parentIds != ''">
+             AND   (a20.parent_ids LIKE  CONCAT('%',#{userArea.id},'%')  or a.case_place = #{userArea.id})
+              </if>
+			<if test="caseName != null and caseName != ''">
+				AND a.case_name LIKE
+				<if test="dbName == 'oracle'">'%'||#{caseName}||'%'</if>
+				<if test="dbName == 'mssql'">'%'+#{caseName}+'%'</if>
+				<if test="dbName == 'mysql'">concat('%',#{caseName},'%')</if>
+			</if>
+			<if test="area != null and area.id != null and area.id != ''">
+				AND a.case_place = #{area.id}
+			</if>
+			<if
+				test="beginHappenDate != null and endHappenDate != null and beginHappenDate != '' and endHappenDate != ''">
+				AND a.happen_date BETWEEN #{beginHappenDate} AND
+				#{endHappenDate}
+			</if>
+			<if test="status != null and status != ''">
+				AND a.status = #{status}
+			</if>
+			<if test="reportPerson != null and reportPerson != ''">
+				AND a.report_person LIKE 
+				<if test="dbName == 'oracle'">'%'||#{reportPerson}||'%'</if>
+				<if test="dbName == 'mssql'">'%'+#{reportPerson}+'%'</if>
+				<if test="dbName == 'mysql'">concat('%',#{reportPerson},'%')</if>
+			</if>
+			<if test="caseScope != null and caseScope != ''">
+				AND a.case_scope = #{caseScope}
+			</if>
+			<if test="reportType != null and reportType != ''">
+				AND a.report_type = #{reportType}
+			</if>
+		</where>
+		<choose>
+			<when
+				test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+
+	<select id="findAllList" resultType="CcmEventIncidentPreview">
+		SELECT
+		<include refid="ccmEventIncidentPreviewColumns" />
+		FROM ccm_event_incident_preview a
+		<include refid="ccmEventIncidentPreviewJoins" />
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>
+		<choose>
+			<when
+				test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+
+	<insert id="insert">
+		INSERT INTO ccm_event_incident_preview(
+		id,
+		case_name,
+		happen_date,
+		case_place,
+		happen_place,
+		area_map,
+		area_point,
+		image,
+		event_kind,
+		other_id,
+		event_scale,
+		event_type,
+		number,
+		property,
+		case_condition,
+		cul_papercode,
+		cul_paperid,
+		cul_name,
+		type_solve,
+		num_crime,
+		num_flee,
+		num_arrest,
+		case_over_day,
+		case_solve,
+		file1,
+		file2,
+		file3,
+		status,
+		create_by,
+		create_date,
+		update_by,
+		update_date,
+		remarks,
+		del_flag,
+		report_person,
+		report_person_phone,
+		is_key_place,
+		case_scope,
+		report_type,
+		event_kind_parent_type
+		) VALUES (
+		#{id},
+		#{caseName},
+		#{happenDate},
+		#{casePlace},
+		#{happenPlace},
+		#{areaMap},
+		#{areaPoint},
+		#{image},
+		#{eventKind},
+		#{otherId},
+		#{eventScale},
+		#{eventType},
+		#{number},
+		#{property},
+		#{caseCondition},
+		#{culPapercode},
+		#{culPaperid},
+		#{culName},
+		#{typeSolve},
+		#{numCrime},
+		#{numFlee},
+		#{numArrest},
+		#{caseOverDay},
+		#{caseSolve},
+		#{file1},
+		#{file2},
+		#{file3},
+		#{status},
+		#{createBy.id},
+		#{createDate},
+		#{updateBy.id},
+		#{updateDate},
+		#{remarks},
+		#{delFlag},
+		#{reportPerson},
+		#{reportPersonPhone},
+		#{isKeyPlace},
+		#{caseScope},
+		#{reportType},
+		#{eventKindParentType}
+		)
+	</insert>
+
+	<update id="update">
+		UPDATE ccm_event_incident_preview SET
+		case_name = #{caseName},
+		happen_date = #{happenDate},
+		case_place = #{casePlace},
+		happen_place = #{happenPlace},
+		area_map = #{areaMap},
+		area_point = #{areaPoint},
+		image = #{image},
+		event_kind = #{eventKind},
+		other_id = #{otherId},
+		event_scale = #{eventScale},
+		event_type = #{eventType},
+		number = #{number},
+		property = #{property},
+		case_condition = #{caseCondition},
+		cul_papercode = #{culPapercode},
+		cul_paperid = #{culPaperid},
+		cul_name = #{culName},
+		type_solve = #{typeSolve},
+		num_crime = #{numCrime},
+		num_flee = #{numFlee},
+		num_arrest = #{numArrest},
+		case_over_day = #{caseOverDay},
+		case_solve = #{caseSolve},
+		file1 = #{file1},
+		file2 = #{file2},
+		file3 = #{file3},
+		status = #{status},
+		update_by = #{updateBy.id},
+		update_date = #{updateDate},
+		remarks = #{remarks},
+		report_person = #{reportPerson},
+		report_person_phone = #{reportPersonPhone},
+		is_key_place = #{isKeyPlace},
+		case_scope = #{caseScope},
+		report_type = #{reportType},
+		event_kind_parent_type = #{eventKindParentType}
+		WHERE id = #{id}
+	</update>
+
+	<update id="delete">
+		UPDATE ccm_event_incident_preview SET
+		del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+
+</mapper>

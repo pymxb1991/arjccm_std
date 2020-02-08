@@ -1,0 +1,137 @@
+<%@ page contentType="text/html;charset=UTF-8" %>
+<%@ include file="/WEB-INF/views/include/taglib.jsp"%>
+<html>
+<head>
+	<title>重点人员签到记录管理</title>
+	<meta name="decorator" content="default"/>
+	<script type="text/javascript">
+		$(document).ready(function() {
+			
+		});
+		function page(n,s){
+			$("#pageNo").val(n);
+			$("#pageSize").val(s);
+			$("#searchForm").submit();
+        	return false;
+        }
+	</script>
+</head>
+<body>
+	<ul class="nav nav-tabs">
+		<li class="active"><a href="${ctx}/log/ccmLogImpPopSign/">重点人员签到记录列表</a></li>
+		<%-- <shiro:hasPermission name="log:ccmLogImpPopSign:edit"><li><a href="${ctx}/log/ccmLogImpPopSign/form">重点人员签到记录添加</a></li></shiro:hasPermission> --%>
+	</ul>
+	<form:form id="searchForm" modelAttribute="ccmLogImpPopSign" action="${ctx}/log/ccmLogImpPopSign/" method="post" class="breadcrumb form-search">
+		<input id="pageNo" name="pageNo" type="hidden" value="${page.pageNo}"/>
+		<input id="pageSize" name="pageSize" type="hidden" value="${page.pageSize}"/>
+		<ul class="ul-form">
+			<li><label>人员姓名：</label>
+				<form:input path="peopleId.name" htmlEscape="false" maxlength="64" class="input-medium"/>
+			</li>
+			<li><label>类型：</label>
+				<form:select path="type" class="input-medium">
+					<form:option value="" label="全部"/>
+					<form:options items="${fns:getDictList('ccm_imp_people_sign_type')}" itemLabel="label" itemValue="value" htmlEscape="false"/>
+				</form:select>
+			</li>
+			<li><label>签到有效状态：</label>
+				<form:select path="effectiveStatus" class="input-medium">
+					<form:option value="" label="全部"/>
+					<form:options items="${fns:getDictList('sign_effective_status')}" itemLabel="label" itemValue="value" htmlEscape="false"/>
+				</form:select>
+			</li>
+			<li><label>签到异常状态：</label>
+				<form:select path="errorStatus" class="input-medium">
+					<form:option value="" label="全部"/>
+					<form:options items="${fns:getDictList('sign_error_status')}" itemLabel="label" itemValue="value" htmlEscape="false"/>
+				</form:select>
+			</li>
+			<li><label>时间：</label>
+				<input name="beginTailTime" type="text" readonly="readonly" maxlength="20" class="input-medium Wdate"
+					value="<fmt:formatDate value="${ccmLogImpPopSign.beginTailTime}" pattern="yyyy-MM-dd HH:mm:ss"/>"
+					onclick="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss',isShowClear:false});"/> - 
+				<input name="endTailTime" type="text" readonly="readonly" maxlength="20" class="input-medium Wdate"
+					value="<fmt:formatDate value="${ccmLogImpPopSign.endTailTime}" pattern="yyyy-MM-dd HH:mm:ss"/>"
+					onclick="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss',isShowClear:false});"/>
+			</li>
+			<li class="btns"><input id="btnSubmit" class="btn btn-primary" type="submit" value="查询"/></li>
+			<li class="clearfix"></li>
+		</ul>
+	</form:form>
+	<sys:message content="${message}"/>
+	<table id="contentTable" class="table table-striped table-bordered table-condensed">
+		<thead>
+			<tr>
+				<th>人员姓名</th>
+				<th>人员类型</th>
+				<th>内容</th>
+				<th>类型</th>
+				<th>时间</th>
+				<th>有效状态</th>
+				<th>异常状态</th>
+				<th>备注信息</th>
+				<shiro:hasPermission name="log:ccmLogImpPopSign:edit"><th>操作</th></shiro:hasPermission>
+			</tr>
+		</thead>
+		<tbody>
+		<c:forEach items="${page.list}" var="ccmLogImpPopSign">
+			<tr>
+				<td class="tc">
+					${ccmLogImpPopSign.peopleId.name}
+				</td>
+				<td class="tc">
+					<c:if test="${ccmLogImpPopSign.peopleId.isRelease eq '1'}">
+					安置帮教人员&nbsp;&nbsp;	 
+					</c:if>
+					<c:if test="${ccmLogImpPopSign.peopleId.isRectification eq '1'}">
+					社区矫正人员&nbsp;&nbsp;	  
+					</c:if>
+					<c:if test="${ccmLogImpPopSign.peopleId.isAids eq '1'}">
+					艾滋病危险人员&nbsp;&nbsp;	  
+					</c:if>
+					<c:if test="${ccmLogImpPopSign.peopleId.isPsychogeny == 1}">
+					 肇事肇祸等严重精神障碍患者	&nbsp;&nbsp;	  
+					</c:if>
+					<c:if test="${ccmLogImpPopSign.peopleId.isDrugs eq '1'}">
+					吸毒人员&nbsp;&nbsp;	  
+					</c:if>
+					<c:if test="${ccmLogImpPopSign.peopleId.isVisit eq '1'}">
+					重点上访人员&nbsp;&nbsp;	  
+					</c:if>
+					<c:if test="${ccmLogImpPopSign.peopleId.isHeresy eq '1'}">
+					涉教人员&nbsp;&nbsp; 
+					</c:if>
+				</td>
+			
+				<td>
+				<a href="${ctx}/log/ccmLogImpPopSign/form?id=${ccmLogImpPopSign.id}">
+					${ccmLogImpPopSign.content}
+				</a>
+				</td>
+				<td class="tc">
+					${fns:getDictLabel(ccmLogImpPopSign.type, 'ccm_imp_people_sign_type', '')}
+				</td>
+				<td class="tc">
+					<fmt:formatDate value="${ccmLogImpPopSign.tailTime}" pattern="yyyy-MM-dd HH:mm:ss"/>
+				</td>
+				<td class="tc">
+					${fns:getDictLabel(ccmLogImpPopSign.effectiveStatus, 'sign_effective_status', '')}
+				</td>
+				<td class="tc">
+					${fns:getDictLabel(ccmLogImpPopSign.errorStatus, 'sign_error_status', '')}
+				</td>
+				<td class="tp">
+					${ccmLogImpPopSign.remarks}
+				</td>
+				<shiro:hasPermission name="log:ccmLogImpPopSign:edit"><td class="tc">
+    				<a class="btnList" href="${ctx}/log/ccmLogImpPopSign/form?id=${ccmLogImpPopSign.id}"><i class="icon-pencil"></i></a>
+					<a class="btnList" href="${ctx}/log/ccmLogImpPopSign/delete?id=${ccmLogImpPopSign.id}" onclick="return confirmx('确认要删除该重点人员签到记录吗？', this.href)"><i class="icon-trash"></i></a>
+				</td></shiro:hasPermission>
+				
+			</tr>
+		</c:forEach>
+		</tbody>
+	</table>
+	<div class="pagination">${page}</div>
+</body>
+</html>

@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.arjjs.ccm.modules.ccm.proposal.dao.CcmDatabaseProposalDao">
+    
+	<sql id="ccmDatabaseProposalColumns">
+		a.id AS "id",
+		a.title AS "title",
+		a.content AS "content",
+		a.remarks AS "remarks",
+		a.create_date AS "createDate",
+		a.create_by AS "createBy.id",
+		a.update_date AS "updateDate",
+		a.update_by AS "updateBy.id",
+		a.del_flag AS "delFlag"
+	</sql>
+	
+	<sql id="ccmDatabaseProposalJoins">
+	</sql>
+    
+	<select id="get" resultType="CcmDatabaseProposal">
+		SELECT 
+			<include refid="ccmDatabaseProposalColumns"/>
+		FROM ccm_database_proposal a
+		<include refid="ccmDatabaseProposalJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="CcmDatabaseProposal">
+		SELECT 
+			<include refid="ccmDatabaseProposalColumns"/>
+		FROM ccm_database_proposal a
+		<include refid="ccmDatabaseProposalJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="title != null and title != ''">
+				AND a.title LIKE 
+					<if test="dbName == 'oracle'">'%'||#{title}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{title}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{title},'%')</if>
+			</if>
+			<if test="beginCreateDate != null and beginCreateDate != ''">
+				AND a.create_date &gt;= #{beginCreateDate}
+			</if>
+			<if test="endCreateDate != null and endCreateDate != ''">
+				AND a.create_date &lt;= #{endCreateDate}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="CcmDatabaseProposal">
+		SELECT 
+			<include refid="ccmDatabaseProposalColumns"/>
+		FROM ccm_database_proposal a
+		<include refid="ccmDatabaseProposalJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO ccm_database_proposal(
+			id,
+			title,
+			content,
+			remarks,
+			create_date,
+			create_by,
+			update_date,
+			update_by,
+			del_flag
+		) VALUES (
+			#{id},
+			#{title},
+			#{content},
+			#{remarks},
+			#{createDate},
+			#{createBy.id},
+			#{updateDate},
+			#{updateBy.id},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE ccm_database_proposal SET 	
+			title = #{title},
+			content = #{content},
+			remarks = #{remarks},
+			update_date = #{updateDate},
+			update_by = #{updateBy.id}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE ccm_database_proposal SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	<select id="getProposalInfo" resultType="com.arjjs.ccm.modules.ccm.rest.entity.CcmRestProposal">
+		SELECT
+			proposal.id AS "proposalId",
+			proposal.title AS "proposalTitle",
+			proposal.content AS "proposalContent",
+			sysuser.id AS "userId",
+			sysuser.`name` AS "userName",
+			sysuser.photo AS "userPhoto"
+		FROM
+			ccm_database_proposal proposal
+		LEFT JOIN sys_user sysuser ON sysuser.id = proposal.create_by
+		WHERE proposal.del_flag = #{DEL_FLAG_NORMAL}
+		AND proposal.create_date &lt;= #{createDate}
+		ORDER BY proposal.create_date DESC
+		LIMIT #{pageNo},#{pageSize}
+	</select>
+</mapper>

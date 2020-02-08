@@ -1,0 +1,506 @@
+/**
+ * Copyright &copy; 2012-2016 <a href="https://github.com/thinkgem/jeesite">JeeSite</a> All rights reserved.
+ */
+package com.arjjs.ccm.modules.ccm.event.web;
+
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.apache.shiro.authz.annotation.RequiresPermissions;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
+import com.arjjs.ccm.common.config.Global;
+import com.arjjs.ccm.common.gis.Point;
+import com.arjjs.ccm.common.persistence.Page;
+import com.arjjs.ccm.common.utils.StringUtils;
+import com.arjjs.ccm.common.web.BaseController;
+import com.arjjs.ccm.modules.ccm.ccmsys.entity.CcmDevice;
+import com.arjjs.ccm.modules.ccm.ccmsys.service.CcmDeviceService;
+import com.arjjs.ccm.modules.ccm.event.entity.CcmEventCasedeal;
+import com.arjjs.ccm.modules.ccm.event.entity.CcmEventIncident;
+import com.arjjs.ccm.modules.ccm.event.service.CcmEventIncidentService;
+import com.arjjs.ccm.modules.ccm.house.entity.CcmHouseBuildmanage;
+import com.arjjs.ccm.modules.ccm.house.service.CcmHouseBuildmanageService;
+import com.arjjs.ccm.modules.ccm.line.entity.CcmLineProtect;
+import com.arjjs.ccm.modules.ccm.line.service.CcmLineProtectService;
+import com.arjjs.ccm.modules.ccm.org.entity.CcmOrgArea;
+import com.arjjs.ccm.modules.ccm.org.entity.CcmOrgCommonality;
+import com.arjjs.ccm.modules.ccm.pop.entity.CcmPeople;
+import com.arjjs.ccm.modules.ccm.pop.entity.CcmPopTenant;
+import com.arjjs.ccm.modules.ccm.pop.service.CcmPeopleService;
+import com.arjjs.ccm.modules.sys.entity.Area;
+import com.arjjs.ccm.tool.CommUtil;
+import com.arjjs.ccm.tool.EchartType;
+import com.arjjs.ccm.tool.SearchTabMore;
+import com.arjjs.ccm.tool.geoJson.GeoJSON;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+
+import net.sf.json.JSONArray;
+import net.sf.json.JsonConfig;
+import net.sf.json.util.CycleDetectionStrategy;
+
+/**
+ * 案事件登记Controller
+ * 
+ * @author arj
+ * @version 2018-01-10
+ */
+@Controller
+@RequestMapping(value = "${adminPath}/event/ccmEventIncident")
+public class CcmEventIncidentController extends BaseController {
+
+	@Autowired
+	private CcmEventIncidentService ccmEventIncidentService;
+	@Autowired
+	private CcmLineProtectService ccmLineProtectService;
+	//建筑
+	@Autowired
+    private CcmHouseBuildmanageService ccmHouseBuildmanageService;
+	//重点人物
+	@Autowired
+	private CcmPeopleService ccmPeopleService;
+	//摄像头
+	@Autowired
+	private CcmDeviceService ccmDevicService;
+	@ModelAttribute
+	public CcmEventIncident get(@RequestParam(required = false) String id,
+			@RequestParam(required = false) String eventPath) {
+		CcmEventIncident entity = null;
+		if (StringUtils.isNotBlank(id)) {
+			entity = ccmEventIncidentService.get(id);
+		}
+		if (entity == null) {
+			entity = new CcmEventIncident();
+		}
+		return entity;
+	}
+
+
+	//涉及线路
+	@RequiresPermissions("event:ccmEventIncident:view")
+	@RequestMapping(value = "formIncident")
+	public String formIncident(CcmEventIncident ccmEventIncident, Model model) {
+		model.addAttribute("ccmEventIncident", ccmEventIncident);
+		return "ccm/event/eventIncident/ccmEventIncidentFormIncident";
+	}
+	//涉及线路的菜单列表跳转（到护路护线修改）
+	@RequiresPermissions("event:ccmEventIncident:view")
+	@RequestMapping(value = "formJump")
+	public String formJump(CcmEventIncident ccmEventIncident, Model model) {
+		//查询相关线路
+		CcmLineProtect ccmLineProtect = ccmLineProtectService.get(ccmEventIncident.getOtherId());
+		//查询相关案事件
+		List<CcmEventIncident> ccmEventIncidentList = ccmLineProtectService.findList(ccmLineProtect.getId());
+		model.addAttribute("ccmEventIncidentList", ccmEventIncidentList);
+		model.addAttribute("ccmLineProtect", ccmLineProtect);
+		return "ccm/line/ccmLineProtectForm";
+	}
+	
+	@RequiresPermissions("event:ccmEventIncident:edit")
+	@RequestMapping(value = "saveIncident")
+	public String saveIncident(CcmEventIncident ccmEventIncident, Model model, RedirectAttributes redirectAttributes) {
+		if (!beanValidator(model, ccmEventIncident)) {
+			return form(ccmEventIncident, model);
+		}
+		ccmEventIncidentService.save(ccmEventIncident);
+		addMessage(redirectAttributes, "保存案事件登记成功");
+		return "redirect:" + Global.getAdminPath() + "/line/ccmLineProtect/?repage";
+	}
+	
+	/**
+	 * @see 返回只读页面
+	 * @param ccmEventCasedeal 事件处理原型
+	 * @param model
+	 * @return
+	 */
+	@RequiresPermissions("event:ccmEventIncident:viewRead")
+	@RequestMapping(value = "readformIncident")
+	public String readformIncident(CcmEventIncident ccmEventIncident, Model model) {
+		List<CcmEventCasedeal> CcmEventCasedealList = ccmEventIncidentService.findList(ccmEventIncident.getId());
+		model.addAttribute("CcmEventCasedealList", CcmEventCasedealList);
+		model.addAttribute("ccmEventIncident", ccmEventIncident);
+		return "ccm/event/eventIncident/ccmEventIncidentFormReadyOnly";
+	}
+	
+	//线路案事件列表
+	@RequiresPermissions("event:ccmEventIncident:view")
+	@RequestMapping(value ="listLine")
+	public String listLine(CcmEventIncident ccmEventIncident, HttpServletRequest request, HttpServletResponse response,
+			Model model) {
+		Page<CcmEventIncident> page = ccmEventIncidentService.findPageLine(new Page<CcmEventIncident>(request, response),
+				ccmEventIncident);
+		model.addAttribute("page", page);
+		return "ccm/event/eventIncident/ccmEventIncidentListLine";
+	}
+	//师生案事件列表
+	@RequiresPermissions("event:ccmEventIncident:view")
+	@RequestMapping(value ="listStudent")
+	public String listStudent(CcmEventIncident ccmEventIncident, HttpServletRequest request, HttpServletResponse response,
+			Model model) {
+		Page<CcmEventIncident> page = ccmEventIncidentService.findPageStudent(new Page<CcmEventIncident>(request, response),
+				ccmEventIncident);
+		model.addAttribute("page", page);
+		return "ccm/event/eventIncident/ccmEventIncidentListStudent";
+	}
+
+	//命案列表
+	@RequestMapping(value ="listMurder")
+	public String listMurder(CcmEventIncident ccmEventIncident, HttpServletRequest request, HttpServletResponse response,
+			Model model) {
+		Page<CcmEventIncident> page = ccmEventIncidentService.findPageMurder(new Page<CcmEventIncident>(request, response),
+				ccmEventIncident);
+		model.addAttribute("page", page);
+		return "ccm/event/eventIncident/ccmEventIncidentListMurder";
+	}
+	
+	//师生案事件列表修改
+	@RequiresPermissions("event:ccmEventIncident:view")
+	@RequestMapping(value = "formStudent")
+	public String formStudent(CcmEventIncident ccmEventIncident, Model model) {
+		List<CcmEventCasedeal> CcmEventCasedealList = ccmEventIncidentService.findList(ccmEventIncident.getId());
+		model.addAttribute("CcmEventCasedealList", CcmEventCasedealList);
+		return "ccm/event/eventIncident/ccmEventIncidentFormStudent";
+	}
+	
+	//命案修改
+		@RequiresPermissions("event:ccmEventIncident:view")
+		@RequestMapping(value = "formMurder")
+		public String formMurder(CcmEventIncident ccmEventIncident, Model model) {
+			List<CcmEventCasedeal> CcmEventCasedealList = ccmEventIncidentService.findList(ccmEventIncident.getId());
+			model.addAttribute("CcmEventCasedealList", CcmEventCasedealList);
+			model.addAttribute("ccmEventIncident", ccmEventIncident);
+			return "ccm/event/eventIncident/ccmEventIncidentFormMurder";
+		}
+	
+	//线路案事件列表修改
+	@RequiresPermissions("event:ccmEventIncident:view")
+	@RequestMapping(value = "formLine")
+	public String formLine(CcmEventIncident ccmEventIncident, Model model) {
+		List<CcmEventCasedeal> CcmEventCasedealList = ccmEventIncidentService.findList(ccmEventIncident.getId());
+		model.addAttribute("CcmEventCasedealList", CcmEventCasedealList);
+		ccmEventIncident = ccmEventIncidentService.getLine(ccmEventIncident.getId());
+		model.addAttribute("ccmEventIncident", ccmEventIncident);
+		return "ccm/event/eventIncident/ccmEventIncidentFormLine";
+	}
+	//线路案事件列表删除
+	@RequiresPermissions("event:ccmEventIncident:edit")
+	@RequestMapping(value = "deleteLine")
+	public String deleteLine(CcmEventIncident ccmEventIncident, RedirectAttributes redirectAttributes) {
+		ccmEventIncidentService.delete(ccmEventIncident);
+		addMessage(redirectAttributes, "删除案事件登记成功");
+		return "redirect:" + Global.getAdminPath() + "/event/ccmEventIncident/listLine/?repage";
+	}
+	//师生案事件列表删除
+	@RequiresPermissions("event:ccmEventIncident:edit")
+	@RequestMapping(value = "deleteStudent")
+	public String deleteStudent(CcmEventIncident ccmEventIncident, RedirectAttributes redirectAttributes) {
+		ccmEventIncidentService.delete(ccmEventIncident);
+		addMessage(redirectAttributes, "删除案事件登记成功");
+		return "redirect:" + Global.getAdminPath() + "/event/ccmEventIncident/listStudent/?repage";
+	}
+	
+	//命案列表删除
+		@RequiresPermissions("event:ccmEventIncident:edit")
+		@RequestMapping(value = "deleteMurder")
+		public String deleteMurder(CcmEventIncident ccmEventIncident, RedirectAttributes redirectAttributes) {
+			ccmEventIncidentService.delete(ccmEventIncident);
+			addMessage(redirectAttributes, "删除案事件登记成功");
+			return "redirect:" + Global.getAdminPath() + "/event/ccmEventIncident/listMurder/?repage";
+		}
+		
+	
+	//线路案事件保存
+	@RequiresPermissions("event:ccmEventIncident:edit")
+	@RequestMapping(value = "saveLine")
+	public String saveLine(CcmEventIncident ccmEventIncident, Model model, RedirectAttributes redirectAttributes) {
+		if (!beanValidator(model, ccmEventIncident)) {
+			return form(ccmEventIncident, model);
+		}
+		if(ccmEventIncident.getLine()!=null && ccmEventIncident.getLine().getId()!=null && !"".equals(ccmEventIncident.getLine())){
+			ccmEventIncident.setOtherId(ccmEventIncident.getLine().getId());
+		}
+		ccmEventIncidentService.save(ccmEventIncident);
+		addMessage(redirectAttributes, "保存案事件登记成功");
+		return "redirect:" + Global.getAdminPath() + "/event/ccmEventIncident/listLine/?repage";
+	}
+	//师生案事件保存
+	@RequiresPermissions("event:ccmEventIncident:edit")
+	@RequestMapping(value = "saveStudent")
+	public String saveStudent(CcmEventIncident ccmEventIncident, Model model, RedirectAttributes redirectAttributes) {
+		if (!beanValidator(model, ccmEventIncident)) {
+			return form(ccmEventIncident, model);
+		}
+		ccmEventIncidentService.save(ccmEventIncident);
+		addMessage(redirectAttributes, "保存案事件登记成功");
+		return "redirect:" + Global.getAdminPath() + "/event/ccmEventIncident/listStudent/?repage";
+	}
+	
+	//命案保存
+		@RequiresPermissions("event:ccmEventIncident:edit")
+		@RequestMapping(value = "saveMurder")
+		public String saveMurder(CcmEventIncident ccmEventIncident, Model model, RedirectAttributes redirectAttributes) {
+			if (!beanValidator(model, ccmEventIncident)) {
+				return form(ccmEventIncident, model);
+			}
+			ccmEventIncidentService.save(ccmEventIncident);
+			addMessage(redirectAttributes, "保存案事件登记成功");
+			return "redirect:" + Global.getAdminPath() + "/event/ccmEventIncident/listMurder/?repage";
+		}
+	
+	
+	//
+	@RequiresPermissions("event:ccmEventIncident:view")
+	@RequestMapping(value = "form")
+	public String form(CcmEventIncident ccmEventIncident, Model model) {
+		List<CcmEventCasedeal> CcmEventCasedealList = ccmEventIncidentService.findList(ccmEventIncident.getId());
+		for (CcmEventCasedeal ccmEventCasedeal : CcmEventCasedealList) {
+			SimpleDateFormat sdf=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+			String date = sdf.format(ccmEventCasedeal.getCreateDate());
+//			ccmEventCasedeal.setDealDate(date);todo
+		}
+		JsonConfig config = new JsonConfig();
+		config.setExcludes(new String[]{"createBy","updateBy","currentUser","dbName","global","page","createDate","updateDate","sqlMap"});
+		config.setIgnoreDefaultExcludes(false);  //设置默认忽略
+		config.setCycleDetectionStrategy(CycleDetectionStrategy.LENIENT);
+		String jsonDocumentList = JSONArray.fromObject(CcmEventCasedealList,config).toString(); 
+		model.addAttribute("CcmEventCasedealList", jsonDocumentList);
+		model.addAttribute("CasedealListNumber", CcmEventCasedealList.size());
+		model.addAttribute("ccmEventIncident", ccmEventIncident);
+		return "ccm/event/eventIncident/ccmEventIncidentForm";
+	}
+
+	/**
+	 * 案事件详情，用于弹出层dialog的显示，方法内容和form里面的一样  pengjianqiang
+	 * @param ccmEventIncident
+	 * @param model
+	 * @return
+	 */
+	@RequiresPermissions("event:ccmEventIncident:view")
+	@RequestMapping(value = "detail")
+	public String detail(CcmEventIncident ccmEventIncident, Model model) {
+		List<CcmEventCasedeal> CcmEventCasedealList = ccmEventIncidentService.findList(ccmEventIncident.getId());
+		for (CcmEventCasedeal ccmEventCasedeal : CcmEventCasedealList) {
+			SimpleDateFormat sdf=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+			String date = sdf.format(ccmEventCasedeal.getCreateDate());
+//			ccmEventCasedeal.setHandleDate(date);
+		}
+		JsonConfig config = new JsonConfig();
+		config.setExcludes(new String[]{"createBy","updateBy","currentUser","dbName","global","page","createDate","updateDate","sqlMap"});
+		config.setIgnoreDefaultExcludes(false);  //设置默认忽略
+		config.setCycleDetectionStrategy(CycleDetectionStrategy.LENIENT);
+		String jsonDocumentList = JSONArray.fromObject(CcmEventCasedealList,config).toString(); 
+		model.addAttribute("CcmEventCasedealList", jsonDocumentList);
+		model.addAttribute("CasedealListNumber", CcmEventCasedealList.size());
+		model.addAttribute("ccmEventIncident", ccmEventIncident);
+		return "ccm/event/eventIncident/ccmEventIncidentDetail";
+	}
+	
+	/**
+	 * 今日前10条案事件
+	 * 
+	 * @param model
+	 * @return
+	 */
+	@ResponseBody
+	@RequestMapping(value = "getListToday")
+	public List<CcmEventIncident> getListToday(Model model) {
+		List<CcmEventIncident> list = ccmEventIncidentService.getListToday();
+		return list;
+	}
+
+	/**
+	 * 事件区域分布
+	 */
+	@ResponseBody
+	@RequestMapping(value = "getSafeDisData")
+	public String getSafeDisData(CcmEventIncident ccmEventIncident, Model model) {
+		List<EchartType> listSafeDis = ccmEventIncidentService.getSafeDisData(ccmEventIncident); //安全事故分布
+		EchartType newEchartType = new EchartType();//非空判断
+		newEchartType.setType("暂无数据");
+		newEchartType.setValue("0");
+		if(listSafeDis.size()==0){
+			listSafeDis.add(newEchartType);
+		}
+		JsonConfig config = new JsonConfig();//PingJson
+		config.setExcludes(new String[]{""});
+		config.setIgnoreDefaultExcludes(false);  //设置默认忽略
+		config.setCycleDetectionStrategy(CycleDetectionStrategy.LENIENT);
+		String listSafeDisString = JSONArray.fromObject(listSafeDis,config).toString(); //Json
+		return listSafeDisString;
+	}
+
+	
+	
+	
+	
+	
+	
+
+	/**
+	 * 事故发生趋势
+	 */
+	@ResponseBody
+	@RequestMapping(value = "getSafeHappenData")
+	public String getSafeHappenData(Model model) {
+		CcmEventIncident ccmEventIncident = new CcmEventIncident();
+		ccmEventIncident.setEventType("01");
+		List<EchartType> listSafeHappen = ccmEventIncidentService.findSumByMon(ccmEventIncident); //事故发生趋势
+		EchartType newEchartType = new EchartType();//非空判断
+		newEchartType.setType("暂无数据");
+		newEchartType.setValue("0");
+		if(listSafeHappen.size()==0){
+			listSafeHappen.add(newEchartType);
+		}
+		JsonConfig config = new JsonConfig();//PingJson
+		config.setExcludes(new String[]{""});
+		config.setIgnoreDefaultExcludes(false);  //设置默认忽略
+		config.setCycleDetectionStrategy(CycleDetectionStrategy.LENIENT);
+		String listSafeHappenString = JSONArray.fromObject(listSafeHappen,config).toString(); //Json
+		return listSafeHappenString;
+	}
+	/**
+	 * 事故类型
+	 */
+	@ResponseBody
+	@RequestMapping(value = "getSafeTypeData")
+	public String getSafeTypeData(Model model) {
+		CcmEventIncident ccmEventIncident = new CcmEventIncident();
+		ccmEventIncident.setEventType("01");
+		List<EchartType> listSafeType = ccmEventIncidentService.getSafeTypeData(ccmEventIncident); //事故类型
+		EchartType newEchartType = new EchartType();//非空判断
+		newEchartType.setType("暂无数据");
+		newEchartType.setValue("0");
+		if(listSafeType.size()==0){
+			listSafeType.add(newEchartType);
+		}
+		JsonConfig config = new JsonConfig();//PingJson
+		config.setExcludes(new String[]{""});
+		config.setIgnoreDefaultExcludes(false);  //设置默认忽略
+		config.setCycleDetectionStrategy(CycleDetectionStrategy.LENIENT);
+		String listSafeTypeString = JSONArray.fromObject(listSafeType,config).toString(); //Json
+		return listSafeTypeString;
+	}
+	/**
+	 * 事故级别
+	 */
+	@ResponseBody
+	@RequestMapping(value = "getSafeLevelData")
+	public String getSafeLevelData(Model model) {
+		CcmEventIncident ccmEventIncident = new CcmEventIncident();
+		ccmEventIncident.setEventType("01");
+		List<EchartType> listSafeLevel = ccmEventIncidentService.getSafeLevelData(ccmEventIncident); //事故级别
+		EchartType newEchartType = new EchartType();//非空判断
+		newEchartType.setType("暂无数据");
+		newEchartType.setValue("0");
+		if(listSafeLevel.size()==0){
+			listSafeLevel.add(newEchartType);
+		}
+		JsonConfig config = new JsonConfig();//PingJson
+		config.setExcludes(new String[]{""});
+		config.setIgnoreDefaultExcludes(false);  //设置默认忽略
+		config.setCycleDetectionStrategy(CycleDetectionStrategy.LENIENT);
+		String listSafeLevelString = JSONArray.fromObject(listSafeLevel,config).toString(); //Json
+		return listSafeLevelString;
+	}
+	
+	
+	//本月事件发生前十——社区/街道//近一年重点人员帮扶/事件发生趋势图
+	@RequiresPermissions("event:ccmEventIncident:view")
+	@RequestMapping(value = "findEventMapJump")
+	public String findEventMapJump(Model model) {
+		return "ccm/event/map/eventMapJump";
+	}
+	
+	
+	@RequiresPermissions("event:ccmEventIncident:view")
+	@RequestMapping(value = { "list", "" })
+	public String list(CcmEventIncident ccmEventIncident, HttpServletRequest request, HttpServletResponse response,
+			Model model) {
+		Page<CcmEventIncident> page = ccmEventIncidentService.findPage(new Page<CcmEventIncident>(request, response),
+				ccmEventIncident);
+		model.addAttribute("page", page);
+		return "ccm/event/eventIncident/ccmEventIncidentList";
+	}
+
+	@RequiresPermissions("event:ccmEventIncident:edit")
+	@RequestMapping(value = "save")
+	public String save(CcmEventIncident ccmEventIncident, Model model, RedirectAttributes redirectAttributes) {
+		if (!beanValidator(model, ccmEventIncident)) {
+			return form(ccmEventIncident, model);
+		}
+		if("".equals(ccmEventIncident.getId())||ccmEventIncident.getId()==null){
+			ccmEventIncident.setStatus("01");
+		}
+		ccmEventIncidentService.save(ccmEventIncident);
+		addMessage(redirectAttributes, "保存案事件登记成功");
+		return "redirect:" + Global.getAdminPath() + "/event/ccmEventIncident/list/?repage";
+	}
+
+	@RequiresPermissions("event:ccmEventIncident:edit")
+	@RequestMapping(value = "delete")
+	public String delete(CcmEventIncident ccmEventIncident, RedirectAttributes redirectAttributes) {
+		ccmEventIncidentService.delete(ccmEventIncident);
+		addMessage(redirectAttributes, "删除案事件登记成功");
+		return "redirect:" + Global.getAdminPath() + "/event/ccmEventIncident/list/?repage";
+	}
+	
+	
+	@RequiresPermissions("user")
+	@ResponseBody
+	@RequestMapping(value = "treeData")
+	public List<Map<String, Object>> treeData(@RequestParam(required = false) String extId, HttpServletResponse response) {
+		List<Map<String, Object>> mapList = Lists.newArrayList();
+		List<CcmLineProtect> list = ccmLineProtectService.findList(new CcmLineProtect());
+		if(list.size()>0){
+			for (int i = 0; i < list.size(); i++) {
+				CcmLineProtect c = list.get(i);
+				if ((StringUtils.isBlank(extId) || (extId != null && !extId.equals(c.getId()) ) )) {
+					Map<String, Object> map = Maps.newHashMap();
+					map.put("id", c.getId());
+					map.put("pId", "0");
+					map.put("name", c.getName());
+					mapList.add(map);
+				}
+			}
+		}
+		return mapList;
+	}
+	
+	
+
+	/**
+	 * @author wangyikai
+	 * @方法描述 通过时间和案件类型查询警情信息四色图
+	 * 从扁平化项目中移植过来，在地图上进行事件分析的展示
+	 */
+	@ResponseBody
+	@RequestMapping(value = "queryAlarmInfoByDateAndAlarmTypeToFourColor")
+	public GeoJSON queryAlarmInfoByDateAndAlarmTypeToFourColor(CcmEventIncident ccmEventIncident) {
+		return ccmEventIncidentService.queryAlarmInfoByDateAndAlarmTypeToFourColor(ccmEventIncident);
+	}
+
+	/**
+	 * @author wangyikai
+	 * @方法描述 通过时间和案件类型查询警情信息热力图和聚合图
+	 * 从扁平化项目中移植过来，在地图上进行事件分析的展示
+	 */
+	@ResponseBody
+	@RequestMapping(value = "queryAlarmInfoByDateAndAlarmType")
+	public GeoJSON queryAlarmInfoByDateAndAlarmType(CcmEventIncident ccmEventIncident) {
+		return ccmEventIncidentService.queryAlarmInfoByDateAndAlarmType(ccmEventIncident);
+	}
+
+}

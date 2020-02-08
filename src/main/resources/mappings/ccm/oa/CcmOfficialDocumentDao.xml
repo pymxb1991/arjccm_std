@@ -1,0 +1,172 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.arjjs.ccm.modules.ccm.oa.dao.CcmOfficialDocumentDao">
+    
+	<sql id="ccmOfficialDocumentColumns">
+		a.id AS "id",
+		a.proc_ins_id AS "procInsId",
+		a.type AS "type",
+		a.subject AS "subject",
+		a.content AS "content",
+		a.file AS "file",
+		a.drafter AS "drafter",
+		a.drafter_tel AS "drafterTel",
+		a.status AS "status",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag",
+		(case a.type 
+			when 01 then '指挥性公文' 
+			when 02 then '报请性公文' 
+			when 03 then '奖惩性公文'
+			when 04 then '知照性公文' 
+			when 05 then '记载性公文' 
+			when 06 then '其他'
+			else '' end) "typeLable"
+	</sql>
+	
+	<sql id="ccmOfficialDocumentJoins">
+	</sql>
+    
+	<select id="get" resultType="CcmOfficialDocument">
+		SELECT 
+			<include refid="ccmOfficialDocumentColumns"/>
+		FROM ccm_official_document a
+		<include refid="ccmOfficialDocumentJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	
+    <select id="getByProcInsId" resultType="CcmOfficialDocument">
+		SELECT 
+			<include refid="ccmOfficialDocumentColumns"/>
+		FROM ccm_official_document a
+		<include refid="ccmOfficialDocumentJoins"/>
+		WHERE a.proc_ins_id = #{procInsId}
+	</select>
+	
+	<select id="findList" resultType="CcmOfficialDocument">
+		SELECT 
+			<include refid="ccmOfficialDocumentColumns"/>
+		FROM ccm_official_document a
+		<include refid="ccmOfficialDocumentJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="type != null and type != ''">
+				AND a.type = #{type}
+			</if>
+			<if test="subject != null and subject != ''">
+				AND a.subject LIKE 
+					<if test="dbName == 'oracle'">'%'||#{subject}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{subject}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{subject},'%')</if>
+			</if>
+			<if test="content != null and content != ''">
+				AND a.content LIKE 
+					<if test="dbName == 'oracle'">'%'||#{content}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{content}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{content},'%')</if>
+			</if>
+			<!-- 我的通知 -->
+			<if test="currentUser.id != null and '1'.toString() != currentUser.id ">
+				AND a.create_by = #{currentUser.id}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="CcmOfficialDocument">
+		SELECT 
+			<include refid="ccmOfficialDocumentColumns"/>
+		FROM ccm_official_document a
+		<include refid="ccmOfficialDocumentJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO ccm_official_document(
+			id,
+			proc_ins_id,
+			type,
+			subject,
+			content,
+			file,
+			drafter,
+			drafter_tel,
+			status,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag
+		) VALUES (
+			#{id},
+			#{procInsId},
+			#{type},
+			#{subject},
+			#{content},
+			#{file},
+			#{drafter},
+			#{drafterTel},
+			#{status},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE ccm_official_document SET 	
+			proc_ins_id = #{procInsId},
+			type = #{type},
+			subject = #{subject},
+			content = #{content},
+			file = #{file},
+			drafter = #{drafter},
+			drafter_tel = #{drafterTel},
+			status = #{status},
+			update_date = #{updateDate},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE ccm_official_document SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="updateProcInsId">
+		UPDATE ccm_official_document SET 
+			proc_ins_id = #{procInsId},
+			update_by = #{updateBy.id}, 
+			update_date = #{updateDate}
+		WHERE id = #{id}
+	</update>
+	
+	
+</mapper>

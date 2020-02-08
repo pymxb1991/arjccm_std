@@ -1,0 +1,92 @@
+package com.arjjs.ccm.modules.ccm.index.service;
+
+import java.util.Calendar;
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.arjjs.ccm.modules.ccm.event.dao.CcmEventAmbiDao;
+import com.arjjs.ccm.modules.ccm.event.entity.CcmEventAmbi;
+import com.arjjs.ccm.modules.ccm.view.dao.VCcmTeamDao;
+import com.arjjs.ccm.modules.ccm.view.entity.VCcmTeam;
+import com.arjjs.ccm.tool.EchartType;
+import com.arjjs.ccm.tool.LayUIBean;
+import com.google.common.collect.Lists;
+
+@Service
+@Transactional(readOnly = true)
+public class IndexChartService {
+	
+	@Autowired
+	private CcmEventAmbiDao ccmEventAmbiDao;
+	@Autowired
+	private VCcmTeamDao vCcmTeamDao;
+	
+	public List<EchartType> oneYearSolveEvent(){
+		CcmEventAmbi ccmEventAmbi = new CcmEventAmbi();
+		Calendar dateCalendar = Calendar.getInstance();
+		dateCalendar.set(dateCalendar.get(Calendar.YEAR)-1, dateCalendar.get(Calendar.MONTH)+1, 1, 0, 0, 0);
+		ccmEventAmbi.setBeginSendDate(dateCalendar.getTime());
+		dateCalendar.add(Calendar.YEAR, 1);
+		dateCalendar.add(Calendar.SECOND, -1);
+		ccmEventAmbi.setEndSendDate(dateCalendar.getTime());
+		List<EchartType> list = ccmEventAmbiDao.stateEventOneYear(ccmEventAmbi);
+		List<EchartType> result = Lists.newArrayList();
+		dateCalendar.setTime(ccmEventAmbi.getBeginSendDate());
+		int count = 0;
+		boolean flag = true;
+		for (int i = 0; i < 12; i++) {
+			StringBuffer t = new StringBuffer();
+			t.append(dateCalendar.get(Calendar.YEAR));
+			t.append("-");
+			t.append(dateCalendar.get(Calendar.MONTH)+1);
+			dateCalendar.add(Calendar.MONTH, 1);
+			if (flag && t.toString().equals(list.get(count).getType())) {
+				result.add(list.get(count));
+				if (count == list.size() - 1) {
+					flag = false;
+				}
+				count ++;
+			} else {
+				EchartType e = new EchartType();
+				e.setType(t.toString());
+				e.setValue("0");
+				result.add(e);
+			}
+		}
+		return result;
+	}
+	
+	public LayUIBean indexChartService() {
+		LayUIBean result =new LayUIBean();
+		List<CcmEventAmbi> list = ccmEventAmbiDao.findCountByStatus();
+		result.setCode("0");
+		result.setCount(list.size());
+		result.setData(list);
+		result.setMsg("");
+		return result;
+	}
+	
+	public LayUIBean findOfficeCount() {
+		LayUIBean result =new LayUIBean();
+		List<CcmEventAmbi> list = ccmEventAmbiDao.findOfficeCount();
+		result.setCode("0");
+		result.setCount(list.size());
+		result.setData(list);
+		result.setMsg("");
+		return result;
+	}
+	
+	public LayUIBean findTeamCount() {
+		LayUIBean result =new LayUIBean();
+		List<VCcmTeam> list = vCcmTeamDao.findTeamCount();
+		result.setCode("0");
+		result.setCount(list.size());
+		result.setData(list);
+		result.setMsg("");
+		return result;
+	}
+	
+}

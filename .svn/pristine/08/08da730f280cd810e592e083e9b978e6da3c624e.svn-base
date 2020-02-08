@@ -1,0 +1,1658 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.arjjs.ccm.modules.ccm.event.dao.CcmEventIncidentDao">
+
+    <sql id="ccmEventIncidentColumns">
+		a.id AS "id",
+		a.case_name AS "caseName",
+		a.happen_date AS "happenDate",
+		a.case_place AS "area.id",
+		a.happen_place AS "happenPlace",
+		a.address AS "address",
+		a.area_map AS "areaMap",
+		a.area_point AS "areaPoint",
+		a.image AS "image",
+		a.event_kind AS "eventKind",
+		a.other_id AS "otherId",
+		a.event_scale AS "eventScale",
+		a.event_type AS "eventType",
+		a.collect_type AS "collectType",
+		a.alarm_tv_sn AS "alarmTvSn",
+		a.alarm_people_id AS "alarmPeopleId",
+		a.alarm_people_name AS "alarmPeopleName",
+		a.alarm_people_tel AS "alarmPeopleTel",
+		a.camera_code AS "cameraCode",
+		a.number AS "number",
+		a.property AS "property",
+		a.case_condition AS "caseCondition",
+		a.cul_papercode AS "culPapercode",
+		a.cul_paperid AS "culPaperid",
+		a.cul_name AS "culName",
+		a.type_solve AS "typeSolve",
+		a.num_crime AS "numCrime",
+		a.num_flee AS "numFlee",
+		a.num_arrest AS "numArrest",
+		a.case_over_day AS "caseOverDay",
+		a.case_solve AS "caseSolve",
+		a.file1 AS "file1",
+		a.file2 AS "file2",
+		a.file3 AS "file3",
+		a.status AS "status",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag",
+		a.ratify AS "ratify",
+		a.stick AS "stick",
+		a.urgent AS "urgent",
+		a.history_legacy AS "historyLegacy",
+		a20.name AS "area.name",
+		a.case_scope AS "caseScope",
+		a.event_sort AS "eventSort",
+		a.camera_code AS "cameraCode"
+	</sql>
+
+    <sql id="ccmEventIncidentColumnsWithUser">
+		a.id AS "id",
+		a.case_name AS "caseName",
+		a.happen_date AS "happenDate",
+		a.case_place AS "area.id",
+		a.happen_place AS "happenPlace",
+		a.address AS "address",
+		a.area_map AS "areaMap",
+		a.area_point AS "areaPoint",
+		a.image AS "image",
+		a.event_kind AS "eventKind",
+		a.other_id AS "otherId",
+		a.event_scale AS "eventScale",
+		a.event_type AS "eventType",
+		a.collect_type AS "collectType",
+		a.alarm_tv_sn AS "alarmTvSn",
+		a.alarm_people_id AS "alarmPeopleId",
+		a.alarm_people_name AS "alarmPeopleName",
+		a.alarm_people_tel AS "alarmPeopleTel",
+		a.number AS "number",
+		a.property AS "property",
+		a.case_condition AS "caseCondition",
+		a.cul_papercode AS "culPapercode",
+		a.cul_paperid AS "culPaperid",
+		a.cul_name AS "culName",
+		a.type_solve AS "typeSolve",
+		a.num_crime AS "numCrime",
+		a.num_flee AS "numFlee",
+		a.num_arrest AS "numArrest",
+		a.case_over_day AS "caseOverDay",
+		a.case_solve AS "caseSolve",
+		a.file1 AS "file1",
+		a.file2 AS "file2",
+		a.file3 AS "file3",
+		a.status AS "status",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag", 
+		a.ratify AS "ratify",
+		a.stick AS "stick",
+		a.urgent AS "urgent",
+		a.history_legacy AS "historyLegacy",
+		a.case_scope AS "caseScope",
+		a.event_sort AS "eventSort",
+		b.name AS "createName",
+		IFNULL( a20.name ,"") AS "area.name",
+		(case a.status 
+			when 01 then '未处理' 
+			when 02 then '处理中' 
+			when 03 then '已完成'
+			else '' end) "statusLable"
+	</sql>
+
+    <sql id="ccmEventIncidentJoins">
+		LEFT JOIN sys_area a20 ON a20.id = a.case_place
+	</sql>
+    <sql id="ccmBphAlarmInfoJoins">
+        LEFT JOIN bph_alarm_info a21 ON a21.id = a.id
+    </sql>
+    <sql id="ccmEventIncidentJoinsCaseGrad">
+		LEFT JOIN sys_dict b21 ON b21.`value` = a.event_scale AND
+		b21.type="ccm_case_grad"
+	</sql>
+
+    <sql id="ccmEventIncidentJoinsUser">
+		LEFT JOIN sys_user b ON b.id = a.create_by
+	</sql>
+
+    <select id="get" resultType="CcmEventIncident">
+        SELECT
+        <include refid="ccmEventIncidentColumns"/>
+        FROM ccm_event_incident a
+        <include refid="ccmEventIncidentJoins"/>
+        WHERE a.id = #{id}
+    </select>
+
+    <select id="getIncidents" resultType="CcmEventIncident">
+        SELECT
+        <include refid="ccmEventIncidentColumnsWithUser"/>
+        ,a21.id AS "bphAlarmInfoId"
+        FROM ccm_event_incident a
+        <include refid="ccmEventIncidentJoinsUser"/>
+        <include refid="ccmEventIncidentJoins"/>
+        <include refid="ccmBphAlarmInfoJoins"/>
+        LEFT JOIN ccm_event_place place ON place.event_id = a.id
+        WHERE a.del_flag = #{DEL_FLAG_NORMAL} AND place.place_id = #{placeId}
+    </select>
+
+    <select id="getIncidentPlace" resultType="string">
+        SELECT
+        	a.event_id AS "id"
+        FROM ccm_event_place a
+        WHERE a.place_id = #{placeId}
+    </select>
+
+    <delete id="deleteIncidentPlace">
+		DELETE FROM ccm_event_place
+		WHERE place_id = #{placeId}
+	</delete>
+
+	<insert id="saveIncidentPlace">
+		INSERT INTO ccm_event_place(
+			id,
+			place_id,
+			event_id
+		) VALUES (
+			#{id},
+			#{placeId},
+			#{eventId}
+		)
+	</insert>
+
+    <!-- 首页师生安全统计数 -->
+    <select id="findCountSchoolPeople" resultType="CcmEventIncident">
+		SELECT
+			count( a.id )  AS "count"
+		FROM
+			ccm_event_incident a
+		WHERE
+			a.del_flag = 0
+			AND a.event_kind = "02"
+	</select>
+    <!-- 查询相关案事件 -->
+    <select id="findOtherId" resultType="CcmEventIncident">
+        SELECT
+        <include refid="ccmEventIncidentColumns"/>
+        FROM ccm_event_incident a
+        <include refid="ccmEventIncidentJoins"/>
+        <where>
+            a.del_flag = #{DEL_FLAG_NORMAL}
+            <if test="otherId != null and otherId != ''">
+                AND a.other_id = #{otherId}
+            </if>
+        </where>
+        <choose>
+            <when test="page !=null and page.orderBy != null and page.orderBy != ''">
+                ORDER BY ${page.orderBy}
+            </when>
+            <otherwise>
+                ORDER BY a.happen_date DESC
+            </otherwise>
+        </choose>
+    </select>
+
+    <select id="getItemByPropertyec" resultType="com.arjjs.ccm.tool.EchartType">
+        SELECT
+        IF
+        ( a.property IS NULL || a.property = '', '99', a.property ) AS typeO,
+        IF
+        ( b.label IS NULL || b.label = '', '未知', b.label ) AS "type",
+        COUNT(*) AS "value"
+        FROM
+        ccm_event_incident a
+        LEFT JOIN sys_dict b
+        ON
+        b.`value` = a.property
+        AND b.type="ccm_case_natu"
+        <where>
+            a.del_flag=0 AND a.event_kind="02"
+        </where>
+        GROUP BY
+        a.property
+    </select>
+
+    <!-- 师生相关案事件 -->
+    <select id="findPageStudent" resultType="CcmEventIncident">
+        SELECT
+        <include refid="ccmEventIncidentColumnsWithUser"/>
+        FROM ccm_event_incident a
+        <include refid="ccmEventIncidentJoinsUser"/>
+        <include refid="ccmEventIncidentJoins"/>
+        <where>
+            a.del_flag = #{DEL_FLAG_NORMAL}
+            AND a.event_kind = "02"
+            <if test="caseName != null and caseName != ''">
+                AND a.case_name LIKE
+                <if test="dbName == 'oracle'">'%'||#{caseName}||'%'</if>
+                <if test="dbName == 'mssql'">'%'+#{caseName}+'%'</if>
+                <if test="dbName == 'mysql'">concat('%',#{caseName},'%')</if>
+            </if>
+            <if
+                    test="beginHappenDate != null and endHappenDate != null and beginHappenDate != '' and endHappenDate != ''">
+                AND a.happen_date BETWEEN #{beginHappenDate} AND
+                #{endHappenDate}
+            </if>
+            <if test="area != null and area.id != null and area.id != ''">
+                AND a.case_place = #{area.id}
+            </if>
+            <if test="eventScale != null and eventScale != ''">
+                AND a.event_scale = #{eventScale}
+            </if>
+            <if test="eventType != null and eventType != ''">
+                AND a.event_type = #{eventType}
+            </if>
+            <if test="status != null and status != ''">
+                AND a.status = #{status}
+            </if>
+            <if test="property != null and property != ''">
+                AND a.property = #{property}
+            </if>
+        </where>
+        <choose>
+            <when test="page !=null and page.orderBy != null and page.orderBy != ''">
+                ORDER BY ${page.orderBy}
+            </when>
+            <otherwise>
+                ORDER BY a.happen_date DESC
+            </otherwise>
+        </choose>
+    </select>
+
+
+    <!-- 线路相关案事件getLine -->
+    <select id="getLine" resultType="CcmEventIncident">
+        SELECT
+        <include refid="ccmEventIncidentColumns"/>
+        ,l.id AS "line.id"
+        ,l.name AS "line.name"
+        FROM ccm_event_incident a
+        <include refid="ccmEventIncidentJoins"/>
+        LEFT JOIN ccm_line_protect l ON l.id = a.other_id
+        WHERE a.id = #{id}
+    </select>
+    <!-- 线路相关案事件 -->
+    <select id="findPageLine" resultType="CcmEventIncident">
+        SELECT
+        <include refid="ccmEventIncidentColumnsWithUser"/>
+        ,l.id AS "line.id"
+        ,l.name AS "line.name"
+        FROM ccm_event_incident a
+        <include refid="ccmEventIncidentJoinsUser"/>
+        <include refid="ccmEventIncidentJoins"/>
+        LEFT JOIN ccm_line_protect l ON l.id = a.other_id
+        <where>
+            a.del_flag = #{DEL_FLAG_NORMAL}
+            AND a.event_kind = "03"
+            <if test="caseName != null and caseName != ''">
+                AND a.case_name LIKE
+                <if test="dbName == 'oracle'">'%'||#{caseName}||'%'</if>
+                <if test="dbName == 'mssql'">'%'+#{caseName}+'%'</if>
+                <if test="dbName == 'mysql'">concat('%',#{caseName},'%')</if>
+            </if>
+            <if test="beginHappenDate != null and endHappenDate != null and beginHappenDate != '' and endHappenDate != ''">
+                AND a.happen_date BETWEEN #{beginHappenDate} AND
+                #{endHappenDate}
+            </if>
+            <if test="area != null and area.id != null and area.id != ''">
+                AND a.case_place = #{area.id}
+            </if>
+            <if test="eventScale != null and eventScale != ''">
+                AND a.event_scale = #{eventScale}
+            </if>
+            <if test="eventType != null and eventType != ''">
+                AND a.event_type = #{eventType}
+            </if>
+            <if test="status != null and status != ''">
+                AND a.status = #{status}
+            </if>
+            <if test="property != null and property != ''">
+                AND a.property = #{property}
+            </if>
+            <if test="otherId != null and otherId != ''">
+                AND a.other_id = #{otherId}
+            </if>
+            <if test="line != null and line.id != null and line.id != ''">
+                AND a.other_id = #{line.id}
+            </if>
+        </where>
+        <choose>
+            <when test="page !=null and page.orderBy != null and page.orderBy != ''">
+                ORDER BY ${page.orderBy}
+            </when>
+            <otherwise>
+                ORDER BY a.happen_date DESC
+            </otherwise>
+        </choose>
+    </select>
+
+    <!-- 命案相关案事件 -->
+    <select id="findPageMurder" resultType="CcmEventIncident">
+        SELECT
+        <include refid="ccmEventIncidentColumnsWithUser"/>
+        FROM ccm_event_incident a
+        <include refid="ccmEventIncidentJoinsUser"/>
+        <include refid="ccmEventIncidentJoins"/>
+        <where>
+            a.del_flag = #{DEL_FLAG_NORMAL}
+            AND a.event_kind = "04"
+            <if test="caseName != null and caseName != ''">
+                AND a.case_name LIKE
+                <if test="dbName == 'oracle'">'%'||#{caseName}||'%'</if>
+                <if test="dbName == 'mssql'">'%'+#{caseName}+'%'</if>
+                <if test="dbName == 'mysql'">concat('%',#{caseName},'%')</if>
+            </if>
+            <if
+                    test="beginHappenDate != null and endHappenDate != null and beginHappenDate != '' and endHappenDate != ''">
+                AND a.happen_date BETWEEN #{beginHappenDate} AND
+                #{endHappenDate}
+            </if>
+            <if test="area != null and area.id != null and area.id != ''">
+                AND a.case_place = #{area.id}
+            </if>
+            <if test="eventScale != null and eventScale != ''">
+                AND a.event_scale = #{eventScale}
+            </if>
+            <if test="eventType != null and eventType != ''">
+                AND a.event_type = #{eventType}
+            </if>
+            <if test="status != null and status != ''">
+                AND a.status = #{status}
+            </if>
+            <if test="property != null and property != ''">
+                AND a.property = #{property}
+            </if>
+        </where>
+        <choose>
+            <when test="page !=null and page.orderBy != null and page.orderBy != ''">
+                ORDER BY ${page.orderBy}
+            </when>
+            <otherwise>
+                ORDER BY a.happen_date DESC
+            </otherwise>
+        </choose>
+    </select>
+    <!-- 安全事故分布 -->
+    <select id="getSafeDisData" resultType="com.arjjs.ccm.tool.EchartType">
+        SELECT
+        (
+        CASE c.param_str
+        WHEN '1' THEN community.name
+        WHEN '2' THEN street.name
+        ELSE street.name
+        END
+        ) AS "type",
+        COUNT(a.id) AS "value"
+        FROM
+        ccm_event_incident a
+        LEFT JOIN sys_area net ON a.case_place = net.id
+        LEFT JOIN sys_area community ON community.id = net.parent_id
+        LEFT JOIN sys_area street ON street.id = community.parent_id
+        LEFT JOIN sys_config c ON c.id = 'system_level'
+        WHERE
+        a.del_flag = '0'
+        AND net.del_flag = '0'
+        AND community.del_flag = '0'
+        AND street.del_flag = '0'
+        <if test="eventType != null and eventType != ''">
+            AND a.event_type = #{eventType}
+        </if>
+        <if test="eventTypes != null and eventTypes.length > 0">
+            AND (
+            <foreach collection="eventTypes" item="m"  separator=" OR " >
+                <if test="m != null and m != ''">
+                    a.event_type = #{m}
+                </if>
+            </foreach>
+            )
+        </if>
+        GROUP BY
+        (
+        CASE c.param_str
+        WHEN '1' THEN community.name
+        WHEN '2' THEN street.name
+        ELSE street.name
+        END
+        )
+        ORDER BY
+        COUNT(a.id) DESC
+        LIMIT 5
+    </select>
+
+
+    <select id="findList" resultType="CcmEventIncident">
+        SELECT
+        <include refid="ccmEventIncidentColumnsWithUser"/>
+        ,a21.id AS "bphAlarmInfoId"
+        FROM ccm_event_incident a
+        <include refid="ccmEventIncidentJoinsUser"/>
+        <include refid="ccmEventIncidentJoins"/>
+        <include refid="ccmBphAlarmInfoJoins"/>
+        <where>
+            a.del_flag = #{DEL_FLAG_NORMAL}
+            <if test="userArea != null and userArea.parentIds != null and userArea.parentIds != ''">
+                AND (a20.parent_ids LIKE CONCAT('%',#{userArea.id},'%') or a.case_place = #{userArea.id})
+            </if>
+            <if test="caseName != null and caseName != ''">
+                AND a.case_name LIKE
+                <if test="dbName == 'oracle'">'%'||#{caseName}||'%'</if>
+                <if test="dbName == 'mssql'">'%'+#{caseName}+'%'</if>
+                <if test="dbName == 'mysql'">concat('%',#{caseName},'%')</if>
+            </if>
+            <if test="beginHappenDate != null and beginHappenDate != ''">
+                AND a.happen_date &gt;= #{beginHappenDate}
+            </if>
+            <if test="endHappenDate != null and endHappenDate != ''">
+                AND a.happen_date &lt;= #{endHappenDate}
+            </if>
+            <if test="area != null and area.id != null and area.id != ''">
+                AND a.case_place = #{area.id}
+            </if>
+            <if test="eventScale != null and eventScale != ''">
+                AND a.event_scale = #{eventScale}
+            </if>
+            <if test="eventType != null and eventType != ''">
+                AND a.event_type = #{eventType}
+            </if>
+            <if test="eventKind != null and eventKind != ''">
+                AND a.event_kind = #{eventKind}
+            </if>
+            <if test="status != null and status != ''">
+                AND a.status = #{status}
+            </if>
+            <if test="property != null and property != ''">
+                AND a.property = #{property}
+            </if>
+            <if test="historyLegacy != null and historyLegacy != ''">
+                AND a.history_legacy = #{historyLegacy}
+            </if>
+            <if test="createBy != null and createBy.id != null and createBy.id != ''">
+                AND a.create_by = #{createBy.id}
+            </if>
+        </where>
+        <choose>
+            <when test="page !=null and page.orderBy != null and page.orderBy != ''">
+                ORDER BY ${page.orderBy}
+            </when>
+            <otherwise>
+                ORDER BY a.stick DESC ,a.happen_date DESC
+            </otherwise>
+        </choose>
+    </select>
+
+    <select id="findAllList" resultType="CcmEventIncident">
+        SELECT
+        <include refid="ccmEventIncidentColumns"/>
+        FROM ccm_event_incident a
+        <include refid="ccmEventIncidentJoins"/>
+        <where>
+            a.del_flag = #{DEL_FLAG_NORMAL}
+        </where>
+        <choose>
+            <when test="page !=null and page.orderBy != null and page.orderBy != ''">
+                ORDER BY ${page.orderBy}
+            </when>
+            <otherwise>
+                ORDER BY a.happen_date DESC
+            </otherwise>
+        </choose>
+    </select>
+
+    <!-- 首页护线护路数量统计 -->
+    <select id="findCountLineProtect" resultType="CcmEventIncident">
+		SELECT
+			count( * )  AS "count"
+		FROM
+			ccm_event_incident a
+			LEFT JOIN ccm_line_protect l ON l.id = a.other_id
+			AND l.del_flag = 0
+		WHERE
+			a.del_flag = 0 AND a.event_kind = 03
+	</select>
+
+    <insert id="insert">
+		INSERT INTO ccm_event_incident(
+		id,
+		case_name,
+		happen_date,
+		case_place,
+		happen_place,
+		address,
+		area_map,
+		area_point,
+		image,
+		event_kind,
+		other_id,
+		event_scale,
+		event_type,
+		number,
+		property,
+		case_condition,
+		cul_papercode,
+		cul_paperid,
+		cul_name,
+		type_solve,
+		num_crime,
+		num_flee,
+		num_arrest,
+		case_over_day,
+		case_solve,
+		file1,
+		file2,
+		file3,
+		status,
+		create_by,
+		create_date,
+		update_by,
+		update_date,
+		remarks,
+		del_flag,
+		ratify,
+		stick,
+		urgent,
+		case_scope,
+		event_sort,
+		history_legacy,
+		report_type,
+		camera_code,
+		event_kind_parent_type,
+		alarm_tv_sn,
+		alarm_people_id,
+		alarm_people_name,
+		alarm_people_tel,
+		report_person ,
+		report_person_phone,
+		doing
+		) VALUES (
+		#{id},
+		#{caseName},
+		#{happenDate},
+		#{area.id},
+		#{happenPlace},
+		#{address},
+		#{areaMap},
+		#{areaPoint},
+		#{image},
+		#{eventKind},
+		#{otherId},
+		#{eventScale},
+		#{eventType},
+		#{number},
+		#{property},
+		#{caseCondition},
+		#{culPapercode},
+		#{culPaperid},
+		#{culName},
+		#{typeSolve},
+		#{numCrime},
+		#{numFlee},
+		#{numArrest},
+		#{caseOverDay},
+		#{caseSolve},
+		#{file1},
+		#{file2},
+		#{file3},
+		#{status},
+		#{createBy.id},
+		#{createDate},
+		#{updateBy.id},
+		#{updateDate},
+		#{remarks},
+		#{delFlag},
+		#{ratify},
+		#{stick},
+		#{urgent},
+		#{caseScope},
+		#{eventSort},
+		#{historyLegacy},
+		#{reportType},
+		#{cameraCode},
+		#{eventKindParents},
+		#{alarmPeopleId},
+		#{alarmPeopleName},
+		#{alarmPeopleTel},
+		#{alarmTvSn},
+		#{reportPerson},
+		#{reportPersonPhone},
+		#{doing}
+		)
+	</insert>
+
+    <update id="update">
+		UPDATE ccm_event_incident SET
+		case_name = #{caseName},
+		happen_date = #{happenDate},
+		case_place = #{area.id},
+		happen_place = #{happenPlace},
+		address = #{address},
+		area_map = #{areaMap},
+		area_point = #{areaPoint},
+		image = #{image},
+		event_kind = #{eventKind},
+		other_id = #{otherId},
+		event_scale = #{eventScale},
+		event_type = #{eventType},
+		number = #{number},
+		property = #{property},
+		case_condition = #{caseCondition},
+		cul_papercode = #{culPapercode},
+		cul_paperid = #{culPaperid},
+		cul_name = #{culName},
+		type_solve = #{typeSolve},
+		num_crime = #{numCrime},
+		num_flee = #{numFlee},
+		num_arrest = #{numArrest},
+		case_over_day = #{caseOverDay},
+		case_solve = #{caseSolve},
+		file1 = #{file1},
+		file2 = #{file2},
+		file3 = #{file3},
+		status = #{status},
+		update_by = #{updateBy.id},
+		update_date = #{updateDate},
+		remarks = #{remarks},
+		ratify = #{ratify},
+		stick = #{stick},
+		urgent = #{urgent},
+		case_scope = #{caseScope},
+		event_sort = #{eventSort},
+		history_legacy = #{historyLegacy},
+		doing = #{doing}
+		WHERE id = #{id}
+	</update>
+
+    <update id="delete">
+		UPDATE ccm_event_incident SET
+		del_flag =
+		#{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+
+    <select id="getItemByProperty" resultType="com.arjjs.ccm.tool.EchartType">
+        SELECT
+        b.label AS "type",
+        COUNT(1) AS "value"
+        FROM
+        ccm_event_incident a
+        <include refid="ccmEventIncidentJoins"/>
+        LEFT JOIN sys_dict b
+        ON
+        b.`value` = a.property
+        AND b.type="bph_alarm_info_typecode"
+        <where>
+            a.del_flag=0
+        </where>
+        GROUP BY
+        a.property
+    </select>
+
+    <select id="getItemByScale" resultType="com.arjjs.ccm.tool.EchartType">
+        SELECT
+        b21.label AS "type",
+        COUNT(1) AS "value"
+        FROM
+        ccm_event_incident a
+        <include refid="ccmEventIncidentJoinsCaseGrad"/>
+        <include refid="ccmEventIncidentJoins"/>
+        <where>
+            a.del_flag=0
+        </where>
+        GROUP BY a.event_scale
+        ORDER BY event_scale ASC
+    </select>
+
+    <select id="getItemByScaleTable" resultType="com.arjjs.ccm.tool.EchartType">
+        SELECT
+        (
+        CASE c.param_str
+        WHEN '1' THEN community.name
+        WHEN '2' THEN street.name
+        ELSE street.name
+        END
+        ) AS "type",
+        b21.label AS "typeO",
+        count(1) AS "value"
+        FROM
+        ccm_event_incident a
+        <include refid="ccmEventIncidentJoins"/>
+        <include refid="ccmEventIncidentJoinsCaseGrad"/>
+        LEFT JOIN sys_area community ON community.id = a20.parent_id
+        LEFT JOIN sys_area street ON street.id = community.parent_id
+        LEFT JOIN sys_config c ON c.id = 'system_level'
+        <where>
+            a.del_flag='0'
+            AND a20.del_flag='0'
+            AND b21.del_flag='0'
+            AND community.del_flag='0'
+            AND street.del_flag='0'
+            <if test="eventKind != null and eventKind != ''">
+                AND a.event_kind = #{eventKind}
+            </if>
+        </where>
+        GROUP BY
+        (
+        CASE c.param_str
+        WHEN '1' THEN community.id
+        WHEN '2' THEN street.id
+        ELSE street.name
+        END
+        ),
+        a.event_scale
+    </select>
+
+    <select id="getItemBySum" resultType="com.arjjs.ccm.tool.EchartType">
+        SELECT
+        a.status AS
+        "type",
+        COUNT(1) AS "value"
+        FROM
+        ccm_event_incident a
+        <include refid="ccmEventIncidentJoins"/>
+        <where>
+            a.del_flag = 0
+        </where>
+        GROUP BY a.status
+        ORDER BY a.status
+    </select>
+    <!-- 今日案事件统计 -->
+    <select id="getItemBySumToday" resultType="com.arjjs.ccm.tool.EchartType">
+        SELECT
+        a.status AS
+        "type",
+        COUNT(1) AS "value"
+        FROM
+        ccm_event_incident
+        a
+        <where>
+            a.del_flag = 0
+            AND
+            TO_DAYS( NOW( ) ) - TO_DAYS( a.happen_date )&lt;= 1
+        </where>
+        GROUP BY a.status
+        ORDER BY a.status
+    </select>
+    <!-- 今日前10条案事件 -->
+    <select id="getListToday" resultType="CcmEventIncident">
+        SELECT
+        <include refid="ccmEventIncidentColumns"/>
+        FROM ccm_event_incident a
+        <include refid="ccmEventIncidentJoins"/>
+        WHERE
+        a.del_flag='0'
+        AND
+        (a.happen_date &gt;= date_format(DATE_SUB(curdate(), INTERVAL 0 DAY), '%Y-%m-%d') AND
+        a.happen_date &lt; date_format(DATE_SUB(curdate(),INTERVAL - 1 DAY), '%Y-%m-%d'))
+        ORDER BY
+        a.happen_date DESC
+        LIMIT 10
+
+
+    </select>
+    <!-- 事故类型 -->
+    <select id="getSafeTypeData" resultType="com.arjjs.ccm.tool.EchartType">
+        SELECT
+        a.property AS "typeO",
+        b21.label AS "type",
+        COUNT(1) AS "value"
+        FROM
+        ccm_event_incident a
+        LEFT JOIN sys_dict b21 ON b21.`value` = a.property AND b21.type="ccm_case_natu"
+        where
+        a.del_flag = #{DEL_FLAG_NORMAL}
+        <if test="eventType != null and eventType != ''">
+            AND a.event_type = #{eventType}
+        </if>
+        GROUP BY a.property
+    </select>
+    <!-- 事故级别 -->
+    <select id="getSafeLevelData" resultType="com.arjjs.ccm.tool.EchartType">
+        SELECT
+        a.event_scale AS "typeO",
+        b21.label AS "type",
+        COUNT(1) AS "value"
+        FROM
+        ccm_event_incident a
+        LEFT JOIN sys_dict b21 ON b21.`value` = a.event_scale AND b21.type="ccm_case_grad"
+        where
+        a.del_flag = #{DEL_FLAG_NORMAL}
+        <if test="eventType != null and eventType != ''">
+            AND a.event_type = #{eventType}
+        </if>
+        GROUP BY a.event_scale
+    </select>
+    <!-- 安全生产事故类型 -->
+    <select id="getSafeAnalysisType" resultType="com.arjjs.ccm.tool.EchartType">
+        SELECT
+        IF(b21.label IS NULL OR b21.label = '','99',a.property) AS "typeO",
+        IF(b21.label IS NULL OR b21.label = '','其它报警类别',b21.label) AS "type",
+        COUNT( 1 ) AS "value"
+        FROM
+        ccm_event_incident a
+        LEFT JOIN sys_dict b21 ON b21.`value` = a.property
+        AND b21.type = "bph_alarm_info_typecode"
+        WHERE
+        a.del_flag = #{DEL_FLAG_NORMAL}
+        <if test="eventType != null and eventType != ''">
+            AND a.event_type = #{eventType}
+        </if>
+        <if test="eventTypes != null and eventTypes.length > 0">
+            AND (
+            <foreach collection="eventTypes" item="m"  separator=" OR " >
+                <if test="m != null and m != ''">
+                    a.event_type = #{m}
+                </if>
+            </foreach>
+            )
+        </if>
+        GROUP BY
+        typeO
+    </select>
+    <!-- 安全生产事故级别 -->
+    <select id="getSafeAnalysisLevel" resultType="com.arjjs.ccm.tool.EchartType">
+        SELECT
+        IF(a.event_scale IS NULL,'99',a.event_scale) AS "typeO",
+        IF(a.event_scale IS NULL,'其他',b21.label) AS "type",
+        COUNT( 1 ) AS "value"
+        FROM
+        ccm_event_incident a
+        LEFT JOIN sys_dict b21 ON b21.`value` = a.event_scale
+        AND b21.type = "ccm_case_grad"
+        WHERE
+        a.del_flag = #{DEL_FLAG_NORMAL}
+        <if test="eventType != null and eventType != ''">
+            AND a.event_type = #{eventType}
+        </if>
+        <if test="eventTypes != null and eventTypes.length > 0">
+            AND (
+            <foreach collection="eventTypes" item="m"  separator=" OR " >
+                <if test="m != null and m != ''">
+                    a.event_type = #{m}
+                </if>
+            </foreach>
+            )
+        </if>
+        GROUP BY
+        a.event_scale
+    </select>
+
+
+    <select id="findSolveByArea" resultType="com.arjjs.ccm.tool.EchartType">
+		SELECT
+			(
+				CASE c.param_str
+				WHEN '1' THEN community.name
+				WHEN '2' THEN street.name
+				ELSE street.name
+				END
+			) AS "type",
+			FORMAT(
+				SUM(CASE WHEN a.status = '02' THEN '1' ELSE '0' END) * 100 / count(a.id),
+				2
+			) AS "value"
+		FROM
+			ccm_event_incident a
+		LEFT JOIN sys_area net ON a.case_place = net.id
+		LEFT JOIN sys_area community ON community.id = net.parent_id
+		LEFT JOIN sys_area street ON street.id = community.parent_id
+		LEFT JOIN sys_config c ON c.id = 'system_level'
+		WHERE
+			a.del_flag = 0
+			AND net.del_flag = 0
+			AND community.del_flag = 0
+			AND street.del_flag = 0
+		AND (
+			a.happen_date &gt;= date_format(
+				DATE_SUB(curdate(), INTERVAL 0 MONTH),
+				'%Y-%m'
+			)
+			AND a.happen_date &lt; date_format(
+				DATE_SUB(curdate(), INTERVAL - 1 MONTH),
+				'%Y-%m'
+			)
+		)
+		GROUP BY
+			(
+				CASE c.param_str
+				WHEN '1' THEN community.name
+				WHEN '2' THEN street.name
+				ELSE street.name
+				END
+			)
+		ORDER BY
+			--FORMAT(
+				SUM(CASE WHEN a.status = '02' THEN '1' ELSE '0' END) * 100 / count(a.id),
+				2
+			) DESC
+		LIMIT 10
+	</select>
+
+    <select id="findSolveByMon" resultType="com.arjjs.ccm.tool.EchartType">
+        SELECT
+        date_format(a.happen_date,'%Y-%m') as "type",
+        FORMAT(
+        sum(a.status='02') * 100 / count(*),
+        2
+        ) AS "value"
+        FROM
+        ccm_event_incident a
+        <include refid="ccmEventIncidentJoins"/>
+        <where>
+            a.del_flag = 0
+            and
+            (a.happen_date &gt; date_format(
+            DATE_SUB(curdate()
+            , INTERVAL 12
+            MONTH), '%Y-%m')
+            AND
+            a.happen_date &lt;
+            date_format( DATE_SUB(curdate(),
+            INTERVAL 0
+            MONTH), '%Y-%m'))
+        </where>
+        GROUP BY
+        concat(
+        YEAR (a.happen_date),
+        MONTH (a.happen_date)
+        )
+        ORDER BY
+        concat(
+        YEAR (a.happen_date),
+        IF (
+        MONTH (a.happen_date) &gt; 9,
+        MONTH (a.happen_date),
+        concat("0", MONTH(a.happen_date))
+        )) ASC
+        LIMIT 12
+    </select>
+
+    <select id="findSumByMon" resultType="com.arjjs.ccm.tool.EchartType">
+        SELECT
+        concat(
+        YEAR
+        (a.happen_date),
+        "-",
+        MONTH (a.happen_date)
+        ) AS "type",
+        count(*) AS "value"
+        FROM
+        ccm_event_incident a
+        <where>
+            a.del_flag = '0'
+            <if test="eventType != null and eventType != ''">
+                AND a.event_type = #{eventType}
+            </if>
+            <if test="eventTypes != null and eventTypes.length > 0">
+                AND (
+                <foreach collection="eventTypes" item="m"  separator=" OR " >
+                    <if test="m != null and m != ''">
+                        a.event_type = #{m}
+                    </if>
+                </foreach>
+                )
+            </if>
+            <if test="status != null and status != ''">
+                AND a.status = #{status}
+            </if>
+            and
+            (a.happen_date &gt; date_format(
+            DATE_SUB(curdate()
+            , INTERVAL 11
+            MONTH), '%Y-%m')
+            AND
+            a.happen_date &lt;
+            date_format( DATE_SUB(curdate(),
+            INTERVAL -1
+            MONTH), '%Y-%m'))
+        </where>
+        GROUP BY
+        concat(
+        YEAR (a.happen_date),
+        MONTH
+        (a.happen_date)
+        )
+        ORDER BY
+        concat(
+        YEAR (a.happen_date),
+        IF (
+        MONTH (a.happen_date) &gt; 9,
+        MONTH (a.happen_date),
+        concat("0", MONTH(a.happen_date))
+        )) ASC
+        LIMIT 12
+    </select>
+
+    <select id="findSumByCondition" resultType="com.arjjs.ccm.tool.SearchTab">
+		SELECT
+			b21.label AS "type",
+			community.name AS "typeO",
+			(case when a.case_name is null OR a.case_name='' then ' ' else a.case_name end) AS "value",
+			a.happen_date AS "value1",
+			a.id AS "value2"
+		FROM
+			ccm_event_incident a
+		LEFT JOIN sys_area a20 ON a.case_place = a20.id
+		LEFT JOIN sys_area community ON community.id = a20.parent_id
+		LEFT JOIN sys_dict b21 ON b21.value = a.event_scale
+		AND
+			b21.type = "ccm_case_grad"
+		where
+			a.del_flag = 0
+			AND a20.name is not null
+			AND a20.name !=''
+			AND a.happen_date &lt; date_format(DATE_SUB(curdate(),INTERVAL - 1 DAY), '%Y-%m-%d')
+		ORDER BY a.happen_date DESC
+		LIMIT 30
+	</select>
+
+    <select id="findSumByEventType" resultType="com.arjjs.ccm.tool.EchartType">
+        SELECT
+        a.event_type AS "typeO",
+        b.label AS "type",
+        COUNT(1) AS "value"
+        FROM
+        ccm_event_incident a
+        <include refid="ccmEventIncidentJoins"/>
+        LEFT JOIN sys_dict b
+        ON b.`value` = a.event_type
+        AND
+        b.type="ccm_case_type"
+        <where>
+            a.del_flag=0
+        </where>
+        GROUP BY
+        a.event_type
+    </select>
+
+    <!-- 事件分类 -->
+    <select id="findEventFenLeiData" resultType="com.arjjs.ccm.tool.EchartType">
+		SELECT
+			b.label AS "type",
+			COUNT(1) AS "value"
+		FROM
+			ccm_event_incident a
+		LEFT JOIN sys_dict b ON b.`value` = a.event_kind AND b.type="ccm_event_inci_kind"
+		where
+			a.del_flag='0'
+		AND a.event_kind IS NOT NULL
+		AND a.event_kind !=''
+		AND b.label IS NOT NULL
+		AND b.label !=''
+		GROUP BY
+			a.event_kind
+	</select>
+
+    <select id="findSumByEventWeek" resultType="com.arjjs.ccm.tool.EchartType">
+		SELECT
+		count(*) AS value,
+		DATE_FORMAT(a.happen_date, '%Y-%m-%d') AS type
+		FROM
+		ccm_event_incident a
+		WHERE
+		DATE_FORMAT(a.happen_date, '%Y-%m') = DATE_FORMAT(NOW(), '%Y-%m')
+		AND (
+		a.happen_date &gt; DATE_SUB(CURDATE(), INTERVAL 7 DAY)
+		AND a.happen_date &lt;= NOW()
+		)
+		and a.status="03"
+		GROUP BY
+		type
+		ORDER BY
+		NULL
+
+	</select>
+
+    <!-- 本月事件发生前十——社区/街道 -->
+    <select id="findEventMonthMap" resultType="com.arjjs.ccm.tool.EchartType">
+		SELECT
+			(
+				CASE c.param_str
+				WHEN '1' THEN community.name
+				WHEN '2' THEN street.name
+				ELSE street.name
+				END
+			) AS "type",
+			(
+				CASE c.param_str
+				WHEN '1' THEN community.id
+				WHEN '2' THEN street.id
+				ELSE street.name
+				END
+			) AS "typeO",
+			count(a.id)AS "value"
+		FROM
+			ccm_event_incident a
+		LEFT JOIN sys_area net ON a.case_place = net.id
+		LEFT JOIN sys_area community ON community.id = net.parent_id
+		LEFT JOIN sys_area street ON street.id = community.parent_id
+		LEFT JOIN sys_config c ON c.id = 'system_level'
+		WHERE
+			a.del_flag = 0
+			AND net.del_flag = 0
+			AND community.del_flag = 0
+			AND street.del_flag = 0
+		AND (
+			a.happen_date &gt; date_format(
+				DATE_SUB(curdate(), INTERVAL 0 MONTH),
+				'%Y-%m'
+			)
+			AND a.happen_date &lt; date_format(
+				DATE_SUB(curdate(), INTERVAL - 1 MONTH),
+				'%Y-%m'
+			)
+		)
+		GROUP BY
+			(
+				CASE c.param_str
+				WHEN '1' THEN community.name
+				WHEN '2' THEN street.name
+				ELSE street.name
+				END
+			)
+		ORDER BY
+			count(a.id) DESC
+		LIMIT 10
+
+	</select>
+
+
+    <!-- 近一年重点人员帮扶/事件发生趋势图 -->
+    <select id="findEventYearMap" resultType="com.arjjs.ccm.tool.SearchTab">
+		SELECT
+			aa.type AS "type",
+			aa.value AS "value1",
+			bb.value AS "value2"
+		FROM
+			(
+			SELECT
+					concat(YEAR(happen_date),"-",MONTH (happen_date)) AS "type",
+					count(*) AS "value"
+					FROM
+					ccm_event_incident a
+					LEFT JOIN ccm_people p ON p.name = a.cul_name OR p.ident = a.cul_paperid
+					where
+						a.del_flag = '0'
+						AND (p.is_aids = 1 or p.is_behind = 1 or p.is_dangerous = 1 or p.is_drugs = 1 or p.is_heresy =1 or p.is_kym =1 OR p.is_psychogeny = 1 or p.is_rectification =1 or p.is_release = 1 or p.is_visit = 1 )
+						and (a.happen_date &gt; date_format( DATE_SUB(curdate() , INTERVAL 11 MONTH), '%Y-%m') AND a.happen_date &lt; date_format( DATE_SUB(curdate(), INTERVAL -1 MONTH), '%Y-%m'))
+					GROUP BY
+					concat(YEAR(happen_date),"-",MONTH (happen_date))
+					ORDER BY
+					concat(YEAR (happen_date),IF (MONTH (happen_date) &gt; 9,MONTH (happen_date),concat("0", MONTH(happen_date)))) ASC
+					LIMIT 12
+			)aa
+		LEFT JOIN
+			(
+			SELECT
+					concat(YEAR(tail_time),"-",MONTH (tail_time)) AS "type",
+					count(*) AS "value"
+					FROM
+					ccm_log_tail a
+					where
+						a.del_flag = '0'
+						and (relevance_table = 'ccm_house_release'
+							or relevance_table = 'ccm_house_rectification'
+							or relevance_table = 'ccm_house_psychogeny'
+							or relevance_table = 'ccm_house_drugs'
+							or relevance_table = 'ccm_house_aids'
+							or relevance_table = 'ccm_house_kym'
+							or relevance_table = 'ccm_pop_behind'
+							or relevance_table = 'ccm_house_petition'
+							or relevance_table = 'ccm_house_heresy'
+							or relevance_table = 'ccm_house_dangerous')
+						and (a.tail_time &gt; date_format( DATE_SUB(curdate() , INTERVAL 11 MONTH), '%Y-%m') AND a.tail_time &lt; date_format( DATE_SUB(curdate(), INTERVAL -1 MONTH), '%Y-%m'))
+					GROUP BY
+					concat(YEAR(tail_time),"-",MONTH (tail_time))
+					ORDER BY
+					concat(YEAR (tail_time),IF (MONTH (tail_time) &gt; 9,MONTH (tail_time),concat("0", MONTH(tail_time)))) ASC
+					LIMIT 12
+			)bb
+		ON aa.type=bb.type
+
+	</select>
+
+
+    <select id="queryAlarmInfoByDateAndAlarmType" resultType="CcmEventIncident">
+        SELECT
+        a.id AS "id",
+        a.case_name AS "caseName",
+        a.area_point AS "areaPoint"
+        FROM
+        ccm_event_incident a
+        <where>
+            a.happen_date BETWEEN #{beginHappenDate} AND #{endHappenDate}
+            AND a.event_kind IN (
+            <foreach collection="eventKindParents" index="index" item="typeValue" separator=",">
+                #{typeValue}
+            </foreach>
+            )
+            AND a.del_flag = #{DEL_FLAG_NORMAL}
+        </where>
+    </select>
+
+    <select id="queryAlarmInfoByDateAndAlarmTypeToFourColor" resultType="CcmEventIncident">
+        SELECT
+        AREAINFO.AREAID AS "area.id",
+        COUNTNUM.NUM AS "num",
+        AREAINFO.`NAME` AS "area.name",
+        AREAINFO.AREA_MAP AS "areaMap",
+        AREAINFO.AREA_POINT AS "areaPoint"
+        FROM
+        (
+        SELECT
+        ALARMINFO.case_place AS "areaid",
+        COUNT( 1 ) AS "num"
+        FROM
+        ccm_event_incident ALARMINFO
+        LEFT JOIN
+        SYS_AREA ON SYS_AREA.ID = ALARMINFO.case_place AND SYS_AREA.DEL_FLAG = #{DEL_FLAG_NORMAL}
+        WHERE
+        ALARMINFO.happen_date BETWEEN #{beginHappenDate} AND #{endHappenDate}
+        AND ALARMINFO.event_kind IN (
+        <foreach collection="eventKindParents" index="index" item="typeValue" separator=",">
+            #{typeValue}
+        </foreach>
+        )
+        AND ALARMINFO.case_place IS NOT NULL
+        AND ALARMINFO.case_place &lt;&gt; ''
+        AND ALARMINFO.DEL_FLAG = #{DEL_FLAG_NORMAL}
+        GROUP BY ALARMINFO.case_place
+        ) COUNTNUM
+        LEFT JOIN (
+        SELECT
+        SYS_AREA.ID AS "areaid",
+        SYS_AREA.`NAME`,
+        ORGAREA.AREA_MAP,
+        ORGAREA.AREA_POINT
+        FROM
+        SYS_AREA
+        LEFT JOIN CCM_ORG_AREA ORGAREA ON
+        ORGAREA.AREA_ID = SYS_AREA.ID AND
+        ORGAREA.DEL_FLAG = #{DEL_FLAG_NORMAL}
+        WHERE SYS_AREA.DEL_FLAG = #{DEL_FLAG_NORMAL}
+        ) AREAINFO ON AREAINFO.AREAID = COUNTNUM.AREAID
+    </select>
+
+    <update id="incident" parameterType="java.lang.String">
+        UPDATE ccm_event_incident SET
+        update_by = #{updateBy.id}
+        <if test="ratify != null and ratify != ''">
+            ,ratify = #{ratify}
+        </if>
+        <if test="stick != null and stick != ''">
+            ,update_date = #{updateDate},
+            stick = #{stick}
+        </if>
+        <if test="urgent != null and urgent != ''">
+            ,urgent = #{urgent}
+        </if>
+        <if test=" historyLegacy != null and historyLegacy != '' ">
+            ,history_legacy = #{historyLegacy}
+        </if>
+        WHERE id IN
+        <foreach collection="ids" item="idBys" open="(" separator="," close=")">
+            #{idBys}
+        </foreach>
+    </update>
+    <select id="getHomicideByArea" resultType="com.arjjs.ccm.tool.EchartType">
+        SELECT
+        SYS_AREA.name AS "type",
+        COUNT(1) AS "value"
+        FROM ccm_event_incident a
+        LEFT JOIN
+        SYS_AREA ON SYS_AREA.ID = a.case_place
+        <where>
+            a.del_flag = #{DEL_FLAG_NORMAL}
+            AND a.event_kind = "04"
+        </where>
+        GROUP BY a.case_place
+    </select>
+    <select id="countEventPreviewByReportType"
+            resultType="com.arjjs.ccm.modules.dma.eventheme.entity.CountEventByReportTypeVo">
+        SELECT
+        (CASE
+        WHEN t2.report_type = '1' THEN "APP录入"
+        WHEN t2.report_type = '2' THEN "短信录入"
+        WHEN t2.report_type = '3' THEN "热线录入"
+        WHEN t2.report_type = '4' THEN "网站录入"
+        WHEN t2.report_type = '5' THEN "机顶盒录入"
+        ELSE '未知方式录入' END) name,
+
+        count( * ) AS 'value'
+        FROM
+        ccm_event_incident_preview t2
+        WHERE
+        t2.del_flag = '0'
+        <if test="beginHappenDate != null and beginHappenDate != '' ">
+            and t2.happen_date &gt;= #{beginHappenDate}
+        </if>
+        <if test="endHappenDate != null and endHappenDate != '' ">
+            and t2.happen_date &lt; #{endHappenDate}
+        </if>
+        GROUP BY
+        t2.report_type
+        <!--UNION ALL-->
+        <!--SELECT-->
+        <!--(CASE		 WHEN t1.report_type = '0' THEN "手动录入"  END) report_type,-->
+        <!--count( * ) AS 'type_count'-->
+        <!--FROM-->
+        <!--ccm_event_incident t1-->
+        <!--WHERE t1.del_flag = '0'-->
+        <!--and t1.report_type = '0'-->
+        <!--<if test="beginHappenDate != null and beginHappenDate != '' ">-->
+        <!--and t1.happen_date &gt;=  #{beginHappenDate}-->
+        <!--</if>-->
+        <!--<if test="endHappenDate != null and endHappenDate != '' ">-->
+        <!--and t1.happen_date &lt; #{endHappenDate}-->
+        <!--</if>-->
+
+    </select>
+    <select id="countEventByReportType"
+            resultType="com.arjjs.ccm.modules.dma.eventheme.entity.CountEventByReportTypeVo">
+        SELECT
+        (CASE
+        WHEN t1.report_type = '1' THEN "APP录入"
+        WHEN t1.report_type = '2' THEN "短信录入"
+        WHEN t1.report_type = '3' THEN "热线录入"
+        WHEN t1.report_type = '4' THEN "网站录入"
+        WHEN t1.report_type = '5' THEN "机顶盒录入"
+        ELSE '手动录入' END) name,
+        count( * ) AS 'value'
+        FROM
+        ccm_event_incident t1
+        WHERE
+        t1.del_flag = '0'
+        <if test="beginHappenDate != null and beginHappenDate != '' ">
+            and t1.happen_date &gt;= #{beginHappenDate}
+        </if>
+        <if test="endHappenDate != null and endHappenDate != '' ">
+            and t1.happen_date &lt; #{endHappenDate}
+        </if>
+        GROUP BY
+        t1.report_type
+
+
+    </select>
+    <select id="queryAll" resultType="com.arjjs.ccm.modules.dma.eventheme.entity.EventIncidentVo">
+        SELECT
+        t1.id,
+        t1.case_place,
+        (CASE
+        WHEN t1.report_type = '1' THEN "APP录入"
+        WHEN t1.report_type = '2' THEN "短信录入"
+        WHEN t1.report_type = '3' THEN "热线录入"
+        WHEN t1.report_type = '4' THEN "网站录入"
+        WHEN t1.report_type = '5' THEN "机顶盒录入"
+        ELSE '手动录入' END) report_type
+        FROM
+        ccm_event_incident AS t1
+        WHERE
+        t1.del_flag = '0'
+        <if test="beginHappenDate != null and beginHappenDate != '' ">
+            and t1.happen_date &gt;= #{beginHappenDate}
+        </if>
+        <if test="endHappenDate != null and endHappenDate != '' ">
+            and t1.happen_date &lt; #{endHappenDate}
+        </if>
+    </select>
+
+    <resultMap id="ForceResultMap" type="com.arjjs.ccm.tool.EchartForce">
+        <collection property="nodes" ofType="com.arjjs.ccm.tool.EchartForceNodes">
+            <result property="category" column="nodes.category" javaType="java.lang.Integer"/>
+            <result property="name" column="nodes.name" javaType="java.lang.String"/>
+            <result property="value" column="nodes.value" javaType="java.lang.Integer"/>
+            <result property="label" column="nodes.label" javaType="java.lang.String"/>
+        </collection>
+        <collection property="links" ofType="com.arjjs.ccm.tool.EchartForceLinks">
+            <result property="source" column="links.source" javaType="java.lang.String"/>
+            <result property="target" column="links.target" javaType="java.lang.String"/>
+        </collection>
+    </resultMap>
+
+    <select id="getEventForForce" resultMap="ForceResultMap">
+        SELECT
+        1 AS "nodes.category",
+        a.id AS "nodes.name",
+        a.case_name AS "nodes.label",
+        15 AS "nodes.value",
+        a.id AS "links.source",
+        a.cul_paperid AS "links.target"
+        FROM ccm_event_incident a
+        <where>
+            a.del_flag = #{DEL_FLAG_NORMAL}
+            <if test="culPaperid != null and culPaperid != ''">
+                AND a.cul_paperid = #{culPaperid}
+            </if>
+        </where>
+    </select>
+
+    <select id="getcountevent" resultType="com.arjjs.ccm.tool.EchartType">
+		SELECT
+		IFNULL( count(1), 0 ) AS value ,
+		DATE_FORMAT( happen_date, '%Y-%m' ) AS type
+		FROM
+		ccm_event_incident
+		WHERE
+		(
+			happen_date &gt; date_format(
+			DATE_SUB(curdate(), INTERVAL #{num} MONTH),
+			'%Y-%m'
+			)
+			AND happen_date &lt; date_format(
+			DATE_SUB(curdate(), INTERVAL 0 MONTH),
+			'%Y-%m'
+			)
+		)
+		GROUP BY
+		DATE_FORMAT( happen_date, '%Y-%m' )
+	</select>
+
+    <sql id="officeColumns">
+		a.id,
+		a.parent_id AS "parent.id",
+		a.parent_ids,
+		a.area_id AS "area.id",
+		a.code,
+		a.name,
+		a.sort,
+		a.type,
+		a.grade,
+		a.address,
+		a.zip_code,
+		a.master,
+		a.phone,
+		a.fax,
+		a.email,
+		a.remarks,
+		a.create_by AS "createBy.id",
+		a.create_date,
+		a.update_by AS "updateBy.id",
+		a.update_date,
+		a.del_flag,
+		a.useable AS useable,
+		a.primary_person AS "primaryPerson.id",
+		a.deputy_person AS "deputyPerson.id",
+		p.name AS "parent.name",
+		ar.name AS "area.name",
+		ar.parent_ids AS "area.parentIds",
+		pp.name AS "primaryPerson.name",
+		dp.name AS "deputyPerson.name"
+	</sql>
+
+    <sql id="officeJoins">
+		LEFT JOIN sys_office p ON p.id = a.parent_id
+		LEFT JOIN sys_area ar ON ar.id = a.area_id
+		LEFT JOIN sys_user pp ON pp.id = a.primary_person
+		LEFT JOIN sys_user dp ON dp.id = a.deputy_person
+    </sql>
+
+    <select id="findOfficeList" resultType="Office">
+        SELECT
+        <include refid="officeColumns"/>
+        FROM sys_office a
+        <include refid="officeJoins"/>
+        WHERE a.del_flag = #{DEL_FLAG_NORMAL}
+        <!-- 数据范围过滤,只能看到自己区域及子区域的和自己上一级区域的网格员 -->
+        AND (a.id = #{currentUser.office.parentId}
+        OR a.id = #{currentUser.office.id}
+        OR a.parent_ids LIKE concat('%',#{currentUser.office.id},'%'))
+        ORDER BY a.code
+    </select>
+
+    <!-- 事件规模统计 -->
+    <select id="findEventGuiMoData" resultType="com.arjjs.ccm.tool.EchartType">
+		SELECT
+			a.label AS 'type',
+			ifnull( bb.one, 0 ) AS 'value'
+		FROM
+			sys_dict a
+			LEFT JOIN ( SELECT b.case_scope, count( * ) AS one FROM ccm_event_incident b WHERE b.del_flag = 0 GROUP BY b.case_scope ) AS bb ON a.`value` = bb.case_scope
+		WHERE
+			a.type = "ccm_event_scale"
+		ORDER BY
+			ifnull( bb.one, 0 ) DESC
+	</select>
+    <!-- 事件规模统计总数 -->
+    <select id="findAllEventNum" resultType="com.arjjs.ccm.tool.EchartType">
+		SELECT count(*) AS 'value' FROM ccm_event_incident b WHERE b.del_flag = 0
+	</select>
+
+    <select id="selectByAreaIdAndName" resultType="com.arjjs.ccm.modules.ccm.pop.entity.CcmAreaPoint" parameterType="com.arjjs.ccm.modules.ccm.sys.entity.CcmAreaPointVo">
+        SELECT
+        t1.id,
+        t1.area_point,
+        t1.event_scale AS "type"
+        FROM
+        ccm_event_incident t1
+        WHERE
+        t1.del_flag = 0 and t1.area_point != ""
+        <if test="areaId != null and areaId !=''">
+            and t1.case_place = #{areaId}
+        </if>
+        <if test="name != null and name !=''">
+            and t1.case_name like  '%${name}%'
+        </if>
+    </select>
+
+    <select id="findDispatch" resultType="CcmEventIncident">
+        SELECT DISTINCT
+        <include refid="ccmEventIncidentColumnsWithUser"/>
+        ,a21.id AS "bphAlarmInfoId"
+        FROM ccm_event_incident a
+        <include refid="ccmEventIncidentJoinsUser"/>
+        <include refid="ccmEventIncidentJoins"/>
+        <include refid="ccmBphAlarmInfoJoins"/>
+<!--        LEFT JOIN ccm_event_casedeal c ON a.id = c.obj_id-->
+        <where>
+            a.del_flag = #{DEL_FLAG_NORMAL}
+            <if test="userArea != null and userArea.parentIds != null and userArea.parentIds != ''">
+                AND (a20.parent_ids LIKE CONCAT('%',#{userArea.id},'%') or a.case_place = #{userArea.id})
+            </if>
+            <if test="caseName != null and caseName != ''">
+                AND a.case_name LIKE
+                <if test="dbName == 'oracle'">'%'||#{caseName}||'%'</if>
+                <if test="dbName == 'mssql'">'%'+#{caseName}+'%'</if>
+                <if test="dbName == 'mysql'">concat('%',#{caseName},'%')</if>
+            </if>
+            <if test="beginHappenDate != null and beginHappenDate != ''">
+                AND a.happen_date &gt;= #{beginHappenDate}
+            </if>
+            <if test="endHappenDate != null and endHappenDate != ''">
+                AND a.happen_date &lt;= #{endHappenDate}
+            </if>
+            <if test="area != null and area.id != null and area.id != ''">
+                AND a.case_place = #{area.id}
+            </if>
+            <if test="eventScale != null and eventScale != ''">
+                AND a.event_scale = #{eventScale}
+            </if>
+            <if test="eventType != null and eventType != ''">
+                AND a.event_type = #{eventType}
+            </if>
+            <if test="eventKind != null and eventKind != ''">
+                AND a.event_kind = #{eventKind}
+            </if>
+            <if test="status != null and status != ''">
+                AND a.status = #{status}
+            </if>
+            <if test="property != null and property != ''">
+                AND a.property = #{property}
+            </if>
+            <if test="historyLegacy != null and historyLegacy != ''">
+                AND a.history_legacy = #{historyLegacy}
+            </if>
+            AND (a.doing = "0" OR a.doing IS NULL)
+<!--            AND (c.id IS NULL OR c.handle_status = '04')-->
+        </where>
+        <choose>
+            <when test="page !=null and page.orderBy != null and page.orderBy != ''">
+                ORDER BY ${page.orderBy}
+            </when>
+            <otherwise>
+                ORDER BY a.stick DESC ,a.update_date DESC
+            </otherwise>
+        </choose>
+    </select>
+
+    <select id="findArchive" resultType="CcmEventIncident">
+        SELECT DISTINCT
+        <include refid="ccmEventIncidentColumnsWithUser"/>
+        ,a21.id AS "bphAlarmInfoId"
+        FROM ccm_event_incident a
+        <include refid="ccmEventIncidentJoinsUser"/>
+        <include refid="ccmEventIncidentJoins"/>
+        <include refid="ccmBphAlarmInfoJoins"/>
+        <where>
+            a.del_flag = #{DEL_FLAG_NORMAL}
+            <if test="userArea != null and userArea.parentIds != null and userArea.parentIds != ''">
+                AND (a20.parent_ids LIKE CONCAT('%',#{userArea.id},'%') or a.case_place = #{userArea.id})
+            </if>
+            <if test="caseName != null and caseName != ''">
+                AND a.case_name LIKE
+                <if test="dbName == 'oracle'">'%'||#{caseName}||'%'</if>
+                <if test="dbName == 'mssql'">'%'+#{caseName}+'%'</if>
+                <if test="dbName == 'mysql'">concat('%',#{caseName},'%')</if>
+            </if>
+            <if test="beginHappenDate != null and beginHappenDate != ''">
+                AND a.happen_date &gt;= #{beginHappenDate}
+            </if>
+            <if test="endHappenDate != null and endHappenDate != ''">
+                AND a.happen_date &lt;= #{endHappenDate}
+            </if>
+            <if test="area != null and area.id != null and area.id != ''">
+                AND a.case_place = #{area.id}
+            </if>
+            <if test="eventScale != null and eventScale != ''">
+                AND a.event_scale = #{eventScale}
+            </if>
+            <if test="eventType != null and eventType != ''">
+                AND a.event_type = #{eventType}
+            </if>
+            <if test="eventKind != null and eventKind != ''">
+                AND a.event_kind = #{eventKind}
+            </if>
+            <if test="property != null and property != ''">
+                AND a.property = #{property}
+            </if>
+            <if test="historyLegacy != null and historyLegacy != ''">
+                AND a.history_legacy = #{historyLegacy}
+            </if>
+            AND a.status = "02"
+        </where>
+        <choose>
+            <when test="page !=null and page.orderBy != null and page.orderBy != ''">
+                ORDER BY ${page.orderBy}
+            </when>
+            <otherwise>
+                ORDER BY a.stick DESC ,a.update_date DESC
+            </otherwise>
+        </choose>
+    </select>
+</mapper>

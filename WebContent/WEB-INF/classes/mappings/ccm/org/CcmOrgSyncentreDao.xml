@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.arjjs.ccm.modules.ccm.org.dao.CcmOrgSyncentreDao">
+    
+	<sql id="ccmOrgSyncentreColumns">
+		a.id AS "id",
+		a.centre_name AS "centreName",
+		a.centre_tel AS "centreTel",
+		a.centre_scale AS "centreScale",
+		a.resp_name AS "respName",
+		a.resp_tel AS "respTel",
+		a.constitute_com AS "constituteCom",
+		a.address AS "address",
+		a.add_detail AS "addDetail",
+		a.area_map AS "areaMap",
+		a.area_point AS "areaPoint",
+		a.icon AS "icon",
+		a.images AS "images",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag"
+	</sql>
+	
+	<sql id="ccmOrgSyncentreJoins">
+	</sql>
+    
+	<select id="get" resultType="CcmOrgSyncentre">
+		SELECT 
+			<include refid="ccmOrgSyncentreColumns"/>
+		FROM ccm_org_syncentre a
+		<include refid="ccmOrgSyncentreJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="CcmOrgSyncentre">
+		SELECT 
+			<include refid="ccmOrgSyncentreColumns"/>
+		FROM ccm_org_syncentre a
+		<include refid="ccmOrgSyncentreJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="centreName != null and centreName != ''">
+				AND a.centre_name LIKE 
+					<if test="dbName == 'oracle'">'%'||#{centreName}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{centreName}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{centreName},'%')</if>
+			</if>
+			<if test="centreScale != null and centreScale != ''">
+				AND a.centre_scale = #{centreScale}
+			</if>
+			<if test="respName != null and respName != ''">
+				AND a.resp_name LIKE 
+					<if test="dbName == 'oracle'">'%'||#{respName}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{respName}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{respName},'%')</if>
+			</if>
+			<if test="address != null and address != ''">
+				AND a.address = #{address}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="CcmOrgSyncentre">
+		SELECT 
+			<include refid="ccmOrgSyncentreColumns"/>
+		FROM ccm_org_syncentre a
+		<include refid="ccmOrgSyncentreJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO ccm_org_syncentre(
+			id,
+			centre_name,
+			centre_tel,
+			centre_scale,
+			resp_name,
+			resp_tel,
+			constitute_com,
+			address,
+			add_detail,
+			area_map,
+			area_point,
+			icon,
+			images,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag
+		) VALUES (
+			#{id},
+			#{centreName},
+			#{centreTel},
+			#{centreScale},
+			#{respName},
+			#{respTel},
+			#{constituteCom},
+			#{address},
+			#{addDetail},
+			#{areaMap},
+			#{areaPoint},
+			#{icon},
+			#{images},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE ccm_org_syncentre SET 	
+			centre_name = #{centreName},
+			centre_tel = #{centreTel},
+			centre_scale = #{centreScale},
+			resp_name = #{respName},
+			resp_tel = #{respTel},
+			constitute_com = #{constituteCom},
+			address = #{address},
+			add_detail = #{addDetail},
+			area_map = #{areaMap},
+			area_point = #{areaPoint},
+			icon = #{icon},
+			images = #{images},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE ccm_org_syncentre SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

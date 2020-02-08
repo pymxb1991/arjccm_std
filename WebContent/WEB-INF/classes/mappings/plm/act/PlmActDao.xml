@@ -1,0 +1,356 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.arjjs.ccm.modules.plm.act.dao.PlmActDao">
+    
+	<sql id="plmActColumns">
+		a.id AS "id",
+		a.proc_ins_id AS "procInsId",
+		a.title AS "title",
+		a.table_id AS "tableId",
+		a.table_name AS "tableName",
+		a.form_url AS "formUrl",
+		a.status AS "status",
+		a.type AS "type",
+		a.proc_def_id AS "procDefId",
+		a.is_sup AS "isSup",
+		a.sup_exe_id AS "supExe.id",
+		a.sup_ini_id AS "supIni.id",
+		a.sup_detail AS "supDetail",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag",
+		u10.name AS "supExe.name",
+		u11.name AS "supIni.name"
+	</sql>
+	
+	<sql id="plmActJoins">
+		LEFT JOIN sys_user u10 ON u10.id = a.sup_exe_id
+		LEFT JOIN sys_user u11 ON u11.id = a.sup_ini_id
+	</sql>
+    
+	<select id="get" resultType="PlmAct">
+		SELECT 
+			<include refid="plmActColumns"/>
+		FROM plm_act a
+		<include refid="plmActJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="getByTable" resultType="PlmAct">
+		SELECT 
+			<include refid="plmActColumns"/>
+		FROM plm_act a
+		<include refid="plmActJoins"/>
+		WHERE a.table_id = #{tableId} AND a.table_name = #{tableName}
+	</select>
+	
+	<select id="findProcDefIdByKey" resultType="string" parameterType="string">
+		select ID_ from act_re_procdef where KEY_=#{procDefKey} AND VERSION_=(
+		select MAX(VERSION_) from act_re_procdef WHERE key_=#{procDefKey})
+	</select>
+		
+	<update id="updateStatus">
+		UPDATE plm_act SET 
+			status = #{status},
+			update_by = #{updateBy.id}, 
+			update_date = #{updateDate}
+		WHERE id = #{id}
+	</update>	
+
+	<update id="updateSup">
+		UPDATE plm_act SET 
+			is_sup = #{isSup},
+			sup_exe_id = #{supExe.id},
+			sup_ini_id = #{supIni.id},
+			sup_detail = #{supDetail},
+			update_by = #{updateBy.id}, 
+			update_date = #{updateDate}
+		WHERE id = #{id}
+	</update>
+	
+	<select id="findList" resultType="PlmAct">
+		SELECT 
+			<include refid="plmActColumns"/>
+		FROM plm_act a
+		<include refid="plmActJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="title != null and title != ''">
+				AND a.title LIKE 
+					<if test="dbName == 'oracle'">'%'||#{title}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{title}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{title},'%')</if>
+			</if>
+			<if test="tableId != null and tableId != ''">
+				AND a.table_id = #{tableId}
+			</if>
+			<if test="tableName != null and tableName != ''">
+				AND a.table_name = #{tableName}
+			</if>
+			<if test="status != null and status != ''">
+				AND a.status = #{status}
+			</if>
+			<if test="type != null and type != ''">
+				AND a.type = #{type}
+			</if>
+			<if test="isSup != null and isSup != ''">
+				AND a.is_sup = #{isSup}
+			</if>
+			<if test="supExe != null and supExe.id != null and supExe.id != ''">
+				AND a.sup_exe_id = #{supExe.id}
+				AND  a.status != 01
+			</if>
+			<if test="supIni != null and supIni.id != null and supIni.id != ''">
+				AND a.sup_ini_id = #{supIni.id}
+			</if>
+			<if test="createBy != null and createBy.id != null and createBy.id != ''">
+				AND a.create_by = #{createBy.id}
+			</if>
+			<if test="procInsId != null and procInsId != ''">
+				AND a.type = #{procInsId}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+     <!-- 各个流程申请数量 -->
+     <select id="countAct"  resultType="Integer" >
+		SELECT 
+			count(*) as value
+		FROM plm_act a	
+		<where>	
+		 a.del_flag = "0"			  
+		</where>		
+	</select>
+	 <!-- 流程各状态数量 -->
+     <select id="countActByStatus"  parameterType="java.util.HashMap" resultType="com.arjjs.ccm.tool.EchartType" >
+		SELECT 		
+			count(*) as value,
+			IFNULL(dict.label," ") as type
+			
+		FROM plm_act a	
+		LEFT JOIN 
+		(SELECT label, value from sys_dict WHERE type = 'plm_act_status')dict
+		ON dict.value = a.status  
+		<where>	
+		 a.del_flag = "0"	
+		 <if test="type != null and type != ''">
+				AND a.type = #{type}
+			</if>	 
+		</where>
+		group by a.status
+	</select>
+	
+	<!-- 流程各类型数量 -->
+     <select id="countActByType"  parameterType="java.util.HashMap" resultType="com.arjjs.ccm.tool.EchartType" >
+		SELECT 	DISTINCT	
+			IFNULL(c.value,0) value,
+			b.label  as type,		
+				b.sort
+		FROM plm_act a	
+		left JOIN 
+       (SELECT id as pid, value ,label ,sort from sys_dict
+        WHERE  
+          del_flag = "0"	
+		  AND type = 'act_type' ) b
+		ON b.value = a.type  
+		left JOIN 
+      ( SELECT 	
+         a.id,
+		count(*) as value	
+		FROM plm_act a			
+		<where>	
+		 a.del_flag = "0"	
+		  AND a.create_date>DATE_SUB(CURDATE(), INTERVAL 12 month)
+		 <if test="status != null and status != ''">
+				AND a.status = #{status}
+			</if>	 
+		</where>
+		group by a.type) c
+		on c.id=a.id
+		group by a.type
+		order by b.sort
+	</select>
+	
+	 <!-- 流程督办数量 -->
+	<select id="countActBySup"  parameterType="java.util.HashMap" resultType="Integer" >
+		SELECT 		
+			count(*) as value			
+		FROM plm_act a	
+		<where>	
+		 a.del_flag = "0"	
+		 AND a.is_sup=1	 
+		 <if test="type != null and type != ''">
+				AND a.type = #{type}
+		</if>
+		</where>	
+	</select>
+     
+     
+     
+     <!--流程趋势  以天为时间轴-->
+	<select id="countActByDate"  parameterType="java.util.HashMap" resultType="com.arjjs.ccm.tool.EchartType">
+		SELECT			
+			count( * ) value,
+				sum(case when status=02 then 1 else 0 end) value2,
+				sum(case when status=04 then 1 else 0 end) value3,
+			day(a.create_date) as type 
+		FROM
+			plm_act a
+		<where>
+			a.del_flag = "0"
+			 AND a.create_date>DATE_SUB(CURDATE(), INTERVAL #{day} DAY)
+		</where>
+		GROUP BY			
+			
+			year(a.create_date), 
+			month(a.create_date),
+			day(a.create_date)
+		ORDER BY
+			value DESC
+	</select>
+     
+     
+	<select id="findSupFinishList" resultType="PlmAct">
+		SELECT 
+			<include refid="plmActColumns"/>
+		FROM plm_act a
+		<include refid="plmActJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="title != null and title != ''">
+				AND a.title LIKE 
+					<if test="dbName == 'oracle'">'%'||#{title}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{title}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{title},'%')</if>
+			</if>
+			<if test="procInsId != null and procInsId != ''">
+				AND a.proc_ins_id = #{procInsId}
+			</if>
+			<if test="status == null">
+				AND a.status not in (01,02)
+			</if>			
+			<if test="status != null and status != ''">
+				AND a.status = #{status}
+			</if>
+			<if test="type != null and type != ''">
+				AND a.type = #{type}
+			</if>
+			<if test="supExe != null and supExe.id != null and supExe.id != ''">
+				AND a.sup_exe_id = #{supExe.id}
+			</if>			
+			<if test="supIni != null and supIni.id != null and supIni.id != ''">
+				AND a.sup_ini_id = #{supIni.id}
+			</if>
+			<if test="createBy != null and createBy.id != null and createBy.id != ''">
+				AND a.create_by = #{createBy.id}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="PlmAct">
+		SELECT 
+			<include refid="plmActColumns"/>
+		FROM plm_act a
+		<include refid="plmActJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO plm_act(
+			id,
+			proc_ins_id,
+			title,
+			table_id,
+			table_name,
+			form_url,
+			status,
+			type,
+			proc_def_id,
+			is_sup,
+			sup_exe_id,
+			sup_ini_id,
+			sup_detail,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag
+		) VALUES (
+			#{id},
+			#{procInsId},
+			#{title},
+			#{tableId},
+			#{tableName},
+			#{formUrl},
+			#{status},
+			#{type},
+			#{procDefId},
+			#{isSup},
+			#{supExe.id},
+			#{supIni.id},
+			#{supDetail},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE plm_act SET 	
+			proc_ins_id = #{procInsId},
+			title = #{title},
+			table_id = #{tableId},
+			table_name = #{tableName},
+			form_url = #{formUrl},
+			status = #{status},
+			type = #{type},
+			proc_def_id = #{procDefId},
+			is_sup = #{isSup},
+			sup_exe_id = #{supExe.id},
+			sup_ini_id = #{supIni.id},
+			sup_detail = #{supDetail},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE plm_act SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

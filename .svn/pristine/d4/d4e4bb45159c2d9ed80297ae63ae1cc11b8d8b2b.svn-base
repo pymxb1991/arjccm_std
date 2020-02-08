@@ -1,0 +1,152 @@
+/**
+ * Copyright &copy; 2012-2016 <a href="https://github.com/thinkgem/jeesite">JeeSite</a> All rights reserved.
+ */
+package com.arjjs.ccm.modules.ccm.casino.entity;
+
+import java.util.Date;
+import org.hibernate.validator.constraints.Length;
+
+
+import com.arjjs.ccm.common.persistence.DataEntity;
+import com.arjjs.ccm.modules.ccm.place.entity.CcmBasePlace;
+
+/**
+ * 娱乐场所Entity
+ * @author ljd
+ * @version 2019-04-25
+ */
+public class CcmPlaceCasino extends DataEntity<CcmPlaceCasino> {
+	
+	private static final long serialVersionUID = 1L;
+	private CcmBasePlace ccmBasePlace;
+	private String type;		// 场所类型（01 室内 02 室外）
+	private String isFree;		// 是否收费(01是   02否）
+	private String basePlaceId;		// 场所id
+	private String managerNumber;		// 管理人员数量
+	private Date beginCreateDate;		// 开始 创建时间
+	private Date endCreateDate;		// 结束 创建时间
+	
+	//基础场所属性
+	private String placeName;		// 场所名称
+	private String relevanceOrg;		// 关联组织机构
+	private String leaderName;		// 负责人姓名
+	private String leaderIdCard;		// 负责人身份证号码
+	private String leaderContact;		// 负责人联系方式
+	
+	
+	
+	public CcmPlaceCasino() {
+		super();
+	}
+
+	public CcmPlaceCasino(String id){
+		super(id);
+	}
+	
+	public CcmBasePlace getCcmBasePlace() {
+		return ccmBasePlace;
+	}
+
+	public void setCcmBasePlace(CcmBasePlace ccmBasePlace) {
+		this.ccmBasePlace = ccmBasePlace;
+	}
+	
+	
+	@Length(min=1, max=255, message="场所名称长度必须介于 1 和 255 之间")
+	public String getPlaceName() {
+		return placeName;
+	}
+
+	public void setPlaceName(String placeName) {
+		this.placeName = placeName;
+	}
+
+	@Length(min=0, max=255, message="关联组织机构长度必须介于 0 和 255 之间")
+	public String getRelevanceOrg() {
+		return relevanceOrg;
+	}
+
+	public void setRelevanceOrg(String relevanceOrg) {
+		this.relevanceOrg = relevanceOrg;
+	}
+	@Length(min=0, max=255, message="负责人姓名长度必须介于 0 和 255 之间")
+	public String getLeaderName() {
+		return leaderName;
+	}
+
+	public void setLeaderName(String leaderName) {
+		this.leaderName = leaderName;
+	}
+
+	@Length(min=0, max=255, message="负责人身份证号码长度必须介于 0 和 255 之间")
+	public String getLeaderIdCard() {
+		return leaderIdCard;
+	}
+
+	public void setLeaderIdCard(String leaderIdCard) {
+		this.leaderIdCard = leaderIdCard;
+	}
+	
+	@Length(min=0, max=255, message="负责人联系方式长度必须介于 0 和 255 之间")
+	public String getLeaderContact() {
+		return leaderContact;
+	}
+
+	public void setLeaderContact(String leaderContact) {
+		this.leaderContact = leaderContact;
+	}
+
+
+	@Length(min=1, max=2, message="场所类型（01 室内 02 室外）长度必须介于 1 和 2 之间")
+	public String getType() {
+		return type;
+	}
+
+	public void setType(String type) {
+		this.type = type;
+	}
+	
+	@Length(min=1, max=2, message="是否收费(01是   02否）长度必须介于 1 和 2 之间")
+	public String getIsFree() {
+		return isFree;
+	}
+
+	public void setIsFree(String isFree) {
+		this.isFree = isFree;
+	}
+	
+	@Length(min=0, max=64, message="场所id长度必须介于 0 和 64 之间")
+	public String getBasePlaceId() {
+		return basePlaceId;
+	}
+
+	public void setBasePlaceId(String basePlaceId) {
+		this.basePlaceId = basePlaceId;
+	}
+	
+	@Length(min=0, max=100, message="管理人员数量长度必须介于 0 和 100 之间")
+	public String getManagerNumber() {
+		return managerNumber;
+	}
+
+	public void setManagerNumber(String managerNumber) {
+		this.managerNumber = managerNumber;
+	}
+	
+	public Date getBeginCreateDate() {
+		return beginCreateDate;
+	}
+
+	public void setBeginCreateDate(Date beginCreateDate) {
+		this.beginCreateDate = beginCreateDate;
+	}
+	
+	public Date getEndCreateDate() {
+		return endCreateDate;
+	}
+
+	public void setEndCreateDate(Date endCreateDate) {
+		this.endCreateDate = endCreateDate;
+	}
+		
+}

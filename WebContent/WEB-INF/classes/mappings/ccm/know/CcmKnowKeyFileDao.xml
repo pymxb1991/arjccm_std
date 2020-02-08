@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.arjjs.ccm.modules.ccm.know.dao.CcmKnowKeyFileDao">
+    
+	<sql id="ccmKnowKeyFileColumns">
+		a.id AS "id",
+		a.type AS "type",
+		a.name AS "name",
+		a.abstracts AS "abstracts",
+		a.content AS "content",
+		a.file AS "file",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag"
+	</sql>
+	
+	<sql id="ccmKnowKeyFileJoins">
+	</sql>
+    
+	<select id="get" resultType="CcmKnowKeyFile">
+		SELECT 
+			<include refid="ccmKnowKeyFileColumns"/>
+		FROM ccm_know_key_file a
+		<include refid="ccmKnowKeyFileJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="CcmKnowKeyFile">
+		SELECT 
+			<include refid="ccmKnowKeyFileColumns"/>
+		FROM ccm_know_key_file a
+		<include refid="ccmKnowKeyFileJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="type != null and type != ''">
+				AND a.type = #{type}
+			</if>
+			<if test="name != null and name != ''">
+				AND a.name LIKE 
+					<if test="dbName == 'oracle'">'%'||#{name}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{name}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{name},'%')</if>
+			</if>
+			<if test="abstracts != null and abstracts != ''">
+				AND a.abstracts LIKE 
+					<if test="dbName == 'oracle'">'%'||#{abstracts}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{abstracts}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{abstracts},'%')</if>
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="CcmKnowKeyFile">
+		SELECT 
+			<include refid="ccmKnowKeyFileColumns"/>
+		FROM ccm_know_key_file a
+		<include refid="ccmKnowKeyFileJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO ccm_know_key_file(
+			id,
+			type,
+			name,
+			abstracts,
+			content,
+			file,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag
+		) VALUES (
+			#{id},
+			#{type},
+			#{name},
+			#{abstracts},
+			#{content},
+			#{file},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE ccm_know_key_file SET 	
+			type = #{type},
+			name = #{name},
+			abstracts = #{abstracts},
+			content = #{content},
+			file = #{file},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE ccm_know_key_file SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

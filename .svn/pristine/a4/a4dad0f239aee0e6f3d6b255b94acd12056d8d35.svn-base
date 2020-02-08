@@ -1,0 +1,47 @@
+package com.arjjs.ccm.modules.sys.web;
+
+import java.util.List;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.apache.shiro.authz.annotation.RequiresPermissions;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.RequestMapping;
+
+import com.arjjs.ccm.common.utils.DateUtils;
+import com.arjjs.ccm.common.utils.excel.ExportExcel;
+import com.arjjs.ccm.common.web.BaseController;
+import com.arjjs.ccm.modules.pbs.person.service.UserService;
+import com.arjjs.ccm.modules.sys.entity.User;
+
+/**
+ * 编码方案管理Controller
+ * @author chenboyuan
+ * @version 2018-07-03
+ */
+@Controller
+@RequestMapping(value = "${adminPath}/sys/sysUser")
+public class SysUserController extends BaseController {
+	@Autowired
+	private UserService userService;
+
+	/**
+	 *
+	 * 导出用户列表
+	 */
+	@RequiresPermissions("sys:user:view")
+	@RequestMapping(value = { "/export" })
+	public void export(User user, HttpServletRequest request, HttpServletResponse response,
+							Model model) {
+		try {
+			String fileName = "用户信息"  + DateUtils.getDate("yyyyMMddHHmmss") + ".xlsx";
+			List<User> list = userService.findList(user);
+			new ExportExcel("用户信息", User.class).setDataList(list).write(response, fileName).dispose();
+		} catch (Exception e) {
+			System.out.println("导出用户信息数据失败！失败信息：" + e.getMessage());
+		}
+	}
+}

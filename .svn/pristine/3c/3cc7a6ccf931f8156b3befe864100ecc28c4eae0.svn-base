@@ -1,0 +1,189 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.arjjs.ccm.modules.pbs.vote.dao.PbsVoteSubjectDao">
+
+	<sql id="pbsVoteSubjectColumns">
+		a.id AS "id",
+		a.s_parentid AS "sParentid.id",
+		a.s_name AS
+		"sName",
+		a.s_mode AS "sMode",
+		a.s_sort AS "sSort",
+		a.s_sum AS "sSum",
+		a.s_spare01 AS "sSpare01",
+		a.s_spare02 AS
+		"sSpare02",
+		a.s_spare03 AS
+		"sSpare03",
+		a.s_spare04 AS "sSpare04",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS
+		"delFlag",
+		topic.s_name AS "sParentid.sName",
+		topic.s_belongfunc AS "sParentid.sBelongfunc"
+	</sql>
+
+	<sql id="pbsVoteSubjectJoins">
+		left join pbs_vote_topic topic on topic.id = a.s_parentid
+	</sql>
+
+	<select id="get" resultType="PbsVoteSubject">
+		SELECT
+		<include refid="pbsVoteSubjectColumns" />
+		FROM pbs_vote_subject a
+		<include refid="pbsVoteSubjectJoins" />
+		WHERE a.id = #{id}
+	</select>
+
+	<select id="findList" resultType="PbsVoteSubject">
+		SELECT
+		<include refid="pbsVoteSubjectColumns" />
+		FROM pbs_vote_subject a
+		<include refid="pbsVoteSubjectJoins" />
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="sName != null and sName != ''">
+				AND a.s_name LIKE CONCAT('%',#{sName},'%') 
+			</if>
+			<if test="sMode != null and sMode != ''">
+				AND a.s_mode = #{sMode}
+			</if>
+			<if
+				test="sParentid != null and sParentid != '' and sParentid.id !=null and sParentid.id != ''">
+				AND a.s_parentid = #{sParentid.id}
+			</if>
+			<if
+				test="sParentid != null and sParentid != '' and sParentid.sName !=null and sParentid.sName != ''">
+				AND topic.s_name like "%${sParentid.sName}%"
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.s_parentid,a.s_sort ASC
+			</otherwise>
+		</choose>
+	</select>
+
+	<select id="findAllList" resultType="PbsVoteSubject">
+		SELECT
+		<include refid="pbsVoteSubjectColumns" />
+		FROM pbs_vote_subject a
+		<include refid="pbsVoteSubjectJoins" />
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+
+	<insert id="insert">
+		INSERT INTO pbs_vote_subject(
+		id,
+		s_parentid,
+		s_name,
+		s_mode,
+		s_sort ,
+		s_sum ,
+		s_spare01,
+		s_spare02,
+		s_spare03,
+		s_spare04,
+		create_by,
+		create_date,
+		update_by,
+		update_date,
+		remarks,
+		del_flag
+		) VALUES (
+		#{id},
+		#{sParentid.id},
+		#{sName},
+		#{sMode},
+		#{sSort},
+		#{sSum},
+		#{sSpare01},
+		#{sSpare02},
+		#{sSpare03},
+		#{sSpare04},
+		#{createBy.id},
+		#{createDate},
+		#{updateBy.id},
+		#{updateDate},
+		#{remarks},
+		#{delFlag}
+		)
+	</insert>
+
+	<update id="update">
+		UPDATE pbs_vote_subject SET
+		s_parentid =
+		#{sParentid.id},
+		s_name = #{sName},
+		s_mode = #{sMode},
+		s_sort = #{sSort},
+		s_sum = #{sSum},
+		s_spare01 = #{sSpare01},
+		s_spare02 = #{sSpare02},
+		s_spare03 = #{sSpare03},
+		s_spare04 = #{sSpare04},
+		update_by =
+		#{updateBy.id},
+		update_date = #{updateDate},
+		remarks = #{remarks}
+		WHERE
+		id = #{id}
+	</update>
+
+	<update id="delete">
+		UPDATE pbs_vote_subject SET
+		del_flag =
+		#{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+
+	<select id="findListVer" resultType="PbsVoteSubject">
+		SELECT
+			a.id AS "id",
+		a.s_parentid AS "sParentid.id",
+		a.s_name AS
+		"sName",
+		a.s_mode AS "sMode",
+		a.s_sort AS "sSort",
+		a.s_sum AS "sSum",
+		a.s_spare01 AS "sSpare01",
+		a.s_spare02 AS
+		"sSpare02",
+		a.s_spare03 AS
+		"sSpare03",
+		a.s_spare04 AS "sSpare04",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag",
+		count( 1 ) AS "itemCount"
+		FROM pbs_vote_subject a
+		LEFT JOIN pbs_vote_item itemV ON itemV.s_parentid = a.id
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			and itemV.del_flag =  #{DEL_FLAG_NORMAL}
+				AND a.s_parentid = #{sParentid.id}
+		</where>
+		group by a.id
+	</select>
+
+</mapper>

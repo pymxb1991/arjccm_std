@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.arjjs.ccm.modules.kpi.scheme.dao.KpiSchemeDao">
+    
+	<sql id="kpiSchemeColumns">
+		a.id AS "id",
+		a.name AS "name",
+		a.start_time AS "startTime",
+		a.end_time AS "endTime",
+		a.office_id AS "office.id",
+		a.user_type AS "userType",
+		a.state AS "state",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag",
+		o5.name AS "office.name"
+	</sql>
+	
+	<sql id="kpiSchemeJoins">
+		LEFT JOIN sys_office o5 ON o5.id = a.office_id
+	</sql>
+    
+	<select id="get" resultType="KpiScheme">
+		SELECT 
+			<include refid="kpiSchemeColumns"/>
+		FROM kpi_scheme a
+		<include refid="kpiSchemeJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="KpiScheme">
+		SELECT 
+			<include refid="kpiSchemeColumns"/>
+		FROM kpi_scheme a
+		<include refid="kpiSchemeJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="name != null and name != ''">
+				AND a.name LIKE 
+					<if test="dbName == 'oracle'">'%'||#{name}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{name}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{name},'%')</if>
+			</if>
+			<if test="startTime != null and startTime != ''">
+				AND a.start_time &gt;= #{startTime}
+			</if>
+			<if test="endTime != null and endTime != ''">
+				AND a.end_time &lt;= #{endTime}
+			</if>
+			<if test="office != null and office.id != null and office.id != ''">
+				AND a.office_id = #{office.id}
+			</if>
+			<if test="userType != null and userType != ''">
+				AND a.user_type = #{userType}
+			</if>
+			<if test="state != null and state != ''">
+				AND a.state = #{state}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="KpiScheme">
+		SELECT 
+			<include refid="kpiSchemeColumns"/>
+		FROM kpi_scheme a
+		<include refid="kpiSchemeJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO kpi_scheme(
+			id,
+			name,
+			start_time,
+			end_time,
+			office_id,
+			user_type,
+			state,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag
+		) VALUES (
+			#{id},
+			#{name},
+			#{startTime},
+			#{endTime},
+			#{office.id},
+			#{userType},
+			#{state},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE kpi_scheme SET 	
+			name = #{name},
+			start_time = #{startTime},
+			end_time = #{endTime},
+			office_id = #{office.id},
+			user_type = #{userType},
+			state = #{state},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE kpi_scheme SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

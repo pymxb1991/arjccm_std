@@ -1,0 +1,146 @@
+/**
+ * Copyright &copy; 2012-2018 All rights reserved.
+ */
+package com.arjjs.ccm.modules.sys.service;
+
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Locale;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.arjjs.ccm.common.persistence.Page;
+import com.arjjs.ccm.common.service.CrudService;
+import com.arjjs.ccm.modules.sys.dao.SysCodesDao;
+import com.arjjs.ccm.modules.sys.entity.SysCodes;
+
+/**
+ * 编码方案管理Service
+ * @author dongqikai
+ * @version 2018-07-03
+ */
+@Service
+@Transactional(readOnly = true)
+public class SysCodesService extends CrudService<SysCodesDao, SysCodes> {
+	
+	@Autowired
+	private SysCodesDao sysCodesDao;
+
+	public SysCodes get(String id) {
+		return super.get(id);
+	}
+	
+	public List<SysCodes> findList(SysCodes sysCodes) {
+		return super.findList(sysCodes);
+	}
+	
+	public Page<SysCodes> findPage(Page<SysCodes> page, SysCodes sysCodes) {
+		return super.findPage(page, sysCodes);
+	}
+	
+	@Transactional(readOnly = false)
+	public void save(SysCodes sysCodes) {
+		super.save(sysCodes);
+	}
+	
+	@Transactional(readOnly = false)
+	public void delete(SysCodes sysCodes) {
+		super.delete(sysCodes);
+	}
+	
+	/**
+	 * 生成编号
+	 * @param modelNmae
+	 * @param type
+	 * @return
+	 */
+	@Transactional(readOnly = false)
+	public List<String> getCode(String id, int num) {
+		List<String> codes = null;
+		SysCodes sysCodes = applyCodeOfDB(id, num);
+		if (sysCodes == null) return codes;
+		switch(sysCodes.getCodeType()) {
+		case "1" :
+			codes = codeAlgorithmWithDate(sysCodes, num);
+		default :
+			codes = codeAlgorithmWithDate(sysCodes, num);
+		}
+		return codes;
+	}
+	
+	/**
+	 * 根据日期进行编码
+	 * @param sysCodes
+	 * @return
+	 */
+	public List<String> codeAlgorithmWithDate(SysCodes sysCodes, int num) {
+		List<String> codes = new ArrayList<>();
+		String code = "";
+		//拼接需要格式化的时间格式
+		String pattern = sysCodes.getCodeB().toLowerCase(Locale.ENGLISH) + sysCodes.getCodeC().toUpperCase(Locale.ENGLISH)
+			+ sysCodes.getCodeD().toLowerCase(Locale.ENGLISH);
+		SimpleDateFormat dateFormat = new SimpleDateFormat(pattern);
+		String dateCode = dateFormat.format(new Date());
+		//批量生成编码
+		for (int i = num; i > 0; i--) {
+			code = "";
+			code = sysCodes.getCodeA();
+			code += dateCode;
+			String codeTemp = getSum(sysCodes.getCodeE(), i)+"";//生成编号
+			if (codeTemp.length() < 6) {  //将编号格式化为6位，不足6位前面补0
+				while(codeTemp.length() < 6) {
+					codeTemp = "0" + codeTemp;
+				}
+			}
+			code += codeTemp;
+			codes.add(code);
+		}
+		return codes;
+	}
+	
+	/**
+	 * 字符串与数字求和
+	 * @param a
+	 * @param b
+	 * @return
+	 */
+	public int getSum(String a, int b) {
+		int c = Integer.parseInt(a) - b;
+		return c;
+	}
+	
+	/**
+	 * 从数据库申请后六位编码
+	 * @param modelNmae 关联模块名
+	 * @param type 编码类型
+	 * @param num 编号申请间隔
+	 */
+	public SysCodes applyCodeOfDB(String id, int num) {
+		id = id.substring(id.lastIndexOf(".")+1);
+		SysCodes sysCodes = null;
+		boolean successFlag = true;
+		while(successFlag) {
+			sysCodes = super.get(id);
+			sysCodes.setCodeE(String.valueOf(Integer.parseInt(sysCodes.getCodeE()) + num));
+			//更新六位编码
+			int count = saveCodeColumn(sysCodes);
+			successFlag = count > 0 ? false : true;
+		}
+		return sysCodes;
+	}
+	
+	/**
+	 * 更新编码序号
+	 * @param sysCodes
+	 * @return
+	 */
+	@Transactional(readOnly = false)
+	public int saveCodeColumn(SysCodes sysCodes) {
+		return sysCodesDao.saveCodeColumn(sysCodes);
+	}
+	
+}

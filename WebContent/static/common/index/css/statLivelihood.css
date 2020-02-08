@@ -1,0 +1,401 @@
+
+.header-logo{
+	width: 1560px;
+}
+.header h5 {
+    background: url(../images/headerLogo.png) no-repeat center;
+    background-size: 100% 100%;
+    line-height: 21px;
+    letter-spacing: 10px;
+    line-height: 40px;
+    letter-spacing: 1px;
+    font-size: 26px;
+}
+.header span {
+    background: url(../images/header-right.png) no-repeat center;
+    background-size: 100% 100%;
+}
+.header h5 b{
+	font-size: 20px;
+    font-weight: 545;
+}
+.zhongdianrenyuantongji {
+	width: 84%;
+	height: 98%;
+	background: url("../images/zhongdianrenyuantongji.png") center
+		no-repeat;
+	background-size: 100% 100%;
+	margin: 3px auto
+}
+
+.zhongdianrenyuan {
+	
+}
+
+.shangfangrenyuan {
+	position: absolute;
+	left: 283px;
+    top: 32px;
+}
+
+.aizibingrenyuan {
+	position: absolute;
+	left: 386px;
+    top: 160px;
+}
+
+.xidurenyuan {
+	position: absolute;
+	    left: 187px;
+    top: 160px;
+}
+
+.fanzuiqianke {
+	position: absolute;
+	left: 373px;
+    top: 78px;
+}
+/* .map-1{
+	display: none
+} */
+.jingshenbingrenyuan {
+	position: absolute;
+	left: 482px;
+    top: 120px;
+}
+
+.shejiaorenyuan {
+	position: absolute;
+	    left: 91px;
+    top: 116px;
+}
+
+.zhongdianrenyuan-common:before {
+	width: 3px;
+	height: 3px;
+	background: red;
+	border-radius: 50%;
+}
+
+.zhongdianrenyuan-num {
+	text-align: center;
+	color: #eea807;
+	font-size: 18px;
+}
+
+.liushourenyuan {
+	position: absolute;
+	left: 186px;
+    top: 76px;
+}
+
+.zhongdianqingshaonian {
+	position: absolute;
+	left: 284px;
+    top: 203px;
+}
+
+.quanburenyuan {
+	position: absolute;
+	left: 281px;
+    top: 121px;
+}
+.shouli-all{
+	position: absolute;
+	left:50%;
+	top:10px
+}
+.shouli-all span{
+	 color: #eea807;
+    font-size: 38px;
+     font-family: myFirstFont;
+}
+.Street-name-table{
+	height: 100%; 
+	width: 77%
+}
+.shengyu{
+	text-align: center;
+	margin-top: -114px;
+}
+.chuli-jindu{
+	text-align: center;
+	margin-top: 49px;
+}
+.fen-lei{
+	text-align: center;
+	margin-top: -43px;
+}
+
+@media (min-width: 1601px) and (max-width:1680px)  {
+		.header-logo {
+    width: 1349px;
+}
+	.Street-name-table{
+	height: 100%; 
+	width: 82%
+}
+.shangfangrenyuan {
+    left: 246px;
+    top: 30px;
+}
+.liushourenyuan {
+    left: 161px;
+    top: 72px;
+}
+.fanzuiqianke {
+    left: 322px;
+    top: 72px;
+}
+.quanburenyuan {
+    left: 244px;
+    top: 116px;
+}
+.shejiaorenyuan {
+    position: absolute;
+    left: 80px;
+    top: 114px;
+}
+.xidurenyuan {
+    position: absolute;
+    left: 163px;
+    top: 156px;
+}
+.zhongdianqingshaonian {
+    position: absolute;
+    left: 245px;
+    top: 196px;
+}
+.aizibingrenyuan {
+    position: absolute;
+    left: 331px;
+    top: 156px;
+}
+.jingshenbingrenyuan {
+    position: absolute;
+    left: 420px;
+    top: 114px;
+}
+}
+@media (min-width: 1441px) and (max-width:1600px)  {
+	
+	.Street-name-table {
+    height: 100%;
+    width: 82%;
+}
+.shangfangrenyuan {
+    position: absolute;
+    left: 233px;
+    top: 26px;
+}
+.liushourenyuan {
+    position: absolute;
+    left: 154px;
+    top: 56px;
+}
+.fanzuiqianke {
+    position: absolute;
+    left: 309px;
+    top: 56px;
+}
+.shejiaorenyuan {
+    position: absolute;
+    left: 77px;
+    top: 91px;
+}
+.quanburenyuan {
+    position: absolute;
+    left: 231px;
+    top: 95px;
+}
+.jingshenbingrenyuan {
+    position: absolute;
+    left: 399px;
+    top: 91px;
+}
+.xidurenyuan {
+    position: absolute;
+    left: 155px;
+    top: 123px;
+}
+.aizibingrenyuan {
+    position: absolute;
+    left: 316px;
+    top: 123px;
+}
+.zhongdianqingshaonian {
+    position: absolute;
+    left: 236px;
+    top: 160px;
+}
+.header h5.header-logo {
+   background: url(../images/headerLogo.png) no-repeat center;
+    background-size: 100% 100%;
+    line-height: 21px;
+    letter-spacing: 10px;
+    line-height: 34px;
+    letter-spacing: 1px;
+    font-size: 18px;
+    width: 100%;
+    height: 52px;
+}
+.shengyu{
+	    text-align: center;
+    margin-top: -92px;
+}
+.chuli-jindu{
+	text-align: center;
+	 margin-top: 34px;
+}
+.fen-lei{
+	text-align: center;
+	margin-top: -43px;
+}
+}
+@media (min-width: 1367px) and (max-width:1440px)  {
+.header h5.header-logo {
+    background: url(../images/headerLogo.png) no-repeat center;
+    background-size: 100% 100%;
+    line-height: 21px;
+    letter-spacing: 10px;
+    line-height: 34px;
+    letter-spacing: 0px;
+    font-size: 18px;
+    width: 100%;
+}
+	.Street-name-table {
+    height: 100%;
+    width: 83%;
+}
+.shengyu {
+    text-align: center;
+    margin-top: -89px;
+}
+.chuli-jindu {
+    text-align: center;
+    margin-top: 27px;
+}
+.fen-lei {
+    text-align: center;
+    margin-top: -41px;
+}
+.shangfangrenyuan {
+    position: absolute;
+    left: 207px;
+    top: 27px;
+}
+.liushourenyuan {
+    position: absolute;
+    left: 134px;
+    top: 56px;
+}
+.fanzuiqianke {
+    position: absolute;
+    left: 272px;
+    top: 56px;
+}
+.shejiaorenyuan {
+    position: absolute;
+    left: 64px;
+    top: 90px;
+}
+.quanburenyuan {
+    position: absolute;
+    left: 202px;
+    top: 92px;
+}
+.jingshenbingrenyuan {
+    position: absolute;
+    left: 355px;
+    top: 90px;
+}
+.xidurenyuan {
+    position: absolute;
+    left: 137px;
+    top: 126px;
+}
+.aizibingrenyuan {
+    position: absolute;
+    left: 279px;
+    top: 126px;
+}
+.zhongdianqingshaonian {
+    position: absolute;
+    left: 208px;
+    top: 160px;
+}
+}
+@media  (max-width:1366px)  {
+.header h5.header-logo {
+       background: url(../images/headerLogo.png) no-repeat center;
+    background-size: 100% 100%;
+    line-height: 21px;
+    letter-spacing: 10px;
+    line-height: 28px;
+    letter-spacing: 0px;
+    font-size: 16px;
+    width: 100%;
+}
+	.Street-name-table {
+    height: 100%;
+    width: 83%;
+}
+.shengyu {
+    text-align: center;
+    margin-top: -89px;
+    display: none
+}
+.chuli-jindu {
+    text-align: center;
+    margin-top: -32px;
+}
+.fen-lei {
+    text-align: center;
+   margin-top: -32px;
+}
+.shangfangrenyuan {
+   position: absolute;
+    left: 195px;
+    top: 18px;
+}
+.liushourenyuan {
+        position: absolute;
+    left: 127px;
+    top: 43px;
+}
+.fanzuiqianke {
+        position: absolute;
+    left: 255px;
+    top: 43px;
+}
+.shejiaorenyuan {
+    position: absolute;
+    left: 59px;
+    top: 69px;
+}
+.quanburenyuan {
+      position: absolute;
+    left: 189px;
+    top: 72px;
+}
+.jingshenbingrenyuan {
+   position: absolute;
+    left: 333px;
+    top: 69px;
+}
+.xidurenyuan {
+     position: absolute;
+    left: 127px;
+    top: 96px;
+}
+.aizibingrenyuan {
+       position: absolute;
+    left: 262px;
+    top: 96px;
+}
+.zhongdianqingshaonian {
+       position: absolute;
+    left: 194px;
+    top: 120px;
+}
+}

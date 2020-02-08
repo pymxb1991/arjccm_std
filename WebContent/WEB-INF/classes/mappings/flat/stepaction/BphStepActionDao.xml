@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.arjjs.ccm.modules.flat.stepaction.dao.BphStepActionDao">
+    
+	<sql id="bphStepActionColumns">
+		a.id AS "id",
+		a.action_id AS "actionId",
+		a.step_id AS "stepId",
+		a.sort AS "sort",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag"
+	</sql>
+	
+	<sql id="bphStepActionJoins">
+	</sql>
+    
+	<select id="get" resultType="BphStepAction">
+		SELECT 
+			<include refid="bphStepActionColumns"/>
+		FROM bph_step_action a
+		<include refid="bphStepActionJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="getActionByStepId" resultType="BphActionInfo">
+		SELECT
+			actionInfo.id AS "id",
+			actionInfo.name AS "name",
+			stepAction.step_id AS "stepId",
+			actionInfo.type AS "type",
+			actionInfo.title AS "title"
+		FROM
+			bph_action_info actionInfo
+			LEFT JOIN bph_step_action	stepAction ON stepAction.action_id = actionInfo.id
+		WHERE stepAction.step_id = #{stepId}
+		AND actionInfo.del_flag = #{DEL_FLAG_NORMAL}
+		AND stepAction.del_flag = #{DEL_FLAG_NORMAL}
+		ORDER BY stepAction.sort
+	</select>
+	
+	<select id="findLastSort" resultType="BphStepAction">
+		SELECT
+			<include refid="bphStepActionColumns"/>
+		FROM bph_step_action a
+		<where>
+			a.step_id = #{stepId}
+		</where>
+		ORDER BY a.id DESC LIMIT 1
+	</select>
+	
+	<select id="findList" resultType="BphStepAction">
+		SELECT 
+			<include refid="bphStepActionColumns"/>
+		FROM bph_step_action a
+		<include refid="bphStepActionJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="BphStepAction">
+		SELECT 
+			<include refid="bphStepActionColumns"/>
+		FROM bph_step_action a
+		<include refid="bphStepActionJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO bph_step_action(
+			id,
+			action_id,
+			step_id,
+			sort,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag
+		) VALUES (
+			#{id},
+			#{actionId},
+			#{stepId},
+			#{sort},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE bph_step_action SET 	
+			action_id = #{actionId},
+			step_id = #{stepId},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE bph_step_action SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE action_id = #{actionId}
+	</update>
+	
+	<update id="deleteByStepIdAndActionId">
+		UPDATE bph_step_action SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE (step_id = #{stepId} AND action_id = #{actionId})
+	</update>
+	
+</mapper>

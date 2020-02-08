@@ -1,0 +1,245 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.arjjs.ccm.modules.ccm.view.dao.VCcmOrgDao">
+    
+	<sql id="vCcmOrgColumns">
+		a.id AS "id",
+		a.parent_id AS "parent.id",
+		a.parent_ids AS "parentIds",
+		a.name AS "name",
+		a.sort AS "sort",
+		a.area_id AS "area.id",
+		a.code AS "code",
+		a.type AS "type",
+		a.grade AS "grade",
+		a.address AS "address",
+		a.zip_code AS "zipCode",
+		a.master AS "master",
+		a.phone AS "phone",
+		a.fax AS "fax",
+		a.email AS "email",
+		a.useable AS "useable",
+		a.primary_person AS "primaryPerson.id",
+		a.deputy_person AS "deputyPerson.id",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag",
+		a.office_id AS "office.id",
+		a.pic_path AS "picPath",
+		a.description AS "description",
+		a.main_func AS "mainFunc",
+		a.area_map AS "areaMap",
+		a.area_point AS "areaPoint",
+		<!-- a.max_arrive_time AS "maxArriveTime",
+		a.max_dispatch_time AS "maxDispatchTime", -->
+		a.icon AS "icon",
+		a.more1 AS "more1",
+		a6.name AS "area.name",
+		o25.name AS "office.name",
+		pp.name AS "primaryPerson.name",
+		pp.photo AS "primaryPerson.remarks",
+		dp.name AS "deputyPerson.name"
+	</sql>
+	
+	<sql id="vCcmOrgJoins">
+		LEFT JOIN sys_area a6 ON a6.id = a.area_id
+		LEFT JOIN sys_office o25 ON o25.id = a.office_id
+		LEFT JOIN SYS_USER pp ON pp.id = a.primary_person
+		LEFT JOIN SYS_USER dp ON dp.id = a.deputy_person
+	</sql>
+    
+	<select id="get" resultType="VCcmOrg">
+		SELECT 
+			<include refid="vCcmOrgColumns"/>
+		FROM v_ccm_org a
+		<include refid="vCcmOrgJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="VCcmOrg">
+		SELECT 
+			<include refid="vCcmOrgColumns"/>
+		FROM v_ccm_org a
+		<include refid="vCcmOrgJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="parentIds != null and parentIds != ''">
+				AND a.parent_ids LIKE 
+					<if test="dbName == 'oracle'">'%'||#{parentIds}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{parentIds}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{parentIds},'%')</if>
+			</if>
+			<if test="area != null and area.id != null and area.id != ''">
+				AND a.area_id = #{area.id}
+			</if>
+			<if test="type != null and type != ''">
+				AND a.type = #{type}
+			</if>
+			<if test="sql != null and sql != ''">
+                AND  (${sql})
+                AND a.type in(2,3,4)
+            </if>
+			OR a.id = #{id}
+		</where>
+		ORDER BY a.code ASC
+	</select>
+	
+	<select id="findAllList" resultType="VCcmOrg">
+		SELECT 
+			<include refid="vCcmOrgColumns"/>
+		FROM v_ccm_org a
+		<include refid="vCcmOrgJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>
+		ORDER BY a.sort ASC
+	</select>
+	
+	<select id="findByParentIdsLike" resultType="VCcmOrg">
+		SELECT
+			a.id,
+			a.parent_id AS "parent.id",
+			a.parent_ids
+		FROM v_ccm_org a
+		<include refid="vCcmOrgJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			AND a.parent_ids LIKE #{parentIds}
+		</where>
+		ORDER BY a.sort ASC
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO v_ccm_org(
+			id,
+			parent_id,
+			parent_ids,
+			name,
+			sort,
+			area_id,
+			code,
+			type,
+			grade,
+			address,
+			zip_code,
+			master,
+			phone,
+			fax,
+			email,
+			useable,
+			primary_person,
+			deputy_person,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag,
+			office_id,
+			pic_path,
+			description,
+			main_func,
+			area_map,
+			area_point,
+			icon,
+			more1
+		) VALUES (
+			#{id},
+			#{parent.id},
+			#{parentIds},
+			#{name},
+			#{sort},
+			#{area.id},
+			#{code},
+			#{type},
+			#{grade},
+			#{address},
+			#{zipCode},
+			#{master},
+			#{phone},
+			#{fax},
+			#{email},
+			#{useable},
+			#{primaryPerson.id},
+			#{deputyPerson.id},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag},
+			#{office.id},
+			#{picPath},
+			#{description},
+			#{mainFunc},
+			#{areaMap},
+			#{areaPoint},
+			#{icon},
+			#{more1}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE v_ccm_org SET 	
+			parent_id = #{parent.id},
+			parent_ids = #{parentIds},
+			name = #{name},
+			sort = #{sort},
+			area_id = #{area.id},
+			code = #{code},
+			type = #{type},
+			grade = #{grade},
+			address = #{address},
+			zip_code = #{zipCode},
+			master = #{master},
+			phone = #{phone},
+			fax = #{fax},
+			email = #{email},
+			useable = #{useable},
+			primary_person = #{primaryPerson.id},
+			deputy_person = #{deputyPerson.id},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks},
+			office_id = #{office.id},
+			pic_path = #{picPath},
+			description = #{description},
+			main_func = #{mainFunc},
+			area_map = #{areaMap},
+			area_point = #{areaPoint},
+			icon = #{icon},
+			more1 = #{more1}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="updateParentIds">
+		UPDATE v_ccm_org SET 
+			parent_id = #{parent.id}, 
+			parent_ids = #{parentIds}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE v_ccm_org SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id} OR parent_ids LIKE '%,'||#{id}||',%'
+	</update>
+
+	<select id="getByOrgType" resultType="com.arjjs.ccm.tool.EchartType">
+	SELECT
+	officeP.`name` AS "type",
+	count( substring_index( substring_index( office.parent_ids, ',', 3 ), ',', - 1 ) ) AS "value"
+FROM
+	sys_office office
+	LEFT JOIN sys_office officeP ON officeP.id = substring_index( substring_index( office.parent_ids, ',', 3 ), ',', - 1 )
+WHERE
+	officeP.id IS NOT NULL
+	AND office.del_flag = 0
+GROUP BY
+	officeP.id
+	</select>
+
+</mapper>

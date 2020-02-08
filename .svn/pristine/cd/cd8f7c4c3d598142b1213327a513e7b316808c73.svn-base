@@ -1,0 +1,160 @@
+/**
+ * Copyright &copy; 2012-2016 <a href="https://github.com/thinkgem/jeesite">JeeSite</a> All rights reserved.
+ */
+package com.arjjs.ccm.modules.risk.audit.web;
+
+import java.util.Date;
+import java.util.List;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.apache.shiro.authz.annotation.RequiresPermissions;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
+import com.arjjs.ccm.common.config.Global;
+import com.arjjs.ccm.common.persistence.Page;
+import com.arjjs.ccm.common.web.BaseController;
+import com.arjjs.ccm.common.utils.StringUtils;
+import com.arjjs.ccm.modules.ccm.sys.entity.CcmWorkReport;
+import com.arjjs.ccm.modules.risk.audit.entity.RiskAudit;
+import com.arjjs.ccm.modules.risk.audit.service.RiskAuditService;
+import com.arjjs.ccm.modules.risk.report.entity.RiskReport;
+import com.arjjs.ccm.modules.risk.report.service.RiskReportService;
+import com.arjjs.ccm.modules.sys.utils.UserUtils;
+
+/**
+ * 重大事项审核Controller
+ * @author liang
+ * @version 2018-04-02
+ */
+@Controller
+@RequestMapping(value = "${adminPath}/audit/riskAudit")
+public class RiskAuditController extends BaseController {
+
+	@Autowired
+	private RiskAuditService riskAuditService;
+	@Autowired
+	private RiskReportService riskReportService;
+	
+	
+	
+	
+	
+	@ModelAttribute
+	public RiskAudit get(@RequestParam(required=false) String id) {
+		RiskAudit entity = null;
+		if (StringUtils.isNotBlank(id)){
+			entity = riskAuditService.get(id);
+		}
+		if (entity == null){
+			entity = new RiskAudit();
+		}
+		return entity;
+	}
+	
+	//listReport审核上报
+	@RequiresPermissions("audit:riskAudit:view")
+	@RequestMapping(value = "listReport")
+	public String listReport(RiskReport riskReport, HttpServletRequest request, HttpServletResponse response, Model model) {
+		Page<RiskReport> page = riskReportService.findPage(new Page<RiskReport>(request, response), riskReport); 
+		model.addAttribute("page", page);
+		return "risk/audit/riskAuditListReport";
+	}
+	//审核上报表单
+	@RequiresPermissions("audit:riskAudit:view")
+	@RequestMapping(value = "formReport")
+	public String formReport(RiskReport riskReport, Model model) {
+		String readNum = riskReport.getReadNum();
+		riskReport = riskReportService.get(riskReport);
+		riskReport.setReadNum(readNum);
+		RiskAudit riskAudit = new RiskAudit();
+		riskAudit.setRiskReport(riskReport);
+		riskReport.setRiskAuditList(riskAuditService.findList(riskAudit));
+		model.addAttribute("riskReport", riskReport);
+		return "risk/audit/riskAuditFormReport";
+	}
+	//审核上报表单提交，保存audit
+	@RequiresPermissions("audit:riskAudit:edit")
+	@RequestMapping(value = "formSave")
+	public String formSave(RiskReport riskReport, Model model, RedirectAttributes redirectAttributes) {
+		if (!beanValidator(model, riskReport)) {
+			return formReport(riskReport, model);
+		}
+		riskReportService.saveInsertAll(riskReport);
+		addMessage(redirectAttributes, "上报重大事项成功");
+		return "redirect:" + Global.getAdminPath() + "/audit/riskAudit/listReport?repage";
+	}
+	//删除重大事项的上报
+	@RequiresPermissions("audit:riskAudit:edit")
+	@RequestMapping(value = "deleteReport")
+	public String deleteReport(RiskReport riskReport, Model model, RedirectAttributes redirectAttributes) {
+		if (!beanValidator(model, riskReport)) {
+			return formReport(riskReport, model);
+		}
+		RiskAudit riskAudit = new RiskAudit();
+		riskAudit.setRiskReport(riskReport);
+		List<RiskAudit> list = riskAuditService.findList(riskAudit);
+		if(list.size()>0){
+			for(RiskAudit l:list){
+				riskAuditService.delete(l);
+			}
+		}
+		return "redirect:"+Global.getAdminPath()+"/audit/riskAudit/listReport?repage";
+	}
+	
+	
+	
+	
+	//
+	@RequiresPermissions("audit:riskAudit:view")
+	@RequestMapping(value = {"list", ""})
+	public String list(RiskAudit riskAudit, HttpServletRequest request, HttpServletResponse response, Model model) {
+		riskAudit.setUser(UserUtils.getUser());//审批人查阅
+		Page<RiskAudit> page = riskAuditService.findPage(new Page<RiskAudit>(request, response), riskAudit); 
+		model.addAttribute("page", page);
+		return "risk/audit/riskAuditList";
+	}
+
+	@RequiresPermissions("audit:riskAudit:view")
+	@RequestMapping(value = "form")
+	public String form(RiskAudit riskAudit, Model model) {
+		riskAudit.setReadFlag("1");//已阅状态
+		riskAuditService.save(riskAudit);
+		riskAudit.setFile(riskAudit.getRiskReport().getFile());//文件浏览
+		model.addAttribute("riskAudit", riskAudit);
+		return "risk/audit/riskAuditForm";
+	}
+
+	@RequiresPermissions("audit:riskAudit:edit")
+	@RequestMapping(value = "save")
+	public String save(RiskAudit riskAudit, Model model, RedirectAttributes redirectAttributes) {
+		if (!beanValidator(model, riskAudit)){
+			return form(riskAudit, model);
+		}
+		RiskAudit riskAudit2 = new RiskAudit();
+		riskAudit2 = riskAuditService.get(riskAudit);
+		riskAudit2.setReadTime(new Date());
+		riskAudit2.setOpinion(riskAudit.getOpinion());
+		riskAudit2.setResult(riskAudit.getResult());
+		riskAudit2.setRemarks(riskAudit.getRemarks());
+		riskAuditService.save(riskAudit2);
+		addMessage(redirectAttributes, "保存重大事项审核成功");
+		return "redirect:"+Global.getAdminPath()+"/audit/riskAudit/?repage";
+	}
+	
+	@RequiresPermissions("audit:riskAudit:edit")
+	@RequestMapping(value = "delete")
+	public String delete(RiskAudit riskAudit, RedirectAttributes redirectAttributes) {
+		riskAuditService.delete(riskAudit);
+		addMessage(redirectAttributes, "删除重大事项审核成功");
+		return "redirect:"+Global.getAdminPath()+"/audit/riskAudit/?repage";
+	}
+
+}

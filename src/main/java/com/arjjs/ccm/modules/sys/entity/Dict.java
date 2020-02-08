@@ -1,0 +1,166 @@
+/**
+ * Copyright &copy; 2012-2016 <a href="http://www.arjjs.com">arjjs</a> All rights reserved.
+ */
+package com.arjjs.ccm.modules.sys.entity;
+
+import javax.validation.constraints.NotNull;
+import javax.xml.bind.annotation.XmlAttribute;
+
+import org.hibernate.validator.constraints.Length;
+
+import com.arjjs.ccm.common.persistence.DataEntity;
+
+/**
+ * 字典Entity
+ * @author admin001
+ * @version 2013-05-15
+ */
+public class Dict extends DataEntity<Dict> {
+
+	private static final long serialVersionUID = 1L;
+	private String name;
+	private String value;	// 数据值
+	private String label;	// 标签名
+	private String type;	// 类型
+	private String description;// 描述
+	private Integer sort;	// 排序
+	private String parentId;//父Id
+	private String url;
+	private String procInsId;
+	private Integer count;//总数量
+	private Integer value0;//实际数量
+	private String status;//分类
+	private String supExeId;//督办人id
+
+	public Dict() {
+		super();
+	}
+	
+	public Dict(String id){
+		super(id);
+	}
+	
+	public Dict(String value, String label){
+		this.value = value;
+		this.label = label;
+	}
+	
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	@XmlAttribute
+	@Length(min=1, max=100)
+	public String getValue() {
+		return value;
+	}
+
+	public void setValue(String value) {
+		this.value = value;
+	}
+	
+	@XmlAttribute
+	@Length(min=1, max=100)
+	public String getLabel() {
+		return label;
+	}
+
+	public void setLabel(String label) {
+		this.label = label;
+	}
+
+	@Length(min=1, max=100)
+	public String getType() {
+		return type;
+	}
+
+	public void setType(String type) {
+		this.type = type;
+	}
+
+	@XmlAttribute
+	@Length(min=0, max=100)
+	public String getDescription() {
+		return description;
+	}
+
+	public void setDescription(String description) {
+		this.description = description;
+	}
+
+	@NotNull
+	public Integer getSort() {
+		return sort;
+	}
+
+	public void setSort(Integer sort) {
+		this.sort = sort;
+	}
+
+	@Length(min=1, max=100)
+	public String getParentId() {
+		return parentId;
+	}
+
+	public void setParentId(String parentId) {
+		this.parentId = parentId;
+	}
+	
+	@Override
+	public String toString() {
+		return label;
+	}
+
+	public String getUrl() {
+		return url;
+	}
+
+	public void setUrl(String url) {
+		this.url = url;
+	}
+
+	public String getProcInsId() {
+		return procInsId;
+	}
+
+	public void setProcInsId(String procInsId) {
+		this.procInsId = procInsId;
+	}
+
+	public Integer getCount() {
+		return count;
+	}
+
+	public void setCount(Integer count) {
+		this.count = count;
+	}
+
+	public Integer getValue0() {
+		return value0;
+	}
+
+	public void setValue0(Integer value0) {
+		this.value0 = value0;
+	}
+
+	public String getStatus() {
+		return status;
+	}
+
+	public void setStatus(String status) {
+		this.status = status;
+	}
+
+	public String getSupExeId() {
+		return supExeId;
+	}
+
+	public void setSupExeId(String supExeId) {
+		this.supExeId = supExeId;
+	}
+	
+}

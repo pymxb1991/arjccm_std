@@ -1,0 +1,24 @@
+package com.arjjs.ccm.modules.im.service;
+
+import org.springframework.stereotype.Service;
+
+import com.arjjs.ccm.common.config.Global;
+import com.arjjs.ccm.modules.im.entity.ImParamData;
+import com.arjjs.ccm.tool.Pager;
+import com.arjjs.ccm.tool.Tool;
+
+import net.sf.json.JSONObject;
+
+@Service
+public class BphImService {
+	public Pager historymessage(ImParamData paramData) {
+		String url = Global.getConfig("arjimRest") + "historymessage";
+		String param = "?userId="+paramData.getUserId()+"&id="+paramData.getId()+"&type="+paramData.getType()+"&skipToPage="+paramData.getSkipToPage();
+		String resultStr = Tool.getRestReturn(url+param);
+		resultStr = resultStr.substring(1, resultStr.length() - 1);
+		resultStr = resultStr.replace("\\", "");
+		JSONObject jsonObject = JSONObject.fromObject(resultStr);
+		Pager pager = new Pager(Integer.valueOf((String) jsonObject.getString("skipToPage")), Integer.valueOf((String) jsonObject.getString("pageSize")), Integer.valueOf((String) jsonObject.getString("totalsize")));
+		return pager;
+	}
+}

@@ -1,0 +1,110 @@
+/* //����ͼ �б��л�css */
+<style type="text/css">
+	.thumbnail {
+	  position: absolute;
+    display: block;
+    margin-bottom: 20px;
+    line-height: 1.42857;
+    background-color: rgb(255, 255, 255);
+    padding: 4px;
+    border-width: 1px;
+    border-style: solid;
+    border-color: rgb(221, 221, 221);
+    border-image: initial;
+    border-radius: 4px;
+    transition: border 0.2s ease-in-out 0s;
+}
+
+  .thumbnail div a{
+  font-size: large;
+  }
+  .thumbnail div a+a{
+  font-size: large;
+  }
+  #prodInfo_small .row{
+   margin-left: 20px;
+   }
+    #prodInfo_small .row{
+   margin-left: 20px;
+   }
+    
+  .row .spandiv{
+	margin-bottom: 20px;
+}
+	 body .breadcrumb {
+    margin-bottom: 0px;
+     }
+	#switchbtn{
+	font-size: large;
+	line-height: 20px;
+	text-align: right;
+	width: 100%;
+	}
+	#switchbtn  a{
+	
+	 color: inherit;
+	 opacity:0.6;
+	}
+	#switchbtn  a:hover{
+	
+	 color: inherit;
+	 opacity:1;
+	}
+	#prodInfo_List{
+	display: none;
+	}
+	#prodInfo_small{
+	display: none;
+	}
+	#switchbtn a{
+ 
+	padding: 3px;
+	}
+	.caption p{
+	  overflow: hidden;
+   text-overflow:ellipsis;
+   white-space: nowrap;
+	}
+	.thumbnail h4{
+	padding:5px 0 0 9px;
+	  overflow: hidden;
+   text-overflow:ellipsis;
+   white-space: nowrap;
+	}
+	.caption div{
+	margin: 0;}
+	#prodInfo_small .thumbnail .caption {
+    padding: 9px 0px 5px 0px;
+    color: #555;
+    margin: 0;
+   }
+	.thumbnail .caption .spantext{
+	 /*   margin-left: 10px; */
+	   margin-top: 5px;
+	   float: left;
+	}
+	.thumbnail .caption .spanimg{
+	
+	   float: left;
+	}
+	.footbtn{
+	position: relative;
+	bottom:2px; 
+	
+	}
+	.caption .spantext6{
+	width: 280px;
+	}
+	.caption .spantext5{
+	width: 200px;
+	}
+	img {
+	
+    padding-left: 9px;
+    width: 82px;
+    height: 98px;
+    max-width: 85px;
+    vertical-align: middle;
+    border: 0;
+    -ms-interpolation-mode: bicubic;
+}

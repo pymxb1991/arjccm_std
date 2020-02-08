@@ -1,0 +1,210 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.arjjs.ccm.modules.pbs.proposal.dao.PbsProposalDao">
+
+	<sql id="pbsProposalColumns">
+		a.id AS "id",
+		a.s_title AS "sTitle",
+		a.s_content AS
+		"sContent",
+		a.s_areaid AS "sAreaid.id",
+		proarea.s_name AS
+		"sAreaid.sName",
+		a.s_areaversion AS "sAreaversion",
+		a.s_showtype AS
+		"sShowtype",
+		a.i_cnt AS "iCnt",
+		a.s_reporteruser AS "sReporteruser.id",
+		u4.name AS "sReporteruser.name",
+		a.s_reportermem AS "sReportermem.id",
+		mem1.s_name AS "sReportermem.sName",
+		a.s_acceptermem AS
+		"sAcceptermem.id",
+		mem2.s_name AS "sAcceptermem.sName",
+		a.s_publish AS
+		"sPublish",
+		a.s_stat AS "sStat",
+		a.s_level AS "sLevel",
+		a.s_description
+		AS "sDescription",
+		a.s_spare01 AS "sSpare01",
+		a.s_spare02 AS "sSpare02",
+		a.s_spare03 AS "sSpare03",
+		a.s_spare04 AS "sSpare04",
+		a.create_by AS
+		"createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS
+		"updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag"
+	</sql>
+
+	<sql id="pbsProposalJoins">
+		LEFT JOIN pbs_proposalarea proarea ON proarea.id =
+		a.s_areaid
+		LEFT JOIN sys_user u4 ON u4.id = a.s_reporteruser
+		LEFT JOIN
+		pbs_partymem mem1 ON mem1.id = a.s_reportermem
+		LEFT JOIN pbs_partymem
+		mem2 ON mem2.id = a.s_acceptermem
+	</sql>
+
+	<select id="get" resultType="PbsProposal">
+		SELECT
+		<include refid="pbsProposalColumns" />
+		FROM pbs_proposal a
+		<include refid="pbsProposalJoins" />
+		WHERE a.id = #{id}
+	</select>
+
+	<select id="findList" resultType="PbsProposal">
+		SELECT
+		<include refid="pbsProposalColumns" />
+		FROM pbs_proposal a
+		<include refid="pbsProposalJoins" />
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="sTitle != null and sTitle != ''">
+				AND a.s_title LIKE CONCAT('%',#{sTitle},'%') 
+			</if>
+			<if
+				test="(sReportermem != null and sReportermem != '' and sReportermem.id != null and sReportermem.id != '') or (sAcceptermem != null and sAcceptermem != '' and sAcceptermem.id != null and sAcceptermem.id != '')">
+				AND (a.s_reportermem = #{sReportermem.id} or a.s_acceptermem =
+				#{sAcceptermem.id})
+			</if>
+
+			<if test="sPublish != null and sPublish != ''">
+				AND a.s_publish = #{sPublish}
+			</if>
+			<if test="sContent != null and sContent != ''">
+				AND a.s_content = #{sContent}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+
+	<select id="findAllList" resultType="PbsProposal">
+		SELECT
+		<include refid="pbsProposalColumns" />
+		FROM pbs_proposal a
+		<include refid="pbsProposalJoins" />
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+
+	<insert id="insert">
+		INSERT INTO pbs_proposal(
+		id,
+		s_title,
+		s_content,
+		s_areaid,
+		s_areaversion,
+		s_showtype,
+		i_cnt,
+		s_reporteruser,
+		s_reportermem,
+		s_acceptermem,
+		s_publish,
+		s_stat,
+		s_level,
+		s_description,
+		s_spare01,
+		s_spare02,
+		s_spare03,
+		s_spare04,
+		create_by,
+		create_date,
+		update_by,
+		update_date,
+		remarks,
+		del_flag
+		) VALUES (
+		#{id},
+		#{sTitle},
+		#{sContent},
+		#{sAreaid.id},
+		#{sAreaversion},
+		#{sShowtype},
+		#{iCnt},
+		#{sReporteruser.id},
+		#{sReportermem.id},
+		#{sAcceptermem.id},
+		#{sPublish},
+		#{sStat},
+		#{sLevel},
+		#{sDescription},
+		#{sSpare01},
+		#{sSpare02},
+		#{sSpare03},
+		#{sSpare04},
+		#{createBy.id},
+		#{createDate},
+		#{updateBy.id},
+		#{updateDate},
+		#{remarks},
+		#{delFlag}
+		)
+	</insert>
+
+	<update id="update">
+		UPDATE pbs_proposal SET
+		s_title = #{sTitle},
+		s_content
+		= #{sContent},
+		s_areaid = #{sAreaid.id},
+		s_areaversion =
+		#{sAreaversion},
+		s_showtype = #{sShowtype},
+		i_cnt = #{iCnt},
+		s_reporteruser = #{sReporteruser.id},
+		s_reportermem =
+		#{sReportermem.id},
+		s_acceptermem = #{sAcceptermem.id},
+		s_publish =
+		#{sPublish},
+		s_stat = #{sStat},
+		s_level = #{sLevel},
+		s_description =
+		#{sDescription},
+		update_by = #{updateBy.id},
+		update_date =
+		#{updateDate},
+		remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+
+	<update id="updateiCntById">
+		UPDATE pbs_proposal sal SET sal.i_cnt = (SELECT
+		count(1) FROM pbs_proposalopt a
+		WHERE a.s_opttype = "0"
+		and a.s_proposalid =#{id}
+		and a.del_flag ="0" )
+		WHERE sal.id =#{id}
+		 
+	</update>
+
+	<update id="delete">
+		UPDATE pbs_proposal SET
+		del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+
+</mapper>

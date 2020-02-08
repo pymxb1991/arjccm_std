@@ -1,0 +1,187 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.arjjs.ccm.modules.plm.storage.dao.PlmCheckDetialDao">
+    
+	<sql id="plmCheckDetialColumns">
+		a.id AS "id",
+		a.sto_id AS "storage.id",
+		a.parent_id AS "parent",
+		a.code AS "code",
+		a.name AS "name",
+		a.spec AS "spec",
+		a.type_id AS "typeId",
+		a.type_child AS "typeChild",
+		a.remaining_quantity AS "remainingQuantity",
+		a.unit AS "unit",
+		a.status AS "status",
+		a.flag AS "flag",
+		a.extend1 AS "extend1",
+		a.extend2 AS "extend2",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag",
+		s.name AS "storage.name"
+	</sql>
+	
+	<sql id="plmCheckDetialJoins">
+		LEFT JOIN plm_storage s ON s.id = a.sto_id
+	</sql>
+    
+	<select id="get" resultType="PlmCheckDetial">
+		SELECT 
+			<include refid="plmCheckDetialColumns"/>
+		FROM plm_check_detial a
+		<include refid="plmCheckDetialJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="PlmCheckDetial">
+		SELECT 
+			<include refid="plmCheckDetialColumns"/>
+		FROM plm_check_detial a
+		<include refid="plmCheckDetialJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="parent != null and parent != ''">
+				AND a.parent_id = #{parent}
+			</if>
+			<if test="code != null and code != ''">
+				AND a.code = #{code}
+			</if>
+			<if test="status !=null and status != ''">
+				AND a.status = #{status}
+			</if>
+			<if test="flag != null and flag != ''">
+				AND a.flag = #{flag}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="PlmCheckDetial">
+		SELECT 
+			<include refid="plmCheckDetialColumns"/>
+		FROM plm_check_detial a
+		<include refid="plmCheckDetialJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO plm_check_detial(
+			id,
+			sto_id,
+			parent_id,
+			code,
+			name,
+			spec,
+			type_id,
+			type_child,
+			remaining_quantity,
+			unit,
+			status,
+			flag,
+			extend1,
+			extend2,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag
+		) VALUES (
+			#{id},
+			#{storage.id},
+			#{parent},
+			#{code},
+			#{name},
+			#{spec},
+			#{typeId},
+			#{typeChild},
+			#{remainingQuantity},
+			#{unit},
+			#{status},
+			#{flag},
+			#{extend1},
+			#{extend2},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE plm_check_detial SET 	
+			sto_id = #{storage.id},
+			parent_id = #{parent},
+			code = #{code},
+			name = #{name},
+			spec = #{spec},
+			type_id = #{typeId},
+			type_child = #{typeChild},
+			remaining_quantity = #{remainingQuantity},
+			unit = #{unit},
+			status = #{status},
+			flag = #{flag},
+			extend1 = #{extend1},
+			extend2 = #{extend2},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE plm_check_detial SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+	<select id="getDetails" resultType="PlmCheckDetial">
+		SELECT 
+			<include refid="plmCheckDetialColumns"/>
+		FROM plm_check_detial a
+		<include refid="plmCheckDetialJoins"/>
+		<where>
+			a.del_flag = '0'
+			AND a.flag = '0'
+			AND a.code IN 
+				<foreach collection="array" index="index" item="item" open="(" separator="," close=")">
+					#{item}
+				</foreach>
+		</where>
+	</select>
+	
+	<update id="updateAllStatus">
+		UPDATE plm_check_detial SET
+		status = '正常',
+		flag = '1'
+		WHERE code IN 
+				<foreach collection="array" index="index" item="item" open="(" separator="," close=")">
+					#{item}
+				</foreach>
+	</update>
+	
+</mapper>

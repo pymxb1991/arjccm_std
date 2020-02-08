@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.arjjs.ccm.modules.ccm.cpp.dao.CppPopVehileDao">
+    
+	<sql id="cppPopVehileColumns">
+		a.id AS "id",
+		a.id_card AS "idCard",
+		a.text_name AS "textName",
+		a.time_relation AS "timeRelation",
+		a.sub_type AS "subType",
+		a.other_type_name AS "otherTypeName",
+		a.type AS "type",
+		a.create_by AS "createBy.id",
+		a.more1 AS "more1",
+		a.more2 AS "more2",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag"
+	</sql>
+	
+	<sql id="cppPopVehileJoins">
+	</sql>
+    
+	<select id="get" resultType="CppPopVehile">
+		SELECT 
+			<include refid="cppPopVehileColumns"/>
+		FROM cpp_pop_vehile a
+		<include refid="cppPopVehileJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="getByRelation" resultType="CppPopVehile">
+		SELECT 
+			<include refid="cppPopVehileColumns"/>
+		FROM cpp_pop_vehile a
+		<include refid="cppPopVehileJoins"/>
+		WHERE a.id_card = #{idCard}
+	</select>
+	
+	<select id="findList" resultType="CppPopVehile">
+		SELECT 
+			<include refid="cppPopVehileColumns"/>
+		FROM cpp_pop_vehile a
+		<include refid="cppPopVehileJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="idCard != null and idCard != ''">
+				AND a.id_card = #{idCard}
+			</if>
+			<if test="textName != null and textName != ''">
+				AND a.text_name = #{textName}
+			</if>
+			<if test="timeRelation != null and timeRelation != ''">
+				AND a.time_relation = #{timeRelation}
+			</if>
+			<if test="subType != null and subType != ''">
+				AND a.sub_type = #{subType}
+			</if>
+			<if test="otherTypeName != null and otherTypeName != ''">
+				AND a.other_type_name = #{otherTypeName}
+			</if>
+			<if test="type != null and type != ''">
+				AND a.type = #{type}
+			</if>
+			<if test="createBy != null and createBy.id != null and createBy.id != ''">
+				AND a.create_by = #{createBy.id}
+			</if>
+			<if test="more1 != null and more1 != ''">
+				AND a.more1 = #{more1}
+			</if>
+			<if test="more2 != null and more2 != ''">
+				AND a.more2 = #{more2}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="CppPopVehile">
+		SELECT 
+			<include refid="cppPopVehileColumns"/>
+		FROM cpp_pop_vehile a
+		<include refid="cppPopVehileJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO cpp_pop_vehile(
+			id,
+			id_card,
+			text_name,
+			time_relation,
+			sub_type,
+			other_type_name,
+			type,
+			create_by,
+			more1,
+			more2,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag
+		) VALUES (
+			#{id},
+			#{idCard},
+			#{textName},
+			#{timeRelation},
+			#{subType},
+			#{otherTypeName},
+			#{type},
+			#{createBy.id},
+			#{more1},
+			#{more2},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE cpp_pop_vehile SET 	
+			id_card = #{idCard},
+			text_name = #{textName},
+			time_relation = #{timeRelation},
+			sub_type = #{subType},
+			other_type_name = #{otherTypeName},
+			type = #{type},
+			more1 = #{more1},
+			more2 = #{more2},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE cpp_pop_vehile SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

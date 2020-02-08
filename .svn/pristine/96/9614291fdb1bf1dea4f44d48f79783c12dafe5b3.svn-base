@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.arjjs.ccm.modules.flat.actionuser.dao.BphActionUserDao">
+    
+	<sql id="bphActionUserColumns">
+		a.id AS "id",
+		a.user_id AS "userId",
+		a.action_id AS "actionId",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag",
+		u.name AS "uName"
+	</sql>
+	
+	<sql id="bphActionUserJoins">
+		LEFT JOIN sys_user  u ON u.id = a.user_id
+	</sql>
+    
+	<select id="get" resultType="BphActionUser">
+		SELECT 
+			<include refid="bphActionUserColumns"/>
+		FROM bph_action_user a
+		<include refid="bphActionUserJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="getIdList" resultType="BphActionUser">
+		SELECT 
+			<include refid="bphActionUserColumns"/>
+		FROM bph_action_user a
+		<include refid="bphActionUserJoins"/>
+		WHERE a.action_id = #{actionId}
+	</select>
+	
+	<select id="findList" resultType="BphActionUser">
+		SELECT 
+			<include refid="bphActionUserColumns"/>
+		FROM bph_action_user a
+		<include refid="bphActionUserJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="BphActionUser">
+		SELECT 
+			<include refid="bphActionUserColumns"/>
+		FROM bph_action_user a
+		<include refid="bphActionUserJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO bph_action_user(
+			id,
+			user_id,
+			action_id,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag
+		) VALUES (
+			#{id},
+			#{userId},
+			#{actionId},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE bph_action_user SET 	
+			user_id = #{userId},
+			action_id = #{actionId},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE bph_action_user SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+	<delete id="deleteBphActionUser">
+		DELETE FROM  bph_action_user  WHERE  action_id = #{actionId}
+	</delete>
+</mapper>

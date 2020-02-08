@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.arjjs.ccm.modules.pbs.question.dao.PbsQuestionRuleitemDao">
+    
+	<sql id="pbsQuestionRuleitemColumns">
+		a.id AS "id",
+		a.s_parentid AS "sparentid",
+		a.s_type AS "stype",
+		a.s_compare AS "scompare",
+		a.s_codetype AS "scodetype",
+		a.s_codecontent AS "scodecontent",
+		a.s_judgeval AS "sjudgeval",
+		a.i_val AS "ival",
+		a.s_url AS "surl",
+		a.s_spare01 AS "sspare01",
+		a.s_spare02 AS "sspare02",
+		a.s_spare03 AS "sspare03",
+		a.s_spare04 AS "sspare04",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag"
+	</sql>
+	
+	<sql id="pbsQuestionRuleitemJoins">
+	</sql>
+    
+	<select id="get" resultType="PbsQuestionRuleitem">
+		SELECT 
+			<include refid="pbsQuestionRuleitemColumns"/>
+		FROM pbs_question_ruleitem a
+		<include refid="pbsQuestionRuleitemJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="PbsQuestionRuleitem">
+		SELECT 
+			<include refid="pbsQuestionRuleitemColumns"/>
+		FROM pbs_question_ruleitem a
+		<include refid="pbsQuestionRuleitemJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="sparentid != null and sparentid != ''">
+				AND a.s_parentid = #{sparentid}
+			</if>
+			<if test="stype != null and stype != ''">
+				AND a.s_type = #{stype}
+			</if>
+			<if test="scompare != null and scompare != ''">
+				AND a.s_compare = #{scompare}
+			</if>
+			<if test="scodetype != null and scodetype != ''">
+				AND a.s_codetype = #{scodetype}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="PbsQuestionRuleitem">
+		SELECT 
+			<include refid="pbsQuestionRuleitemColumns"/>
+		FROM pbs_question_ruleitem a
+		<include refid="pbsQuestionRuleitemJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO pbs_question_ruleitem(
+			id,
+			s_parentid,
+			s_type,
+			s_compare,
+			s_codetype,
+			s_codecontent,
+			s_judgeval,
+			i_val,
+			s_url,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag
+		) VALUES (
+			#{id},
+			#{sparentid},
+			#{stype},
+			#{scompare},
+			#{scodetype},
+			#{scodecontent},
+			#{sjudgeval},
+			#{ival},
+			#{surl},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE pbs_question_ruleitem SET 	
+			s_parentid = #{sparentid},
+			s_type = #{stype},
+			s_compare = #{scompare},
+			s_codetype = #{scodetype},
+			s_codecontent = #{scodecontent},
+			s_judgeval = #{sjudgeval},
+			i_val = #{ival},
+			s_url = #{surl},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE pbs_question_ruleitem SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

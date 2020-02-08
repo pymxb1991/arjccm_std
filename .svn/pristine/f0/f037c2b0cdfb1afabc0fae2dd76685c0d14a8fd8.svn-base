@@ -1,0 +1,240 @@
+package com.arjjs.ccm.modules.ccm.rest.web;
+
+import java.io.IOException;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.List;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import com.arjjs.ccm.modules.ccm.log.entity.CcmLogImpPopSign;
+import com.arjjs.ccm.modules.ccm.log.service.CcmLogImpPopSignService;
+import com.arjjs.ccm.modules.ccm.sys.entity.SysConfig;
+import com.arjjs.ccm.modules.ccm.sys.service.SysConfigService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import com.arjjs.ccm.common.persistence.Page;
+import com.arjjs.ccm.common.web.BaseController;
+import com.arjjs.ccm.modules.ccm.event.entity.CcmEventCasedeal;
+import com.arjjs.ccm.modules.ccm.house.entity.CcmHouseBuildmanage;
+import com.arjjs.ccm.modules.ccm.log.entity.CcmLogTail;
+import com.arjjs.ccm.modules.ccm.log.service.CcmLogTailService;
+import com.arjjs.ccm.modules.ccm.rest.entity.CcmRestResult;
+import com.arjjs.ccm.modules.ccm.rest.entity.CcmRestType;
+import com.arjjs.ccm.modules.sys.entity.User;
+
+/**
+ * 跟踪日志接口类
+ * 
+ * @author pengjianqiang
+ * @version 2018-02-22
+ */
+@Controller
+@RequestMapping(value = "${appPath}/rest/logTail")
+public class CcmRestLogTail extends BaseController {
+
+	@Autowired
+	private CcmLogTailService ccmLogTailService;
+
+	@Autowired
+	private CcmLogImpPopSignService ccmLogImpPopSignService;
+
+	@Autowired
+	private SysConfigService sysConfigService;
+
+	/**
+	 * @see  获取单个信息
+	 * @param id  ID
+	 * @return 
+	 * @author pengjianqiang
+	 * @version 2018-02-22
+	 */
+	@ResponseBody
+	@RequestMapping(value="/get", method = RequestMethod.GET)
+	public CcmRestResult get(String userId,HttpServletRequest req, HttpServletResponse resp, String id) throws IOException {
+		CcmRestResult result = new CcmRestResult();
+		User sessionUser = (User) req.getSession().getAttribute("user");
+		if (sessionUser== null) {
+			result.setCode(CcmRestType.ERROR_USER_NOT_EXIST);
+			return result;
+		}
+		String sessionUserId = sessionUser.getId();
+		if (userId== null || "".equals(userId) ||!userId.equals(sessionUserId)) {
+			result.setCode(CcmRestType.ERROR_USER_NOT_EXIST);
+			return result;
+		}
+		if (id == null || "".equals(id)) {//参数id不对
+			result.setCode(CcmRestType.ERROR_PARAM);
+			return result;
+		}
+		
+		CcmLogTail ccmLogTail = ccmLogTailService.get(id);
+		
+		result.setCode(CcmRestType.OK);
+		result.setResult(ccmLogTail);
+		
+		return result;
+	}
+	
+	/**
+	 * @see  查询日志信息
+	 * @param relevanceId   跟踪对象
+	 * @param relevanceTable  跟踪对象所在表 
+	 * @param pageNo 页码
+	 * @param pageSize 分页大小
+	 * @return 
+	 * @author pengjianqiang
+	 * @version 2018-02-22
+	 */
+	@ResponseBody
+	@RequestMapping(value="/query", method = RequestMethod.GET)
+	public CcmRestResult query(Page<CcmLogTail> page,String userId,HttpServletRequest req, HttpServletResponse resp) throws IOException {
+		if(page.getPageSize() == -1){
+			page.setPageSize(30);
+		}
+		CcmRestResult result = new CcmRestResult();
+		User sessionUser = (User) req.getSession().getAttribute("user");
+		if (sessionUser== null) {
+			result.setCode(CcmRestType.ERROR_USER_NOT_EXIST);
+			return result;
+		}
+		String sessionUserId = sessionUser.getId();
+		if (userId== null || "".equals(userId) ||!userId.equals(sessionUserId)) {
+			result.setCode(CcmRestType.ERROR_USER_NOT_EXIST);
+			return result;
+		}
+		String relevanceId = req.getParameter("relevanceId");
+		String relevanceTable = req.getParameter("relevanceTable");
+		
+		CcmLogTail ccmLogTail = new CcmLogTail();
+		ccmLogTail.setRelevanceId(relevanceId);
+		ccmLogTail.setRelevanceTable(relevanceTable);
+		ccmLogTail.setPage(page);
+		List<CcmLogTail> logList = ccmLogTailService.findListByObject(ccmLogTail);
+		page.setList(logList);
+		result.setCode(CcmRestType.OK);
+		result.setResult(page.getList());
+		
+		return result;
+	}
+	
+	/**
+	 * 查询分页数据
+	 * @param page 分页对象
+	 * @param entity
+	 * @return
+	 *//*
+	public Page<T> findPage(Page<T> page, T entity) {
+		entity.setPage(page);
+		page.setList(dao.findList(entity));
+		return page;
+	}*/
+	
+	
+
+	/**
+	 * @see  增加跟踪信息
+	 * @param 
+	 * @return 
+	 * @author pengjianqiang
+	 * @version 2018-02-22
+	 */
+	@ResponseBody
+	@RequestMapping(value="/add", method = RequestMethod.POST)
+	public CcmRestResult add(String userId,CcmLogTail ccmLogTail,HttpServletRequest req, HttpServletResponse resp) throws IOException {
+		CcmRestResult result = new CcmRestResult();
+		User sessionUser = (User) req.getSession().getAttribute("user");
+		if (sessionUser== null) {
+			result.setCode(CcmRestType.ERROR_USER_NOT_EXIST);
+			return result;
+		}
+		String sessionUserId = sessionUser.getId();
+		if (userId== null || "".equals(userId) ||!userId.equals(sessionUserId)) {
+			result.setCode(CcmRestType.ERROR_USER_NOT_EXIST);
+			return result;
+		}
+		if (ccmLogTail.getRelevanceId() == null || "".equals(ccmLogTail.getRelevanceId())) {//参数id不对
+			result.setCode(CcmRestType.ERROR_PARAM);
+			return result;
+		}
+		if (ccmLogTail.getRelevanceTable() == null || "".equals(ccmLogTail.getRelevanceTable())) {//参数id不对
+			result.setCode(CcmRestType.ERROR_PARAM);
+			return result;
+		}
+		if (ccmLogTail.getId()!= null && !"".equals(ccmLogTail.getId())) {
+			result.setCode(CcmRestType.ERROR_NO_MODIFY_PERMISSIONS);
+			return result;
+		}
+		ccmLogTail.setCreateBy(new User(userId));
+		ccmLogTail.setUpdateBy(new User(userId));
+		ccmLogTailService.save(ccmLogTail);
+		
+		result.setCode(CcmRestType.OK);
+		result.setResult(ccmLogTail);
+		
+		return result;
+		
+	}
+
+
+	/**
+	 * @see  增加重点人员登记记录信息
+	 * @param
+	 * @return
+	 * @author pengjianqiang
+	 * @version 2019-03-05
+	 */
+	@ResponseBody
+	@RequestMapping(value="/addSign", method = RequestMethod.POST)
+	public CcmRestResult addSign(String userId, CcmLogImpPopSign ccmLogImpPopSign, HttpServletRequest req, HttpServletResponse resp) throws IOException {
+		CcmRestResult result = new CcmRestResult();
+		if (ccmLogImpPopSign.getPeopleId() == null || "".equals(ccmLogImpPopSign.getPeopleId())) {//参数PeopleId不对
+			result.setCode(CcmRestType.ERROR_PARAM);
+			return result;
+		}
+		if (ccmLogImpPopSign.getContent() == null || "".equals(ccmLogImpPopSign.getContent())) {//参数content不对
+			result.setCode(CcmRestType.ERROR_PARAM);
+			return result;
+		}
+		if (ccmLogImpPopSign.getTailTime() == null || "".equals(ccmLogImpPopSign.getTailTime())) {
+			result.setCode(CcmRestType.ERROR_PARAM);
+			return result;
+		}
+		if (userId == null || "".equals(userId)) {//userid为空时，默认赋值1，暂不做权限限制
+			userId = "1";
+		}
+		ccmLogImpPopSign.setRelevanceTable("ccm_people");
+		SysConfig signEffectiveConfig = sysConfigService.get("sign_effective_config");
+		Date effectiveDate = signEffectiveConfig.getParamDate();
+		Date signDate = ccmLogImpPopSign.getTailTime();
+		Calendar effectiveCalendar = Calendar.getInstance();
+		effectiveCalendar.setTime(effectiveDate);
+		effectiveCalendar.set(Calendar.YEAR, Calendar.MONTH, Calendar.DAY_OF_MONTH);
+		Calendar signCalendar = Calendar.getInstance();
+		signCalendar.setTime(signDate);
+		boolean compareResult = signCalendar.getTimeInMillis() > effectiveCalendar.getTimeInMillis();
+		if (compareResult) {
+			ccmLogImpPopSign.setErrorStatus("1");
+		} else {
+			ccmLogImpPopSign.setErrorStatus("0");
+		}
+		ccmLogImpPopSign.setCreateBy(new User(userId));
+		ccmLogImpPopSign.setUpdateBy(new User(userId));
+		ccmLogImpPopSignService.save(ccmLogImpPopSign);
+
+		result.setCode(CcmRestType.OK);
+		result.setResult(ccmLogImpPopSign);
+
+		return result;
+
+	}
+
+
+
+
+}

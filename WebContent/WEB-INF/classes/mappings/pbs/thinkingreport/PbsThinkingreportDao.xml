@@ -1,0 +1,187 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper
+	namespace="com.arjjs.ccm.modules.pbs.thinkingreport.dao.PbsThinkingreportDao">
+
+	<sql id="pbsThinkingreportColumns">
+		a.id AS "id",
+		a.s_title AS "sTitle",
+		a.s_content AS
+		"sContent",
+		a.s_reporteruser AS "sReporteruser.id",
+		u4.name AS
+		"sReporteruser.name",
+		a.s_reportermem AS "sReportermem.id",
+		mem1.s_name
+		AS "sReportermem.sName",
+		a.s_acceptermem AS "sAcceptermem.id",
+		mem2.s_name AS "sAcceptermem.sName",
+		a.s_publish AS "sPublish",
+		a.s_stat AS "sStat",
+		a.s_level AS "sLevel",
+		a.s_description AS
+		"sDescription",
+		<!-- a.s_spare01 AS "sSpare01",
+		a.s_spare02 AS "sSpare02",
+		a.s_spare03 AS "sSpare03",
+		a.s_spare04 AS "sSpare04", -->
+		a.create_by AS
+		"createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS
+		"updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag"
+	</sql>
+
+	<sql id="pbsThinkingreportJoins">
+		LEFT JOIN sys_user u4 ON u4.id = a.s_reporteruser
+		LEFT JOIN
+		pbs_partymem mem1 ON mem1.id = a.s_reportermem
+		LEFT JOIN pbs_partymem
+		mem2 ON mem2.id = a.s_acceptermem
+	</sql>
+
+	<select id="get" resultType="PbsThinkingreport">
+		SELECT
+		<include refid="pbsThinkingreportColumns" />
+		FROM pbs_thinkingreport a
+		<include refid="pbsThinkingreportJoins" />
+		WHERE a.id = #{id}
+	</select>
+
+	<select id="findList" resultType="PbsThinkingreport">
+		SELECT
+		<include refid="pbsThinkingreportColumns" />
+		FROM pbs_thinkingreport a
+		<include refid="pbsThinkingreportJoins" />
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="sTitle != null and sTitle != ''">
+				AND a.s_title like
+				<if test="dbName == 'oracle'">'%'||#{sTitle}||'%'</if>
+				<if test="dbName == 'mssql'">'%'+#{sTitle}+'%'</if>
+				<if test="dbName == 'mysql'">concat('%',#{sTitle},'%')</if>
+			</if>
+			<if
+				test="sReportermem != null and sReportermem != '' and sReportermem.id != null and sReportermem .id != '' ">
+				and ( a.s_reportermem = #{sReportermem.id} or a.s_acceptermem =
+				#{sAcceptermem.id})
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.create_date DESC
+			</otherwise>
+		</choose>
+	</select>
+
+	<select id="findAllList" resultType="PbsThinkingreport">
+		SELECT
+		<include refid="pbsThinkingreportColumns" />
+		FROM pbs_thinkingreport a
+		<include refid="pbsThinkingreportJoins" />
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+
+	<insert id="insert">
+		INSERT INTO pbs_thinkingreport(
+		id,
+		s_title,
+		s_content,
+		s_reporteruser,
+		s_reportermem,
+		s_acceptermem,
+		s_publish,
+		s_stat,
+		s_level,
+		s_description,
+		create_by,
+		create_date,
+		update_by,
+		update_date,
+		remarks,
+		del_flag
+		) VALUES (
+		#{id},
+		#{sTitle},
+		#{sContent},
+		#{sReporteruser.id},
+		#{sReportermem.id},
+		#{sAcceptermem.id},
+		#{sPublish},
+		#{sStat},
+		#{sLevel},
+		#{sDescription},
+		#{createBy.id},
+		#{createDate},
+		#{updateBy.id},
+		#{updateDate},
+		#{remarks},
+		#{delFlag}
+		)
+	</insert>
+
+	<update id="update">
+		UPDATE pbs_thinkingreport SET
+		s_title = #{sTitle},
+		s_content = #{sContent},
+		s_reporteruser = #{sReporteruser.id},
+		s_reportermem = #{sReportermem.id},
+		s_acceptermem = #{sAcceptermem.id},
+		s_publish = #{sPublish},
+		s_stat = #{sStat},
+		s_level = #{sLevel},
+		s_description = #{sDescription},
+		update_by = #{updateBy.id},
+		update_date = #{updateDate},
+		remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+
+	<update id="delete">
+		UPDATE pbs_thinkingreport SET
+		del_flag =
+		#{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+
+	<select id="findListByTransmem" resultType="PbsThinkingreport">
+		SELECT
+		<include refid="pbsThinkingreportColumns" />
+		FROM pbs_thinkingreport a
+		<include refid="pbsThinkingreportJoins" />
+		LEFT JOIN pbs_thinkingreportopt opt ON opt.s_reportid = a.id
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="sTransmem != null and sTransmem != '' and sTransmem.id != null and sTransmem.id != ''">
+				AND opt.s_transmem = #{sTransmem.id}
+			</if>
+			 AND opt.s_type = "1"
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+
+
+</mapper>

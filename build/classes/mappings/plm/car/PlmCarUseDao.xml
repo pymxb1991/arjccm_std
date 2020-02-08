@@ -1,0 +1,293 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.arjjs.ccm.modules.plm.car.dao.PlmCarUseDao">
+    
+	<sql id="plmCarUseColumns">
+		a.id AS "id",
+		a.car_id AS "car.id",
+		a.driver_id AS "driver.id",
+		a.use_id AS "use.id",
+		a.out_date AS "outDate",
+		a.out_mileage AS "outMileage",
+		a.type AS "type",
+		a.process_id AS "process",
+		a.gbuse_id AS "gbuse.id",
+		a.in_date AS "inDate",
+		a.cause AS "cause",
+		a.in_mileage AS "inMileage",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag",
+		u4.name AS "use.name",
+		u4.phone AS "use.phone",		
+		u8.name AS "gbuse.name",
+		b.vehicle AS "car.vehicle",
+		c.name AS "driver.name",
+		c.phone AS "driver.phone",	
+		(case 
+			when a.gbuse_id is null then '1' 
+			else '0' end) "gbFlag"
+	</sql>
+	
+	<sql id="plmCarUseJoins">
+		LEFT JOIN sys_user u4 ON u4.id = a.use_id
+		LEFT JOIN sys_user u8 ON u8.id = a.gbuse_id
+		LEFT JOIN plm_car b ON b.id = a.car_id
+		LEFT JOIN plm_car_driver c ON c.id = a.driver_id
+	</sql>
+    
+	<select id="get" resultType="PlmCarUse">
+		SELECT 
+			<include refid="plmCarUseColumns"/>
+		FROM plm_car_use a
+		<include refid="plmCarUseJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="PlmCarUse">
+		SELECT 
+			<include refid="plmCarUseColumns"/>
+		FROM plm_car_use a
+		<include refid="plmCarUseJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="car != null and car.id != null and car.id != ''">
+				AND a.car_id = #{car.id}
+			</if>
+			<if test="use != null and use.id != null and use.id != ''">
+				AND a.use_id = #{use.id}
+			</if>
+			<if test="beginOutDate != null and beginOutDate != ''">
+				AND a.out_date &lt;= #{beginOutDate} AND a.in_date &gt;= #{beginOutDate}
+			</if>
+			<if test="type != null and type != ''">
+				AND a.type = #{type}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="PlmCarUse">
+		SELECT 
+			<include refid="plmCarUseColumns"/>
+		FROM plm_car_use a
+		<include refid="plmCarUseJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<!-- 车辆领用次数top10统计 -->
+	<select id="selectUseNumByCar" resultType="com.arjjs.ccm.tool.EchartType" parameterType="Office">
+		SELECT
+			b.vehicle AS "type",
+			count(*) AS "value"
+		FROM plm_car_use a
+		LEFT JOIN plm_car b ON b.id = a.car_id
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="id != null and id != ''">
+				and b.office_id = #{id}
+			</if>
+			and YEAR(a.create_date)=YEAR(NOW())
+		</where>		
+		group by b.vehicle
+		ORDER BY count(*) DESC
+		limit 10
+	</select>	
+
+	<!-- 部门用车次数top10统计 -->
+	<select id="selectUseNumByOffice" resultType="com.arjjs.ccm.tool.EchartType" >
+		SELECT
+			o.name AS "type",
+			count(*) AS "value"
+		FROM plm_car_use a
+		LEFT JOIN sys_user u4 ON u4.id = a.use_id
+		LEFT JOIN sys_office o ON o.id = u4.office_id
+		<where>
+			a.del_flag = '0'
+			and YEAR(a.create_date)=YEAR(NOW())
+		</where>		
+		group by u4.office_id
+		ORDER BY count(*) DESC
+		limit 10
+	</select>
+	<!-- 部门本年度用车次数统计 -->
+	<select id="selectUseNumAllByOffice" resultType="com.arjjs.ccm.tool.EchartType" >
+		SELECT
+			o.name AS "type",
+			count(*) AS "value"
+		FROM plm_car_use a
+		LEFT JOIN sys_user u4 ON u4.id = a.use_id
+		LEFT JOIN sys_office o ON o.id = u4.office_id
+		<where>
+			a.del_flag = '0'
+			and YEAR(a.create_date)=YEAR(NOW())
+		</where>		
+		group by u4.office_id
+	</select>
+
+	<!-- 近五个月用车次数/违章次数统计 -->
+	<select id="selectUseAndVioNumByMonth" resultType="com.arjjs.ccm.tool.EchartType" >
+		SELECT
+			a.type AS "type",
+			a.VALUE	AS "value",
+			COALESCE(b.VALUE,0)	AS "value2"
+		FROM
+			(
+				SELECT
+					extract(MONTH FROM in_date) AS "type",
+					COUNT(*) AS "value"
+				FROM
+					plm_car_use
+				WHERE
+					del_flag = '0'
+				AND in_date &gt;= DATE_SUB(curdate(), INTERVAL 5 MONTH)
+				GROUP BY
+					extract(YEAR_MONTH FROM in_date)
+			) a
+		LEFT JOIN (
+				SELECT
+					extract(MONTH FROM viol_date) AS "type",
+					COUNT(*) AS "value"
+				FROM
+					plm_car_violation
+				WHERE
+					del_flag = '0'
+				AND viol_date &gt;= DATE_SUB(curdate(), INTERVAL 5 MONTH)
+				GROUP BY
+					extract(YEAR_MONTH FROM viol_date)
+		) b ON a.type = b.type
+		ORDER BY type
+	</select>	
+	
+
+		
+	<!-- 司机出勤违章次数统计 -->
+	<select id="selectNumByDriver" resultType="com.arjjs.ccm.tool.EchartType" >
+		SELECT
+			d. NAME AS "type",
+			count(*) AS "value",
+			COALESCE(c.num,0) AS "typeO",
+			COALESCE(e.num,0) AS "value2"
+		FROM
+			plm_car_driver d
+		LEFT JOIN plm_car_use a ON a.driver_id = d.id
+		LEFT JOIN (
+			SELECT
+				driver_id,
+				COUNT(*) AS num
+			FROM
+				plm_car_violation
+			WHERE
+				del_flag = '0'
+				and YEAR(create_date)=YEAR(NOW())
+			GROUP BY
+				driver_id
+		) c ON c.driver_id = d.id
+		LEFT JOIN (
+			SELECT
+				driver_id,
+				COUNT(*) AS num
+			FROM
+				plm_car_use_spend
+			WHERE
+				del_flag = '0'
+				and YEAR(create_date)=YEAR(NOW())
+			AND is_damaged = '1'
+			GROUP BY
+				driver_id
+		) e ON e.driver_id = d.id
+		WHERE
+			a.del_flag = '0'
+		GROUP BY
+			a.driver_id
+		ORDER BY
+			count(*) DESC
+	</select>	
+	<insert id="insert">
+		INSERT INTO plm_car_use(
+			id,
+			car_id,
+			driver_id,
+			use_id,
+		    cause ,
+			out_date,
+			out_mileage,
+			type,
+			process_id,
+			gbuse_id,
+			in_date,
+			in_mileage,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag
+		) VALUES (
+			#{id},
+			#{car.id},
+			#{driver.id},
+			#{use.id},
+			#{cause},
+			#{outDate},
+			#{outMileage},
+			#{type},
+			#{process},
+			#{gbuse.id},
+			#{inDate},
+			#{inMileage},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE plm_car_use SET 	
+			car_id = #{car.id},
+			driver_id = #{driver.id},
+			use_id = #{use.id},
+			   cause =#{cause},
+			out_date = #{outDate},
+			out_mileage = #{outMileage},
+			type = #{type},
+			process_id = #{process},
+			gbuse_id = #{gbuse.id},
+			in_date = #{inDate},
+			in_mileage = #{inMileage},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE plm_car_use SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

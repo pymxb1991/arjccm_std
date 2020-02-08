@@ -1,0 +1,209 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.arjjs.ccm.modules.plm.home.dao.PlmHomeDao">
+    
+	<sql id="plmHomeColumns">
+		a.id AS "id",
+		a.portal_dict_id AS "portalDictId",
+		a.title AS "title",
+		a.connect AS "connect",
+		c.content AS "content",
+		a.hight AS "hight",
+		a.long_itude AS "longItude",
+		a.lat_itude AS "latItude",			
+		a.type AS "type",
+		a.sort AS "sort",
+		a.extend1 AS "extend1",
+		a.extend2 AS "extend2",
+		a.creator_name AS "creatorName",
+		a.create_date AS "createDate",
+		a.update_name AS "updateName",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag",
+		a.user_id AS "user.id",
+		u18.name AS "user.name"
+	</sql>
+	
+	<sql id="plmHomeJoins">
+		LEFT JOIN sys_user u18 ON u18.id = a.user_id
+		LEFT JOIN plm_portal_dict c ON c.id = a.portal_dict_id
+	</sql>
+    
+	<select id="get" resultType="PlmHome">
+		SELECT 
+			<include refid="plmHomeColumns"/>
+		FROM plm_home a
+		<include refid="plmHomeJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+
+	<select id="findList" resultType="PlmHome">
+		SELECT 
+			<include refid="plmHomeColumns"/>
+		FROM plm_home a
+			<include refid="plmHomeJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="user!= null and user.id != null and user.id != ''">
+				AND a.user_id =#{user.id}
+			</if>
+			<if test="title != null and title != ''">
+				AND a.title LIKE 
+					<if test="dbName == 'oracle'">'%'||#{title}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{title}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{title},'%')</if>
+			</if>
+			<if test="type != null and type != ''">
+				AND a.type = #{type}
+			</if>
+			<if test="extend1 != null and extend1 != ''">
+				AND a.extend1 = #{extend1}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<!--del_flag 把以逻辑删除的也查出来 -->
+	<select id="findList2" resultType="PlmHome">
+		SELECT 
+			<include refid="plmHomeColumns"/>
+		FROM plm_home a
+		<include refid="plmHomeJoins"/>
+		<where>
+			<if test="user!= null and user.id != null and user.id != ''">
+			AND a.user_id =#{user.id}
+			</if>
+		</where>
+		
+	</select>
+	
+	<select id="findAllList" resultType="PlmHome">
+		SELECT 
+			<include refid="plmHomeColumns"/>
+		FROM plm_home a
+		<include refid="plmHomeJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO plm_home(
+			id,
+			portal_dict_id,
+			title,
+			connect,
+			content,
+			hight,
+			long_itude,
+			lat_itude,
+			type,
+			sort,
+			extend1,
+			extend2,
+			creator_name,
+			create_date,
+			update_name,
+			update_date,
+			remarks,
+			del_flag,
+			user_id
+		) VALUES (
+			#{id},
+			#{portalDictId},
+			#{title},
+			#{connect},
+			#{content},
+			#{hight},
+			#{longItude},
+			#{latItude},
+			#{type},
+			#{sort},
+			#{extend1},
+			#{extend2},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag},
+			#{updateBy.id}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE plm_home SET 
+			portal_dict_id = #{portalDictId},
+			title = #{title},
+			connect = #{connect},
+			content = #{content},
+			hight = #{hight},
+			long_itude = #{longItude},
+			lat_itude = #{latItude},			
+			type = #{type},
+			sort = #{sort},
+			extend1 = #{extend1},
+			extend2 = #{extend2},
+			update_name = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks},
+			user_id = #{updateBy.id}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE plm_home SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	<update id="deleteUser">
+		UPDATE plm_home SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE user_id = #{user.id}
+	</update>
+	
+	<update id="undelete">
+		UPDATE plm_home SET 
+			del_flag = #{DEL_FLAG_NORMAL}
+		WHERE id = #{id}
+		
+	</update>
+	
+	<delete id="zdelete">
+	delete from plm_home
+	WHERE id = #{id}
+	</delete>
+	
+	<update id="deleteType">
+		UPDATE plm_home SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE type != #{type} and user_id = #{user.id}
+	</update>
+	
+	<update id="undeleteType">
+		UPDATE plm_home SET 
+			del_flag = #{DEL_FLAG_NORMAL}
+		WHERE type = #{type} and user_id = #{user.id}	
+	</update>
+	
+	<delete id="deleteData">
+		delete from plm_home where user_id = #{user.id}
+	</delete>
+</mapper>

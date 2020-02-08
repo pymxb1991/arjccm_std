@@ -1,0 +1,1517 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper
+		namespace="com.arjjs.ccm.modules.flat.alarm.dao.BphAlarmInfoDao">
+
+	<sql id="bphAlarmInfoColumns">
+		a.id AS "id",
+		a.order_num AS "orderNum",
+		a.police_num AS "policeNum",
+		a.police_name AS "policeName",
+		a.man_name AS "manName",
+		a.man_sex AS "manSex",
+		a.man_tel AS "manTel",
+		a.place AS "place",
+		a.x AS "x",
+		a.y AS "y",
+		a.z AS "z",
+		a.content AS "content",
+		a.type_code AS "typeCode",
+		a.genre_code AS "genreCode",
+		a.class_code AS "classCode",
+		a.area_id AS "area.id",
+		a.office_id AS "office.id",
+		a.office_ids AS "office.ids",
+		a.alarm_from AS "alarmFrom",
+		a.alarm_time AS "alarmTime",
+		a.alarm_record AS "alarmRecord",
+		a.is_important AS "isImportant",
+		a.state AS "state",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag",
+		sys_area.name AS "area.name",
+		o.name AS "office.name"
+	</sql>
+
+	<sql id="bphAlarmInfoJoins">
+		LEFT JOIN sys_area ON sys_area.id = a.area_id
+		LEFT JOIN sys_office o ON o.id = a.office_id
+	</sql>
+
+	<!-- 门户今日统计SQL -->
+	<select id="countDtae" resultType="BphAlarmInfo">
+		SELECT
+			o.name AS "oName",
+			SUM(CASE a.state WHEN 0 THEN 1 ELSE 0 END) value0,
+			SUM(CASE a.state WHEN 1 THEN 1 ELSE 0 END) value1,
+			SUM(CASE a.state WHEN 2 THEN 1 ELSE 0 END) value2,
+			SUM(CASE a.state WHEN 3 THEN 1 ELSE 0 END) value3
+		FROM
+			bph_alarm_info a
+			LEFT JOIN sys_office o ON o.id = a.office_id
+		WHERE
+			a.office_id IS NOT NULL
+			AND to_days( alarm_time ) = to_days( now( ) )
+		GROUP BY
+			a.office_id
+	</select>
+
+	<!--今日警情摘要 -->
+	<select id="findPieData" resultType="BphAlarmInfo">
+		SELECT
+			info.type_code AS "typeCode",
+			COUNT( 1 ) AS "num"
+		FROM
+			bph_alarm_info info
+		WHERE
+			info.alarm_time BETWEEN date_format( now( ), '%Y-%m-%d 00:00:00' )
+			AND date_format( now( ), '%Y-%m-%d 23:59:59' ) AND info.del_flag = 0
+		GROUP BY
+			info.type_code
+	</select>
+
+	<select id="get" resultType="BphAlarmInfo">
+		SELECT
+			a.id AS "id",
+			a.order_num AS "orderNum",
+			a.police_num AS "policeNum",
+			a.police_name AS "policeName",
+			a.man_name AS "manName",
+			a.man_sex AS "manSex",
+			a.man_tel AS "manTel",
+			a.place AS "place",
+			a.x AS "x",
+			a.y AS "y",
+			a.z AS "z",
+			a.content AS "content",
+			a.type_code AS "typeCode",
+			a.genre_code AS "genreCode",
+			a.class_code AS "classCode",
+			a.area_id AS "area.id",
+			a.office_id AS "office.id",
+			a.office_ids AS "office.ids",
+			a.alarm_from AS "alarmFrom",
+			a.alarm_time AS "alarmTime",
+			a.alarm_record AS "alarmRecord",
+			a.is_important AS "isImportant",
+			a.state AS "state",
+			a.create_by AS "createBy.id",
+			a.create_date AS "createDate",
+			a.update_by AS "updateBy.id",
+			a.update_date AS "updateDate",
+			a.remarks AS "remarks",
+			a.del_flag AS "delFlag",
+			a21.name AS "area.name",
+			o.name AS "office.name"
+		FROM bph_alarm_info a
+		LEFT JOIN sys_area a21 ON a21.id = a.area_id
+		LEFT JOIN sys_office o ON o.id = a.office_id
+		WHERE a.id = #{id}
+		AND a.del_flag = 0
+	</select>
+
+	<select id="findList" resultType="BphAlarmInfo">
+		SELECT
+		<include refid="bphAlarmInfoColumns" />
+		FROM
+		(SELECT
+		b.*
+		FROM
+		bph_alarm_info b
+		<where>
+			b.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="orderNum != null and orderNum != ''">
+				AND b.order_num LIKE
+				<if test="dbName == 'oracle'">'%'||#{orderNum}||'%'</if>
+				<if test="dbName == 'mssql'">'%'+#{orderNum}+'%'</if>
+				<if test="dbName == 'mysql'">concat('%',#{orderNum},'%')</if>
+			</if>
+			<if test="policeName != null and policeName != ''">
+				AND b.police_name LIKE
+				<if test="dbName == 'oracle'">'%'||#{policeName}||'%'</if>
+				<if test="dbName == 'mssql'">'%'+#{policeName}+'%'</if>
+				<if test="dbName == 'mysql'">concat('%',#{policeName},'%')</if>
+			</if>
+			<if test="place != null and place != ''">
+				AND b.place LIKE
+				<if test="dbName == 'oracle'">'%'||#{place}||'%'</if>
+				<if test="dbName == 'mssql'">'%'+#{place}+'%'</if>
+				<if test="dbName == 'mysql'">concat('%',#{place},'%')</if>
+			</if>
+			<if test="typeCode != null and typeCode != ''">
+				AND b.type_code = #{typeCode}
+			</if>
+			<if test="area != null and area.id != null and area.id != ''">
+				AND b.area_id = #{area.id}
+			</if>
+			<if test="isImportant != null and isImportant != ''">
+				AND b.is_important = #{isImportant}
+			</if>
+			<if
+					test="beginAlarmTime != null and endAlarmTime != null and beginAlarmTime != '' and endAlarmTime != ''">
+				AND b.alarm_time BETWEEN #{beginAlarmTime} AND #{endAlarmTime}
+			</if>
+			<if test="state != null and state != ''">
+				AND b.state = #{state}
+			</if>
+			<if test="incSubset">
+				<if test="officeId != null and officeId != ''">
+					AND (b.office_id = #{officeId} OR b.office_ids LIKE
+					CONCAT('%,', #{officeId}, ',%'))
+				</if>
+			</if>
+			<if test="!incSubset">
+				<if test="officeId != null and officeId != ''">
+					AND b.office_id = #{officeId}
+				</if>
+			</if>
+		</where>
+		ORDER BY b.create_date DESC
+		LIMIT #{startIndex}, #{pageSize}) a
+		LEFT JOIN sys_area ON sys_area.id = a.area_id
+		LEFT JOIN sys_office o ON o.id = a.office_id
+	</select>
+
+	<select id="findAlarmList" resultType="BphAlarmInfo">
+		SELECT
+		alarmInfo.id AS "id",
+		alarmInfo.order_num AS "orderNum",
+		alarmInfo.content AS "content",
+		alarmInfo.alarm_time AS "alarmTime",
+		alarmInfo.place AS "place",
+		alarmInfo.type_code AS "typeCode",
+		alarmInfo.office_id AS "office.id",
+		alarmInfo.state AS "state",
+		office.`name` AS "office.name",
+		alarmInfo.`status` AS "handleStatus"
+		FROM
+		(
+		SELECT
+		a.id,
+		a.order_num,
+		a.content,
+		a.alarm_time,
+		a.place,
+		a.type_code,
+		a.office_id,
+		a.state,
+		handle.`status`
+		FROM
+		bph_alarm_info a
+		LEFT JOIN v_bph_alarm_handle handle ON handle.alarm_id = a.id
+		WHERE
+		a.del_flag = #{DEL_FLAG_NORMAL}
+		<if test="orderNum != null and orderNum != ''">
+			AND a.order_num LIKE concat('%',#{orderNum},'%')
+		</if>
+		<if test="policeName != null and policeName != ''">
+			AND a.police_name LIKE concat('%',#{policeName},'%')
+		</if>
+		<if test="place != null and place != ''">
+			AND a.place LIKE concat('%',#{place},'%')
+		</if>
+		<if test="typeCode != null and typeCode != ''">
+			AND a.type_code = #{typeCode}
+		</if>
+		<if test="isImportant != null and isImportant != ''">
+			AND a.is_important = #{isImportant}
+		</if>
+		<if test="state != null and state != ''">
+			AND a.state = #{state}
+		</if>
+		<if test="handleStatus != null and handleStatus != ''">
+			AND handle.`status` = #{handleStatus}
+		</if>
+		<if test="incSubset">
+			<if test="officeId != null and officeId != ''">
+				AND (a.office_id = #{officeId} OR a.office_ids LIKE CONCAT('%,', #{officeId}, ',%'))
+			</if>
+		</if>
+		<if test="!incSubset">
+			<if test="officeId != null and officeId != ''">
+				AND a.office_id = #{officeId}
+			</if>
+		</if>
+		<if test="beginAlarmTime != null and endAlarmTime != null and beginAlarmTime != '' and endAlarmTime != ''">
+			AND a.alarm_time BETWEEN #{beginAlarmTime} AND #{endAlarmTime}
+		</if>
+		ORDER BY a.alarm_time DESC
+		LIMIT #{startIndex}, #{pageSize}
+		) alarmInfo
+		LEFT JOIN sys_office office ON office.id = alarmInfo.office_id AND office.del_flag = #{DEL_FLAG_NORMAL}
+	</select>
+
+	<select id="findDistributeList" resultType="BphAlarmInfo">
+		SELECT
+		a.id AS "id",
+		a.order_num AS "orderNum",
+		a.police_num AS "policeNum",
+		a.police_name AS "policeName",
+		a.man_name AS "manName",
+		a.man_sex AS "manSex",
+		a.man_tel AS "manTel",
+		a.place AS "place",
+		a.x AS "x",
+		a.y AS "y",
+		a.z AS "z",
+		a.content AS "content",
+		a.type_code AS "typeCode",
+		a.genre_code AS "genreCode",
+		a.class_code AS "classCode",
+		a.area_id AS "area.id",
+		a.office_id AS "office.id",
+		a.office_ids AS "office.ids",
+		a.alarm_from AS "alarmFrom",
+		a.alarm_time AS "alarmTime",
+		a.alarm_record AS "alarmRecord",
+		a.is_important AS "isImportant",
+		a.state AS "state",
+		o.NAME AS "office.name"
+		FROM
+		(
+		SELECT
+		*
+		FROM
+		bph_alarm_info
+		WHERE
+		del_flag = 0
+		<if test="beginAlarmTime != null and endAlarmTime != null and beginAlarmTime != '' and endAlarmTime != ''">
+			AND alarm_time BETWEEN #{beginAlarmTime} AND #{endAlarmTime}
+		</if>
+		<if test="state != null and state != ''">
+			AND state = #{state}
+		</if>
+		<if test="officeId != null and officeId != ''">
+			AND (office_id = #{officeId} OR office_ids LIKE CONCAT('%,', #{officeId}, ',%'))
+		</if>
+		ORDER BY create_date DESC
+		LIMIT #{startIndex}, #{pageSize}
+		) a
+		LEFT JOIN sys_office o ON o.id = a.office_id
+	</select>
+
+	<select id="countDistributeList" resultType="Integer">
+		SELECT
+		COUNT(1) AS "count"
+		FROM
+		bph_alarm_info
+		WHERE
+		del_flag = 0
+		<if
+				test="beginAlarmTime != null and endAlarmTime != null and beginAlarmTime != '' and endAlarmTime != ''">
+			AND alarm_time BETWEEN #{beginAlarmTime} AND #{endAlarmTime}
+		</if>
+		<if test="state != null and state != ''">
+			AND state = #{state}
+		</if>
+		<if test="officeId != null and officeId != ''">
+			AND (
+			office_id = #{officeId} OR office_ids LIKE
+			<if test="dbName == 'oracle'">'%,'||#{officeId}||',%'</if>
+			<if test="dbName == 'mssql'">'%,'+#{officeId}+',%'</if>
+			<if test="dbName == 'mysql'">CONCAT('%,', #{officeId}, ',%')</if>
+			)
+		</if>
+	</select>
+
+	<select id="countAlarmList" resultType="Integer">
+		SELECT
+		count(1)
+		FROM
+		bph_alarm_info a
+		LEFT JOIN v_bph_alarm_handle handle ON handle.alarm_id = a.id
+		WHERE
+		a.del_flag = #{DEL_FLAG_NORMAL}
+		<if test="orderNum != null and orderNum != ''">
+			AND a.order_num LIKE concat('%',#{orderNum},'%')
+		</if>
+		<if test="policeName != null and policeName != ''">
+			AND a.police_name LIKE concat('%',#{policeName},'%')
+		</if>
+		<if test="place != null and place != ''">
+			AND a.place LIKE concat('%',#{place},'%')
+		</if>
+		<if test="typeCode != null and typeCode != ''">
+			AND a.type_code = #{typeCode}
+		</if>
+		<if test="isImportant != null and isImportant != ''">
+			AND a.is_important = #{isImportant}
+		</if>
+		<if test="state != null and state != ''">
+			AND a.state = #{state}
+		</if>
+		<if test="handleStatus != null and handleStatus != ''">
+			AND handle.`status` = #{handleStatus}
+		</if>
+		<if test="incSubset">
+			<if test="officeId != null and officeId != ''">
+				AND (a.office_id = #{officeId} OR a.office_ids LIKE CONCAT('%,', #{officeId}, ',%'))
+			</if>
+		</if>
+		<if test="!incSubset">
+			<if test="officeId != null and officeId != ''">
+				AND a.office_id = #{officeId}
+			</if>
+		</if>
+		<if test="beginAlarmTime != null and endAlarmTime != null and beginAlarmTime != '' and endAlarmTime != ''">
+			AND a.alarm_time BETWEEN #{beginAlarmTime} AND #{endAlarmTime}
+		</if>
+	</select>
+
+	<select id="findAllList" resultType="BphAlarmInfo">
+		SELECT
+		<include refid="bphAlarmInfoColumns" />
+		FROM bph_alarm_info a
+		<include refid="bphAlarmInfoJoins" />
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+
+	<!-- 查询前十条数据 -->
+	<select id="findNewestAlarmInfo" resultType="BphAlarmInfo">
+		SELECT
+			a.id AS "id",
+			a.content AS "content",
+			a.alarm_time AS "alarmTime"
+		FROM bph_alarm_info a
+		ORDER BY alarm_time DESC
+		LIMIT 10
+	</select>
+
+	<!-- 统计数量 -->
+	<select id="count" resultType="BphAlarmInfo">
+		SELECT
+		e.sum,
+		s.count0,
+		b.count1,
+		c.count2,
+		d.count3
+		FROM
+		(SELECT count(*) AS sum FROM bph_alarm_info a LEFT JOIN sys_office o ON o.id = a.office_id WHERE a.del_flag = 0
+		<if test="beginAlarmTime != null and endAlarmTime != null and beginAlarmTime != '' and endAlarmTime != ''">
+			AND a.alarm_time BETWEEN #{beginAlarmTime} AND #{endAlarmTime}
+		</if>
+		<if test="officeId != null and officeId != ''">
+			AND (a.office_id = #{officeId} OR a.office_ids LIKE CONCAT('%,', #{officeId}, ',%'))
+		</if>
+		AND o.type = 2
+		) e,
+		(SELECT count(*) AS count0 FROM bph_alarm_info a
+		LEFT JOIN sys_office o ON o.id = a.office_id WHERE a.del_flag = 0 AND
+		a.state = 0
+		<if test="beginAlarmTime != null and endAlarmTime != null and beginAlarmTime != '' and endAlarmTime != ''">
+			AND a.alarm_time BETWEEN #{beginAlarmTime} AND #{endAlarmTime}
+		</if>
+		<if test="officeId != null and officeId != ''">
+			AND (a.office_id = #{officeId} OR a.office_ids LIKE CONCAT('%,', #{officeId}, ',%'))
+		</if>
+		AND o.type = 2
+		) s,
+		(SELECT count(*) AS count1 FROM bph_alarm_info a
+		LEFT JOIN sys_office o ON o.id = a.office_id WHERE a.del_flag = 0 AND
+		a.state = 1
+		<if test="beginAlarmTime != null and endAlarmTime != null and beginAlarmTime != '' and endAlarmTime != ''">
+			AND a.alarm_time BETWEEN #{beginAlarmTime} AND #{endAlarmTime}
+		</if>
+		<if test="officeId != null and officeId != ''">
+			AND (a.office_id = #{officeId} OR a.office_ids LIKE CONCAT('%,', #{officeId}, ',%'))
+		</if>
+		AND o.type = 2
+		) b,
+		(SELECT count(*) AS count2 FROM bph_alarm_info a
+		LEFT JOIN sys_office o ON o.id = a.office_id WHERE a.del_flag = 0 AND
+		a.state = 2
+		<if test="beginAlarmTime != null and endAlarmTime != null and beginAlarmTime != '' and endAlarmTime != ''">
+			AND a.alarm_time BETWEEN #{beginAlarmTime} AND #{endAlarmTime}
+		</if>
+		<if test="officeId != null and officeId != ''">
+			AND (a.office_id = #{officeId} OR a.office_ids LIKE CONCAT('%,', #{officeId}, ',%'))
+		</if>
+		AND o.type = 2
+		) c,
+		(SELECT count(*) AS count3 FROM bph_alarm_info a
+		LEFT JOIN sys_office o ON o.id = a.office_id WHERE a.del_flag = 0 AND
+		a.state = 3
+		<if test="beginAlarmTime != null and endAlarmTime != null and beginAlarmTime != '' and endAlarmTime != ''">
+			AND a.alarm_time BETWEEN #{beginAlarmTime} AND #{endAlarmTime}
+		</if>
+		<if test="officeId != null and officeId != ''">
+			AND (a.office_id = #{officeId} OR a.office_ids LIKE CONCAT('%,', #{officeId}, ',%'))
+		</if>
+		AND o.type = 2
+		) d
+	</select>
+
+	<!-- 按部门统计数量 -->
+	<select id="byOfficeCount" resultType="BphAlarmInfo">
+		SELECT
+		office.id officeId,
+		office.`name`,
+		IFNULL(alarm_join.state,'0:0,1:0,2:0,3:0') numState
+		FROM
+		sys_office office
+		LEFT JOIN
+		(
+		SELECT
+		info.office_id,
+		GROUP_CONCAT( IFNULL(info.state,0), ':', IFNULL(info.num,0) ) AS state
+		FROM
+		(
+		<!--SELECT
+		alarm.office_id,
+		alarm.state,
+		IFNULL( count( alarm.office_id ),0) AS num
+		FROM
+		bph_alarm_info alarm
+		WHERE
+		alarm.del_flag = 0
+		<if test="beginAlarmTime != null and endAlarmTime != null and beginAlarmTime != '' and endAlarmTime != ''">
+			AND alarm.alarm_time BETWEEN #{beginAlarmTime} AND #{endAlarmTime}
+		</if>
+		<if test="officeId != null and officeId != ''">
+			AND (alarm.office_id = #{officeId} OR alarm.office_ids LIKE CONCAT('%,', #{officeId}, ',%'))
+		</if>
+		GROUP BY
+		alarm.office_id,
+		alarm.state-->
+		SELECT
+		officet2.id office_id,
+		alarm.state,
+		IFNULL( count( officet2.id ), 0 ) AS num
+		FROM
+		bph_alarm_info alarm
+		, sys_office officet1
+		, sys_office officet2
+		WHERE
+		alarm.del_flag = 0
+		and officet1.del_flag = 0
+		AND alarm.office_id = officet1.id
+		AND officet1.parent_id = officet2.id
+		AND alarm.alarm_time
+		<if test="beginAlarmTime != null and endAlarmTime != null and beginAlarmTime != '' and endAlarmTime != ''">
+			AND alarm.alarm_time BETWEEN #{beginAlarmTime} AND #{endAlarmTime}
+		</if>
+		<if test="officeId != null and officeId != ''">
+			AND (alarm.office_id = #{officeId} OR alarm.office_ids LIKE CONCAT('%,', #{officeId}, ',%'))
+		</if>
+		GROUP BY
+		officet2.id,
+		alarm.state
+		) info
+		GROUP BY
+		info.office_id
+		) alarm_join ON alarm_join.office_id = office.id
+		WHERE
+		office.del_flag = 0
+		AND office.type = 2
+	</select>
+
+	<insert id="insert">
+		INSERT INTO bph_alarm_info(
+		id,
+		order_num,
+		police_num,
+		police_name,
+		man_name,
+		man_sex,
+		man_tel,
+		place,
+		x,
+		y,
+		z,
+		content,
+		type_code,
+		genre_code,
+		class_code,
+		area_id,
+		office_id,
+		alarm_from,
+		alarm_time,
+		alarm_record,
+		is_important,
+		state,
+		create_by,
+		create_date,
+		update_by,
+		update_date,
+		remarks,
+		del_flag
+		) VALUES (
+		#{id},
+		#{orderNum},
+		#{policeNum},
+		#{policeName},
+		#{manName},
+		#{manSex},
+		#{manTel},
+		#{place},
+		#{x},
+		#{y},
+		#{z},
+		#{content},
+		#{typeCode},
+		#{genreCode},
+		#{classCode},
+		#{area.id},
+		#{office.id},
+		#{alarmFrom},
+		#{alarmTime},
+		#{alarmRecord},
+		#{isImportant},
+		#{state},
+		#{createBy.id},
+		#{createDate},
+		#{updateBy.id},
+		#{updateDate},
+		#{remarks},
+		#{delFlag}
+		)
+	</insert>
+
+	<update id="update">
+		UPDATE bph_alarm_info SET
+		order_num = #{orderNum},
+		police_num = #{policeNum},
+		police_name = #{policeName},
+		man_name =
+		#{manName},
+		man_sex = #{manSex},
+		man_tel = #{manTel},
+		place = #{place},
+		x
+		= #{x},
+		y = #{y},
+		z = #{z},
+		content = #{content},
+		type_code = #{typeCode},
+		genre_code = #{genreCode},
+		class_code = #{classCode},
+		area_id =
+		#{area.id},
+		office_id = #{office.id},
+		alarm_from = #{alarmFrom},
+		alarm_time = #{alarmTime},
+		alarm_record = #{alarmRecord},
+		is_important =
+		#{isImportant},
+		state = #{state},
+		update_by = #{updateBy.id},
+		update_date = #{updateDate},
+		remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+
+	<update id="delete">
+		UPDATE bph_alarm_info SET
+		del_flag =
+		#{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+
+	<select id="queryAlarmInfoByDateAndAlarmType" resultType="BphAlarmInfo">
+		SELECT
+		a.id AS "id",
+		a.order_num AS "orderNum",
+		a.x AS "x",
+		a.y AS "y"
+		FROM
+		bph_alarm_info a
+		<where>
+			a.alarm_time BETWEEN #{beginAlarmTime} AND #{endAlarmTime}
+			AND a.type_code IN (
+			<foreach collection="typeCodes" index="index" item="typeValue" separator=",">
+				#{typeValue}
+			</foreach>
+			)
+			AND a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>
+	</select>
+	<select id="queryAlarmInfoByDateAndAlarmTypeToFourColor" resultType="BphAlarmInfo">
+		SELECT
+		AREAINFO.AREAID AS "area.id",
+		COUNTNUM.NUM AS "num",
+		AREAINFO.`NAME` AS "area.name",
+		AREAINFO.AREA_MAP AS "areaMap",
+		AREAINFO.AREA_POINT AS "areaPoint"
+		FROM
+		(
+		SELECT
+		aa.ID AS "areaid",
+		COUNT( 1 ) AS "num"
+		from (
+		SELECT SYS_AREA.ID, ALARMINFO.ID as alarmid
+		FROM
+		BPH_ALARM_INFO ALARMINFO
+		,SYS_OFFICE OFFICE
+		,SYS_AREA
+		,CCM_ORG_AREA
+		WHERE
+		ALARMINFO.DEL_FLAG = 0
+		AND OFFICE.ID=ALARMINFO.office_id
+		AND SYS_AREA.ID = OFFICE.AREA_ID
+		AND SYS_AREA.DEL_FLAG = 0
+		AND CCM_ORG_AREA.area_id = SYS_AREA.ID
+		AND CCM_ORG_AREA.area_point IS NOT NULL
+		AND ALARMINFO.ALARM_TIME BETWEEN #{beginAlarmTime}
+		AND #{endAlarmTime}
+		AND ALARMINFO.TYPE_CODE IN (
+		<foreach collection="typeCodes" index="index" item="typeValue" separator=",">
+			#{typeValue}
+		</foreach>
+		)
+		)	aa
+		GROUP BY
+		aa.ID
+		) COUNTNUM
+		LEFT JOIN (
+		SELECT
+		SYS_AREA.ID AS "areaid",
+		SYS_AREA.`NAME`,
+		ORGAREA.AREA_MAP,
+		ORGAREA.AREA_POINT
+		FROM
+		SYS_AREA
+		LEFT JOIN CCM_ORG_AREA ORGAREA ON ORGAREA.AREA_ID = SYS_AREA.ID
+		AND ORGAREA.DEL_FLAG = 0
+		WHERE
+		SYS_AREA.DEL_FLAG = 0
+		) AREAINFO ON AREAINFO.AREAID = COUNTNUM.AREAID
+	</select>
+	<select id="queryAlarmSituation" resultType="BphAlarmInfo">
+		SELECT
+		a.id AS "id",
+		a.order_num AS "orderNum",
+		a.police_num AS
+		"policeNum",
+		a.police_name AS "policeName",
+		a.man_name AS "manName",
+		a.man_sex AS "manSex",
+		a.man_tel AS "manTel",
+		a.place AS "place",
+		a.x AS
+		"x",
+		a.y AS "y",
+		a.z AS "z",
+		a.content AS "content",
+		a.type_code AS
+		"typeCode",
+		a.genre_code AS "genreCode",
+		a.class_code AS "classCode",
+		a.area_id AS "area.id",
+		a.office_id AS "office.id",
+		a.office_ids AS
+		"office.ids",
+		a.alarm_from AS "alarmFrom",
+		a.alarm_time AS "alarmTime",
+		a.alarm_record AS "alarmRecord",
+		a.is_important AS "isImportant",
+		a.state AS "state"
+		FROM
+		bph_alarm_info a
+		<where>
+			to_days(a.alarm_time) = to_days(now())
+			<if test="state != null and state != ''">
+				AND a.state = #{state}
+			</if>
+			AND a.del_Flag = #{DEL_FLAG_NORMAL}
+		</where>
+		ORDER BY
+		a.is_important DESC,a.alarm_time DESC
+	</select>
+	<select id="queryHisAlarmSituation" resultType="BphAlarmInfo">
+		SELECT
+		a.id AS "id",
+		a.order_num AS "orderNum",
+		a.police_num AS "policeNum",
+		a.police_name AS "policeName",
+		a.man_name AS "manName",
+		a.man_sex AS "manSex",
+		a.man_tel AS "manTel",
+		a.place AS "place",
+		a.x AS "x",
+		a.y AS "y",
+		a.z AS "z",
+		a.content AS "content",
+		a.type_code AS "typeCode",
+		a.genre_code AS "genreCode",
+		a.class_code AS "classCode",
+		a.area_id AS "area.id",
+		a.office_id AS "office.id",
+		a.office_ids AS "office.ids",
+		a.alarm_from AS "alarmFrom",
+		a.alarm_time AS "alarmTime",
+		a.alarm_record AS "alarmRecord",
+		a.is_important AS "isImportant",
+		a.state AS "state",
+		a.create_date AS "createDate"
+		FROM bph_alarm_info a
+		<where>
+			a.del_Flag = #{DEL_FLAG_NORMAL}
+			<if test="incSubset">
+				<if test="officeId != null and officeId != ''">
+					AND (a.office_id = #{officeId} OR a.office_ids LIKE
+					CONCAT('%,', #{officeId}, ',%'))
+				</if>
+			</if>
+			<if test="!incSubset">
+				<if test="officeId != null and officeId != ''">
+					AND a.office_id = #{officeId}
+				</if>
+			</if>
+			<if test="state != null and state != ''">
+				AND a.state = #{state}
+			</if>
+			<if test="createDate != null and createDate != ''">
+				AND a.create_date > #{createDate}
+			</if>
+			<if test="beginAlarmTime != null and endAlarmTime != null and beginAlarmTime != '' and endAlarmTime != ''">
+				AND a.alarm_time BETWEEN #{beginAlarmTime} AND #{endAlarmTime}
+			</if>
+		</where>
+		ORDER BY
+		a.state ASC,a.is_important DESC,a.alarm_time DESC
+		<if test=" pageSize != null and pageSize != ''">
+			LIMIT #{startIndex}, #{pageSize}
+		</if>
+	</select>
+
+	<select id="statCountByAlarmType"
+			resultType="com.arjjs.ccm.modules.flat.alarm.entity.BphAlarmTypeStat">
+		SELECT
+			a.type AS "type",
+			GROUP_CONCAT( a.num  ORDER BY a.dateTime SEPARATOR ',' ) AS "nums"
+		FROM
+		(
+		SELECT
+		stat.stat_date AS "dateTime",
+		stat.alarm_type AS "type",
+		SUM( stat.count ) AS "num"
+		FROM
+		bph_alarm_info_stat stat
+		WHERE
+		DATE( stat.stat_date ) >= DATE_SUB( CURDATE( ), INTERVAL 11 DAY )
+		AND stat.del_Flag = 0
+		GROUP BY
+		stat.alarm_type,
+		stat.stat_date
+		ORDER BY
+		stat.alarm_type
+		) a
+		GROUP BY
+		a.type
+	</select>
+
+	<select id="sameDayContrastStat"
+			resultType="com.arjjs.ccm.modules.flat.alarm.entity.BphAlarmSameDayContrast">
+		SELECT
+			stat.stat_date AS "dateTime",
+			SUM( stat.count ) AS "num"
+		FROM
+			bph_alarm_info_stat stat
+		WHERE
+			DATE( stat.stat_date ) BETWEEN DATE_SUB( CURDATE( ), INTERVAL #{begin} DAY
+			) AND DATE_SUB( CURDATE( ), INTERVAL #{end} DAY )
+			AND stat.del_Flag = 0
+		GROUP BY
+			stat.stat_date
+	</select>
+	<select id="thisMonthContrastStat"
+			resultType="com.arjjs.ccm.modules.flat.alarm.entity.BphAlarmSameDayContrast">
+		SELECT
+			a.date_time as dateTime ,
+			ifnull( b.count, 0 ) AS num
+		FROM
+			(
+		SELECT
+			DATE_SUB( curdate( ), INTERVAL 11 DAY ) AS date_time UNION ALL
+		SELECT
+			DATE_SUB( curdate( ), INTERVAL 10 DAY ) AS date_time UNION ALL
+		SELECT
+			DATE_SUB( curdate( ), INTERVAL 9 DAY ) AS date_time UNION ALL
+		SELECT
+			DATE_SUB( curdate( ), INTERVAL 8 DAY ) AS date_time UNION ALL
+		SELECT
+			DATE_SUB( curdate( ), INTERVAL 7 DAY ) AS date_time UNION ALL
+		SELECT
+			DATE_SUB( curdate( ), INTERVAL 6 DAY ) AS date_time UNION ALL
+		SELECT
+			DATE_SUB( curdate( ), INTERVAL 5 DAY ) AS date_time UNION ALL
+		SELECT
+			DATE_SUB( curdate( ), INTERVAL 4 DAY ) AS date_time UNION ALL
+		SELECT
+			DATE_SUB( curdate( ), INTERVAL 3 DAY ) AS date_time UNION ALL
+		SELECT
+			DATE_SUB( curdate( ), INTERVAL 2 DAY ) AS date_time UNION ALL
+		SELECT
+			DATE_SUB( curdate( ), INTERVAL 1 DAY ) AS date_time
+			) a
+			LEFT JOIN (
+		SELECT
+			DATE( t.alarm_time ) AS datetime,
+			count( * ) AS count
+		FROM
+			bph_alarm_info t
+		GROUP BY
+			DATE( t.alarm_time )
+			) b ON a.date_time = b.datetime;
+	</select>
+
+	<select id="lastMonthContrastStat"
+			resultType="com.arjjs.ccm.modules.flat.alarm.entity.BphAlarmSameDayContrast">
+		SELECT
+			a.date_time as dateTime,
+			ifnull( b.count, 0 ) AS num
+		FROM
+			(
+		SELECT
+			DATE_SUB( curdate( ), INTERVAL 42 DAY ) AS date_time UNION ALL
+		SELECT
+			DATE_SUB( curdate( ), INTERVAL 41 DAY ) AS date_time UNION ALL
+		SELECT
+			DATE_SUB( curdate( ), INTERVAL 40 DAY ) AS date_time UNION ALL
+		SELECT
+			DATE_SUB( curdate( ), INTERVAL 39 DAY ) AS date_time UNION ALL
+		SELECT
+			DATE_SUB( curdate( ), INTERVAL 38 DAY ) AS date_time UNION ALL
+		SELECT
+			DATE_SUB( curdate( ), INTERVAL 37 DAY ) AS date_time UNION ALL
+		SELECT
+			DATE_SUB( curdate( ), INTERVAL 36 DAY ) AS date_time UNION ALL
+		SELECT
+			DATE_SUB( curdate( ), INTERVAL 35 DAY ) AS date_time UNION ALL
+		SELECT
+			DATE_SUB( curdate( ), INTERVAL 34 DAY ) AS date_time UNION ALL
+		SELECT
+			DATE_SUB( curdate( ), INTERVAL 33 DAY ) AS date_time UNION ALL
+		SELECT
+			DATE_SUB( curdate( ), INTERVAL 32 DAY ) AS date_time
+			) a
+			LEFT JOIN (
+		SELECT
+			DATE( t.alarm_time ) AS datetime,
+			count( * ) AS count
+		FROM
+			bph_alarm_info t
+		GROUP BY
+			DATE( t.alarm_time )
+			) b ON a.date_time = b.datetime;
+
+	</select>
+
+	<select id="statPercentByAlarmType" resultType="BphAlarmInfo">
+		SELECT
+			stat.office_id AS "officeId",
+			office.`name` AS "office.name",
+			SUM( count ) AS "num"
+		FROM
+			bph_alarm_info_stat stat
+		LEFT JOIN sys_office office ON office.id = stat.office_id
+		WHERE
+			stat.alarm_type = #{typeCode}
+			AND stat.stat_date = CURDATE( )
+		GROUP BY
+			stat.office_id
+	</select>
+
+	<select id="statCountByOfficeAndAlarmType"
+			resultType="BphAlarmInfo">
+		SELECT
+			stat.stat_date AS "dateTime",
+			stat.count AS "num"
+		FROM
+			bph_alarm_info_stat stat
+		WHERE
+			stat.office_id = #{officeId}
+			AND stat.stat_date >= DATE_SUB(CURDATE(),INTERVAL 30 DAY)
+		ORDER BY
+			stat.stat_date
+	</select>
+
+	<!--<select id="selectDataNum"
+			resultType="List">
+		SELECT	DATE_FORMAT( DATE_SUB( curdate( ), INTERVAL 11 DAY ),'%d') AS dateTime UNION ALL
+		SELECT	DATE_FORMAT( DATE_SUB( curdate( ), INTERVAL 10 DAY ),'%d') AS dateTime UNION ALL
+		SELECT	DATE_FORMAT( DATE_SUB( curdate( ), INTERVAL 9 DAY ) ,'%d') AS dateTime UNION ALL
+		SELECT	DATE_FORMAT( DATE_SUB( curdate( ), INTERVAL 8 DAY ) ,'%d') AS dateTime UNION ALL
+		SELECT	DATE_FORMAT( DATE_SUB( curdate( ), INTERVAL 7 DAY ) ,'%d') AS dateTime UNION ALL
+		SELECT	DATE_FORMAT( DATE_SUB( curdate( ), INTERVAL 6 DAY ) ,'%d') AS dateTime UNION ALL
+		SELECT	DATE_FORMAT( DATE_SUB( curdate( ), INTERVAL 5 DAY ) ,'%d') AS dateTime UNION ALL
+		SELECT	DATE_FORMAT( DATE_SUB( curdate( ), INTERVAL 4 DAY ) ,'%d') AS dateTime UNION ALL
+		SELECT	DATE_FORMAT( DATE_SUB( curdate( ), INTERVAL 3 DAY ) ,'%d') AS dateTime UNION ALL
+		SELECT	DATE_FORMAT( DATE_SUB( curdate( ), INTERVAL 2 DAY ) ,'%d') AS dateTime UNION ALL
+		SELECT	DATE_FORMAT( DATE_SUB( curdate( ), INTERVAL 1 DAY ) ,'%d') AS dateTime
+	</select>-->
+
+	<sql id="officeColumns">
+		a.id,
+		a.parent_id AS "parent.id",
+		a.parent_ids AS "parent.ids",
+		a.area_id AS "area.id",
+		a.code,
+		a.name,
+		a.sort,
+		a.type,
+		a.grade,
+		a.address,
+		a.zip_code,
+		a.master,
+		a.phone,
+		a.fax,
+		a.email,
+		a.remarks,
+		a.create_by AS "createBy.id",
+		a.create_date,
+		a.update_by AS "updateBy.id",
+		a.update_date,
+		a.del_flag
+	</sql>
+
+	<select id="find" parameterType="String"
+			resultType="BphAlarmInfo">
+		SELECT
+		<include refid="officeColumns" />
+		FROM sys_office a
+		WHERE a.del_flag = 0
+		AND a.id = #{id,jdbcType=VARCHAR}
+	</select>
+
+	<select id="findOfficeAllList"
+			resultType="com.arjjs.ccm.modules.sys.entity.Office">
+		SELECT
+		<include refid="officeColumns" />
+		FROM sys_office a
+		WHERE a.del_flag = #{DEL_FLAG_NORMAL}
+		<if test="type != null and type != ''">
+			AND a.type = #{type} or a.type = 1
+		</if>
+	</select>
+
+	<select id="getParentId" resultType="BphAlarmInfo">
+		SELECT
+		<include refid="officeColumns" />
+		FROM sys_office a
+		WHERE a.del_flag = #{DEL_FLAG_NORMAL}
+		<if test="parentId != null and parentId != ''">
+			AND a.parent_id = #{parentId}
+		</if>
+	</select>
+
+	<update id="insertAlarmByIdForOffice">
+		UPDATE bph_alarm_info SET
+		office_id = #{officeId,jdbcType=VARCHAR},
+		office_ids = #{officeIds,jdbcType=VARCHAR}
+		WHERE id = #{id,jdbcType=VARCHAR}
+	</update>
+
+	<update id="updateAlarmInfo">
+		UPDATE bph_alarm_info SET
+		update_by = #{updateBy.id},
+		update_date = now()
+		<if test="orderNum!=null and orderNum !=''">
+			,order_num = #{orderNum}
+		</if>
+		<if test="policeNum != null and policeNum !=''">
+			,police_num = #{policeNum}
+		</if>
+		<if test="policeName !=null and policeName !=''">
+			,police_name = #{policeName}
+		</if>
+		<if test="manName !=null and manName !=''">
+			,man_name = #{manName}
+		</if>
+		<if test="manSex !=null and manSex !=''">
+			,man_sex = #{manSex}
+		</if>
+		<if test="manTel !=null and manTel !=''">
+			,man_tel = #{manTel}
+		</if>
+		<if test="place !=null and place !=''">
+			,place = #{place}
+		</if>
+		<if test="x !=null and x !=''">
+			,x = #{x}
+		</if>
+		<if test="y !=null and y !=''">
+			,y = #{y}
+		</if>
+		<if test="z !=null and z !=''">
+			,z = #{z}
+		</if>
+		<if test="content !=null and content !=''">
+			,content = #{content}
+		</if>
+		<if test="typeCode !=null and typeCode !=''">
+			,type_code = #{typeCode}
+		</if>
+		<if test="genreCode !=null and genreCode !=''">
+			,genre_code = #{genreCode}
+		</if>
+		<if test="classCode !=null and classCode !=''">
+			,class_code = #{classCode}
+		</if>
+		<if test="area != null and area.id !=null and area.id !=''">
+			,area_id = #{area.id}
+		</if>
+		<if test=" office != null and office.id !=null and office.id !=''">
+			,office_id = #{office.id}
+		</if>
+		<if test=" office != null and office.parentIds !=null and office.parentIds !=''">
+			,office_ids = #{office.parentIds}
+		</if>
+		<if test="alarmFrom !=null and alarmFrom !=''">
+			,alarm_from = #{alarmFrom}
+		</if>
+		<if test="alarmTime !=null and alarmTime !=''">
+			,alarm_time = #{alarmTime}
+		</if>
+		<if test="isImportant !=null and isImportant !=''">
+			,is_important = #{isImportant}
+		</if>
+		<if test="state !=null and state !=''">
+			,state = #{state}
+		</if>
+		<if test="remarks !=null and remarks !=''">
+			,remarks = #{remarks}
+		</if>
+		<if test="createDate !=null and createDate !=''">
+			,create_date = #{createDate}
+		</if>
+		WHERE id = #{id}
+	</update>
+
+	<select id="findCount" resultType="Integer">
+		SELECT count(1) FROM bph_alarm_info a
+		<where>
+			a.del_Flag = #{DEL_FLAG_NORMAL}
+			<if test="incSubset">
+				<if test="officeId != null and officeId != ''">
+					AND (a.office_id = #{officeId} OR a.office_ids LIKE
+					CONCAT('%,', #{officeId}, ',%'))
+				</if>
+			</if>
+			<if test="!incSubset">
+				<if test="officeId != null and officeId != ''">
+					AND a.office_id = #{officeId}
+				</if>
+			</if>
+			<if test="state != null and state != ''">
+				AND a.state = #{state}
+			</if>
+			<if test="beginAlarmTime != null and endAlarmTime != null and beginAlarmTime != '' and endAlarmTime != ''">
+				AND a.alarm_time BETWEEN #{beginAlarmTime} AND #{endAlarmTime}
+			</if>
+		</where>
+	</select>
+
+	<select id="statCountGroupOffice" resultType="BphAlarmInfo">
+		SELECT
+			office.NAME AS "office.name",
+			COUNT( 1 ) AS "num"
+		FROM
+			bph_alarm_info info
+			LEFT JOIN sys_office office ON office.id = info.office_id
+		WHERE
+			info.alarm_time BETWEEN date_format( now( ), '%Y-%m-%d 00:00:00' )
+			AND date_format( now( ), '%Y-%m-%d 23:59:59' )
+			AND info.del_flag = 0
+			AND info.office_id IS NOT NULL
+		GROUP BY
+			info.office_id
+	</select>
+
+	<select id="statPercentByOffice" resultType="BphAlarmInfo">
+		SELECT
+			info.type_code AS "typeCode",
+			COUNT( 1 ) AS "num"
+		FROM
+			bph_alarm_info info
+		WHERE
+			info.alarm_time BETWEEN date_format( now( ), '%Y-%m-%d 00:00:00' )
+			AND date_format( now( ), '%Y-%m-%d 23:59:59' ) AND info.del_flag = #{DEL_FLAG_NORMAL}
+			AND info.office_id = #{officeId}
+		GROUP BY
+			info.type_code
+	</select>
+
+	<select id="statCountByOffice" resultType="BphAlarmInfo">
+		SELECT
+			DATE_FORMAT( t.stat_date, '%Y-%m' ) AS "dateTime",
+			t.alarm_type AS "typeCode",
+			SUM( t.count ) AS "num"
+		FROM
+			bph_alarm_info_stat t
+		WHERE
+			DATE_FORMAT( t.stat_date, '%Y-%m' ) > DATE_FORMAT( date_sub( curdate( ), INTERVAL 12 MONTH ), '%Y-%m' )
+			AND t.office_id = #{officeId}
+		GROUP BY
+			DATE_FORMAT( t.stat_date, '%Y-%m' ),
+			t.alarm_type
+		ORDER BY t.stat_date
+	</select>
+
+	<select id="findByHandlePoliceId"  resultType="BphAlarmInfo">
+		SELECT
+			a.order_num AS "orderNum",
+			a.police_num AS "policeNum",
+			a.police_name AS "policeName",
+			a.man_name AS "manName",
+			a.man_sex AS "manSex",
+			a.man_tel AS "manTel",
+			a.content AS "content",
+			a.alarm_time AS "alarmTime",
+			a.place AS "place",
+			a.type_code AS "typeCode",
+			a.state AS "state",
+			a.alarm_record AS "alarmRecord",
+			h.task AS "handleTask",
+			h.status AS "handleStatus"
+		FROM bph_alarm_handle h
+		LEFT JOIN bph_alarm_info a ON h.alarm_id = a.id AND a.del_flag = 0
+		WHERE
+			h.handle_police_id = #{handlePoliceId,jdbcType=VARCHAR}
+			AND h.dispatch_time &gt; DATE_SUB(CURDATE(), INTERVAL 3 DAY)
+			AND h.del_flag = 0
+	</select>
+
+	<select id="queryTimeoutAlarm"  resultType="com.arjjs.ccm.modules.flat.alarm.entity.BphTimeoutAlarm" parameterType="com.arjjs.ccm.modules.flat.alarm.entity.BphTimeoutAlarm">
+		SELECT
+			alarmInfo.id,
+			alarmInfo.place,
+			alarmInfo.type_code,
+			alarmInfo.is_important,
+			alarmInfo.content,
+			alarmInfo.man_name,
+			alarmInfo.alarm_time,
+			alarmInfo.x,
+			alarmInfo.y,
+			'0' AS "timeoutType"
+		FROM
+			bph_alarm_info alarmInfo
+		WHERE
+			( UNIX_TIMESTAMP( NOW( ) ) - UNIX_TIMESTAMP( alarmInfo.alarm_time ) ) > #{maxDispatchTime}
+			AND alarmInfo.id NOT IN ( SELECT handle.alarm_id FROM bph_alarm_handle handle WHERE handle.`status` = 0 AND handle.del_flag = 0 )
+			AND alarmInfo.del_flag = 0
+			AND alarmInfo.state = 0 UNION ALL
+		SELECT
+			alarmInfo.id,
+			alarmInfo.place,
+			alarmInfo.type_code,
+			alarmInfo.is_important,
+			alarmInfo.content,
+			alarmInfo.man_name,
+			alarmInfo.alarm_time,
+			alarmInfo.x,
+			alarmInfo.y,
+			'1' AS "timeoutType"
+		FROM
+			bph_alarm_info alarmInfo,
+			bph_alarm_handle handle
+		WHERE
+			( UNIX_TIMESTAMP( NOW( ) ) - UNIX_TIMESTAMP( handle.dispatch_time ) ) > #{maxAcceptTime}
+			AND alarmInfo.del_flag = 0
+			AND handle.del_flag = 0
+			AND alarmInfo.state = 0
+			AND alarmInfo.id = handle.alarm_id UNION ALL
+		SELECT
+			alarmInfo.id,
+			alarmInfo.place,
+			alarmInfo.type_code,
+			alarmInfo.is_important,
+			alarmInfo.content,
+			alarmInfo.man_name,
+			alarmInfo.alarm_time,
+			alarmInfo.x,
+			alarmInfo.y,
+			'2' AS "timeoutType"
+		FROM
+			bph_alarm_info alarmInfo,
+			bph_alarm_handle handle
+		WHERE
+			( UNIX_TIMESTAMP( NOW( ) ) - UNIX_TIMESTAMP( handle.receive_time ) ) > #{maxArriveTime}
+			AND alarmInfo.del_flag = 0
+			AND handle.del_flag = 0
+			AND handle.`status` = 1
+			AND alarmInfo.id = handle.alarm_id
+	</select>
+
+	<select id="getAlarmHandleFile" parameterType="String" resultType="BphAlarmHandleFile">
+		SELECT
+			info.id "alarmId",
+			handle.id "alarmHandleId",
+			file.id "id",
+			file.type "type",
+			file.path "path",
+			file.create_by "userId",
+			u.`name` "userName",
+			handle.handle_result "handleResult"
+		FROM
+			bph_alarm_handle_file file
+			INNER JOIN bph_alarm_handle handle ON file.alarm_handle_id = handle.id
+			INNER JOIN bph_alarm_info info ON handle.alarm_id = info.id
+			LEFT JOIN sys_user u ON u.id = file.create_by
+		WHERE
+			file.del_flag = 0
+			AND handle.del_flag = 0
+			AND info.del_flag = 0
+			AND info.id = #{id}
+	</select>
+
+	<insert id="insertData">
+		INSERT INTO bph_alarm_info(
+		id,
+		order_num,
+		police_num,
+		police_name,
+		man_name,
+		man_sex,
+		man_tel,
+		place,
+		x,
+		y,
+		z,
+		content,
+		type_code,
+		genre_code,
+		class_code,
+		area_id,
+		office_id,
+		office_ids,
+		alarm_from,
+		alarm_time,
+		alarm_record,
+		is_important,
+		state,
+		create_by,
+		create_date,
+		update_by,
+		update_date,
+		remarks,
+		del_flag
+		) VALUES
+		<foreach collection="list" item="alarm" separator=",">
+			(
+			UUID(),
+			#{alarm.orderNum},
+			#{alarm.policeNum},
+			#{alarm.policeName},
+			#{alarm.manName},
+			#{alarm.manSex},
+			#{alarm.manTel},
+			#{alarm.place},
+			#{alarm.x},
+			#{alarm.y},
+			#{alarm.z},
+			#{alarm.content},
+			#{alarm.typeCode},
+			#{alarm.genreCode},
+			#{alarm.classCode},
+			#{alarm.areaId},
+			#{alarm.officeId},
+			#{alarm.officeIds},
+			#{alarm.alarmFrom},
+			#{alarm.alarmTime},
+			#{alarm.alarmRecord},
+			#{alarm.isImportant},
+			#{alarm.state},
+			'1',
+			NOW(),
+			'1',
+			NOW(),
+			#{alarm.remarks},
+			0
+			)
+		</foreach>
+	</insert>
+	<insert id="insertJjDockiData">
+		INSERT INTO bph_alarm_info(
+			id,
+			order_num,
+			police_num,
+			police_name,
+			man_name,
+			man_sex,
+			man_tel,
+			place,
+			x,
+			y,
+			z,
+			content,
+			type_code,
+			genre_code,
+			class_code,
+			area_id,
+			office_id,
+			office_ids,
+			alarm_from,
+			alarm_time,
+			alarm_record,
+			is_important,
+			state,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag
+		) VALUES
+		(
+			UUID(),
+			#{alarm.orderNum},
+			#{alarm.policeNum},
+			#{alarm.policeName},
+			#{alarm.manName},
+			#{alarm.manSex},
+			#{alarm.manTel},
+			#{alarm.place},
+			#{alarm.x},
+			#{alarm.y},
+			#{alarm.z},
+			#{alarm.content},
+			#{alarm.typeCode},
+			#{alarm.genreCode},
+			#{alarm.classCode},
+			#{alarm.areaId},
+			#{alarm.officeId},
+			#{alarm.officeIds},
+			#{alarm.alarmFrom},
+			#{alarm.alarmTime},
+			#{alarm.alarmRecord},
+			#{alarm.isImportant},
+			#{alarm.state},
+			'1',
+			NOW(),
+			'1',
+			NOW(),
+			#{alarm.remarks},
+			0
+		)
+	</insert>
+	<select id="selectOfficeByCode" resultType="com.arjjs.ccm.modules.sys.entity.Office">
+	 	Select * from sys_office s where s.code = #{code} and s.del_flag = 0
+	</select>
+	<select id="selectAlarmInfoByOrderNum" resultType="BphAlarmInfo">
+	 	Select * from bph_alarm_info b where b.order_num = #{orderNum}
+	</select>
+	<insert id="insertAlarm">
+		INSERT INTO bph_alarm_info(
+		id,
+		order_num,
+		police_num,
+		police_name,
+		man_name,
+		man_sex,
+		man_tel,
+		place,
+		x,
+		y,
+		z,
+		content,
+		type_code,
+		genre_code,
+		class_code,
+		area_id,
+		office_id,
+		office_ids,
+		alarm_from,
+		alarm_time,
+		alarm_record,
+		is_important,
+		state,
+		create_by,
+		create_date,
+		update_by,
+		update_date,
+		remarks,
+		del_flag,
+		deal_type_code,
+		receival_office_id
+		) VALUES (
+		#{id},
+		#{orderNum},
+		#{policeNum},
+		#{policeName},
+		#{manName},
+		#{manSex},
+		#{manTel},
+		#{place},
+		#{x},
+		#{y},
+		#{z},
+		#{content},
+		#{typeCode},
+		#{genreCode},
+		#{classCode},
+		#{area.id},
+		#{officeId},
+		#{officeIds},
+		#{alarmFrom},
+		#{alarmTime},
+		#{alarmRecord},
+		#{isImportant},
+		#{state},
+		#{createBy.id},
+		#{createDate},
+		#{updateBy.id},
+		#{updateDate},
+		#{remarks},
+		#{delFlag},
+		#{dealTypeCode},
+		#{receiveOfficeId}
+		)
+	</insert>
+	<select id="officeList" parameterType="String" resultType="com.arjjs.ccm.modules.flat.alarm.entity.OfficeAreaEntity">
+		 SELECT
+			t1.id AS officeId,t1.`name` AS officeName,t2.id AS areaId,t2.`name` AS areaName
+		FROM
+			sys_office t1
+			LEFT JOIN sys_area t2 on t1.area_id = t2.id
+			WHERE
+				1 = 1
+				AND t2.id = #{areaId}
+			ORDER BY t1.id
+	</select>
+	<update id="updateBphAlarmInfo" parameterType="com.arjjs.ccm.modules.flat.alarm.entity.BphAlarmInfo">
+		update bph_alarm_info set update_date = now()
+		<if test=" state != null and state != '' "> , state = #{state}</if>
+		<if test=" genreCode != null and genreCode != '' "> , genre_code = #{genreCode}</if>
+		<if test=" typeCode != null and typeCode != '' "> , type_code = #{typeCode}</if>
+		<if test=" classCode != null and classCode != '' "> , class_code = #{classCode}</if>
+		<if test=" x!= null and x != '' "> , x = #{x}</if>
+		<if test=" y!= null and y != '' "> , y = #{y}</if>
+		<if test=" officeId!= null and officeId != '' "> , office_id = #{officeId}</if>
+		<if test=" officeIds!= null and officeIds != '' "> , office_ids = #{officeIds}</if>
+		where id = #{id}
+<!--		<if test=" state != null and state != '' "> and state &lt; #{state} </if>-->
+	</update>
+	<select id="selectAlarmNotifyInfoById" resultType="com.arjjs.ccm.modules.ccm.rest.entity.AlarmNotifyInfo">
+		SELECT
+			alarm.id alarm_id,	alarm.order_num alarm_order_num,	alarm.police_num alarm_police_num,
+			alarm.police_name alarm_police_name,	alarm.man_name alarm_man_name,	alarm.man_tel alarm_man_tel,
+			alarm.place alarm_place,	alarm.x alarm_x,	alarm.y alarm_y,	alarm.z alarm_z,	alarm.content alarm_content,
+			dictgenre.label alarm_gener_name,	dicttype.label alarm_type_name,	dictclass.label alarm_class_name,
+			alarm.alarm_time alarm_time,	alarm.alarm_record alarm_record,	office.NAME office_name,	compresive.max_dispatch_time,	compresive.max_arrive_time
+		FROM
+			bph_alarm_info alarm
+			LEFT JOIN sys_dict dictgenre ON alarm.genre_code = dictgenre.`value`
+			AND dictgenre.type = 'bph_alarm_info_class'	LEFT JOIN sys_dict dicttype ON alarm.type_code = dicttype.VALUE
+			AND dicttype.type = 'bph_alarm_info_typecode'	LEFT JOIN sys_dict dictclass ON alarm.class_code = dictclass.VALUE
+			AND dictclass.type = 'bph_alarm_info_small_class'	LEFT JOIN sys_office office ON alarm.office_id = office.id
+			LEFT JOIN ccm_org_comprehensive compresive ON office.id = compresive.office_id
+		WHERE
+			alarm.del_flag = 0
+		AND alarm.id = #{alarmId}
+	</select>
+</mapper>

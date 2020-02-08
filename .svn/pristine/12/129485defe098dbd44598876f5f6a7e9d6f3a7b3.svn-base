@@ -1,0 +1,646 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.arjjs.ccm.modules.plm.storage.dao.PlmEquipmentDao">
+    
+	<sql id="plmEquipmentColumns">
+		a.id AS "id",
+		a.sto_id AS "storage.id",
+		a.minusand_id AS "minusandId",
+		a.code AS "code",
+		a.name AS "name",
+		a.spec AS "spec",
+		a.type_id AS "typeId",
+		a.type_child AS "typeChild",
+		a.category as "category",
+		a.shape AS "shape",
+		a.stockahead AS "stockahead",
+		a.erial_number AS "erialNumber",
+		substring_index(a.img_url, '|', -1) AS "imgUrl",
+		a.production_batch AS "productionBatch",
+		a.production_date AS "productionDate",
+		a.guarantee_period AS "guaranteePeriod",
+		a.expiration_date AS "expirationDate",
+		a.unit AS "unit",
+		a.durable_years AS "durableYears",
+		a.price AS "price",
+		a.user_id AS "user.id",
+		a.user_job AS "userJob.id",
+		a.type AS "type",
+		a.extend1 AS "extend1",
+		a.extend2 AS "extend2",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag",
+		u20.name AS "user.name",
+		o21.name AS "userJob.name",
+		s.name AS "storage.name",
+		a.use_number AS "useNumber"
+	</sql>
+	
+	<sql id="selectCondition">
+		<if test="storage != null and storage.id != null and storage.id != ''">
+			AND (s.id = #{storage.id} OR s.parent_ids LIKE
+				<if test="dbName == 'oracle'">'%,'||#{storage.id}||',%')</if>
+				<if test="dbName == 'mssql'">'%,'+#{storage.id}+',%')</if>
+				<if test="dbName == 'mysql'">CONCAT('%,', #{storage.id}, ',%'))</if>
+		</if>
+		<if test="name != null and name != ''">
+			AND a.name LIKE 
+				<if test="dbName == 'oracle'">'%'||#{name}||'%'</if>
+				<if test="dbName == 'mssql'">'%'+#{name}+'%'</if>
+				<if test="dbName == 'mysql'">concat('%',#{name},'%')</if>
+		</if>
+		<if test="code != null and code != ''">
+			AND a.code LIKE 
+				<if test="dbName == 'oracle'">'%'||#{code}||'%'</if>
+				<if test="dbName == 'mssql'">'%'+#{code}+'%'</if>
+				<if test="dbName == 'mysql'">concat('%',#{code},'%')</if>
+		</if>
+		<if test="spec != null and spec != ''">
+			AND a.spec LIKE 
+				<if test="dbName == 'oracle'">'%'||#{spec}||'%'</if>
+				<if test="dbName == 'mssql'">'%'+#{spec}+'%'</if>
+				<if test="dbName == 'mysql'">concat('%',#{spec},'%')</if>
+		</if>
+		<if test="typeId != null and typeId != ''">
+			AND a.type_id = #{typeId}
+		</if>
+		<if test="typeChild != null and typeChild != ''">
+			AND a.type_child = #{typeChild}
+		</if>
+		<if test="category != null and category != ''">
+			AND a.category = #{category}
+		</if>
+		<if test="user != null and user.id != null and user.id != ''">
+			AND a.user_id = #{user.id}
+		</if>
+		<if test="userJob != null and userJob.id != null and userJob.id != ''">
+			AND a.user_job = #{userJob.id}
+		</if>
+		<choose>
+			<when test="type != null and type != ''">
+				AND a.type = #{type}
+			</when>
+			<otherwise>
+				<![CDATA[
+					AND a.type <> 0
+				]]>
+			</otherwise>
+		</choose>
+		<if test="minusandId != null and minusandId != ''">
+			AND a.minusand_id = #{minusandId}
+		</if>
+	</sql>
+	
+	<sql id="selectConditionShowDetail">
+		<if test="name != null and name != ''">
+			AND a.name = #{name}
+		</if>
+		<if test="spec != null and spec != ''">
+			AND a.spec = #{spec}
+		</if>
+		<if test="typeId != null and typeId != ''">
+			AND a.type_id = #{typeId}
+		</if>
+		<if test="typeChild != null and typeChild != ''">
+			AND a.type_child = #{typeChild}
+		</if>
+	</sql>
+	
+	<sql id="plmEquipmentJoins">
+	LEFT JOIN sys_user u20 ON u20.id = a.user_id
+	LEFT JOIN sys_office o21 ON o21.id = a.user_job
+	LEFT JOIN plm_storage s ON s.id = a.sto_id
+	</sql>
+    
+	<select id="get" resultType="PlmEquipment">
+		SELECT 
+			<include refid="plmEquipmentColumns"/>
+		FROM plm_equipment a
+		<include refid="plmEquipmentJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findCode" resultType="PlmEquipment">
+		SELECT	*	from 	plm_equipment
+		<where>
+		id = #{id}
+		</where>
+	</select>
+	
+	<select id="findList" resultType="PlmEquipment">
+		SELECT 
+			<include refid="plmEquipmentColumns"/>
+		FROM plm_equipment a
+		<include refid="plmEquipmentJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<include refid="selectCondition"/>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.code DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	
+	
+	
+	<select id="findAllList" resultType="PlmEquipment">
+		SELECT 
+			<include refid="plmEquipmentColumns"/>
+		FROM plm_equipment a
+		<include refid="plmEquipmentJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	<select id="countEquipmentByStorage" resultType="PlmEquipment">
+	SELECT 
+		COUNT(a.id) counts, s.name	AS "storage.name"
+		FROM plm_equipment a
+	   right JOIN plm_storage s ON s.id = a.sto_id  		
+		<where>
+			a.del_flag = "0"
+		
+			<if test="type != null and type != ''">
+				AND a.type = 1
+			</if>	
+		</where>
+		GROUP BY s.id , s.name
+		
+	</select>
+	
+	<select id="countEquipmentByType" resultType="PlmEquipment">
+		SELECT
+			a.NAME,
+			a.spec,
+			a.type_id,
+			a.type_child,
+			count( * ) counts 
+		FROM
+			plm_equipment a
+		<where>
+			a.del_flag = "0"
+			<![CDATA[
+			AND a.type_id <> 0
+			]]>
+			<include refid="selectCondition"/>
+		</where>
+		GROUP BY
+			a.NAME,
+			a.spec,
+			a.type_id,
+			a.type_child 
+		ORDER BY
+			counts DESC
+	</select>
+	
+	<!-- 总物资数量 -->
+	<select id="countEquipment"  resultType="Integer"> 
+		SELECT		
+			count( * )  
+		FROM
+			plm_equipment a
+		<where>
+			a.del_flag = "0"		
+		</where>		
+	</select>
+	
+	<!-- 物资类型数量（有多少个类型） -->
+	<select id="countByType"  resultType="Integer">
+		SELECT		
+			count( *)  
+		FROM (SELECT		
+			id 
+		FROM
+			plm_equipment a
+		<where>
+			a.del_flag = "0"		
+		</where>
+		GROUP BY			
+			a.type_id,
+			a.type_child) a
+		
+	</select>
+	
+	<!-- 各物资统计数量top10 -->
+	<select id="countEquipmentByName" resultType="java.util.HashMap">
+			SELECT			
+		dict.label  label,
+		sum(case when a.type=0 then 1 else 0 end) value0,
+		sum(case when a.type=1 then 1 else 0 end) value1,
+		sum(case when a.type=2 then 1 else 0 end) value2,
+		sum(case when a.type=3 then 1 else 0 end) value3,
+		sum(case when a.type=4 then 1 else 0 end) value4			
+	FROM
+		plm_equipment a 
+		
+		LEFT JOIN  sys_dict dict on  dict.value=a.type_child  AND dict.type='plm_equipment_type_child'
+	WHERE
+		a.del_flag = "0" 
+    and  a.type_id=1
+	GROUP BY	
+		a.type_id,
+		a.type_child 					
+		   LIMIT 0,10
+	</select>
+	
+	
+	
+	<!-- 根据类型统计   typechild=1 时 根据 子类型统计-->
+	<select id="ratioEquipmentByType" parameterType="java.util.HashMap" resultType="com.arjjs.ccm.tool.EchartType">
+		SELECT						
+			a.type_id as  type ,
+			<if test="typechild == 1">
+			a.type_child as  typeO,
+			</if>
+				SUM(a.erial_number) as value2,
+			count( * ) as value
+		FROM
+			plm_equipment a
+		<where>
+			a.del_flag = "0"
+			
+		</where>
+		GROUP BY
+			
+			<if test="typechild == 1">
+			a.type_child ,
+		  </if>
+				a.type_id
+		ORDER BY
+			a.type_id DESC
+	</select>
+	
+	
+	<!--物资数  以月为时间轴-->
+	<select id="countEquipmentByTypeDate"  parameterType="java.util.HashMap" resultType="java.util.HashMap">
+		SELECT			
+			count( * ) count,
+			 month(a.create_date) as month 
+		FROM
+			plm_equipment a
+		<where>
+			a.del_flag = "0"
+			 AND a.create_date>DATE_SUB(CURDATE(), INTERVAL #{qmonth} MONTH)
+		</where>
+		GROUP BY			
+			
+			year(a.create_date), 
+			month(a.create_date)
+		ORDER BY
+			count DESC
+	</select>
+	<!-- 到期预警物资 -->
+	<select id="warningEquipment"  parameterType="java.util.HashMap" resultType="java.util.HashMap">
+		SELECT			
+			count( * ) count,
+			a.NAME name	,	
+			a.type_id  typeId,
+			a.type_child typeChild,
+			datediff(a.durable_years,now()) durDay
+		FROM
+			plm_equipment a
+		<where>
+			a.del_flag = "0"
+			AND  a.durable_years  is not null
+			<!-- and a.type_id=1 -->
+			<if test="qmonth == null" >
+			
+			 AND a.durable_years <![CDATA[>]]> now()
+			 </if>
+			 <if test="qmonth ==0 ">
+			 AND a.durable_years <![CDATA[<=]]> now()			
+			 </if>
+		</where>
+		GROUP BY			
+			a.NAME,			
+			a.type_id,
+			a.type_child 
+		ORDER BY
+		    a.durable_years ,
+			create_date DESC
+			LIMIT 0,10
+	</select>
+	<!-- 物资状态统计 -->
+	<select id="countEquipmentByStats"  resultType="com.arjjs.ccm.tool.EchartType">
+		SELECT
+			 count(a.id) as value,
+	        a.type as  type 
+		FROM
+			plm_equipment a
+		<where>
+			a.del_flag = "0"			
+		</where>
+		GROUP BY			
+			a.type		
+	</select>
+	
+	<select id="showCountDetailList" resultType="PlmEquipment">
+		SELECT 
+			<include refid="plmEquipmentColumns"/>
+		FROM plm_equipment a
+		<include refid="plmEquipmentJoins"/>
+		<where>
+			a.del_flag = "0"
+			<include refid="selectConditionShowDetail"/>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findListForLogi" resultType="PlmEquipment">
+		SELECT 
+			<include refid="plmEquipmentColumns"/>
+		FROM plm_equipment a
+		<include refid="plmEquipmentJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="typeId == null or typeId == ''">
+				AND a.type_id != '1'
+			</if>
+			<include refid="selectCondition"/>			
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>	
+		
+		
+	<!--  -->
+	<select id="findListBySpec" resultType="PlmEquipment">
+			SELECT 
+			a.name as name,
+			a.spec as spec,
+			a.type_child as typeChild,
+			count( * ) as counts
+			FROM  plm_equipment a
+			<where>
+			
+			a.type = "1" 
+			
+			<if test="name != null and name != ''">
+			AND a.name LIKE 
+				<if test="dbName == 'oracle'">'%'||#{name}||'%'</if>
+				<if test="dbName == 'mssql'">'%'+#{name}+'%'</if>
+				<if test="dbName == 'mysql'">concat('%',#{name},'%')</if>
+			</if>
+			<if test="name != null and name != ''">
+			AND a.spec LIKE 
+				<if test="dbName == 'oracle'">'%'||#{spec}||'%'</if>
+				<if test="dbName == 'mssql'">'%'+#{spec}+'%'</if>
+				<if test="dbName == 'mysql'">concat('%',#{spec},'%')</if> 
+			</if>
+			GROUP BY
+			a.name,
+			a.type_child
+			</where>  
+	</select>
+	
+	
+	<insert id="insert" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
+		INSERT INTO plm_equipment(
+			id,
+			sto_id,
+			minusand_id,
+			code,
+			name,
+			spec,
+			type_id,
+			type_child,
+			category,
+			shape,
+			stockahead,
+			erial_number,
+			use_number,
+			img_url,
+			production_batch,
+			production_date,
+			guarantee_period,
+			expiration_date,
+			unit,
+			durable_years,
+			price,
+			user_id,
+			user_job,
+			type,
+			extend1,
+			extend2,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag
+		) VALUES (
+			#{id},
+			#{storage.id},
+			#{minusandId},
+			#{code},
+			#{name},
+			#{spec},
+			#{typeId},
+			#{typeChild},
+			#{category},
+			#{shape},
+			#{stockahead},
+			#{erialNumber},
+			#{useNumber},
+			#{imgUrl},
+			#{productionBatch},
+			#{productionDate},
+			#{guaranteePeriod},
+			#{expirationDate},
+			#{unit},
+			#{durableYears},
+			#{price},
+			#{user.id},
+			#{userJob.id},
+			#{type},
+			#{extend1},
+			#{extend2},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE plm_equipment SET 
+			sto_id = #{storage.id},
+			minusand_id = #{minusandId},
+			code = #{code},
+			name = #{name},
+			spec = #{spec},
+			type_id = #{typeId},
+			type_child = #{typeChild},
+			category = #{category},
+			shape = #{shape},
+			stockahead = #{stockahead},
+			erial_number = #{erialNumber},
+			use_number = #{useNumber},
+			img_url = #{imgUrl},
+			production_batch = #{productionBatch},
+			production_date = #{productionDate},
+			guarantee_period = #{guaranteePeriod},
+			expiration_date = #{expirationDate},
+			unit = #{unit},
+			durable_years = #{durableYears},
+			price = #{price},
+			user_id = #{user.id},
+			user_job = #{userJob.id},
+			type = #{type},
+			extend1 = #{extend1},
+			extend2 = #{extend2},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE plm_equipment SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+	<select id="findByIds" resultType="PlmEquipment">
+		SELECT 
+			<include refid="plmEquipmentColumns"/>
+		FROM plm_equipment a
+		<include refid="plmEquipmentJoins"/>
+		<where>
+			a.del_flag = '0'
+			AND a.id IN 
+				<foreach collection="array" index="index" item="item" open="(" separator="," close=")">
+					#{item}
+				</foreach>
+		</where>
+				ORDER BY a.update_date DESC
+	</select>
+	
+	<select id="findByCodes" resultType="PlmEquipment">
+		SELECT 
+			<include refid="plmEquipmentColumns"/>
+		FROM plm_equipment a
+		<include refid="plmEquipmentJoins"/>
+		<where>
+			a.del_flag = '0'
+			AND a.code IN 
+				<foreach collection="array" index="index" item="item" open="(" separator="," close=")">
+					#{item}
+				</foreach>
+		</where>
+				ORDER BY a.update_date DESC
+	</select>
+	
+	<update id="updateUser">
+		update plm_equipment 
+		set user_id = #{user.id},
+		user_job = #{userJob.id},
+		type = '3'
+		where 
+		<![CDATA[type_id <> 0]]> AND
+		code in (
+		select equipment_code 
+		from plm_minusand_add_detail 
+		where parent_id =
+		 #{outId}
+		 )
+	</update>
+	
+	
+	<update id="updateUserAndUserJob">
+		update plm_equipment 
+		set user_id = #{user.id},
+		user_job = #{userJob.id}
+		where 
+		code =  #{code}
+	</update>
+	
+	<update id="updateUseNum">
+		update plm_equipment 
+		set use_number = #{useNumber}
+		where 
+		code =  #{code}
+	</update>
+	
+	<update id="updateOccupyStatus">
+		UPDATE plm_equipment p 
+			SET type = '1' 
+		WHERE
+			p.type = '0' 
+		AND 
+		<if test="dbName == 'oracle'">ROUND(TO_NUMBER(TO_DATE(CURRENT_DATE,"YYYY-MM-DD HH24:MI:SS") - TO_DATE(p.update_date,"YYYY-MM-DD HH24:MI:SS")) * 24 * 60)</if>
+		<if test="dbName == 'mssql'">DATEDIFF(n,p.update_date,GETDATE())</if>
+		<if test="dbName == 'mysql'">TIMESTAMPDIFF(MINUTE,p.update_date,CURRENT_TIME)</if>
+		>= 30
+		AND NOT EXISTS ( SELECT id FROM plm_minusand_add_detail d WHERE d.equipment_code = p.code )
+	</update>
+	<update id="updateGiveBack">
+		UPDATE plm_equipment a 
+		SET a.user_id=NULL,
+			a.user_job= NULL,
+			a.type='1' 
+		WHERE
+		 	a.code=#{code}
+	</update>
+	<select id="countByEquType" resultType="PlmEquipment">
+		SELECT CONCAT(spec,pe.type_id,pe.type_child) AS "onlyFlag", 
+			pe.name AS "name",
+			pe.spec AS "spec",
+			pe.type_id AS "typeId",
+			pe.type_child AS "typeChild",
+			<if test="flag == 1">
+				pe.type AS "type",
+			</if>
+			COUNT(id) AS "counts"
+		FROM plm_equipment pe
+		WHERE <![CDATA[
+				pe.type_id <> 0
+				]]> and pe.del_flag='0'
+			<if test="typeId != null and typeId != ''">
+				AND pe.type_id = #{typeId}
+			</if>
+			<if test="typeChild != null and typeChild != ''">
+				AND pe.type_child = #{typeChild}
+			</if>
+		GROUP BY pe.spec,pe.type_id,pe.type_child
+		<if test="flag == 1">
+			,pe.type
+		</if>
+		ORDER BY pe.type_child
+		
+	</select>
+	
+</mapper>

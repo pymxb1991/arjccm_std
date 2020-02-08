@@ -1,0 +1,94 @@
+/**
+ * Copyright &copy; 2012-2016 <a href="https://github.com/thinkgem/jeesite">JeeSite</a> All rights reserved.
+ */
+package com.arjjs.ccm.modules.ccm.place.web;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.apache.shiro.authz.annotation.RequiresPermissions;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
+import com.arjjs.ccm.common.config.Global;
+import com.arjjs.ccm.common.persistence.Page;
+import com.arjjs.ccm.common.web.BaseController;
+import com.arjjs.ccm.common.utils.StringUtils;
+import com.arjjs.ccm.modules.ccm.live.entity.CcmPlaceLive;
+import com.arjjs.ccm.modules.ccm.place.entity.CcmBasePlace;
+import com.arjjs.ccm.modules.ccm.place.service.CcmBasePlaceService;
+
+/**
+ * 场所基本信息表Controller
+ * 
+ * @author lgh
+ * @version 2019-04-23
+ */
+@Controller
+@RequestMapping(value = "${adminPath}/place/ccmBasePlace")
+public class CcmBasePlaceController extends BaseController {
+
+	@Autowired
+	private CcmBasePlaceService ccmBasePlaceService;
+
+	@ModelAttribute
+	public CcmBasePlace get(@RequestParam(required = false) String id) {
+		CcmBasePlace entity = null;
+		if (StringUtils.isNotBlank(id)) {
+			entity = ccmBasePlaceService.get(id);
+		}
+		if (entity == null) {
+			entity = new CcmBasePlace();
+		}
+		return entity;
+	}
+
+	@RequiresPermissions("place:ccmBasePlace:view")
+	@RequestMapping(value = { "list", "" })
+	public String list(CcmBasePlace ccmBasePlace, HttpServletRequest request, HttpServletResponse response,
+			Model model) {
+		Page<CcmBasePlace> page = ccmBasePlaceService.findPage(new Page<CcmBasePlace>(request, response), ccmBasePlace);
+		model.addAttribute("page", page);
+		return "ccm/place/ccmBasePlaceList";
+	}
+
+	@RequiresPermissions("place:ccmBasePlace:view")
+	@RequestMapping(value = "form")
+	public String form(CcmBasePlace ccmBasePlace, Model model) {
+		model.addAttribute("ccmBasePlace", ccmBasePlace);
+		return "ccm/place/ccmBasePlaceForm";
+	}
+
+	@RequiresPermissions("place:ccmBasePlace:view")
+	@RequestMapping(value = "form/common")
+	public String formCommon(CcmBasePlace ccmBasePlace, Model model) {
+		model.addAttribute("ccmBasePlace", ccmBasePlace);
+		return "ccm/place/ccmBasePlaceFormCommon";
+	}
+
+	@RequiresPermissions("place:ccmBasePlace:edit")
+	@RequestMapping(value = "save")
+	public String save(CcmBasePlace ccmBasePlace, Model model, RedirectAttributes redirectAttributes) {
+		if (!beanValidator(model, ccmBasePlace)) {
+			return form(ccmBasePlace, model);
+		}
+		ccmBasePlaceService.save(ccmBasePlace);
+		addMessage(redirectAttributes, "保存场所信息成功");
+		return "redirect:" + Global.getAdminPath() + "/place/ccmBasePlace/?repage";
+	}
+
+	@RequiresPermissions("place:ccmBasePlace:edit")
+	@RequestMapping(value = "delete")
+	public String delete(CcmBasePlace ccmBasePlace, RedirectAttributes redirectAttributes) {
+		ccmBasePlaceService.delete(ccmBasePlace);
+		addMessage(redirectAttributes, "删除场所信息成功");
+		return "redirect:" + Global.getAdminPath() + "/place/ccmBasePlace/?repage";
+	}
+
+}

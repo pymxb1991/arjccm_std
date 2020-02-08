@@ -1,0 +1,121 @@
+/*  全局  */
+.has_dark .form-control{
+    border-color: #097684;
+    background-color: #040d1e;
+    color: #fff;
+}
+.has_dark .form-control-feedback{
+    color: #0a9dc3;
+}
+
+.checkbox label::before{
+    background-color: #040d1e;
+    border: 1px solid #097684;
+}
+.checkbox label::after {
+    padding-top: 2px;
+    color: #ffffff;
+}
+/*  左侧  */
+.left-area{
+    width: 360px;
+    height: 799px;
+    background:url("../images/statIndexZj/keyPersonal_left_box.png") no-repeat center;
+    position:fixed;
+    left: 1.5vw;
+    top: 120px;
+    z-index: 10000;
+}
+.left-area .title{
+    width: 100%;
+    font-size: 18px;
+    color: #fff;
+    text-align: center;
+    line-height: 40px;
+}
+.left-area .content{
+    padding: 25px 30px;
+}
+
+.left-area .content .checkbox-box .tit{
+    font-size: 12px;
+    width: 100%;
+    text-align: left;
+    padding: 15px 0;
+}
+.left-area .content .checkbox-box .ckbx .checkbox{
+    width: 33%;
+    float: left;
+    margin-top: 0;
+    font-size: 12px;
+}
+
+.date-box .tit{
+    font-size: 12px;
+    width: 100%;
+    text-align: left;
+    padding: 15px 0;
+}
+.date-box > div{
+    float: left;
+}
+.date-box .timebox{
+    width: 47%;
+}
+.btn-box button{
+    width: 90px;
+    height: 28px;
+    text-align: center;
+    background: #040d1e;
+    color: #ffffff;
+    border: 1px solid #097684;
+    border-radius: 4px;
+    margin-right: 6px;
+}
+.btn-box button:last-child{
+    margin-right: 0;
+}
+
+.table-box{
+    margin-top: 25px;
+}
+.table-box tr th{
+    text-align: center;
+}
+.table-box tr td{
+    font-size: 12px;
+    color: #05B1C7;
+    /*border-top: 1px solid #ddd;*/
+    border-top: none !important;
+}
+.table-box tr th{
+    border-bottom: 1px solid #ddd;
+}
+.table-box tr td a{
+    display: block;
+    float: left;
+    margin-right: 5px;
+    margin-top: 2px;
+    cursor: pointer;
+}
+.table-box tr td a:last-child{
+    margin-right: 0;
+}
+.table-box tr td .dangan{
+    width: 12px;
+    height: 12px;
+    background: url("../images/statIndexZj/zj_icon_01.png") no-repeat center;
+    background-size: 100% 100%;
+}
+.table-box tr td .guiji{
+    width: 12px;
+    height: 12px;
+    background: url("../images/statIndexZj/zj_icon_02.png") no-repeat center;
+    background-size: 100% 100%;
+}
+.table-box tr td .dingwei{
+    width: 10px;
+    height: 12px;
+    background: url("../images/statIndexZj/zj_icon_03.png") no-repeat center;
+    background-size: 100% 100%;
+}

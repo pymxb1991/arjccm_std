@@ -1,0 +1,168 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.arjjs.ccm.modules.kpi.scheme.dao.KpiSchemeSubjectivityDao">
+    
+	<sql id="kpiSchemeSubjectivityColumns">
+		a.id AS "id",
+		a.user_id AS "userId.id",
+		a.scorer_id AS "scorerId.id",
+		a.kpi_id AS "kpiId",
+		a.weight AS "weight",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag",
+		u2.name AS "userId.name",
+		u2.no AS "userId.no",
+		u3.name AS "scorerId.name",
+		u3.no AS "scorerId.no"
+	</sql>
+	
+	<sql id="kpiSchemeSubjectivityJoins">
+		LEFT JOIN sys_user u2 ON u2.id = a.user_id
+		LEFT JOIN sys_user u3 ON u3.id = a.scorer_id
+	</sql>
+    
+	<select id="get" resultType="KpiSchemeSubjectivity">
+		SELECT 
+			<include refid="kpiSchemeSubjectivityColumns"/>
+		FROM kpi_scheme_subjectivity a
+		<include refid="kpiSchemeSubjectivityJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="KpiSchemeSubjectivity">
+		SELECT 
+			<include refid="kpiSchemeSubjectivityColumns"/>
+		FROM kpi_scheme_subjectivity a
+		<include refid="kpiSchemeSubjectivityJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="userId != null and userId.id != null and userId.id != ''">
+				AND a.user_id = #{userId.id}
+			</if>
+			<if test="scorerId != null and scorerId.id != null and scorerId.id != ''">
+				AND a.scorer_id = #{scorerId.id}
+			</if>
+			<if test="kpiId != null and kpiId != ''">
+				AND a.kpi_id = #{kpiId}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="KpiSchemeSubjectivity">
+		SELECT 
+			<include refid="kpiSchemeSubjectivityColumns"/>
+		FROM kpi_scheme_subjectivity a
+		<include refid="kpiSchemeSubjectivityJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	
+	
+	<select id="findListWithScore" resultType="KpiSchemeSubjectivity">
+		SELECT 
+			<include refid="kpiSchemeSubjectivityColumns"/>
+			,u4.remarks AS "scoreRemarks"
+		FROM kpi_scheme_subjectivity a
+		<include refid="kpiSchemeSubjectivityJoins"/>
+		LEFT JOIN kpi_scheme_score u4 ON u4.user_id = a.user_id AND u4.scorer_id = a.scorer_id AND u4.kpi_id = a.kpi_id AND u4.del_flag = #{DEL_FLAG_NORMAL}
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			AND u2.id != ''
+			<if test="userId != null and userId.id != null and userId.id != ''">
+				AND a.user_id = #{userId.id}
+			</if>
+			<if test="scorerId != null and scorerId.id != null and scorerId.id != ''">
+				AND a.scorer_id = #{scorerId.id}
+			</if>
+			<if test="kpiId != null and kpiId != ''">
+				AND a.kpi_id = #{kpiId}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	
+	<insert id="insert">
+		INSERT INTO kpi_scheme_subjectivity(
+			id,
+			user_id,
+			scorer_id,
+			kpi_id,
+			weight,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag
+		) VALUES (
+			#{id},
+			#{userId.id},
+			#{scorerId.id},
+			#{kpiId},
+			#{weight},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE kpi_scheme_subjectivity SET 	
+			user_id = #{userId.id},
+			scorer_id = #{scorerId.id},
+			kpi_id = #{kpiId},
+			weight = #{weight},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE kpi_scheme_subjectivity SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	<!-- 真删除 -->
+	<delete id="deleteTrue">
+		DELETE 
+		FROM kpi_scheme_subjectivity 
+		WHERE id = #{id}
+			AND del_flag = #{DEL_FLAG_NORMAL}
+	</delete>
+	
+	
+</mapper>

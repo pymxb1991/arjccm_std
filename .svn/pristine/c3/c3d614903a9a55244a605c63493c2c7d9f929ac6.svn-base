@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.arjjs.ccm.modules.iot.message.dao.CcmMessageManageDao">
+    
+	<sql id="ccmMessageManageColumns">
+		a.id AS "id",
+		a.equipment_id AS "equipmentId",
+		a.equipment_num AS "equipmentNum",
+		a.message AS "message",
+		a.send_state AS "sendState",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag"
+	</sql>
+	
+	<sql id="ccmMessageManageJoins">
+	</sql>
+    
+	<select id="get" resultType="CcmMessageManage">
+		SELECT 
+			<include refid="ccmMessageManageColumns"/>
+		FROM ccm_message_manage a
+		<include refid="ccmMessageManageJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="CcmMessageManage">
+		SELECT 
+			<include refid="ccmMessageManageColumns"/>
+		FROM ccm_message_manage a
+		<include refid="ccmMessageManageJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="message != null and message != ''">
+				AND a.message LIKE
+				<if test="dbName == 'oracle'">'%'||#{message}||'%'</if>
+				<if test="dbName == 'mssql'">'%'+#{message}+'%'</if>
+				<if test="dbName == 'mysql'">concat('%',#{message},'%')</if>
+			</if>
+			<if test="beginCreateDate != null and endCreateDate != null and beginCreateDate != '' and endCreateDate != ''">
+				AND a.create_date BETWEEN #{beginCreateDate} AND #{endCreateDate}
+			</if>
+			<if test="equipmentId != null and equipmentId != ''">
+				AND a.equipment_id = #{equipmentId}
+			</if>
+			<if test="equipmentNum != null and equipmentNum != ''">
+				AND a.equipment_num = #{equipmentNum}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="CcmMessageManage">
+		SELECT 
+			<include refid="ccmMessageManageColumns"/>
+		FROM ccm_message_manage a
+		<include refid="ccmMessageManageJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO ccm_message_manage(
+			id,
+			equipment_id,
+			equipment_num,
+			message,
+			send_state,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag
+		) VALUES (
+			#{id},
+			#{equipmentId},
+			#{equipmentNum},
+			#{message},
+			#{sendState},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE ccm_message_manage SET 	
+			equipment_id = #{equipmentId},
+			equipment_num = #{equipmentNum},
+			message = #{message},
+			send_state = #{sendState}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE ccm_message_manage SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="send">
+		UPDATE ccm_message_manage SET 
+			send_state = #{sendState}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

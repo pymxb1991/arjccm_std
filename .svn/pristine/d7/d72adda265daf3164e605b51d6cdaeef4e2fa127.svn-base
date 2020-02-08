@@ -1,0 +1,278 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.arjjs.ccm.modules.risk.report.dao.RiskIncidentDao">
+    
+	<sql id="riskIncidentColumns">
+		a.id AS "id",
+		a.event_id AS "riskEventGreat.id",
+		a.source AS "source",
+		a.name AS "name",
+		a.type AS "type",
+		a.description AS "description",
+		a.countermeasure AS "countermeasure",
+		a.implement AS "implement",
+		a.importance AS "importance",
+		a.urgency AS "urgency",
+		a.put_man AS "putMan",
+		a.put_time AS "putTime",
+		a.dispose_type AS "disposeType",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag",
+		g.name AS "riskEventGreat.name"
+	</sql>
+	
+	<sql id="riskIncidentJoins">
+		LEFT JOIN risk_event_great g ON g.id = a.event_id
+	</sql>
+    
+	<select id="get" resultType="RiskIncident">
+		SELECT 
+			<include refid="riskIncidentColumns"/>
+		FROM risk_incident a
+		<include refid="riskIncidentJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	<!-- 查询风险事件重要程度统计 -->
+	<select id="findImportance" resultType="com.arjjs.ccm.tool.EchartType">
+		SELECT
+			a.importance AS "typeO",
+			b.label AS "type",
+			COUNT(*) AS "value"
+		FROM
+			risk_incident a
+		LEFT JOIN sys_dict b ON b.type = "ccm_conc_exte" AND a.importance = b.value
+		WHERE
+			a.del_flag='0'
+			AND a.importance is not null
+			AND a.importance !=""
+			AND b.label is not null
+			AND b.label !=""
+			<if test="beginPutTime != null and endPutTime != null and beginPutTime != '' and endPutTime != ''">
+				AND a.put_time BETWEEN #{beginPutTime} AND #{endPutTime}
+			</if>
+		GROUP BY typeO
+	</select>
+	<!-- 查询风险事件紧急程度统计 -->
+	<select id="findUrgency" resultType="com.arjjs.ccm.tool.EchartType">
+		SELECT
+			a.urgency AS "typeO",
+			b.label AS "type",
+			COUNT(*) AS "value"
+		FROM
+			risk_incident a
+		LEFT JOIN sys_dict b ON b.type = "ccm_conc_exte" AND a.urgency = b.value
+		WHERE
+			a.del_flag='0'
+			AND a.urgency is not null
+			AND a.urgency !=""
+			AND b.label is not null
+			AND b.label !=""
+			<if test="beginPutTime != null and endPutTime != null and beginPutTime != '' and endPutTime != ''">
+				AND a.put_time BETWEEN #{beginPutTime} AND #{endPutTime}
+			</if>
+		GROUP BY typeO
+	</select>
+	<!-- 查询风险事件处理状态统计 -->
+	<select id="findDisposeType" resultType="com.arjjs.ccm.tool.EchartType">
+		SELECT
+			a.dispose_type AS "typeO",
+			b.label AS "type",
+			COUNT(*) AS "value"
+		FROM
+			risk_incident a
+		LEFT JOIN sys_dict b ON b.type = "ccm_event_status" AND a.dispose_type = b.value
+		WHERE
+			a.del_flag='0'
+			AND a.dispose_type is not null
+			AND a.dispose_type !=""
+			AND b.label is not null
+			AND b.label !=""
+			<if test="beginPutTime != null and endPutTime != null and beginPutTime != '' and endPutTime != ''">
+				AND a.put_time BETWEEN #{beginPutTime} AND #{endPutTime}
+			</if>
+		GROUP BY typeO
+	</select>
+	<!-- 查询list重大事项近几个月风险事件趋势图 -->
+	<select id="findTrend" resultType="com.arjjs.ccm.tool.EchartType">
+		SELECT
+			concat(
+				YEAR (put_time),
+				"-",
+				MONTH (put_time)
+			) AS "type",
+			COUNT(a.id) AS "value"
+		FROM
+			risk_incident a
+		WHERE
+			a.del_flag = '0'
+		AND (
+			a.put_time &gt; date_format(
+				DATE_SUB(curdate(), INTERVAL 11 MONTH),
+				'%Y-%m'
+			)
+			AND a.put_time &lt; date_format(
+				DATE_SUB(curdate(), INTERVAL - 1 MONTH),
+				'%Y-%m'
+			)
+		)
+		GROUP BY
+			concat(
+				YEAR (put_time),
+				MONTH (put_time)
+			)
+		ORDER BY
+			concat(
+				YEAR (put_time),
+		
+			IF (
+				MONTH (put_time) &gt; 9,
+				MONTH (put_time),
+				concat("0", MONTH(put_time))
+			)
+			) ASC
+		LIMIT 12
+	</select>
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	<!--  -->
+	<select id="findList" resultType="RiskIncident">
+		SELECT 
+			<include refid="riskIncidentColumns"/>
+		FROM risk_incident a
+		<include refid="riskIncidentJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="name != null and name != ''">
+				AND a.name LIKE 
+					<if test="dbName == 'oracle'">'%'||#{name}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{name}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{name},'%')</if>
+			</if>
+			<if test="type != null and type != ''">
+				AND a.type = #{type}
+			</if>
+			<if test="importance != null and importance != ''">
+				AND a.importance = #{importance}
+			</if>
+			<if test="urgency != null and urgency != ''">
+				AND a.urgency = #{urgency}
+			</if>
+			<if test="beginPutTime != null and endPutTime != null and beginPutTime != '' and endPutTime != ''">
+				AND a.put_time BETWEEN #{beginPutTime} AND #{endPutTime}
+			</if>
+			<if test="disposeType != null and disposeType != ''">
+				AND a.dispose_type = #{disposeType}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="RiskIncident">
+		SELECT 
+			<include refid="riskIncidentColumns"/>
+		FROM risk_incident a
+		<include refid="riskIncidentJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO risk_incident(
+			id,
+			event_id,
+			source,
+			name,
+			type,
+			description,
+			countermeasure,
+			implement,
+			importance,
+			urgency,
+			put_man,
+			put_time,
+			dispose_type,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag
+		) VALUES (
+			#{id},
+			#{riskEventGreat.id},
+			#{source},
+			#{name},
+			#{type},
+			#{description},
+			#{countermeasure},
+			#{implement},
+			#{importance},
+			#{urgency},
+			#{putMan},
+			#{putTime},
+			#{disposeType},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE risk_incident SET 	
+			event_id = #{riskEventGreat.id},
+			source = #{source},
+			name = #{name},
+			type = #{type},
+			description = #{description},
+			countermeasure = #{countermeasure},
+			implement = #{implement},
+			importance = #{importance},
+			urgency = #{urgency},
+			put_man = #{putMan},
+			put_time = #{putTime},
+			dispose_type = #{disposeType},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE risk_incident SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

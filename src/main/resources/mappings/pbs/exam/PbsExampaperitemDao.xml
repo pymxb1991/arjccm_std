@@ -1,0 +1,194 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.arjjs.ccm.modules.pbs.exam.dao.PbsExampaperitemDao">
+
+	<sql id="pbsExampaperitemColumns">
+		a.id AS "id",
+		a.s_exampaper AS "sExampaper.id",
+		exampaper.s_name AS "sExampaper.sName",
+		exampaper.s_way AS "sExampaper.sWay",
+		a.s_item AS "sItem.id",
+		objective.s_body AS "sItem.sBody",
+		objective.s_answer AS "sItem.sAnswer",
+		objective.s_type AS "sItem.sType",
+		a.s_belongtype AS "sBelongtype",
+		a.i_sort AS
+		"iSort",
+		<!-- a.s_spare01 AS "sSpare01",
+		a.s_spare02 AS
+		"sSpare02",
+		a.s_spare03 AS "sSpare03",
+		a.s_spare04 AS "sSpare04", -->
+		a.create_by AS
+		"createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS
+		"updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks
+		AS "remarks",
+		a.del_flag AS "delFlag"
+	</sql>
+
+	<sql id="pbsExampaperitemJoins">
+		LEFT JOIN pbs_exampaper exampaper ON a.s_exampaper =
+		exampaper.id
+		LEFT JOIN pbs_question_objective objective ON a.s_item =
+		objective.id
+	</sql>
+
+	<select id="get" resultType="PbsExampaperitem">
+		SELECT
+		<include refid="pbsExampaperitemColumns" />
+		FROM pbs_exampaperitem a
+		<include refid="pbsExampaperitemJoins" />
+		WHERE a.id = #{id}
+	</select>
+
+	<select id="findList" resultType="PbsExampaperitem">
+		SELECT
+		<include refid="pbsExampaperitemColumns" />
+		FROM pbs_exampaperitem a
+		<include refid="pbsExampaperitemJoins" />
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if
+				test="sExampaper != null and sExampaper != '' and sExampaper.id != null and sExampaper.id != ''">
+				AND a.s_exampaper = #{sExampaper.id}
+			</if>
+			<if
+				test="sExampaper != null and sExampaper != '' and sExampaper.sName != null and sExampaper.sName != ''">
+				AND exampaper.s_name LIKE
+				<if test="dbName == 'oracle'">'%'||#{sExampaper.sName}||'%'</if>
+				<if test="dbName == 'mssql'">'%'+#{sExampaper.sName}+'%'</if>
+				<if test="dbName == 'mysql'">concat('%',#{sExampaper.sName},'%')</if>
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.s_exampaper,a.i_sort ASC
+			</otherwise>
+		</choose>
+	</select>
+
+	<select id="findAllList" resultType="PbsExampaperitem">
+		SELECT
+		<include refid="pbsExampaperitemColumns" />
+		FROM pbs_exampaperitem a
+		<include refid="pbsExampaperitemJoins" />
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+
+	<insert id="insert">
+		INSERT INTO pbs_exampaperitem(
+		id,
+		s_exampaper,
+		s_item,
+		s_belongtype,
+		i_sort,
+		s_spare01,
+		s_spare02,
+		s_spare03,
+		s_spare04,
+		create_by,
+		create_date,
+		update_by,
+		update_date,
+		remarks,
+		del_flag
+		) VALUES (
+		#{id},
+		#{sExampaper.id},
+		#{sItem.id},
+		#{sBelongtype},
+		#{iSort},
+		#{sSpare01},
+		#{sSpare02},
+		#{sSpare03},
+		#{sSpare04},
+		#{createBy.id},
+		#{createDate},
+		#{updateBy.id},
+		#{updateDate},
+		#{remarks},
+		#{delFlag}
+		)
+	</insert>
+
+	<update id="update">
+		UPDATE pbs_exampaperitem SET
+		s_exampaper =
+		#{sExampaper.id},
+		s_item = #{sItem.id},
+		s_belongtype = #{sBelongtype},
+		i_sort = #{iSort},
+		update_by = #{updateBy.id},
+		update_date =
+		#{updateDate},
+		remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+
+	<update id="delete">
+		UPDATE pbs_exampaperitem SET
+		del_flag =
+		#{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+
+	<insert id="insertAll" parameterType="List">
+		INSERT INTO pbs_exampaperitem(
+		id,
+		s_exampaper,
+		s_item,
+		s_belongtype,
+		i_sort,
+		s_spare01,
+		s_spare02,
+		s_spare03,
+		s_spare04,
+		create_by,
+		create_date,
+		update_by,
+		update_date,
+		remarks,
+		del_flag
+		)
+		<if test="list.get(0).dbName == 'mssql' or list.get(0).dbName == 'mysql'">
+			VALUES
+			<foreach collection="list" item="e" open="" separator=","
+				close="">
+				(
+				#{e.id},
+				#{e.sExampaper.id},
+				#{e.sItem.id},
+				#{e.sBelongtype},
+				#{e.iSort},
+				#{e.sSpare01},
+				#{e.sSpare02},
+				#{e.sSpare03},
+				#{e.sSpare04},
+				#{e.createBy.id},
+				#{e.createDate},
+				#{e.updateBy.id},
+				#{e.updateDate},
+				#{e.remarks},
+				#{e.delFlag}
+				)
+			</foreach>
+		</if>
+	</insert>
+</mapper>

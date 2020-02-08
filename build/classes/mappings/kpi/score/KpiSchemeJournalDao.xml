@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.arjjs.ccm.modules.kpi.score.dao.KpiSchemeJournalDao">
+    
+	<sql id="kpiSchemeJournalColumns">
+		a.id AS "id",
+		a.user_id AS "user.id",
+		a.score AS "score",
+		a.reson AS "reson",
+		a.notify_date AS "notifyDate",
+		a.notify_type AS "notifyType",
+		a.notify_staff_name AS "notifyStaffName",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag",
+		u2.name AS "user.name"
+	</sql>
+	
+	<sql id="kpiSchemeJournalJoins">
+		LEFT JOIN sys_user u2 ON u2.id = a.user_id
+	</sql>
+    
+	<select id="get" resultType="KpiSchemeJournal">
+		SELECT 
+			<include refid="kpiSchemeJournalColumns"/>
+		FROM kpi_scheme_journal a
+		<include refid="kpiSchemeJournalJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="KpiSchemeJournal">
+		SELECT 
+			<include refid="kpiSchemeJournalColumns"/>
+		FROM kpi_scheme_journal a
+		<include refid="kpiSchemeJournalJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="user != null and user.id != null and user.id != ''">
+				AND a.user_id = #{user.id}
+			</if>
+			<if test="beginNotifyDate != null and endNotifyDate != null and beginNotifyDate != '' and endNotifyDate != ''">
+				AND a.notify_date BETWEEN #{beginNotifyDate} AND #{endNotifyDate}
+			</if>
+			<if test="notifyType != null and notifyType != ''">
+				AND a.notify_type LIKE 
+					<if test="dbName == 'oracle'">'%'||#{notifyType}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{notifyType}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{notifyType},'%')</if>
+			</if>
+			<if test="notifyStaffName != null and notifyStaffName != ''">
+				AND a.notify_staff_name LIKE 
+					<if test="dbName == 'oracle'">'%'||#{notifyStaffName}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{notifyStaffName}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{notifyStaffName},'%')</if>
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="KpiSchemeJournal">
+		SELECT 
+			<include refid="kpiSchemeJournalColumns"/>
+		FROM kpi_scheme_journal a
+		<include refid="kpiSchemeJournalJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO kpi_scheme_journal(
+			id,
+			user_id,
+			score,
+			reson,
+			notify_date,
+			notify_type,
+			notify_staff_name,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag
+		) VALUES (
+			#{id},
+			#{user.id},
+			#{score},
+			#{reson},
+			#{notifyDate},
+			#{notifyType},
+			#{notifyStaffName},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE kpi_scheme_journal SET 	
+			user_id = #{user.id},
+			score = #{score},
+			reson = #{reson},
+			notify_date = #{notifyDate},
+			notify_type = #{notifyType},
+			notify_staff_name = #{notifyStaffName},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE kpi_scheme_journal SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

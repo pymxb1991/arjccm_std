@@ -1,0 +1,12 @@
+package com.arjjs.ccm.modules.flat.userBindingDevice.dao;
+
+import java.util.List;
+
+import com.arjjs.ccm.common.persistence.CrudDao;
+import com.arjjs.ccm.common.persistence.annotation.MyBatisDao;
+import com.arjjs.ccm.modules.flat.userBindingDevice.entity.UserBindingDevice;
+
+@MyBatisDao
+public interface UserBindingDeviceDao extends CrudDao<UserBindingDevice>{
+	List<UserBindingDevice> finduserBindingDeviceList(UserBindingDevice userBindingDevice);
+}

@@ -1,0 +1,38 @@
+.input-xxlarge {
+    width: 900px;
+}
+#title {
+    width: 945px;
+}
+#cke_content {
+    width: 65%;
+}
+.form-horizontal .control-label{
+	padding-top: 0px;
+}
+.form-horizontal .control-group {
+    margin-bottom: 0px;
+    padding: 8px;
+}
+.email-title{
+	padding-bottom: 5px;
+	padding-top:0px;
+}
+.gray{
+	background: #eff5fb;
+}
+.blue{
+	background: #c1d9f3;
+}
+ol{
+	margin: 0 0 -5px 14px;
+}
+.form-horizontal {
+    margin: -15px 0px;
+}
+input[readonly] {
+    background-color: rgb(255, 255, 255);
+}
+.email-receive {
+    display: table-cell;
+}

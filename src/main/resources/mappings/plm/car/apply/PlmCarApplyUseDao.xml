@@ -1,0 +1,195 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.arjjs.ccm.modules.plm.car.dao.apply.PlmCarApplyUseDao">
+    
+	<sql id="plmCarApplyUseColumns">
+		a.id AS "id",
+		a.proc_ins_id AS "procInsId",
+		a.title AS "title",
+		a.user_id AS "user.id",
+		a.car_desc AS "carDesc",
+		a.car_id AS "car.id",
+		a.driver_id AS "driver.id",
+		a.out_date AS "outDate",
+		a.in_date AS "inDate",
+		a.num AS "num",
+		a.is_end AS "isEnd",
+		a.create_by AS "createBy.id",
+		a.remarks AS "remarks",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.del_flag AS "delFlag",
+		u3.name AS "user.name",
+		u3.phone AS "user.phone",
+		o.name AS "user.office.name",
+		c.vehicle AS "car.vehicle"		
+	</sql>
+	
+	<sql id="plmCarApplyUseJoins">
+		LEFT JOIN sys_user u3 ON u3.id = a.user_id
+		LEFT JOIN sys_office o ON o.id = u3.office_id
+		LEFT JOIN plm_car c ON c.id = a.car_id
+	</sql>
+    
+	<select id="get" resultType="PlmCarApplyUse">
+		SELECT 
+			<include refid="plmCarApplyUseColumns"/>
+		FROM plm_car_apply_use a
+		<include refid="plmCarApplyUseJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	<select id="getByProcInsId" resultType="PlmCarApplyUse">
+		SELECT 
+			<include refid="plmCarApplyUseColumns"/>
+		FROM plm_car_apply_use a
+		<include refid="plmCarApplyUseJoins"/>
+		WHERE a.proc_ins_id = #{procInsId}
+	</select>
+	
+	<update id="updateProcInsId">
+		UPDATE plm_car_apply_use SET 
+			proc_ins_id = #{procInsId},
+			update_by = #{updateBy.id}, 
+			update_date = #{updateDate}
+		WHERE id = #{id}
+	</update>
+
+	<update id="updateIsEnd">
+		UPDATE plm_car_apply_use SET 
+			is_end = #{isEnd},
+			update_by = #{updateBy.id}, 
+			update_date = #{updateDate}
+		WHERE id = #{id}
+	</update>
+	
+	<select id="findList" resultType="PlmCarApplyUse">
+		SELECT 
+			act.status AS "plmAct.status",
+			<include refid="plmCarApplyUseColumns"/>
+		FROM plm_car_apply_use a
+		LEFT JOIN plm_act act ON a.id = act.table_id
+		<include refid="plmCarApplyUseJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="user != null and user.id != null and user.id != ''">
+				AND a.user_id = #{user.id}
+			</if>
+			<if test="beginCreateDate != null and endCreateDate != null and beginCreateDate != '' and endCreateDate != ''">
+				AND a.create_date BETWEEN #{beginCreateDate} AND #{endCreateDate}
+			</if>
+			<if test="isEnd != null and isEnd != ''">
+				AND a.is_end = #{isEnd}
+			</if>				
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+
+	<select id="findSelect2Type" resultType="com.arjjs.ccm.tool.Select2Type">
+		SELECT 
+			a.id AS "id",
+			CONCAT(a.title,'(',u3.name,')') 	 AS "text"
+		FROM plm_car_apply_use a
+		LEFT JOIN plm_act c ON c.table_id = a.id
+		LEFT JOIN sys_user u3 ON u3.id = a.user_id
+		<where>
+			a.del_flag = '0'
+			AND c.status = '04'
+		</where>		
+		<choose>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+
+	<select id="findAllList" resultType="PlmCarApplyUse">
+		SELECT 
+			<include refid="plmCarApplyUseColumns"/>
+		FROM plm_car_apply_use a
+		<include refid="plmCarApplyUseJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO plm_car_apply_use(
+			id,
+			proc_ins_id,
+			title,
+			user_id,
+			car_desc,
+			car_id,
+			driver_id,
+			out_date,
+			in_date,
+			num,
+			is_end,
+			create_by,
+			remarks,
+			create_date,
+			update_by,
+			update_date,
+			del_flag
+		) VALUES (
+			#{id},
+			#{procInsId},
+			#{title},
+			#{user.id},
+			#{carDesc},
+			#{car.id},
+			#{driver.id},
+			#{outDate},
+			#{inDate},
+			#{num},
+			#{isEnd},
+			#{createBy.id},
+			#{remarks},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE plm_car_apply_use SET 	
+			proc_ins_id = #{procInsId},
+			title = #{title},
+			user_id = #{user.id},
+			car_desc = #{carDesc},
+			car_id = #{car.id},
+			driver_id = #{driver.id},
+			out_date = #{outDate},
+			in_date = #{inDate},
+			num = #{num},
+			is_end = #{isEnd},
+			remarks = #{remarks},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE plm_car_apply_use SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

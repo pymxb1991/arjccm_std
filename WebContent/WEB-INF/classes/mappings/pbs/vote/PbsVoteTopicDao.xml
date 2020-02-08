@@ -1,0 +1,183 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.arjjs.ccm.modules.pbs.vote.dao.PbsVoteTopicDao">
+
+	<sql id="pbsVoteTopicColumns">
+		a.id AS "id",
+		a.s_name AS "sName",
+		a.s_body AS "sBody",
+		a.s_close AS "sClose",
+		a.dt_start AS "dtStart",
+		a.dt_end AS "dtEnd",
+		a.s_sum AS "sSum",
+		a.s_belongfunc AS "sBelongfunc",
+		a.s_isautoclose AS
+		"sIsautoclose",
+		a.s_stat AS "sStat",
+		a.s_spare01 AS "sSpare01",
+		a.s_spare02 AS "sSpare02",
+		a.s_spare03 AS "sSpare03",
+		a.s_spare04 AS
+		"sSpare04",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks
+		AS "remarks",
+		a.del_flag AS "delFlag"
+	</sql>
+
+	<sql id="pbsVoteTopicJoins">
+	</sql>
+
+	<select id="get" resultType="PbsVoteTopic">
+		SELECT
+		<include refid="pbsVoteTopicColumns" />
+		FROM pbs_vote_topic a
+		<include refid="pbsVoteTopicJoins" />
+		WHERE a.id = #{id}
+	</select>
+
+	<select id="findList" resultType="PbsVoteTopic">
+		SELECT
+		<include refid="pbsVoteTopicColumns" />
+		FROM pbs_vote_topic a
+		<include refid="pbsVoteTopicJoins" />
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="sName != null and sName != ''">
+				AND a.s_name LIKE
+				<if test="dbName == 'oracle'">'%'||#{sName}||'%'</if>
+				<if test="dbName == 'mssql'">'%'+#{sName}+'%'</if>
+				<if test="dbName == 'mysql'">concat('%',#{sName},'%')</if>
+			</if>
+			<if test="sBody != null and sBody != ''">
+				AND a.s_body LIKE
+				<if test="dbName == 'oracle'">'%'||#{sBody}||'%'</if>
+				<if test="dbName == 'mssql'">'%'+#{sBody}+'%'</if>
+				<if test="dbName == 'mysql'">concat('%',#{sBody},'%')</if>
+			</if>
+			<if test="sClose != null and sClose != ''">
+				AND a.s_close = #{sClose}
+			</if>
+			<!-- <if test="sIsautoclose != null and sIsautoclose != ''"> AND a.s_isautoclose 
+				= #{sIsautoclose} </if> -->
+			<if test="sBelongfunc != null and sBelongfunc != ''">
+				AND a.s_belongfunc = #{sBelongfunc}
+			</if>
+			<if test="sStat != null and sStat != ''">
+				AND a.s_stat = #{sStat}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+
+	<select id="findAllList" resultType="PbsVoteTopic">
+		SELECT
+		<include refid="pbsVoteTopicColumns" />
+		FROM pbs_vote_topic a
+		<include refid="pbsVoteTopicJoins" />
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="sBelongfunc != null and sBelongfunc != ''">
+				AND a.s_belongfunc = #{sBelongfunc}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+
+	<insert id="insert">
+		INSERT INTO pbs_vote_topic(
+		id,
+		s_name,
+		s_body,
+		s_close,
+		dt_start,
+		dt_end,
+		s_isautoclose,
+		s_sum,
+		s_belongfunc,
+		s_stat,
+		s_spare01,
+		s_spare02,
+		s_spare03,
+		s_spare04,
+		create_by,
+		create_date,
+		update_by,
+		update_date,
+		remarks,
+		del_flag
+		) VALUES (
+		#{id},
+		#{sName},
+		#{sBody},
+		#{sClose},
+		#{dtStart},
+		#{dtEnd},
+		#{sIsautoclose},
+		#{sSum},
+		#{sBelongfunc},
+		#{sStat},
+		#{sSpare01},
+		#{sSpare02},
+		#{sSpare03},
+		#{sSpare04},
+		#{createBy.id},
+		#{createDate},
+		#{updateBy.id},
+		#{updateDate},
+		#{remarks},
+		#{delFlag}
+		)
+	</insert>
+
+	<update id="update">
+		UPDATE pbs_vote_topic SET
+		s_name = #{sName},
+		s_body = #{sBody},
+		s_close = #{sClose},
+		dt_start = #{dtStart},
+		dt_end = #{dtEnd},
+		s_isautoclose = #{sIsautoclose},
+		s_sum = #{sSum},
+		s_belongfunc = #{sBelongfunc},
+		s_stat = #{sStat},
+		s_spare01 = #{sSpare01},
+		s_spare02 = #{sSpare02},
+		s_spare03 = #{sSpare03},
+		s_spare04 = #{sSpare04},
+		update_by = #{updateBy.id},
+		update_date = #{updateDate},
+		remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+
+	<update id="updateStat">
+		UPDATE pbs_vote_topic SET
+		s_stat = #{sStat}
+		WHERE id = #{id}
+	</update>
+
+	<update id="delete">
+		UPDATE pbs_vote_topic SET
+		del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+
+</mapper>

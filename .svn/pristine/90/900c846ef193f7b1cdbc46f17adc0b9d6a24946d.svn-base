@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.arjjs.ccm.modules.pbs.flow.dao.PbsFlowentercondDao">
+
+	<sql id="pbsFlowentercondColumns">
+		a.id AS "id",
+		a.s_flowid AS "sFlowid.id",
+		a.s_flownodeid AS "sFlownodeid.id",
+		a.s_condtype AS "sCondtype",
+		a.s_order AS "sOrder",
+		a.s_collection AS "sCollection",
+		a.s_property AS "sProperty",
+		a.s_condsign AS "sCondsign",
+		a.s_condval AS "sCondval",
+		a.s_connection AS "sConnection",
+		a.s_opearatecontent AS "sOpearatecontent",
+		a.s_description AS "sDescription",
+		a.s_spare01 AS "sSpare01",
+		a.s_spare02 AS "sSpare02",
+		a.s_spare03 AS "sSpare03",
+		a.s_spare04 AS "sSpare04",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag",
+		flowdefinition.s_name AS "sFlowid.sName",
+		flownode.s_name AS "sFlownodeid.sName"
+	</sql>
+
+	<sql id="pbsFlowentercondJoins">
+		LEFT JOIN pbs_flowdefinition flowdefinition on
+		flowdefinition.id = a.s_flowid
+		LEFT JOIN pbs_flownode flownode on
+		 flownode.id = a.s_flownodeid
+	</sql>
+
+	<select id="get" resultType="PbsFlowentercond">
+		SELECT
+		<include refid="pbsFlowentercondColumns" />
+		FROM pbs_flowentercond a
+		<include refid="pbsFlowentercondJoins" />
+		WHERE a.id = #{id}
+	</select>
+
+	<select id="findList" resultType="PbsFlowentercond">
+		SELECT
+		<include refid="pbsFlowentercondColumns" />
+		FROM pbs_flowentercond a
+		<include refid="pbsFlowentercondJoins" />
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+
+	<select id="findAllList" resultType="PbsFlowentercond">
+		SELECT
+		<include refid="pbsFlowentercondColumns" />
+		FROM pbs_flowentercond a
+		<include refid="pbsFlowentercondJoins" />
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+
+	<insert id="insert">
+		INSERT INTO pbs_flowentercond(
+		id,
+		s_flowid,
+		s_flownodeid,
+		s_condtype,
+		s_order,
+		s_collection,
+		s_property,
+		s_condsign,
+		s_condval,
+		s_connection,
+		s_opearatecontent,
+		s_description,
+		s_spare01,
+		s_spare02,
+		s_spare03,
+		s_spare04,
+		create_by,
+		create_date,
+		update_by,
+		update_date,
+		remarks,
+		del_flag
+		) VALUES (
+		#{id},
+		#{sFlowid.id},
+		#{sFlownodeid.id},
+		#{sCondtype},
+		#{sOrder},
+		#{sCollection},
+		#{sProperty},
+		#{sCondsign},
+		#{sCondval},
+		#{sConnection},
+		#{sOpearatecontent},
+		#{sDescription},
+		#{sSpare01},
+		#{sSpare02},
+		#{sSpare03},
+		#{sSpare04},
+		#{createBy.id},
+		#{createDate},
+		#{updateBy.id},
+		#{updateDate},
+		#{remarks},
+		#{delFlag}
+		)
+	</insert>
+
+	<update id="update">
+		UPDATE pbs_flowentercond SET
+		s_flowid = #{sFlowid.id},
+		s_flownodeid = #{sFlownodeid.id},
+		s_condtype = #{sCondtype},
+		s_order =
+		#{sOrder},
+		s_collection = #{sCollection},
+		s_property = #{sProperty},
+		s_condsign = #{sCondsign},
+		s_condval = #{sCondval},
+		s_connection =
+		#{sConnection},
+		s_opearatecontent = #{sOpearatecontent},
+		s_description =
+		#{sDescription},
+		update_by = #{updateBy.id},
+		update_date = #{updateDate}
+		WHERE id = #{id}
+	</update>
+
+	<update id="delete">
+		UPDATE pbs_flowentercond SET
+		del_flag =
+		#{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+
+</mapper>

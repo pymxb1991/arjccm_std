@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.arjjs.ccm.modules.ccm.work.dao.CcmWorkBeondutyDao">
+    
+	<sql id="ccmWorkBeondutyColumns">
+		a.id AS "id",
+		a.months AS "months",
+		a.datas AS "datas",
+		a.principal AS "principal.id",
+		a.principal_mans AS "principalMans",
+		a.adds AS "adds",
+		a.details AS "details",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag",
+		a.office AS "office",
+		u4.name AS "principal.name",
+		c.name AS "office.name"
+	</sql>
+	
+	<sql id="ccmWorkBeondutyJoins">
+		LEFT JOIN sys_user u4 ON u4.id = a.principal
+	</sql>
+    
+    <sql id="ccmWorkBeondutyJoins_Office">
+		LEFT JOIN sys_office c ON a.office = c.id
+	</sql>
+    
+	<select id="get" resultType="CcmWorkBeonduty">
+		SELECT 
+			<include refid="ccmWorkBeondutyColumns"/>
+		FROM ccm_work_beonduty a
+		<include refid="ccmWorkBeondutyJoins"/>
+		<include refid="ccmWorkBeondutyJoins_Office"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="CcmWorkBeonduty">
+		SELECT 
+			<include refid="ccmWorkBeondutyColumns"/>
+		FROM ccm_work_beonduty a
+		<include refid="ccmWorkBeondutyJoins"/>
+		<include refid="ccmWorkBeondutyJoins_Office"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="beginMonths != null and endMonths != null and beginMonths != '' and endMonths != ''">
+				AND a.months BETWEEN #{beginMonths} AND #{endMonths}
+			</if>
+			<if test="months != null and months != ''">
+				AND a.months = #{months}
+			</if>
+			<if test="office != null and office.id != null and office.id != ''">
+				AND a.office = #{office.id}
+			</if>
+			<if test="datas != null and datas != ''">
+				AND a.datas LIKE 
+					<if test="dbName == 'oracle'">'%'||#{datas}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{datas}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{datas},'%')</if>
+			</if>
+			<if test="principal != null and principal.id != null and principal.id != ''">
+				AND a.principal = #{principal.id}
+			</if>
+			<if test="principalMans != null and principalMans != ''">
+				AND a.principal_mans LIKE 
+					<if test="dbName == 'oracle'">'%'||#{principalMans}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{principalMans}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{principalMans},'%')</if>
+			</if>
+			<if test="adds != null and adds != ''">
+				AND a.adds LIKE 
+					<if test="dbName == 'oracle'">'%'||#{adds}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{adds}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{adds},'%')</if>
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.months DESC,  a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="CcmWorkBeonduty">
+		SELECT 
+			<include refid="ccmWorkBeondutyColumns"/>
+		FROM ccm_work_beonduty a
+		<include refid="ccmWorkBeondutyJoins"/>
+		<include refid="ccmWorkBeondutyJoins_Office"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO ccm_work_beonduty(
+			id,
+			months,
+			datas,
+			principal,
+			principal_mans,
+			adds,
+			details,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag,
+			office
+		) VALUES (
+			#{id},
+			#{months},
+			#{datas},
+			#{principal.id},
+			#{principalMans},
+			#{adds},
+			#{details},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag},
+			#{office.id}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE ccm_work_beonduty SET 	
+			months = #{months},
+			datas = #{datas},
+			principal = #{principal.id},
+			principal_mans = #{principalMans},
+			adds = #{adds},
+			details = #{details},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks},
+			office = #{office}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE ccm_work_beonduty SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

@@ -1,0 +1,188 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.arjjs.ccm.modules.ccm.broadcast.dao.CcmDeviceBroadcastDao">
+    
+	<sql id="ccmDeviceBroadcastColumns">
+		a.id AS "id",
+		a.code AS "code",
+		a.name AS "name",
+		a.ip AS "ip",
+		a.com_port AS "comPort",
+		a.param AS "param",
+		a.account AS "account",
+		a.password AS "password",
+		a.parent_id AS "parent.id",
+		a.type_id AS "typeId",
+		a.area_id AS "area.id",
+		a.address AS "address",
+		a.status AS "status",
+		a.company_id AS "companyId",
+		a.version AS "version",
+		a.image_path AS "imagePath",
+		a.description AS "description",
+		a.coordinate AS "coordinate",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag",
+		a11.name AS "area.name"
+	</sql>
+	
+	<sql id="ccmDeviceBroadcastJoins">
+		LEFT JOIN sys_area a11 ON a11.id = a.area_id
+	</sql>
+    
+	<select id="get" resultType="CcmDeviceBroadcast">
+		SELECT 
+			<include refid="ccmDeviceBroadcastColumns"/>
+		FROM ccm_device_broadcast a
+		<include refid="ccmDeviceBroadcastJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="CcmDeviceBroadcast">
+		SELECT 
+			<include refid="ccmDeviceBroadcastColumns"/>
+		FROM ccm_device_broadcast a
+		<include refid="ccmDeviceBroadcastJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="name != null and name != ''">
+				AND a.name LIKE 
+					<if test="dbName == 'oracle'">'%'||#{name}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{name}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{name},'%')</if>
+			</if>
+			<if test="more1 != null and more1 != ''">
+				AND  (${more1})
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="CcmDeviceBroadcast">
+		SELECT 
+			<include refid="ccmDeviceBroadcastColumns"/>
+		FROM ccm_device_broadcast a
+		<include refid="ccmDeviceBroadcastJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO ccm_device_broadcast(
+			id,
+			code,
+			name,
+			ip,
+			com_port,
+			param,
+			account,
+			password,
+			parent_id,
+			type_id,
+			area_id,
+			address,
+			status,
+			company_id,
+			version,
+			image_path,
+			description,
+			coordinate,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag
+		) VALUES (
+			#{id},
+			#{code},
+			#{name},
+			#{ip},
+			#{comPort},
+			#{param},
+			#{account},
+			#{password},
+			#{parent.id},
+			#{typeId},
+			#{area.id},
+			#{address},
+			#{status},
+			#{companyId},
+			#{version},
+			#{imagePath},
+			#{description},
+			#{coordinate},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE ccm_device_broadcast SET 	
+			code = #{code},
+			name = #{name},
+			ip = #{ip},
+			com_port = #{comPort},
+			param = #{param},
+			account = #{account},
+			password = #{password},
+			parent_id = #{parent.id},
+			type_id = #{typeId},
+			area_id = #{area.id},
+			address = #{address},
+			status = #{status},
+			company_id = #{companyId},
+			version = #{version},
+			image_path = #{imagePath},
+			description = #{description},
+			coordinate = #{coordinate},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE ccm_device_broadcast SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	<update id="updateCoordinates">
+		UPDATE ccm_device_broadcast SET
+		coordinate = #{coordinate}
+		WHERE id = #{id}
+	</update>
+	
+	
+	<select id="getByCode" resultType="CcmDeviceBroadcast">
+		SELECT 
+			<include refid="ccmDeviceBroadcastColumns"/>
+		FROM ccm_device_broadcast a
+		<include refid="ccmDeviceBroadcastJoins"/>
+		WHERE a.code = #{code} AND a.del_flag = #{DEL_FLAG_NORMAL}
+	</select>
+</mapper>

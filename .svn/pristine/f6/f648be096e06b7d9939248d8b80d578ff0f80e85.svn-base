@@ -1,0 +1,215 @@
+/**
+ * Copyright &copy; 2012-2016 <a href="https://github.com/thinkgem/jeesite">JeeSite</a> All rights reserved.
+ */
+package com.arjjs.ccm.modules.ccm.broadcast.entity;
+
+import org.hibernate.validator.constraints.Length;
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.arjjs.ccm.modules.sys.entity.Area;
+
+import com.arjjs.ccm.common.persistence.DataEntity;
+
+/**
+ * 广播站Entity
+ * @author maoxb
+ * @version 2019-08-28
+ */
+public class CcmDeviceBroadcast extends DataEntity<CcmDeviceBroadcast> {
+	
+	private static final long serialVersionUID = 1L;
+	private String code;		// 设备编号
+	private String name;		// 设备名称
+	private String ip;		// IP地址
+	private String comPort;		// 串口号
+	private String param;		// 设备参数信息
+	private String account;		// 登陆账号
+	private String password;		// 密码
+	private CcmDeviceBroadcast parent;		// 父节点ID
+	private String typeId;		// 设备类型
+	private Area area;		// 所属区域
+	private String address;		// 安放位置
+	private String status;		// 设备状态
+	private String companyId;		// 厂商
+	private String version;		// 版本
+	private String imagePath;		// 图片
+	private String description;		// 说明
+	private String coordinate;		// 设备坐标
+	private String more1;  // Sql 查询语句
+	private String fileUrl;     //下发广播文件路径
+	
+	public String getFileUrl() {
+		return fileUrl;
+	}
+
+	public void setFileUrl(String fileUrl) {
+		this.fileUrl = fileUrl;
+	}
+
+	public CcmDeviceBroadcast() {
+		super();
+	}
+
+	public CcmDeviceBroadcast(String id){
+		super(id);
+	}
+
+	@Length(min=0, max=64, message="设备编号长度必须介于 0 和 64 之间")
+	public String getCode() {
+		return code;
+	}
+
+	public void setCode(String code) {
+		this.code = code;
+	}
+	
+	@Length(min=0, max=64, message="设备名称长度必须介于 0 和 64 之间")
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+	
+	@Length(min=0, max=15, message="IP地址长度必须介于 0 和 15 之间")
+	public String getIp() {
+		return ip;
+	}
+
+	public void setIp(String ip) {
+		this.ip = ip;
+	}
+	
+	@Length(min=0, max=20, message="串口号长度必须介于 0 和 20 之间")
+	public String getComPort() {
+		return comPort;
+	}
+
+	public void setComPort(String comPort) {
+		this.comPort = comPort;
+	}
+	
+	@Length(min=0, max=1000, message="设备参数信息长度必须介于 0 和 1000 之间")
+	public String getParam() {
+		return param;
+	}
+
+	public void setParam(String param) {
+		this.param = param;
+	}
+	
+	@Length(min=0, max=64, message="登陆账号长度必须介于 0 和 64 之间")
+	public String getAccount() {
+		return account;
+	}
+
+	public void setAccount(String account) {
+		this.account = account;
+	}
+	
+	@Length(min=0, max=64, message="密码长度必须介于 0 和 64 之间")
+	public String getPassword() {
+		return password;
+	}
+
+	public void setPassword(String password) {
+		this.password = password;
+	}
+	
+	@JsonBackReference
+	public CcmDeviceBroadcast getParent() {
+		return parent;
+	}
+
+	public void setParent(CcmDeviceBroadcast parent) {
+		this.parent = parent;
+	}
+	
+	@Length(min=0, max=3, message="设备类型长度必须介于 0 和 3 之间")
+	public String getTypeId() {
+		return typeId;
+	}
+
+	public void setTypeId(String typeId) {
+		this.typeId = typeId;
+	}
+	
+	public Area getArea() {
+		return area;
+	}
+
+	public void setArea(Area area) {
+		this.area = area;
+	}
+	
+	@Length(min=0, max=200, message="安放位置长度必须介于 0 和 200 之间")
+	public String getAddress() {
+		return address;
+	}
+
+	public void setAddress(String address) {
+		this.address = address;
+	}
+	
+	@Length(min=0, max=2, message="设备状态长度必须介于 0 和 1 之间")
+	public String getStatus() {
+		return status;
+	}
+
+	public void setStatus(String status) {
+		this.status = status;
+	}
+	
+	@Length(min=0, max=64, message="厂商长度必须介于 0 和 64 之间")
+	public String getCompanyId() {
+		return companyId;
+	}
+
+	public void setCompanyId(String companyId) {
+		this.companyId = companyId;
+	}
+	
+	@Length(min=0, max=64, message="版本长度必须介于 0 和 64 之间")
+	public String getVersion() {
+		return version;
+	}
+
+	public void setVersion(String version) {
+		this.version = version;
+	}
+	
+	@Length(min=0, max=100, message="图片长度必须介于 0 和 100 之间")
+	public String getImagePath() {
+		return imagePath;
+	}
+
+	public void setImagePath(String imagePath) {
+		this.imagePath = imagePath;
+	}
+	
+	@Length(min=0, max=1000, message="说明长度必须介于 0 和 1000 之间")
+	public String getDescription() {
+		return description;
+	}
+
+	public void setDescription(String description) {
+		this.description = description;
+	}
+	
+	@Length(min=0, max=64, message="设备坐标长度必须介于 0 和 64 之间")
+	public String getCoordinate() {
+		return coordinate;
+	}
+
+	public void setCoordinate(String coordinate) {
+		this.coordinate = coordinate;
+	}
+
+	public String getMore1() {
+		return more1;
+	}
+
+	public void setMore1(String more1) {
+		this.more1 = more1;
+	}
+}

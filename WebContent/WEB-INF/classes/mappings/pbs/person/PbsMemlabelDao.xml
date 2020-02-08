@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.arjjs.ccm.modules.pbs.person.dao.PbsMemlabelDao">
+
+	<sql id="pbsMemlabelColumns">
+		a.id AS "id",
+		a.s_memberid AS "sMemberid.id",
+		mem.s_name AS
+		"sMemberid.sName",
+		a.s_type AS "sType",
+		a.s_labelids AS "sLabelids",
+		a.s_description AS "sDescription",
+		a.s_spare01 AS "sSpare01",
+		a.s_spare02 AS "sSpare02",
+		a.s_spare03 AS "sSpare03",
+		a.s_spare04 AS
+		"sSpare04",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks
+		AS "remarks",
+		a.del_flag AS "delFlag"
+	</sql>
+
+	<sql id="pbsMemlabelJoins">
+		LEFT JOIN pbs_partymem mem ON mem.id = a.s_memberid
+	</sql>
+
+	<select id="get" resultType="PbsMemlabel">
+		SELECT
+		<include refid="pbsMemlabelColumns" />
+		FROM pbs_memlabel a
+		<include refid="pbsMemlabelJoins" />
+		WHERE a.id = #{id}
+	</select>
+
+	<select id="findList" resultType="PbsMemlabel">
+		SELECT
+		<include refid="pbsMemlabelColumns" />
+		FROM pbs_memlabel a
+		<include refid="pbsMemlabelJoins" />
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if
+				test="sMemberid != null and sMemberid != '' and sMemberid.id != null and sMemberid.id != ''">
+				AND a.s_memberid = #{sMemberid.id}
+			</if>
+			<if test="sLabelids != null and sLabelids != ''">
+                and a.s_labelids like
+                <if test="dbName == 'oracle'">'%'||#{sLabelids}||'%'</if>
+                <if test="dbName == 'mssql'">'%'+#{sLabelids}+'%'</if>
+                <if test="dbName == 'mysql'">concat('%',#{sLabelids},'%')</if>
+            </if>
+			<if test="sDescription != null and sDescription != ''">
+				AND a.s_description = #{sDescription}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+
+	<select id="findAllList" resultType="PbsMemlabel">
+		SELECT
+		<include refid="pbsMemlabelColumns" />
+		FROM pbs_memlabel a
+		<include refid="pbsMemlabelJoins" />
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+
+	<insert id="insert">
+		INSERT INTO pbs_memlabel(
+		id,
+		s_memberid,
+		s_labelids,
+		s_description,
+		create_by,
+		create_date,
+		update_by,
+		update_date,
+		remarks,
+		del_flag
+		) VALUES (
+		#{id},
+		#{sMemberid.id},
+		#{sLabelids},
+		#{sDescription},
+		#{createBy.id},
+		#{createDate},
+		#{updateBy.id},
+		#{updateDate},
+		#{remarks},
+		#{delFlag}
+		)
+	</insert>
+
+	<update id="update">
+		UPDATE pbs_memlabel SET
+		s_memberid = #{sMemberid.id},
+		s_labelids = #{sLabelids},
+		s_description = #{sDescription},
+		update_by =
+		#{updateBy.id},
+		update_date = #{updateDate},
+		remarks = #{remarks}
+		WHERE
+		id = #{id}
+	</update>
+
+	<update id="delete">
+		UPDATE pbs_memlabel SET
+		del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	<delete id="deleteBymemId" parameterType="String">
+		DELETE FROM  pbs_memlabel where s_memberid = #{pbspartymemId}
+	</delete>
+</mapper>

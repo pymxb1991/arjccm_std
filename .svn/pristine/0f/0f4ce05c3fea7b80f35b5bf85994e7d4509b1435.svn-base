@@ -1,0 +1,210 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.arjjs.ccm.modules.pbs.person.dao.PbsDepartmentbindDao">
+
+	<sql id="pbsDepartmentbindColumns">
+		a.id AS "id",
+		a.s_departmentid AS "sDepartmentid",
+		a.s_partymemid AS
+		"sPartymemid",
+		a.s_post AS "sPost.id",
+		level1.s_name AS "sPost.sName",
+		<!-- a.s_spare01 AS "sSpare01", a.s_spare02 AS "sSpare02", a.s_spare03 
+			AS "sSpare03", a.s_spare04 AS "sSpare04", -->
+		a.create_by AS
+		"createBy.id",
+		a.create_date
+		AS "createDate",
+		a.update_by
+		AS
+		"updateBy.id",
+		a.update_date AS
+		"updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag",
+		a.dt_posttime AS "dtPosttime",
+		a.s_posttitle AS
+		"sPosttitle.id",
+		level2.s_name AS "sPosttitle.sName",
+		partymem.i_type AS
+		"partymemtype",
+		partymem.s_mobilephone AS "partymem.sMobilephone",
+		partymem.s_name AS "partymemname",
+		partymem.s_photo AS "partymem.sPhoto",
+		partymem.s_post AS "partymem.sPost",
+		office.name AS "officename"
+	</sql>
+
+	<sql id="pbsDepartmentbindJoins">
+		left join sys_office office on office.id = a.s_departmentid AND office.del_flag = 0
+		left join pbs_partymem partymem on partymem.id = a.s_partymemid AND partymem.del_flag = 0
+		left join pbs_positionlevel level1 on level1.id = a.s_post AND level1.del_flag = 0
+		left join pbs_positionlevel level2 on level2.id = a.s_posttitle AND level2.del_flag = 0
+	</sql>
+
+	<select id="get" resultType="PbsDepartmentbind">
+		SELECT
+		<include refid="pbsDepartmentbindColumns" />
+		FROM pbs_departmentbind a
+		<include refid="pbsDepartmentbindJoins" />
+		WHERE a.id = #{id}
+	</select>
+
+	<select id="findList" resultType="PbsDepartmentbind">
+		SELECT
+		<include refid="pbsDepartmentbindColumns" />
+		FROM pbs_departmentbind a
+		<include refid="pbsDepartmentbindJoins" />
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="sDepartmentidSelect != null and sDepartmentidSelect != ''">
+				AND a.s_departmentid= #{sDepartmentidSelect}
+			</if>
+			<if test="sDepartmentid != null and sDepartmentid != ''">
+				AND a.s_departmentid= #{sDepartmentid}
+			</if>
+			<if test="sPartymemid != null and sPartymemid != ''">
+				AND a.s_partymemid = #{sPartymemid}
+			</if>
+			<if test="officename != null and officename != ''">
+				AND office.name LIKE "%${officename}%"
+			</if>
+			<if test="partymemname != null and partymemname != ''">
+				AND partymem.s_name LIKE concat('%',#{partymemname},'%') 
+			</if>
+			<if test="partymemtype != null and partymemtype != ''">
+				AND partymem.i_type = #{partymemtype}
+			</if>
+			<if
+				test="officeparentid != null and officeparentid != '' and  sDepartmentid != null and sDepartmentid != '' ">
+				AND (office.id = #{sDepartmentid} or office.parent_ids LIKE
+				"${officeparentid}%" )
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+
+	<select id="findAllList" resultType="PbsDepartmentbind">
+		SELECT
+		<include refid="pbsDepartmentbindColumns" />
+		FROM pbs_departmentbind a
+		<include refid="pbsDepartmentbindJoins" />
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+
+	<insert id="insert">
+		INSERT INTO pbs_departmentbind(
+		id,
+		s_departmentid,
+		s_partymemid,
+		s_post,
+		s_spare01,
+		s_spare02,
+		s_spare03,
+		s_spare04,
+		create_by,
+		create_date,
+		update_by,
+		update_date,
+		remarks,
+		del_flag,
+		dt_posttime,
+		s_posttitle
+		) VALUES (
+		#{id},
+		#{sDepartmentid},
+		#{sPartymemid},
+		#{sPost.id},
+		#{sSpare01},
+		#{sSpare02},
+		#{sSpare03},
+		#{sSpare04},
+		#{createBy.id},
+		#{createDate},
+		#{updateBy.id},
+		#{updateDate},
+		#{remarks},
+		#{delFlag},
+		#{dtPosttime},
+		#{sPosttitle.id}
+		)
+	</insert>
+
+	<update id="update">
+		UPDATE pbs_departmentbind SET
+		s_departmentid =
+		#{sDepartmentid},
+		s_partymemid = #{sPartymemid},
+		s_post = #{sPost.id},
+		s_spare01 = #{sSpare01},
+		s_spare02 = #{sSpare02},
+		s_spare03 =
+		#{sSpare03},
+		s_spare04 = #{sSpare04},
+		update_by = #{updateBy.id},
+		update_date = #{updateDate},
+		remarks = #{remarks},
+		dt_posttime =
+		#{dtPosttime},
+		s_posttitle = #{sPosttitle.id}
+		WHERE id = #{id}
+	</update>
+
+	<update id="delete">
+		UPDATE pbs_departmentbind SET
+		del_flag =
+		#{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+
+	<update id="deleteByRelationship">
+		UPDATE pbs_departmentbind SET
+		del_flag =
+		#{DEL_FLAG_DELETE},
+		remarks = #{remarks}
+		WHERE
+		s_departmentid =
+		#{sDepartmentid} and
+		s_partymemid = #{sPartymemid}
+	</update>
+
+	<select id="checkExist" resultType="java.lang.Integer">
+		SELECT
+		count(1)
+		FROM
+		pbs_departmentbind a
+		WHERE
+		id &lt;&gt; #{id}
+		and a.s_departmentid =
+		#{sDepartmentid}
+		and a.s_partymemid =
+		#{sPartymemid}
+		and del_flag =
+		#{DEL_FLAG_NORMAL}
+	</select>
+	<select id="findRecordBypbsPartymemId" resultType="PbsDepartmentbind">
+		SELECT
+		<include refid="pbsDepartmentbindColumns"></include>
+		FROM pbs_departmentbind a
+		<include refid="pbsDepartmentbindJoins" />
+		WHERE a.s_partymemid = #{id}  AND a.del_flag = 0
+	</select>
+
+</mapper>

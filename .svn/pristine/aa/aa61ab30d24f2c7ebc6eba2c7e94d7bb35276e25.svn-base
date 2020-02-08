@@ -1,0 +1,369 @@
+.unfold {
+	width: 50px;
+    height: 50px;
+    position: absolute;
+    left: 3px;
+    bottom: 3px;
+    background-color: #0e54a9;
+    z-index: 999;
+    cursor: pointer;
+}
+
+.relevance-bg {
+	width: 50px;
+	height: 50px;
+	position: absolute;
+	left: 0;
+	top: 0;
+	z-index: 9;
+}
+
+.br-yuan {
+	width: 40px;
+	height: 40px;
+	border: 2px solid #fff;
+	border-radius: 50%;
+	background: url(../images/Shape.png) no-repeat 50% 50%;
+	position: absolute;
+	left: 50%;
+	top: 50%;
+	margin-top: -20px;
+    margin-left: -20px;
+}
+
+.relevance {
+	background: #fff;
+	position: absolute;
+	left: 0;
+	bottom: 0%;
+	overflow: hidden;
+}
+
+.re-close {
+	width: 30px;
+	height: 30px;
+	border-radius: 50%;
+	background: url(../images/Shape2.png) no-repeat center;
+	position: absolute;
+	right: 0;
+	top: 0;
+}
+
+.re-header {
+	width: 36px;
+	height: 36px;
+	position: absolute;
+	right: 0;
+	top: 0;
+	background: #0e54a9
+}
+
+/* #pubMap {
+	height: 100%;
+	position: relative;
+	width: 100%;
+} */
+
+.map-4 {
+	display: none
+}
+
+.re-center {
+	padding: 10px 20px;
+	width: 95%;
+}
+
+.pub-icon {
+	width: 16px;
+	height: 16px;
+	float: left;
+	display: block;
+}
+
+.pub-name {
+	padding-left: 6px
+}
+
+.pub-flag {
+	width: 100px;
+	height: 26px;
+	float: left;
+	display: block;
+	color: #000;
+	margin: 1px;
+	line-height: 24px;
+	border:1px solid transparent;
+}
+
+.icon-xuexiao {
+	width: 24px;
+	height: 24px;
+	background: url(../images/pub/xuexiao4.png)  no-repeat center;
+	background-size: 85% 85%;
+}
+
+.icon-yiyuan {
+	width: 24px;
+	height: 24px;
+	background: url(../images/pub/yiyuan4.png)  no-repeat center;
+	background-size: 85% 85%;
+}
+
+.icon-jiayouzhans {
+	width: 24px;
+	height: 24px;
+	background: url(../images/pub/jiayouzhan4.png)  no-repeat center;
+	background-size: 85% 85%;
+}
+.icon-shangchang{
+	width: 24px;
+	height: 24px;
+	background: url(../images/pub/shangchang4.png)  no-repeat center;
+	background-size: 85% 85%;
+}
+.icon-yule {
+	width: 24px;
+	height: 24px;
+	background: url(../images/pub/yule4.png)  no-repeat center;
+	background-size: 85% 85%;
+}
+
+.icon-bingguan {
+	width: 24px;
+	height: 24px;
+	background: url(../images/pub/binguan4.png)  no-repeat center;
+	background-size: 85% 85%;
+}
+
+.icon-shipins {
+	width: 24px;
+	height: 24px;
+	background: url(../images/pub/shipin4.png)  no-repeat center;
+	background-size: 85% 85%;
+}
+
+.icon-jingwushi {
+	width: 24px;
+	height: 24px;
+	background: url(../images/pub/gongan4.png)  no-repeat center;
+	background-size: 85% 85%;
+}
+
+.icon-jingche {
+	width: 24px;
+	height: 24px;
+	background: url(../images/pub/jingche3.png)  no-repeat center;
+	background-size: 85% 85%;
+}
+
+.icon-sheweishebao {
+	width: 24px;
+	height: 24px;
+	background: url(../images/pub/shewei4.png)  no-repeat center;
+	background-size: 85% 85%;
+}
+.icon-shipin {
+	width: 24px;
+	height: 24px;
+	border-radius: 50%;
+	background: url(../images/pub/shipin3.png) no-repeat center;
+	background-size: 85% 85%;
+}
+.icon-jingyuan {
+	width: 24px;
+	height: 24px;
+	background: url(../images/pub/jingcha4.png)  no-repeat center;
+	background-size: 85% 85%;
+}
+
+.icon-xiaofang {
+	width: 24px;
+	height: 24px;
+	border-radius: 50%;
+	background: url(../images/pub/xiaofang3.png) #aa4644 no-repeat center;
+	background-size: 85% 85%;
+}
+.icon-gongzuozhan {
+	width: 24px;
+	height: 24px;
+	background: url(../images/pub/gongzuozhan4.png)  no-repeat center;
+	background-size: 85% 85%;
+}
+.icon-guangbozhan {
+	width: 24px;
+	height: 24px;
+	border-radius: 50%;
+	background: url(../images/pub/guangbozhan4.png) no-repeat center;
+	background-size: 85% 85%;
+}
+
+.icon-jidujiao{
+	width: 24px;
+	height: 24px;
+	border-radius: 50%;
+	background: url(../images/jiduj.png) no-repeat center;
+	background-size: 85% 85%;
+}
+
+.icon-tianzhujiao{
+	width: 24px;
+	height: 24px;
+	border-radius: 50%;
+	background: url(../images/tianzhuj.png) no-repeat center;
+	background-size: 85% 85%;
+}
+
+.icon-fojiao{
+	width: 24px;
+	height: 24px;
+	border-radius: 50%;
+	background: url(../images/foj.png) no-repeat center;
+	background-size: 85% 85%;
+}
+
+.icon-daojiao{
+	width: 24px;
+	height: 24px;
+	border-radius: 50%;
+	background: url(../images/daoj.png) no-repeat center;
+	background-size: 85% 85%;
+}
+
+.icon-yisilanjiao{
+	width: 24px;
+	height: 24px;
+	border-radius: 50%;
+	background: url(../images/yisilanj.png) no-repeat center;
+	background-size: 85% 85%;
+}
+
+.pubMapDialog {
+	width: 500px;
+	height: 400px;
+	position: absolute;
+	right: 10px;
+	top: 10px;
+}
+
+.pubMapDialog-bg1 {
+	position: absolute;
+	width: 500px;
+	height: 400px;
+	left: -71px;
+	top: 17px;
+	background: url(../images/pub/dialog2.png) no-repeat center;
+	background-size: 100% 100%;
+	z-index: 9
+}
+
+.pubMapDialog-bg2 {
+	position: absolute;
+	width: 500px;
+	height: 400px;
+	right: -53px;
+	bottom: -48px;
+	background: url(../images/pub/dialog1.png) no-repeat center;
+	background-size: 100% 100%;
+	z-index: 9
+}
+
+.pubMapDialog-center {
+	width: 500px;
+	height: 313px;
+	background: rgba(0, 0, 0, 0.6);
+	border-radius: 104px 20px 104px 20px;
+	position: absolute;
+	left: -9px;
+	top: 76px;
+	color: #fff;
+}
+
+.pubMapDialog-center-center {
+	width: 440px;
+	height: 264px;
+	position: absolute;
+	left: 31px;
+	top: 30px;
+	z-index: 9999
+}
+.pubMapDialog{
+	display: none
+}
+.pubMapDialog-close{
+	font-size: 24px;
+	color: #fff;
+	font-weight: bold;
+	position: absolute;
+	right:22px;
+	top:10px;
+	z-index: 9999;
+	cursor: pointer;
+}
+.pubMapDialog-center1 {
+	width: 100%;
+	height: 50%;
+}
+
+.pubMapDialog-center2 {
+	width: 100%;
+	height: 50%
+}
+.well-item{
+/* 	width:33%;
+	float:left;
+	height:50% */
+}
+.jiachatouxiang {
+	/* width: 50px;
+	height: 60px; */
+	/* background: url(../images/pub/jingchatouxiang.png) no-repeat center;
+	background-size: 100% 100%; */
+	margin: auto
+}
+.jiachatouxiang img{
+	/* width: 50px;
+	height:60px;
+	margin: auto */
+}
+
+.jingcha-name {
+	/* float: left;
+	width: 33%; */
+}
+
+.pubMapDialog-center-center p {
+	text-align: center;
+	margin: 3px;
+}
+.textcenterleft{
+	text-align: left
+}
+
+.textcenterright{
+	text-align: right
+}
+.textcenterright img{
+	width:48px;
+	height:48px
+}
+.paichusuo-header{
+	background: #1B1B19;
+	height:40px;
+	line-height: 40px;
+	color:#fff;
+	font-size: 16px; 
+	font-weight: bold;
+}
+.icon-Settopbox {
+	width: 24px;
+	height: 24px;
+	border-radius: 50%;
+	background: url(../images/pub/jijinghe2.png)  no-repeat center;
+	background-size: 85% 85%;
+}
+.icon-jiayouzhan {
+   width: 24px;
+   height: 24px;
+   background: url(../images/pub/jiayouzhan3.png)  no-repeat center;
+   background-size: 85% 85%;
+}

@@ -1,0 +1,133 @@
+/**
+ * */
+
+var map,Map, plotDraw, plotEdit, drawOverlay, drawStyle;
+
+var center = [ 117.648920, 39.034450 ];
+
+function init(){
+//滨海新区  centerCoordinate : [ 117.648920, 39.034450 ],
+//津南区  centerCoordinate : [ 117.29900836944581,39.03772830963135],
+	// 地图默认数据设置
+	var defaultPrams = {
+		id : 'map',
+		centerCoordinate : centerCoordinate,
+		zoom : zoomApp,
+		maxZoom : 20,
+		minZoom : 2,
+		baseUrl :baseUrlT,
+		zoomShowOrHide : false,// 缩小放大
+		overviewMap : false,
+		selectPointerFlag:true
+	// 鹰眼图
+	}
+    　Map = new ArjMap.Map(defaultPrams);
+	// 加载地图
+	Map.init();
+
+    map=Map.map;
+    var val=$('#ccmHouseSchoolrimareaMap').val();
+    if(val!=""){
+    	debugger
+    	var coor=val.split(';')
+    	var len=coor.length;
+		var coorArr=[]
+		if(len>0){
+			for(var i=0;i<len;i++){
+				coorArr.push(coor[i].split(','))
+			}
+		}
+   
+    var ccmHouseSchoolrimschoolName=$('#ccmHouseSchoolrimschoolName').val();
+    var ccmHouseSchoolrimschoolAdd=$('#ccmHouseSchoolrimschoolAdd').val();
+    var ccmHouseSchoolrimarea=$('#ccmHouseSchoolrimarea').val();
+    var ccmHouseSchoolrimschoolNum=$("#ccmHouseSchoolrimschoolNum").val();
+    var ccmHouseSchoolrimschoolEducDepa=$('#ccmHouseSchoolrimschoolEducDepa').val()
+    var ccmHouseSchoolrimareaPoint=$('#ccmHouseSchoolrimareaPoint').val();
+    centpoint=ccmHouseSchoolrimareaPoint.split(',')
+	//画出小区区域
+	var Data={
+		    "type": "FeatureCollection",
+		    "centpoint":centpoint,
+		    "features": [
+		    {
+		        "type": "Feature",
+		        "id": "alarmcommunitys123",
+		        "properties": {
+		            "name":ccmHouseSchoolrimschoolName,
+		            "icon": "",
+		            "info":{
+		                "在校学生人数": ccmHouseSchoolrimschoolNum,
+		                "学校地址": ccmHouseSchoolrimschoolAdd,
+		                "所属区域": ccmHouseSchoolrimarea,
+		                "所属主管部门": ccmHouseSchoolrimschoolEducDepa
+		            },
+		            "coordinateCentre":centpoint
+		        },
+		        "geometry": {
+		            "type": "Polygon",
+		            "coordinates": [
+		            	coorArr
+		            ]
+		        }
+		    },
+		]
+		}
+	
+	
+	Map.addJSON1([ {
+		'type' : 'grids',
+		'data' : Data,
+		'isShow' : true
+	} ])
+   Map.goTo(centpoint)
+    }
+   //出租屋
+   $('#chuzu').change(function(){
+	  if( $(this).is(":checked")){
+			$.getJSON('' + ctx + '/sys/map/buildmanageMapType?type=2',
+					function(data1) {
+						Map.addJSON1([ {
+							'type' : 'rentingPerson',
+							'data' : data1,
+							'isShow' : true
+						} ])
+					})
+	  }else{
+		  Map.removeLayer('rentingPerson')
+	  }
+   })
+   //重点人员楼栋
+      $('#zhongdian').change(function(){
+	  if( $(this).is(":checked")){
+			$.getJSON('' + ctx + '/sys/map/buildmanageMapType?type=1',
+					function(data2) {
+				Map.removeLayer('keyPerson');
+						Map.addJSON1([ {
+							'type' : 'keyPerson',
+							'data' : data2,
+							'isShow' : true
+						} ])
+					})
+	  }else{
+		  Map.removeLayer('keyPerson')
+	  }
+   })
+   //治安场所
+     $('#zhian').change(function(){
+	  if( $(this).is(":checked")){
+		  $.getJSON('' + ctx + '/sys/map/ccmOrgNpseMap?type=8', function(data3) {
+				Map.addJSON1([ {
+					'type' : 'keyPlace',
+					'data' : data3,
+					'isShow' : true
+				} ])
+
+			})
+
+	  }else{
+		  Map.removeLayer('keyPlace')
+	  }
+   })
+}
+

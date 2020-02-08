@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.arjjs.ccm.modules.pbs.payment.dao.PbsPaymentDao">
+    
+	<sql id="pbsPaymentColumns">
+		a.id AS "id",
+		a.s_partymemid AS "sPartymemid",
+		a.money AS "money",
+		a.payment_time AS "paymentTime",
+		a.s_type AS "sType",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		mem.id AS "pbspartymem.id",
+		mem.s_name AS "pbspartymem.sName",
+		mem.s_name AS "pbsmemName",
+		mem.s_photo AS "pbspartymem.sPhoto",
+		a.del_flag AS "delFlag"
+	</sql>
+	
+	<sql id="pbsPaymentJoins">
+		LEFT JOIN pbs_partymem mem ON  a.s_partymemid = mem.id
+	</sql>
+    
+	<select id="get" resultType="PbsPayment">
+		SELECT 
+			<include refid="pbsPaymentColumns"/>
+		FROM pbs_payment a
+		<include refid="pbsPaymentJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="PbsPayment">
+		SELECT 
+			<include refid="pbsPaymentColumns"/>
+		FROM pbs_payment a
+		<include refid="pbsPaymentJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="sType != null and sType != ''">
+				AND a.s_type = #{sType}
+			</if>
+			<if test="pbspartymem != null and pbspartymem.sName != '' and pbspartymem.sName != null ">
+				AND mem.s_name like CONCAT('%',#{pbspartymem.sName},'%')
+			</if>
+			<if test="startPayTime != null and startPayTime != ''">
+				AND a.payment_time &gt;= #{startPayTime}
+			</if>
+			<if test="endPayTime != null and endPayTime != ''">
+				AND a.payment_time &lt;= #{endPayTime}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="PbsPayment">
+		SELECT 
+			<include refid="pbsPaymentColumns"/>
+		FROM pbs_payment a
+		<include refid="pbsPaymentJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO pbs_payment(
+			id,
+			s_partymemid,
+			money,
+			payment_time,
+			s_type,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag
+		) VALUES (
+			#{id},
+			#{sPartymemid},
+			#{money},
+			#{paymentTime},
+			#{sType},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE pbs_payment SET 	
+			s_partymemid = #{sPartymemid},
+			money = #{money},
+			payment_time = #{paymentTime},
+			s_type = #{sType},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE pbs_payment SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

@@ -1,0 +1,210 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.arjjs.ccm.modules.flat.planinfo.dao.BphPlanInfoDao">
+    <sql id="bphPlanInfoColumns">
+		b.id AS "id",
+		b.NAME AS "name",
+		b.is_important AS "isImportant",
+		b.type_code AS "typeCode",
+		b.content AS "content",
+		b.create_by AS "createBy.id",
+		b.create_date AS "createDate",
+		b.update_by AS "updateBy.id",
+		b.update_date AS "updateDate",
+		b.remarks AS "remarks",
+		b.del_flag AS "delFlag",
+		b.bphStepInfoName AS "bphStepInfo.Name",
+		c.n AS "num" 
+	</sql>
+	<sql id="bphPlanStepColumns">
+		a.id AS "id",
+		a.NAME AS "name",
+		a.is_important AS "is_important",
+		a.type_code AS "type_code",
+		a.content AS "content",
+		a.create_by AS "create_by",
+		a.create_date AS "create_date",
+		a.update_by AS "update_by",
+		a.update_date AS "update_date",
+		a.remarks AS "remarks",
+		a.del_flag AS "del_flag",
+		GROUP_CONCAT( bsi.NAME ) AS "bphStepInfoName"
+	</sql>
+	
+	<sql id="bphAlarmPlanColumns">
+		a.id AS "id",
+		COUNT( bap.alarm_id ) AS n 
+	</sql>
+	
+    <sql id="bphAlarmPlanJoins">
+		LEFT JOIN bph_alarm_plan bap ON a.id = bap.plan_id 
+		GROUP BY a.id 
+	</sql>
+	<sql id="bphPlanInfo">
+		b.id AS "id",
+		b.NAME AS "name",
+		b.is_important AS "isImportant",
+		b.type_code AS "typeCode",
+		b.content AS "content",
+		b.create_by AS "createBy.id",
+		b.create_date AS "createDate",
+		b.update_by AS "updateBy.id",
+		b.update_date AS "updateDate",
+		b.remarks AS "remarks",
+		b.del_flag AS "delFlag"
+	</sql>
+	<sql id="bphPlanInfoJoins">
+	</sql>
+	<select id="get" resultType="BphPlanInfo">
+		SELECT 
+			<include refid="bphPlanInfo"/>
+		FROM bph_plan_info b
+		<include refid="bphPlanInfoJoins"/>
+		WHERE b.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="BphPlanInfo">
+		SELECT 
+			<include refid="bphPlanInfoColumns"/>
+		FROM
+			(SELECT
+				<include refid="bphPlanStepColumns"/>
+				FROM bph_plan_info a
+				LEFT JOIN bph_plan_step bps ON a.id = bps.plan_id AND bps.del_flag = 0 
+				LEFT JOIN bph_step_info bsi ON bps.step_id = bsi.id AND bsi.del_flag = 0 
+				where a.del_flag = 0
+				GROUP BY a.id 
+			)  b 
+			LEFT JOIN 
+			(SELECT
+				<include refid="bphAlarmPlanColumns"/>
+				FROM bph_plan_info a
+				LEFT JOIN bph_alarm_plan bap ON a.id = bap.plan_id 
+				where bap.del_flag = 0
+				GROUP BY a.id 
+			)  c  ON b.id = c.id
+		<where>
+			b.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="name != null and name != ''">
+				AND b.name LIKE 
+					<if test="dbName == 'oracle'">'%'||#{name}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{name}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{name},'%')</if>
+			</if>
+			<if test="typeCode != null and typeCode != ''">
+				AND b.type_code = #{typeCode}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy} GROUP BY bap.plan_id
+			</when>
+			<otherwise>
+				ORDER BY b.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="BphPlanInfo">
+		SELECT 
+			<include refid="bphPlanInfoColumns"/>
+		FROM bph_plan_info a
+		<include refid="bphPlanInfoJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="checkPlanName" resultType="BphPlanInfo">
+	 SELECT
+		a.name AS "name"
+		FROM bph_plan_info a
+	<where>
+	  	a.del_flag = #{DEL_FLAG_NORMAL}
+	  	AND
+	  	a.name=#{name}
+	</where>
+	</select>
+	
+	<select id="findByIsImportantAndTypeCode" resultType="BphPlanInfo">
+		SELECT
+		<include refid="bphPlanInfo"/>
+		FROM bph_plan_info b
+		<where>
+			b.del_flag = 0
+			<if test="isImportant != null and isImportant != ''">
+			AND b.is_important = #{isImportant}
+			</if>
+			<if test="typeCode !=null and typeCode != ''">
+			AND b.type_code = #{typeCode}
+			</if>
+		</where>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO bph_plan_info(
+			id,
+			name,
+			is_important,
+			type_code,
+			content,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag
+		) VALUES (
+			#{id},
+			#{name},
+			#{isImportant},
+			#{typeCode},
+			#{content},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE bph_plan_info SET 	
+			name = #{name},
+			is_important = #{isImportant},
+			type_code = #{typeCode},
+			content = #{content},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE bph_plan_info SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+	<!-- 门户预案调用的次数统计 -->
+	<select id="findPlanInvokeCount" resultType="BphPlanInfo">
+		SELECT
+			p.name AS "name",
+			count( * ) AS "count" 
+		FROM
+			bph_plan_info p
+			LEFT JOIN bph_alarm_handle h ON h.plan_id = p.id  
+		WHERE
+			h.plan_id IS NOT NULL 
+		GROUP BY
+			h.plan_id
+	</select>
+</mapper>

@@ -1,0 +1,184 @@
+* {
+	margin: 0px;
+	padding: 0px;
+}
+
+html, body {
+	width: 100%;
+	height: 100%;
+	background-repeat: no-repeat;
+	background-position: center;
+	background-size: 100% 100%;
+	overflow: hidden !important;
+}
+
+.form-signin-heading {
+	font-family: 微软雅黑;
+	font-size: 25px;
+	color: #ffffff;
+	width: 100%;
+	position: absolute;
+	top: 5px;
+}
+
+label.error {
+	background: none;
+	width: 270px;
+	font-weight: normal;
+	color: inherit;
+	margin: 0;
+}
+
+.top {
+	position:relative;
+	top: 0px;
+	width: 100%;
+	height:89px;
+}
+
+.form-top {
+	color: #1b8ef4;
+	font-weight: normal;
+	position: relative;
+	top: 20px;
+	left: 33%;
+}
+
+.input-block-level {
+	font-size: 18px !important;
+	border: none !important;
+	width: 280px;
+	height: 50px !important;
+	background-color: transparent !important;
+	padding: 0px !important;
+	margin-left: 35px;
+	padding-left: 60px !important;
+}
+
+.username {
+	background: url('${ctxStatic}/images/login_form_user.png') no-repeat
+		center;
+	margin-bottom: 20px !important;
+	margin-top: 50px;
+}
+
+.password {
+	background: url('${ctxStatic}/images/login_form_password.png') no-repeat
+		center;
+}
+
+input::-webkit-input-placeholder {
+	font-size: 14px;
+}
+
+.bodyBg {
+	position: relative;
+	width: 100%;
+	height: 100%;
+	background: url('../../../images/index-bg2.png') center   no-repeat ;
+	background-size: 100% 100%;
+}
+
+#header li {
+	font-size: 14px;
+	_font-size: 12px;
+	margin-left: 5px;
+}
+#header .brand {
+    font-family: Helvetica, Georgia, Arial, sans-serif, 黑体;
+    font-size: 26px;
+    padding-left: 33px;
+}
+.navbar-inner {
+	background: none
+}
+
+#userControl>li>a { /*color:#fff;*/
+	text-shadow: none;
+}
+
+#userControl>li>a:hover, #user #userControl>li.open>a {
+	background: transparent;
+}
+
+#productName {
+	color: #fff;
+	font-weight: 400;
+}
+
+.navbar .nav>li>a {
+	padding: 11px 11px 9px;
+}
+
+.navbar .brand {
+	padding: 11px 40px 3px 10px;
+}
+a,a:hover{
+    text-decoration: none;
+}
+.system-nav{
+    width: calc(70% + 60px);
+    margin: 0 auto;
+    padding-top: 8%;
+}
+.system-nav li{
+   width: 18%;
+    height: 132px;
+    border: 1px solid #E9F3F4;
+    border-radius: 10px;
+    padding-top: 10px;
+    font-size: 15px;
+    float: left;
+    margin-right: 1%;
+    margin-left: 1%;
+    margin-bottom: 15px;
+    background-color: rgba(200,200,200,0.1);
+	 text-align: center;
+	 box-sizing: border-box;
+
+}
+.system-nav>li>a{
+	  color:#fff;
+}
+.system-nav li span{
+ overflow: hidden;
+    text-overflow: ellipsis;
+    -o-text-overflow: ellipsis;
+    -webkit-text-overflow: ellipsis;
+    -moz-text-overflow: ellipsis;
+    white-space: nowrap;
+     display: block;
+     height: 24px;
+    line-height: 24px;
+    margin-top: -15px;
+    font-size: 20px;
+   font-weight: 550;
+   font-family: "Microsoft YaHei";
+      background-image: -webkit-linear-gradient(left, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.2) 10%, rgba(255,255,255,0.3) 20%, rgba(255,255,255,0.5) 30%,   rgba(255,255,255,0.8) 40%, rgba(255,255,255,1) 50%, rgba(255,255,255,0.8) 60%, rgba(255,255,255,0.5) 70%, rgba(255,255,255,0.3) 80%, rgba(255,255,255,0.2) 90%, rgba(255,255,255,0.1));
+     color: transparent; /*文字填充色为透明*/
+     -webkit-text-fill-color: transparent;
+     -webkit-background-clip: text;          /*背景剪裁为文字，只将文字显示为背景*/
+}
+.system-nav .menu .nav-icon{
+    font-size: 70px;
+   /*  color:#33aaff; */
+   color:#fff;
+}
+.system-nav>li>a:hover {
+	background: none;
+	color: #eea807;
+}
+.system-nav li:hover  {
+	border: 1px solid #20c694;
+}
+
+.system-nav li:hover>a {
+	color: #eea807;
+	background: none;
+}
+#main {
+    background: none !important;
+}
+.navbarname{
+	display: none
+}

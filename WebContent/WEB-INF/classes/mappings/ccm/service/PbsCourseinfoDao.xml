@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.arjjs.ccm.modules.ccm.service.dao.PbsCourseinfoDao">
+    
+	<sql id="pbsCourseinfoColumns">
+		a.id AS "id",
+		a.s_parentid AS "sParentid",
+		a.s_type AS "sType",
+		a.s_name AS "sName",
+		a.i_sort AS "iSort",
+		a.s_iconurl AS "sIconurl",
+		a.s_filetype AS "sFiletype",
+		a.s_fileurl AS "sFileurl",
+		a.s_content AS "sContent",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag"
+	</sql>
+	
+	<sql id="pbsCourseinfoJoins">
+	</sql>
+    
+	<select id="get" resultType="PbsCourseinfo">
+		SELECT 
+			<include refid="pbsCourseinfoColumns"/>
+		FROM pbs_courseinfo a
+		<include refid="pbsCourseinfoJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="PbsCourseinfo">
+		SELECT 
+			<include refid="pbsCourseinfoColumns"/>
+		FROM pbs_courseinfo a
+		<include refid="pbsCourseinfoJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="sType != null and sType != ''">
+				AND a.s_type = #{sType}
+			</if>
+			<if test="sName != null and sName != ''">
+				AND a.s_name LIKE 
+					<if test="dbName == 'oracle'">'%'||#{sName}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{sName}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{sName},'%')</if>
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY  a.i_sort DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="PbsCourseinfo">
+		SELECT 
+			<include refid="pbsCourseinfoColumns"/>
+		FROM pbs_courseinfo a
+		<include refid="pbsCourseinfoJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY  a.i_sort DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO pbs_courseinfo(
+			id,
+			s_parentid,
+			s_type,
+			s_name,
+			i_sort,
+			s_iconurl,
+			s_filetype,
+			s_fileurl,
+			s_content,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag
+		) VALUES (
+			#{id},
+			#{sParentid},
+			#{sType},
+			#{sName},
+			#{iSort},
+			#{sIconurl},
+			#{sFiletype},
+			#{sFileurl},
+			#{sContent},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE pbs_courseinfo SET 	
+			s_parentid = #{sParentid},
+			s_type = #{sType},
+			s_name = #{sName},
+			i_sort = #{iSort},
+			s_iconurl = #{sIconurl},
+			s_filetype = #{sFiletype},
+			s_fileurl = #{sFileurl},
+			s_content = #{sContent},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE pbs_courseinfo SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

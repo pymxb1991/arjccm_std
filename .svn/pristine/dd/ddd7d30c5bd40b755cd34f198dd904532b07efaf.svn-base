@@ -1,0 +1,164 @@
+var pathName=window.document.location.pathname;
+var projectName=pathName.substring(0,pathName.substr(1).indexOf('/')+1);
+var ctx="http://"+window.location.host+projectName+"/a";
+$(document).ready(function() {
+	findTableNameInDict();
+});
+
+function findTableNameInDict(){
+	var html = '';
+	$.getJSON(ctx + '/house/ccmHouseEmphasis/tableName',function(data){
+		var emphasisData = data.content;
+		for(var i = 0;i < emphasisData.length;i++){
+			if(i == 0){
+				html += '<li class="active"><a href="javascript:;" onclick="findHouseEmphasis(this,\''+emphasisData[0].type+'\')">'+emphasisData[0].label+'</a></li>';
+				findHouseEmphasis(this,emphasisData[0].type);
+			}else{
+				html += '<li><a href="javascript:;" onclick="findHouseEmphasis(this,\''+emphasisData[i].type+'\')">'+emphasisData[i].label+'</a></li>';
+			}
+		}
+		$('#emphasisTitle').html(html);
+	})
+}
+
+function findHouseEmphasis(_this,type){
+	debugger
+	
+	$('#emphasisTitle li').removeClass("active");
+	$(_this).parent().addClass("active");
+	$("#mainFrameCenter").attr('src',ctx+"/house/"+type+"/list?tableType="+type)
+	/*var tableName = type;
+		var detailsUrl=ctx+"/house/ccmHouseKym/form?peopleId=";//重点青少年
+		var visitRecordUrl=ctx+"/house/ccmHouseEmphasis/visitRecord?relevanceTable=ccm_house_kym&relevanceId=";//重点青少年;
+		var visitUrl=ctx+"/log/ccmLogTail/formPro?relevance_table=ccm_house_kym&relevance_id=";//重点青少年;
+		if(type=='ccm_house_kym'){
+			detailsUrl=ctx+"/house/ccmHouseKym/form?peopleId=";//重点青少年
+			visitUrl=ctx+"/log/ccmLogTail/formPro?relevance_table=ccm_house_kym&relevance_id=";//重点青少年;
+			visitRecordUrl=ctx+"/house/ccmHouseEmphasis/visitRecord?relevanceTable=ccm_house_kym&relevanceId="
+		}else if(type=='ccm_house_release'){
+			detailsUrl=ctx+"/house/ccmHouseRelease/form?peopleId=";//安置帮教人员
+			visitUrl=ctx+"/log/ccmLogTail/formPro?relevance_table=ccm_house_release&relevance_id=";
+			visitRecordUrl=ctx+"/house/ccmHouseEmphasis/visitRecord?relevanceTable=ccm_house_release&relevanceId="
+		}else if(type=='ccm_house_rectification'){
+			detailsUrl=ctx+"/house/ccmHouseRectification/form?peopleId=";//社区矫正
+			visitUrl=ctx+"/log/ccmLogTail/formPro?relevance_table=ccm_house_rectification&relevance_id=";
+			visitRecordUrl=ctx+"/house/ccmHouseEmphasis/visitRecord?relevanceTable=ccm_house_rectification&relevanceId="
+
+		}else if(type=='ccm_house_aids'){
+			detailsUrl=ctx+"/house/ccmHouseAids/form?peopleId=";//艾滋病患者
+			visitUrl=ctx+"/log/ccmLogTail/formPro?relevance_table=ccm_house_aids&relevance_id=";
+			visitRecordUrl=ctx+"/house/ccmHouseEmphasis/visitRecord?relevanceTable=ccm_house_aids&relevanceId="
+
+		}else if(type=='ccm_house_dangerous'){
+			detailsUrl=ctx+"/house/ccmHouseDangerous/form?peopleId=";//危险从业者
+			visitUrl=ctx+"/log/ccmLogTail/formPro?relevance_table=ccm_house_dangerous&relevance_id=";
+			visitRecordUrl=ctx+"/house/ccmHouseEmphasis/visitRecord?relevanceTable=ccm_house_dangerous&relevanceId="
+
+
+		}else if(type=='ccm_house_drugs'){
+			detailsUrl=ctx+"/house/ccmHouseDrugs/form?peopleId=";//吸毒人员
+			visitUrl=ctx+"/log/ccmLogTail/formPro?relevance_table=ccm_house_drugs&relevance_id=";
+			visitRecordUrl=ctx+"/house/ccmHouseEmphasis/visitRecord?relevanceTable=ccm_house_drugs&relevanceId="
+
+		}else if(type=='ccm_house_heresy'){
+			detailsUrl=ctx+"/house/ccmHouseHeresy/form?peopleId=";//涉教人员
+			visitUrl=ctx+"/log/ccmLogTail/formPro?relevance_table=ccm_house_heresy&relevance_id=";
+			visitRecordUrl=ctx+"/house/ccmHouseEmphasis/visitRecord?relevanceTable=ccm_house_heresy&relevanceId="
+
+		}else if(type=='ccm_house_petition'){
+			detailsUrl=ctx+"/house/ccmHousePetition/form?peopleId=";//重点上访
+			visitUrl=ctx+"/log/ccmLogTail/formPro?relevance_table=ccm_house_heresy&relevance_id=";
+			visitRecordUrl=ctx+"/house/ccmHouseEmphasis/visitRecord?relevanceTable=ccm_house_heresy&relevanceId="
+
+		}else if(type=='ccm_house_psychogeny'){
+			detailsUrl=ctx+"/house/ccmHousePsychogeny/form?peopleId=";//肇事肇祸等严重精神障碍患者
+			visitUrl=ctx+"/log/ccmLogTail/formPro?relevance_table=ccm_house_psychogeny&relevance_id=";
+			visitRecordUrl=ctx+"/house/ccmHouseEmphasis/visitRecord?relevanceTable=ccm_house_psychogeny&relevanceId="
+		}
+		
+		
+		
+	layui.use('table', function(){
+		var table = layui.table;
+		table.render({
+		    elem: '#emphasis'
+		    ,url:ctx + '/house/ccmHouseEmphasis/emphasis'
+		    ,where:{tableName:tableName}
+		    ,cols: [[
+			    {field:'id', }
+			    ,{field:'name', width:'7%', title: '姓名'}
+			    ,{field:'sex', width:'10%', title: '性别'}
+			    ,{field:'birthday', width:'12%', title: '出生日期'}
+			    ,{field:'nation', title: '民族', width: '10%'}
+			    ,{field:'censu', title: '籍贯',width:'13%'}
+			    ,{field:'marriage', title: '婚姻状况',width:'10%'}
+			    ,{field:'ident', title: '身份证号码',width:'15%'}
+			    ,{field:'telephone',title: '联系方式',width:'13%'}
+			    ,{
+			    	field:'houseRectification',title: '操作',
+			    	templet: function(d){
+			    		var id=d.id;
+			    		var html='';
+			    		html+='<a onclick="parent.LayerDialog3(\''+detailsUrl+id+'\', \'信息\', \'1200px\', \'780px\')">详情</a>';
+			    		html+='<a onclick="visitRecord(\''+id+'\', \''+type+'\')">走访记录</a>';
+			    		html+='<a onclick="parent.LayerDialog(\''+visitUrl+id+'\', \'走访\', \'800px\', \'600px\')">走访</a>';
+			    		return html
+			          }
+			    	}
+			    //,{title:'操作', toolbar: html,width:'10%'}
+		    ]]
+			,page: true
+			,request : {
+				pageName : 'currentPage',// 页码的参数名称，默认：page
+				limitName : 'pageSize' // 每页数据量的参数名，默认：limit
+			}
+		    ,limit:15
+			,limits:[15,30,45,60]
+		 
+		});
+	});*/
+}
+function visitRecord(id,type){
+	debugger
+	
+	layer.open({
+		  type: 1,
+		  title: '走访记录',
+		  area: ['800px', '400px'],
+		//  fixed: true, //固定
+		  //maxmin: true,
+		  id:'visitRecord',
+		   //btn: [ '确定',  '关闭'], //可以无限个按钮
+		  content: '<table  id="visitRecordTable"></table>',
+		  success: function(layero, index){
+			  debugger
+			
+		  }
+		});
+	var table = layui.table;
+	table.render({
+	    elem: '#visitRecordTable'
+	    ,url:ctx + '/house/ccmHouseEmphasis/visitRecord'
+	    ,where:{"relevanceTable":type,"relevanceId":id}
+	    ,cols: [[
+             {field:'tailTime',  title: '时间'}
+		    ,{field:'tailCase', title: '跟踪事项'}
+		    ,{field:'tailContent',  title: '跟踪内容'}
+		    ,{field:'tailPerson', title: '处理人员', }
+		    ,{field:'more1', title: '处理人员联系方式'}
+		    ,{field:'remarks', title: '备注信息'}
+	    ]]
+		,page: false
+		,request : {
+			pageName : 'currentPage',// 页码的参数名称，默认：page
+			limitName : 'pageSize' // 每页数据量的参数名，默认：limit
+		}
+	    ,done: function(res, curr, count){
+	    	debugger
+		   /* $('#content').find('.layui-table-body').find("table").find("tbody").children("tr").on('click',function(){
+		        var id = JSON.stringify($('#content').find('.layui-table-body').find("table" ).find("tbody").find(".layui-table-hover").data('index'));
+		        var objId = res.data[id].id;
+		    })*/
+		}
+	});
+}

@@ -1,0 +1,276 @@
+/**
+ * Copyright &copy; 2012-2016 <a href="https://github.com/thinkgem/jeesite">JeeSite</a> All rights reserved.
+ */
+package com.arjjs.ccm.modules.ccm.event.service;
+
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.arjjs.ccm.common.persistence.Page;
+import com.arjjs.ccm.common.service.CrudService;
+import com.arjjs.ccm.common.utils.StringUtils;
+import com.arjjs.ccm.modules.ccm.event.entity.CcmEventCasedeal;
+import com.arjjs.ccm.modules.ccm.event.entity.CcmEventIncident;
+import com.arjjs.ccm.modules.ccm.report.entity.CcmPeopleAmount;
+import com.arjjs.ccm.modules.sys.entity.User;
+import com.arjjs.ccm.modules.sys.utils.UserUtils;
+import com.arjjs.ccm.tool.EchartType;
+import com.arjjs.ccm.tool.SearchTab;
+import com.arjjs.ccm.tool.SysConfigInit;
+import com.arjjs.ccm.modules.ccm.ccmsys.entity.CcmUploadLog;
+import com.arjjs.ccm.modules.ccm.ccmsys.service.CcmUploadLogService;
+import com.arjjs.ccm.modules.ccm.event.dao.CcmEventCasedealDao;
+import com.arjjs.ccm.modules.ccm.event.dao.CcmEventIncidentDao;
+
+/**
+ * 案事件登记Service
+ * 
+ * @author arj
+ * @version 2018-01-10
+ */
+@Service
+@Transactional(readOnly = true)
+public class CcmEventIncidentService extends CrudService<CcmEventIncidentDao, CcmEventIncident> {
+
+	@Autowired
+	private CcmEventCasedealDao casedealDao;
+	@Autowired
+	private CcmEventIncidentDao ccmEventIncidentDao;
+	//上传上级平台记录
+	@Autowired
+	private CcmUploadLogService ccmUploadLogService;
+
+	public CcmEventIncident get(String id) {
+		return super.get(id);
+	}
+
+	public List<CcmEventIncident> findList(CcmEventIncident ccmEventIncident) {
+		return super.findList(ccmEventIncident);
+	}
+
+	/**
+	 * @param id
+	 *            案事件登记ID
+	 * @return 事件处理结果集
+	 */
+	public List<CcmEventCasedeal> findList(String id) {
+		return casedealDao.listWithPID(id);
+	}
+
+	/**
+	 * @return 师生案事件列表
+	 */
+	public Page<CcmEventIncident> findPageStudent(Page<CcmEventIncident> page, CcmEventIncident ccmEventIncident) {
+		ccmEventIncident.setPage(page);
+		page.setList(ccmEventIncidentDao.findPageStudent(ccmEventIncident));
+		return page;
+	}
+
+	/**
+	 * @return 命案列表
+	 */
+	public Page<CcmEventIncident> findPageMurder(Page<CcmEventIncident> page, CcmEventIncident ccmEventIncident) {
+		ccmEventIncident.setPage(page);
+		page.setList(ccmEventIncidentDao.findPageMurder(ccmEventIncident));
+		return page;
+	}
+
+	/**
+	 * @return 线路事件结果集
+	 */
+	public Page<CcmEventIncident> findPageLine(Page<CcmEventIncident> page, CcmEventIncident ccmEventIncident) {
+		ccmEventIncident.setPage(page);
+		page.setList(ccmEventIncidentDao.findPageLine(ccmEventIncident));
+		return page;
+	}
+	// public Page<CcmEventIncident> findPageLine(Page<CcmEventIncident> page,
+	// CcmEventIncident ccmEventIncident) {
+	// return ccmEventIncidentDao.findPageLine(page, ccmEventIncident);
+	// }
+
+	public Page<CcmEventIncident> findPage(Page<CcmEventIncident> page, CcmEventIncident ccmEventIncident) {
+		return super.findPage(page, ccmEventIncident);
+	}
+
+	@Transactional(readOnly = false)
+	public void save(CcmEventIncident ccmEventIncident) {
+		boolean isNew = false;
+		if (ccmEventIncident.getId() == null || "".equals(ccmEventIncident.getId())) {//无主键ID，则是新记录
+			isNew = true;
+		}
+		if (ccmEventIncident.getIsNewRecord()) {//指定了是新增记录，则算新记录
+			isNew = true;
+		}
+		super.save(ccmEventIncident);
+
+		//上传上级平台记录
+		if (!SysConfigInit.UPPER_URL.equals("")) {//有上级平台地址时，才存入上传上级平台记录的日志
+			CcmUploadLog uploadLog = new CcmUploadLog();
+			if (isNew) {//新增数据
+				uploadLog.setOperateType("1");
+				uploadLog.setRemarks("新增案事件数据：" + ccmEventIncident.getCaseName());
+			} else {//编辑数据
+				uploadLog.setOperateType("2");
+				uploadLog.setRemarks("编辑案事件数据：" + ccmEventIncident.getCaseName());
+			}
+			uploadLog.setTableName("ccm_event_incident");
+			uploadLog.setDataId(ccmEventIncident.getId());
+			uploadLog.setUploadStatus("1");
+			User user = UserUtils.getUser();
+			if (user == null || StringUtils.isBlank(user.getId())){
+				uploadLog.setCreateBy(new User("1"));
+				uploadLog.setUpdateBy(new User("1"));
+			}
+			ccmUploadLogService.save(uploadLog);
+		}
+	}
+
+	@Transactional(readOnly = false)
+	public void delete(CcmEventIncident ccmEventIncident) {
+		super.delete(ccmEventIncident);
+
+		//上传上级平台记录
+		if (!SysConfigInit.UPPER_URL.equals("")) {//有上级平台地址时，才存入上传上级平台记录的日志
+			CcmUploadLog uploadLog = new CcmUploadLog();
+			uploadLog.setOperateType("3");
+			uploadLog.setRemarks("删除案事件数据：" + ccmEventIncident.getCaseName());
+			uploadLog.setTableName("ccm_event_incident");
+			uploadLog.setDataId(ccmEventIncident.getId());
+			uploadLog.setUploadStatus("1");
+			User user = UserUtils.getUser();
+			if (user == null || StringUtils.isBlank(user.getId())){
+				uploadLog.setCreateBy(new User("1"));
+				uploadLog.setUpdateBy(new User("1"));
+			}
+			ccmUploadLogService.save(uploadLog);
+		}
+	}
+
+	/**
+	 * @see 根据案事件性质统计情况。
+	 * @return
+	 */
+	public List<EchartType> getItemByProperty() {
+		return ccmEventIncidentDao.getItemByProperty();
+	}
+
+	/**
+	 * @see 根据案事件分级统计情况
+	 * @return
+	 */
+	public List<EchartType> getItemByScale() {
+		return ccmEventIncidentDao.getItemByScale();
+	}
+
+	/**
+	 * @see 查询出所有的 案事件根据地区以及分级数量
+	 * @param ccmEventIncident
+	 *            案事件实体
+	 * @return
+	 */
+	public List<EchartType> getItemByScaleTable(CcmEventIncident ccmEventIncident) {
+		return ccmEventIncidentDao.getItemByScaleTable(ccmEventIncident);
+	}
+
+	/**
+	 * @see 案事件统计 是否解决
+	 * @return
+	 */
+	public List<EchartType> getItemBySum() {
+		return ccmEventIncidentDao.getItemBySum();
+	}
+
+	/**
+	 * @see 前10的地区破案率
+	 * @return
+	 */
+	public List<EchartType> findSolveByArea() {
+		return ccmEventIncidentDao.findSolveByArea();
+	}
+
+	/**
+	 * @see 按月统计的案事件数
+	 * @return
+	 */
+	public List<EchartType> findSumByMon(CcmEventIncident ccmEventIncident) {
+		return ccmEventIncidentDao.findSumByMon(ccmEventIncident);
+	}
+
+	/**
+	 * @see 按月统计的处理率
+	 * @return
+	 */
+	public List<EchartType> findSolveByMon() {
+		return ccmEventIncidentDao.findSolveByMon();
+	}
+
+	/**
+	 * @see 最新案事件
+	 * @return
+	 */
+	public List<SearchTab> findSumByCondition() {
+		return ccmEventIncidentDao.findSumByCondition();
+	}
+
+	/**
+	 * @see 案事件类型统计
+	 * @return
+	 */
+	public List<EchartType> findSumByEventType() {
+		return ccmEventIncidentDao.findSumByEventType();
+	}
+
+	// 获取一周内的数量
+	public List<EchartType> findSumByEventWeek() {
+		return ccmEventIncidentDao.findSumByEventWeek();
+	}
+
+	//今日案事件统计
+	public List<EchartType> getItemBySumToday() {
+		return ccmEventIncidentDao.getItemBySumToday();
+	}
+
+	//今日前10条案事件
+	public List<CcmEventIncident> getListToday() {
+		return ccmEventIncidentDao.getListToday();
+	}
+
+	//安全事故分布
+	public List<EchartType> getSafeDisData(CcmEventIncident ccmEventIncident) {
+		return ccmEventIncidentDao.getSafeDisData(ccmEventIncident);
+	}
+
+	//事故类型
+	public List<EchartType> getSafeTypeData(CcmEventIncident ccmEventIncident) {
+		return ccmEventIncidentDao.getSafeTypeData(ccmEventIncident);
+	}
+
+	//事故级别
+	public List<EchartType> getSafeLevelData(CcmEventIncident ccmEventIncident) {
+		return ccmEventIncidentDao.getSafeLevelData(ccmEventIncident);
+	}
+
+	//事件分类
+	public List<EchartType> findEventFenLeiData() {
+		return ccmEventIncidentDao.findEventFenLeiData();
+	}
+
+	//事件查询Line
+	public CcmEventIncident getLine(String id) {
+		return ccmEventIncidentDao.getLine(id);
+	}
+
+	//本月事件发生前十
+	public List<EchartType> findEventMonthMap() {
+		return ccmEventIncidentDao.findEventMonthMap();
+	}
+
+	//近一年事件发生/重点人员帮扶趋势图
+	public List<SearchTab> findEventYearMap() {
+		return ccmEventIncidentDao.findEventYearMap();
+	}
+
+}

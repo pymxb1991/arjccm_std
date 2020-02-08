@@ -1,0 +1,170 @@
+<%@ page contentType="text/html;charset=UTF-8"%>
+<%@ include file="/WEB-INF/views/include/taglib.jsp"%>
+<html>
+<head>
+<title>留守人员管理</title>
+<meta name="decorator" content="default" />
+<script type="text/javascript"
+	src="${ctxStatic}/ccm/pop/js/ccmPopBehindInfo.js"></script>
+	<script type="text/javascript"
+	src="${ctxStatic}/ccm/pop/js/ccmCommon.js"></script>
+</head>
+<body>
+<div class="context" content="${ctx}"></div>
+	<!-- 导入、导出模块 -->
+	<div id="importBox" class="hide">
+		<form id="importForm" action="${ctx}/pop/ccmPopBehind/import"
+			method="post" enctype="multipart/form-data" class="form-search"
+			style="padding-left: 20px; text-align: center;"
+			onsubmit="loading('正在导入，请稍等...');">
+			<br /> <input id="uploadFile" name="file" type="file"
+				style="width: 330px" /><br /> <br /> <input id="btnImportSubmit"
+				class="btn btn-primary" type="submit" value="导  入 " />
+		</form>
+	</div>
+
+	<ul class="nav nav-tabs">
+		<li><a href="${ctx}/report/ccmPeopleStat/statisticsPage?title=ccmPeopleStatBehind">数据统计</a></li>
+		<li class="active"><a href="${ctx}/pop/ccmPopBehind/">数据列表</a></li>
+	</ul>
+	<form:form id="searchForm" modelAttribute="ccmPopBehind"
+		action="${ctx}/pop/ccmPopBehind/" method="post"
+		class="breadcrumb form-search">
+		<input id="pageNo" name="pageNo" type="hidden" value="${page.pageNo}" />
+		<input id="pageSize" name="pageSize" type="hidden"
+			value="${page.pageSize}" />
+		<ul class="ul-form">
+			<li><label>姓名：</label> <form:input path="name"
+					htmlEscape="false" maxlength="50" class="input-medium" /></li>
+			<li><label>性别：</label> <form:select path="sex"
+					class="input-medium">
+					<form:option value="" label="全部" />
+					<form:options items="${fns:getDictList('sex')}"
+						itemLabel="label" itemValue="value" htmlEscape="false" />
+				</form:select></li>
+			<li><label>关注程度：</label> <form:select path="atteType"
+					class="input-medium">
+					<form:option value="" label="全部" />
+					<form:options items="${fns:getDictList('ccm_conc_exte')}"
+						itemLabel="label" itemValue="value" htmlEscape="false" />
+				</form:select></li>
+			<li class="clearfix"></li>
+			<li><label>健康状况：</label> <form:select path="health"
+					class="input-medium">
+					<form:option value="" label="全部" />
+					<form:options items="${fns:getDictList('ccm_phy_cdt')}"
+						itemLabel="label" itemValue="value" htmlEscape="false" />
+				</form:select></li>
+			<li><label>留守人员类型：</label> <form:select path="staytype"
+					class="input-medium">
+					<form:option value="" label="全部" />
+					<form:options items="${fns:getDictList('ccm_rear_type')}"
+						itemLabel="label" itemValue="value" htmlEscape="false" />
+				</form:select></li>
+			<li><label>家庭主要成员姓名：</label> <form:input path="crucialname"
+					htmlEscape="false" maxlength="50" class="input-medium" /></li>
+			<li class="btns">
+			<shiro:hasPermission name="pop:ccmPopBehind:edit">
+				<!-- <input id="btnImport" class="btn btn-primary" type="button" value="导入" /> 
+				<input id="btnExport" class="btn btn-primary" type="button" value="导出" /> --> 
+				<a href="javascript:;" id="btnImport" class="btn  btn-export ">
+						<i class=" icon-share-alt "></i> 导入
+					</a>
+					<a href="javascript:;" id="btnExport" class="btn btn-export"> 
+						<i class=" icon-reply"></i> 导出
+					</a>
+			</shiro:hasPermission>
+		
+			<li class="btns">
+				<a href="javascript:;" id="btnSubmit" class="btn btn-primary">
+                <i class="icon-search"></i> 查询 </a>
+			</li>
+			<li class="clearfix"></li>
+
+		</ul>
+	</form:form>
+	<sys:message content="${message}" />
+	<table id="contentTable"
+		class="table table-striped table-bordered table-condensed">
+		<thead>
+			<tr>
+				<th>人员图片</th>
+				<th>姓名</th>
+				<th>公民身份号码</th>
+				<th>性别</th>
+				<th>联系方式</th>
+				<th>健康状况</th>
+				<th>关注程度</th>
+				<th>留守人员类型</th>
+				<th>家庭主要成员姓名</th>
+
+				<shiro:hasPermission name="pop:ccmPopBehind:edit">
+					<th>操作</th>
+				</shiro:hasPermission>
+			</tr>
+		</thead>
+		<tbody>
+			<c:forEach items="${page.list}" var="ccmPopBehind">
+				<tr>
+					<td width="100px">
+						<img src="${ccmPopBehind.images}" style="height:50px;"/>
+					</td>
+					<td>
+					<a class="btnList"
+									onclick="parent.LayerDialog('${ctx}/pop/ccmPopBehind/form?id=${ccmPopBehind.id}', '编辑', '1200px', '900px')"
+							title="修改"> ${ccmPopBehind.name}</a>
+					<td>${ccmPopBehind.ident}</td>
+					<td>${fns:getDictLabel(ccmPopBehind.sex, 'sex', '')}</td>
+					<td>${ccmPopBehind.telephone}</td>
+					<td>${fns:getDictLabel(ccmPopBehind.health, 'ccm_phy_cdt', '')}</td>
+					<c:if test="${ccmPopBehind.atteType eq '01'}">
+						<td style='color: red'>${fns:getDictLabel(ccmPopBehind.atteType, 'ccm_conc_exte', '')}&nbsp;
+							&nbsp; <img src="${ctxStatic}/images/atteType_red.png" />
+						</td>
+					</c:if>
+					<c:if test="${ccmPopBehind.atteType eq '02'}">
+						<td style='color: orange'>${fns:getDictLabel(ccmPopBehind.atteType, 'ccm_conc_exte', '')}&nbsp;
+							&nbsp; <img src="${ctxStatic}/images/atteType_orange.png" />
+						</td>
+					</c:if>
+					<c:if test="${ccmPopBehind.atteType eq '03'}">
+						<td>${fns:getDictLabel(ccmPopBehind.atteType, 'ccm_conc_exte', '')}&nbsp;
+							&nbsp; <img src="${ctxStatic}/images/atteType_green.png" />
+						</td>
+					</c:if>
+					<c:if
+						test="${ccmPopBehind.atteType eq '' or empty ccmPopBehind.atteType}">
+						<td>${fns:getDictLabel(ccmPopBehind.atteType, 'ccm_conc_exte', '')}
+						</td>
+					</c:if>
+					<td>${fns:getDictLabel(ccmPopBehind.staytype, 'ccm_rear_type', '')}
+					</td>
+					<td>${ccmPopBehind.crucialname}</td>
+					<td><shiro:hasPermission name="pop:ccmPopBehind:edit">
+							<a class="btnList"
+									onclick="parent.LayerDialog('${ctx}/pop/ccmPopBehind/form?id=${ccmPopBehind.id}', '编辑', '1200px', '900px')"
+							title="修改"><i class="icon-pencil"></i> </a>
+							<a class="btnList"
+								href="${ctx}/pop/ccmPopBehind/delete?id=${ccmPopBehind.id}"
+								onclick="return confirmx('确认要删除该留守人员吗？', this.href)"  title="删除"><i class="icon-trash"></i></a>
+							<a class="btnList"
+								href="javascript:;" onclick="LocationOpen('${ccmPopBehind.peopleId}')"  title="位置信息"><i class="icon-tint"></i></a>
+							<a class="btnList" onclick="parent.LayerDialog('${ctx}/pop/ccmPeople/getSocialConnections?id=${ccmPopBehind.peopleId}', '社交关系', '1000px', '700px')"
+								  title="社交关系"><i class="icon-group"></i></a>
+							<a class="btnList" onclick="parent.LayerDialog1('','${ctx}/work/ccmWorkTiming/form', '定时提醒', '700px', '500px')"
+								  title="定时提醒"><i class="icon-bell"></i></a>
+						</shiro:hasPermission> <shiro:hasPermission name="log:ccmLogTail:edit">
+		
+						<a class="btnList" onclick="parent.LayerDialog('${ctx}/log/ccmLogTail/formPro?relevance_id=${ccmPopBehind.id}&relevance_table=ccm_pop_behind', '添加记录', '800px', '660px')"
+								  title="添加记录"><i class="icon-plus"></i></a>
+						</shiro:hasPermission>
+						
+						</td>
+
+				</tr>
+			</c:forEach>
+		</tbody>
+	</table>
+	<div class="pagination">${page}</div>
+</body>
+</html>

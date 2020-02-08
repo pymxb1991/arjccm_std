@@ -1,0 +1,231 @@
+/**
+ * Copyright &copy; 2012-2016 <a href="https://github.com/thinkgem/jeesite">JeeSite</a> All rights reserved.
+ */
+package com.arjjs.ccm.modules.ccm.org.service;
+
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.arjjs.ccm.common.persistence.Page;
+import com.arjjs.ccm.common.service.CrudService;
+import com.arjjs.ccm.common.utils.StringUtils;
+import com.arjjs.ccm.modules.ccm.org.entity.CcmOrgNpse;
+import com.arjjs.ccm.modules.sys.entity.User;
+import com.arjjs.ccm.modules.sys.utils.UserUtils;
+import com.arjjs.ccm.tool.EchartType;
+import com.arjjs.ccm.tool.SearchTab;
+import com.arjjs.ccm.tool.SearchTabMore;
+import com.arjjs.ccm.tool.SysConfigInit;
+import com.arjjs.ccm.modules.ccm.ccmsys.entity.CcmUploadLog;
+import com.arjjs.ccm.modules.ccm.ccmsys.service.CcmUploadLogService;
+import com.arjjs.ccm.modules.ccm.org.dao.CcmOrgNpseDao;
+
+/**
+ * 非公有制经济组织Service
+ * 
+ * @author wwh
+ * @version 2018-01-26
+ */
+@Service
+@Transactional(readOnly = true)
+public class CcmOrgNpseService extends CrudService<CcmOrgNpseDao, CcmOrgNpse> {
+
+	@Autowired
+	private CcmOrgNpseDao ccmOrgNpseDao;
+	
+	//上传上级平台记录
+	@Autowired
+	private CcmUploadLogService ccmUploadLogService;
+
+	public CcmOrgNpse get(String id) {
+		return super.get(id);
+	}
+
+	public List<CcmOrgNpse> findList(CcmOrgNpse ccmOrgNpse) {
+		return super.findList(ccmOrgNpse);
+	}
+
+	public Page<CcmOrgNpse> findPage(Page<CcmOrgNpse> page, CcmOrgNpse ccmOrgNpse) {
+		return super.findPage(page, ccmOrgNpse);
+	}
+
+	// 安全生产重点
+	public Page<CcmOrgNpse> findPageSafe(Page<CcmOrgNpse> page, CcmOrgNpse ccmOrgNpse) {
+		return super.findPage(page, ccmOrgNpse);
+	}
+
+	@Transactional(readOnly = false)
+	public void save(CcmOrgNpse ccmOrgNpse) {
+		boolean isNew = false;
+		if (ccmOrgNpse.getId() == null || "".equals(ccmOrgNpse.getId())) {//无主键ID，则是新记录
+			isNew = true;
+		}
+		if (ccmOrgNpse.getIsNewRecord()) {//指定了是新增记录，则算新记录
+			isNew = true;
+		}
+		super.save(ccmOrgNpse);
+
+		//上传上级平台记录
+		if (!SysConfigInit.UPPER_URL.equals("")) {//有上级平台地址时，才存入上传上级平台记录的日志
+			CcmUploadLog uploadLog = new CcmUploadLog();
+			if (isNew) {//新增数据
+				uploadLog.setOperateType("1");
+				uploadLog.setRemarks("新增非公有制经济组织数据：" + ccmOrgNpse.getCompName());
+			} else {//编辑数据
+				uploadLog.setOperateType("2");
+				uploadLog.setRemarks("编辑非公有制经济组织数据：" + ccmOrgNpse.getCompName());
+			}
+			uploadLog.setTableName("ccm_org_npse");
+			uploadLog.setDataId(ccmOrgNpse.getId());
+			uploadLog.setUploadStatus("1");
+			User user = UserUtils.getUser();
+			if (user == null || StringUtils.isBlank(user.getId())){
+				uploadLog.setCreateBy(new User("1"));
+				uploadLog.setUpdateBy(new User("1"));
+			}
+			ccmUploadLogService.save(uploadLog);
+		}
+			
+	}
+
+	@Transactional(readOnly = false)
+	public void delete(CcmOrgNpse ccmOrgNpse) {
+		super.delete(ccmOrgNpse);
+
+		//上传上级平台记录
+		if (!SysConfigInit.UPPER_URL.equals("")) {//有上级平台地址时，才存入上传上级平台记录的日志
+			CcmUploadLog uploadLog = new CcmUploadLog();
+			uploadLog.setOperateType("3");
+			uploadLog.setRemarks("删除非公有制经济组织数据：" + ccmOrgNpse.getCompName());
+			uploadLog.setTableName("ccm_org_npse");
+			uploadLog.setDataId(ccmOrgNpse.getId());
+			uploadLog.setUploadStatus("1");
+			User user = UserUtils.getUser();
+			if (user == null || StringUtils.isBlank(user.getId())){
+				uploadLog.setCreateBy(new User("1"));
+				uploadLog.setUpdateBy(new User("1"));
+			}
+			ccmUploadLogService.save(uploadLog);
+		}
+	}
+
+	// 更新点坐标信息
+	@Transactional(readOnly = false)
+	public boolean updateCoordinates(CcmOrgNpse ccmOrgNpse) {
+		return ccmOrgNpseDao.updateCoordinates(ccmOrgNpse)>0;
+	}
+	//报表:非公有经济组织数量
+	public SearchTabMore findNumStatistics() {
+		return ccmOrgNpseDao.findNumStatistics();
+	}
+
+	//报表:非公有经济组织类别
+	public List<EchartType> findCompType() {
+		return ccmOrgNpseDao.findCompType();
+	}
+
+	//报表:非公有经济组织控股情况
+	public List<EchartType> findHoldCase() {
+		return ccmOrgNpseDao.findHoldCase();
+	}
+
+	//报表:非公有经济组织安全隐患类型
+	public List<EchartType> findSafeHazaType() {
+		return ccmOrgNpseDao.findSafeHazaType();
+	}
+
+	//报表:非公有经济组织重点类型
+	public List<EchartType> findCompImpoType() {
+		return ccmOrgNpseDao.findCompImpoType();
+	}
+
+	//报表:非公有经济组织是否危化企业
+	public List<EchartType> findDangComp() {
+		return ccmOrgNpseDao.findDangComp();
+	}
+
+	//报表:非公有经济组织关注程度
+	public List<EchartType> findConcExte() {
+		return ccmOrgNpseDao.findConcExte();
+	}
+
+	//报表:重点场所数据重点类型
+	public List<EchartType> findKeyPlaceType(EchartType echartType) {
+		return ccmOrgNpseDao.findKeyPlaceType(echartType);
+	}
+
+	//报表:重点场所数据重点类型-学校
+	public List<EchartType> findSchool() {
+		return ccmOrgNpseDao.findSchool();
+	}
+
+	//报表:重点场所数据-学校办学类型统计
+	public List<EchartType> findSchoolType() {
+		return ccmOrgNpseDao.findSchoolType();
+	}
+
+	//重点企业数量
+	public int findCompImpoTypes() {
+		return ccmOrgNpseDao.findCompImpoTypes();
+	}
+
+	//报表:重点场所数据区域
+	public List<EchartType> findArea(EchartType echartType) {
+		return ccmOrgNpseDao.findArea(echartType);
+	}
+
+	//危化企业
+	public List<EchartType> getDangComp() {
+		return ccmOrgNpseDao.getDangComp();
+	}
+
+	//风险级别数量
+	public int findNumRiskRank(CcmOrgNpse ccmOrgNpse) {
+		return ccmOrgNpseDao.findNumRiskRank(ccmOrgNpse);
+	}
+
+	//首页概况各种总数查询//安全生产重点//消防重点//物流安全
+	public int findCompImpoTypeData(CcmOrgNpse ccmOrgNpse) {
+		return ccmOrgNpseDao.findCompImpoTypeData(ccmOrgNpse);
+	}
+
+	//重点企业分布
+	public List<EchartType> getCompImpoTypeTrue() {
+		return ccmOrgNpseDao.getCompImpoTypeTrue();
+	}
+
+	//治安重点场所
+	public List<EchartType> getSafePubData() {
+		return ccmOrgNpseDao.getSafePubData();
+	}
+
+	//企业数量-大屏-滨海新区社会网格化管理信息平台
+	public String getqiyeNumData(CcmOrgNpse ccmOrgNpse) {
+		return ccmOrgNpseDao.getqiyeNumData(ccmOrgNpse);
+	}
+
+	//风险单位数据分析-按街道-大屏-滨海新区社会网格化管理信息平台
+	public List<EchartType> findSumByString(CcmOrgNpse ccmOrgNpse) {
+		return ccmOrgNpseDao.findSumByString(ccmOrgNpse);
+	}
+
+	//街道信息-大屏-滨海新区社会网格化管理信息平台
+	public List<SearchTab> findListAllData(CcmOrgNpse ccmOrgNpse) {
+		return ccmOrgNpseDao.findListAllData(ccmOrgNpse);
+	}
+
+	//报表:非公有经济组织重点类型-无关联
+	public List<EchartType> findCompImpoType2() {
+		return ccmOrgNpseDao.findCompImpoType2();
+	}
+	
+	
+	
+	
+	
+	
+	
+}

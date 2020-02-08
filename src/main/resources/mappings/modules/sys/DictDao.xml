@@ -1,0 +1,265 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.arjjs.ccm.modules.sys.dao.DictDao">
+
+
+	<!-- 树形结构 -->
+	<select id="findListAll" resultType="Dict">
+		SELECT proc.ID_ as id,
+		dict.pid as parent_id, proc.NAME_ as
+		name,proc.DESCRIPTION_ as url FROM
+		(SELECT id as pid, value from sys_dict WHERE type =
+		'act_category')dict,
+		(SELECT ID_, CATEGORY_, KEY_, NAME_,DESCRIPTION_
+		from act_re_procdef
+		GROUP BY KEY_ ) proc
+		WHERE dict.value =
+		proc.CATEGORY_
+		UNION
+		SELECT id, '' as pid, label as name,'' as url from
+		sys_dict WHERE type =
+		'act_category'
+	</select>
+	<!--我的请求和流程归档的树形查询的数量 -->
+	<select id="findAll" resultType="Dict">
+		SELECT A.ID AS id,A.NAME AS
+		name,A.PARENT_ID AS parentId,A.PROCINSID AS
+		procInsId,IFNULL(B.COUNT,0) AS count FROM
+		(SELECT PROC.ID_ AS ID,
+		DICT.PID AS PARENT_ID, PROC.NAME_ AS NAME,
+		PROC.KEY_ AS PROCINSID FROM
+		( SELECT ID AS PID, VALUE FROM SYS_DICT
+		WHERE TYPE = 'act_category' )
+		DICT, ( SELECT ID_, CATEGORY_, KEY_,
+		NAME_, DESCRIPTION_ FROM
+		ACT_RE_PROCDEF GROUP BY KEY_ ) PROC WHERE
+		DICT.VALUE = PROC.CATEGORY_
+		UNION
+		SELECT id, '' AS pId, LABEL AS name, '' AS procInsId FROM
+		SYS_DICT WHERE
+		TYPE = 'act_category') A
+		LEFT JOIN
+		(SELECT COUNT( * )
+		count,
+		A.TYPE TYPE FROM PLM_ACT A WHERE A.DEL_FLAG = 0
+		<if test="supExeId == null or supExeId == ''">
+			AND A.CREATE_BY = #{currentUser.id}
+		</if>
+		<if test="status != null and status != ''">
+			AND A.STATUS = #{status}
+		</if>
+		<if test="supExeId != null and supExeId != ''">
+			AND A.sup_exe_id=#{currentUser.id}
+			AND A.STATUS !=
+			#{supExeId}
+		</if>
+		GROUP BY
+		A.TYPE ) B
+		ON A.PROCINSID = B.type
+	</select>
+	<!-- 待办事宜的数量 -->
+	<select id="findNumberAll" resultType="Dict">
+		SELECT A.ID AS id,A.NAME
+		AS
+		name,A.PARENT_ID AS parentId,A.PROCINSID AS
+		procInsId,IFNULL(B.COUNT,0) AS count FROM
+		(SELECT PROC.ID_ AS ID,
+		DICT.PID AS PARENT_ID, PROC.NAME_ AS NAME,
+		PROC.KEY_ AS PROCINSID FROM
+		( SELECT ID AS PID, VALUE FROM SYS_DICT
+		WHERE TYPE = 'act_category' )
+		DICT, ( SELECT ID_, CATEGORY_, KEY_,
+		NAME_, DESCRIPTION_ FROM
+		ACT_RE_PROCDEF GROUP BY KEY_ ) PROC WHERE
+		DICT.VALUE = PROC.CATEGORY_
+		UNION
+		SELECT id, '' AS pId, LABEL AS name, '' AS procInsId FROM
+		SYS_DICT WHERE
+		TYPE = 'act_category') A
+		LEFT JOIN
+		(SELECT count(*) count
+		, substring_index(PROC_DEF_ID_,":",1) AS procdefid FROM act_ru_task a
+		WHERE a.ASSIGNEE_ = #{currentUser.loginName} GROUP BY substring_index(
+		a.PROC_DEF_ID_ , ":", 1 )) B
+		ON A.PROCINSID = B.procdefid
+	</select>
+	<!-- 查询已办流程 -->
+	<select id="findAllNumber" resultType="Dict">
+		SELECT A.ID AS id,A.NAME
+		AS
+		name,A.PARENT_ID AS parentId,A.PROCINSID AS
+		procInsId,IFNULL(B.COUNT,0) AS count FROM
+		(SELECT PROC.ID_ AS ID,
+		DICT.PID AS PARENT_ID, PROC.NAME_ AS NAME,
+		PROC.KEY_ AS PROCINSID FROM
+		( SELECT ID AS PID, VALUE FROM SYS_DICT
+		WHERE TYPE = 'act_category' )
+		DICT, ( SELECT ID_, CATEGORY_, KEY_,
+		NAME_, DESCRIPTION_ FROM
+		ACT_RE_PROCDEF GROUP BY KEY_ ) PROC WHERE
+		DICT.VALUE = PROC.CATEGORY_
+		UNION
+		SELECT id, '' AS pId, LABEL AS name, '' AS procInsId FROM
+		SYS_DICT WHERE
+		TYPE = 'act_category') A
+		LEFT JOIN
+		(SELECT count(*) count
+		, substring_index(PROC_DEF_ID_,":",1) AS procdefid FROM
+		act_hi_taskinst a WHERE a.END_TIME_ IS NOT NULL AND a.ASSIGNEE_ =
+		#{currentUser.loginName} GROUP BY substring_index( a.PROC_DEF_ID_ ,
+		":", 1 )) B
+		ON A.PROCINSID = B.procdefid
+	</select>
+	<!--查询所有流程的留成标识和名称 -->
+	<select id="findActKeyAndName" resultType="Dict">
+		SELECT proc.KEY_ as
+		value , proc.NAME_ as name FROM
+		(SELECT id as pid, value from sys_dict
+		WHERE type = 'act_category')dict,
+		(SELECT ID_, CATEGORY_, KEY_, NAME_
+		from act_re_procdef GROUP BY KEY_
+		) proc
+		WHERE dict.value =
+		proc.CATEGORY_
+	</select>
+
+
+	<select id="get" resultType="Dict">
+		SELECT
+		*
+		FROM sys_dict
+		WHERE id = #{id}
+	</select>
+
+	<select id="findList" resultType="Dict">
+		SELECT
+		*
+		FROM sys_dict
+		WHERE del_flag = #{DEL_FLAG_NORMAL}
+		<if test="type != null and type != ''">
+			AND type = #{type}
+		</if>
+		<if test="description != null and description != ''">
+			AND description LIKE
+			<if test="dbName == 'oracle'">'%'||#{description}||'%'</if>
+			<if test="dbName == 'mssql'">'%'+#{description}+'%'</if>
+			<if test="dbName == 'mysql'">CONCAT('%', #{description}, '%')</if>
+		</if>
+		ORDER BY type, sort, update_date DESC
+	</select>
+
+	<select id="findAllList" resultType="Dict">
+		SELECT
+		*
+		FROM sys_dict
+		WHERE
+		del_flag = #{DEL_FLAG_NORMAL}
+		ORDER BY type, sort, update_date DESC
+	</select>
+
+	<select id="findTypeList" resultType="string">
+		SELECT
+		type
+		FROM sys_dict
+		WHERE del_flag = #{DEL_FLAG_NORMAL}
+		GROUP BY type
+		ORDER BY type
+	</select>
+
+	<insert id="insert">
+		INSERT INTO sys_dict(
+		id,
+		value,
+		label,
+		type,
+		description,
+		sort,
+		create_by,
+		create_date,
+		update_by,
+		update_date,
+		remarks,
+		del_flag
+		) VALUES (
+		#{id},
+		#{value},
+		#{label},
+		#{type},
+		#{description},
+		#{sort},
+		#{createBy.id},
+		#{createDate},
+		#{updateBy.id},
+		#{updateDate},
+		#{remarks},
+		#{delFlag}
+		)
+	</insert>
+
+	<update id="update">
+		UPDATE sys_dict SET
+		value = #{value},
+		label = #{label},
+		type = #{type},
+		description = #{description},
+		sort = #{sort},
+		update_by =
+		#{updateBy.id},
+		update_date = #{updateDate},
+		remarks = #{remarks}
+		WHERE
+		id = #{id}
+	</update>
+
+	<update id="delete">
+		UPDATE sys_dict SET
+		del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+
+
+	<resultMap id="ResultAlarmTypeMap"  type="com.arjjs.ccm.modules.ccm.rest.entity.SysDictLbVo" >
+		<id column="id" property="id" jdbcType="VARCHAR" />
+		<result column="value" property="value" jdbcType="VARCHAR" />
+		<result column="label" property="label" jdbcType="VARCHAR" />
+		<result column="type" property="type" jdbcType="VARCHAR" />
+		<result column="description" property="description" jdbcType="VARCHAR" />
+		<result column="sort" property="sort" jdbcType="DECIMAL" />
+		<result column="parent_id" property="parentId" jdbcType="VARCHAR" />
+		<collection property="lxList" ofType="com.arjjs.ccm.modules.ccm.rest.entity.SysDictLxVo">
+			<id column="lx_id" property="id" jdbcType="VARCHAR" />
+			<result column="lx_value" property="value" jdbcType="VARCHAR" />
+			<result column="lx_label" property="label" jdbcType="VARCHAR" />
+			<result column="lx_type" property="type" jdbcType="VARCHAR" />
+			<result column="lx_description" property="description" jdbcType="VARCHAR" />
+			<result column="lx_sort" property="sort" jdbcType="DECIMAL" />
+			<result column="lx_parent" property="parentId" jdbcType="VARCHAR" />
+			<collection property="lxList" ofType="com.arjjs.ccm.modules.ccm.rest.entity.SysDictLxVo">
+				<id column="sl_id" property="id" jdbcType="VARCHAR" />
+				<result column="sl_value" property="value" jdbcType="VARCHAR" />
+				<result column="sx_label" property="label" jdbcType="VARCHAR" />
+				<result column="sl_type" property="type" jdbcType="VARCHAR" />
+				<result column="sl_description" property="description" jdbcType="VARCHAR" />
+				<result column="sl_sort" property="sort" jdbcType="DECIMAL" />
+				<result column="sl_parent" property="parentId" jdbcType="VARCHAR" />
+			</collection>
+		</collection>
+	</resultMap>
+	<select id="selectAlarmTypeInfo" resultMap="ResultAlarmTypeMap" parameterType="com.arjjs.ccm.modules.ccm.rest.entity.SysDictLbVo" >
+      SELECT
+          t1.id,t1.`value`,t1.label,t1.type,t1.description,t1.sort,t1.parent_id,
+          t2.id lx_id,t2.`value` lx_value,t2.label lx_label,t2.type lx_type,t2.description lx_description,t2.sort lx_sort,t2.parent_id lx_parent,
+          t3.id sl_id,t3.`value` sl_value,t3.label sx_label,t3.type sl_type,t3.description sl_description,t3.sort sl_sort,t3.parent_id sl_parent
+      FROM
+       sys_dict AS t1
+      LEFT JOIN sys_dict AS t2 ON t1.id = t2.parent_id
+      LEFT JOIN sys_dict AS t3 ON t2.id = t3.parent_id
+      WHERE
+        t1.type = 'bph_alarm_info_typecode'
+  </select>
+	<select id="selectDictByType" resultType="com.arjjs.ccm.modules.ccm.sys.entity.SysDict">
+		SELECT    *   FROM sys_dict t WHERE
+		<if test=" type != null and type != '' ">  t.type = #{type}</if>
+		order by t.sort asc
+	</select>
+</mapper>

@@ -1,0 +1,153 @@
+
+ p.notice {
+    color: #fff;
+    text-align: left;
+    height: 55%;
+    overflow: hidden;
+     text-indent: 2em;
+     display: -webkit-box;
+     -webkit-line-clamp: 3;
+     -webkit-box-orient: vertical;
+}
+#DutyUL .span6{
+    padding-left: 5%;
+}
+#DutyUL  i {
+    display: block;
+    width: 10px;
+    height: 10px;
+    background-color: #1aa0ee;
+    float: left;
+    margin-top: 4px;
+    margin-right: 10px;
+}
+#DutyUL  b {
+   font-weight: normal;
+}
+.echartsAlarm-value  li {
+    float: none;
+    width: 114px;
+    background-color: rgba(0,0,0,0.3);
+    border-radius: 4px;
+    margin-top: 10px;
+    height: 28px;
+    line-height: 28px;
+    overflow: hidden;
+    margin-left: 14px;
+}
+
+.alarm-value{
+    margin-left: 10%;
+}
+ .alarm-name {
+    display: inline-block;
+    width: 60px;
+    text-align: center;
+}
+ .alarm-name1 {
+    background: #aa4644;
+}
+.alarm-name2 {
+    background: #cc7b33;
+}
+.alarm-name3 {
+    background: #89a54e;
+}
+.alarm-name4 {
+    background: #18a73e;
+}
+
+/* #echartsAlarm {
+    width: 100%;
+    height: 200px;
+} */
+.echartsAlarm-tab  li {
+    width: 25%;
+    float: left;
+    line-height: 28px;
+    text-align: center;
+    cursor: pointer;
+}
+.echartsAlarm-tab > li.active, .echartsAlarm-tab > li:hover {
+    background: url('../../tc2.png') no-repeat center;
+    background-size: 100% 100%;
+    background-color: rgba(45,84,159,0.3);
+}
+
+ #alarmTable {
+     margin-top: 12px;
+ }
+.results{
+    margin-top: 5%;
+}
+.results .span4{
+    text-align: center;
+}
+.list_lh {
+    height: 104%;
+}
+#AlarmUL {
+    width: 100%;
+    margin: 0 auto;
+}
+#AlarmUL li {
+    padding: 1% 0;
+    word-break: keep-all;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    cursor: pointer;
+}
+.alarm1 b {
+    color: #aa4644;
+    font-weight: normal;
+}
+.alarm2 b {
+    color: #cc7b33;
+    font-weight: normal;
+}
+.alarm3 b{
+    color: #89a54e;
+    font-weight: normal;
+}
+ .alarm4 b{
+     color: #18a73e;
+     font-weight: normal;
+ }
+
+@media (max-width: 1366px) {
+    p.notice {
+        height: 47%;
+    }
+    #DutyUL .span6 {
+         padding-left: 0%;
+        min-height: 24px;
+    }
+
+    #echartsAlarm{
+        height:140px
+    }
+    .echartsAlarm-value li {
+        height: 20px;
+        line-height: 20px;
+        width: 91px;
+    }
+    .alarm-name {
+        width: 50px;
+    }
+    #alarmTable td {
+        line-height: 18px;
+    }
+    .echartsAlarm-tab li {
+        line-height: 20px;
+    }
+    #alarmTable {
+        margin-top: 5px;
+    }
+}
+@media (min-width: 1367px) and (max-width:1440px) {
+
+}
+@media (min-width: 1441px)  {
+
+}

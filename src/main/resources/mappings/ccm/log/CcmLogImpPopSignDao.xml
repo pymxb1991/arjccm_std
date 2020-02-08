@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.arjjs.ccm.modules.ccm.log.dao.CcmLogImpPopSignDao">
+    
+	<sql id="ccmLogImpPopSignColumns">
+		a.id AS "id",
+		a.people_id AS "peopleId.id",
+		a.relevance_table AS "relevanceTable",
+		a.type AS "type",
+		a.content AS "content",
+		a.tail_time AS "tailTime",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag",
+		a.pic AS "pic",
+		a.effective_status AS "effectiveStatus",
+		a.error_status AS "errorStatus",
+		u.name AS "peopleId.name",
+		u.is_release AS "peopleId.isRelease",
+		u.is_rectification AS "peopleId.isRectification",
+		u.is_aids AS "peopleId.isAids",
+		u.is_psychogeny AS "peopleId.isPsychogeny",
+		u.is_drugs AS "peopleId.isDrugs",
+		u.is_visit AS "peopleId.isVisit",
+		u.is_heresy AS "peopleId.isHeresy",
+		u.images AS "peopleId.images"
+	</sql>
+	
+	<sql id="ccmLogImpPopSignJoins">
+		LEFT JOIN ccm_people u on u.id = a.people_id
+	</sql>
+    
+	<select id="get" resultType="CcmLogImpPopSign">
+		SELECT 
+			<include refid="ccmLogImpPopSignColumns"/>
+		FROM ccm_log_imp_pop_sign a
+		<include refid="ccmLogImpPopSignJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="CcmLogImpPopSign">
+		SELECT 
+			<include refid="ccmLogImpPopSignColumns"/>
+		FROM ccm_log_imp_pop_sign a
+		<include refid="ccmLogImpPopSignJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="peopleId != null and peopleId.name != null and peopleId.name != ''">
+				AND u.name LIKE 
+				<if test="dbName == 'oracle'">'%'||#{peopleId.name}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{peopleId.name}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{peopleId.name},'%')</if>
+			</if>
+			<if test="type != null and type != ''">
+				AND a.type = #{type}
+			</if>
+			<if test="effectiveStatus != null and effectiveStatus != ''">
+				AND a.effective_status = #{effectiveStatus}
+			</if>
+			<if test="errorStatus != null and errorStatus != ''">
+				AND a.error_status = #{errorStatus}
+			</if>
+			<if test="content != null and content != ''">
+				AND a.content LIKE 
+					<if test="dbName == 'oracle'">'%'||#{content}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{content}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{content},'%')</if>
+			</if>
+			<if test="beginTailTime != null and endTailTime != null and beginTailTime != '' and endTailTime != ''">
+				AND a.tail_time BETWEEN #{beginTailTime} AND #{endTailTime}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="CcmLogImpPopSign">
+		SELECT 
+			<include refid="ccmLogImpPopSignColumns"/>
+		FROM ccm_log_imp_pop_sign a
+		<include refid="ccmLogImpPopSignJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO ccm_log_imp_pop_sign(
+			id,
+			people_id,
+			relevance_table,
+			type,
+			content,
+			tail_time,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag,
+			pic,
+			effective_status,
+			error_status
+		) VALUES (
+			#{id},
+			#{peopleId.id},
+			#{relevanceTable},
+			#{type},
+			#{content},
+			#{tailTime},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag},
+			#{pic},
+			#{effectiveStatus},
+			#{errorStatus}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE ccm_log_imp_pop_sign SET 	
+			people_id = #{peopleId.id},
+			relevance_table = #{relevanceTable},
+			type = #{type},
+			content = #{content},
+			tail_time = #{tailTime},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			pic = #{pic},
+			effective_status = #{effectiveStatus},
+			error_status = #{errorStatus},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE ccm_log_imp_pop_sign SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

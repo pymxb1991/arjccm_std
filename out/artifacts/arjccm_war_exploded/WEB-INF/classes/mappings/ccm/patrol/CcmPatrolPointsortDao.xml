@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.arjjs.ccm.modules.ccm.patrol.dao.CcmPatrolPointsortDao">
+
+	<sql id="ccmPatrolPointsortColumns">
+		a.id AS "id",
+		a.plan_id AS "planId",
+		a.point_id AS "pointId",
+		a.sort AS "sort",
+		a.create_by AS "createBy.id",
+		a.create_date AS
+		"createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS
+		"updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag",
+		b.area_point AS "areaPoint"
+	</sql>
+
+	<sql id="ccmPatrolPointsortJoins">
+		LEFT JOIN ccm_patrol_point b ON b.id = a.point_id
+	</sql>
+
+	<select id="get" resultType="CcmPatrolPointsort">
+		SELECT
+		<include refid="ccmPatrolPointsortColumns" />
+		FROM ccm_patrol_pointsort a
+		<include refid="ccmPatrolPointsortJoins" />
+		WHERE a.id = #{id}
+	</select>
+
+	<select id="findList" resultType="CcmPatrolPointsort">
+		SELECT
+		<include refid="ccmPatrolPointsortColumns" />
+		FROM ccm_patrol_pointsort a
+		<include refid="ccmPatrolPointsortJoins" />
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test=" planId != null and planId !='' ">
+            and plan_id = #{planId}
+            </if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.sort asc
+			</otherwise>
+		</choose>
+	</select>
+
+	<select id="findAllList" resultType="CcmPatrolPointsort">
+		SELECT
+		<include refid="ccmPatrolPointsortColumns" />
+		FROM ccm_patrol_pointsort a
+		<include refid="ccmPatrolPointsortJoins" />
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+
+	<insert id="insert">
+		INSERT INTO ccm_patrol_pointsort(
+		id,
+		plan_id,
+		point_id,
+		sort,
+		create_by,
+		create_date,
+		update_by,
+		update_date,
+		remarks,
+		del_flag
+		) VALUES (
+		#{id},
+		#{planId},
+		#{pointId},
+		#{sort},
+		#{createBy.id},
+		#{createDate},
+		#{updateBy.id},
+		#{updateDate},
+		#{remarks},
+		#{delFlag}
+		)
+	</insert>
+
+	<update id="update">
+		UPDATE ccm_patrol_pointsort SET
+		plan_id = #{planId},
+		point_id = #{pointId},
+		sort = #{sort},
+		update_by = #{updateBy.id},
+		update_date = #{updateDate},
+		remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+
+	<update id="delete">
+		UPDATE ccm_patrol_pointsort SET
+		del_flag =
+		#{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+
+	<!-- read_time AS "readTime" -->
+	<insert id="insertAll" parameterType="List">
+		INSERT INTO ccm_patrol_pointsort(
+		id,
+		plan_id,
+		point_id,
+		sort,
+		create_by,
+		create_date,
+		update_by,
+		update_date,
+		remarks,
+		del_flag
+		)
+		<if test="list.get(0).dbName == 'mssql' or list.get(0).dbName == 'mysql'">
+			VALUES
+			<foreach collection="list" item="e" open="" separator=","
+				close="">
+				(
+				#{e.id},
+				#{e.planId},
+				#{e.pointId},
+				#{e.sort},
+				#{e.createBy.id},
+				#{e.createDate},
+				#{e.updateBy.id},
+				#{e.updateDate},
+				#{e.remarks},
+				#{e.delFlag}
+				)
+			</foreach>
+		</if>
+	</insert>
+
+	<delete id="deleteBypointId">
+		DELETE FROM ccm_patrol_pointsort
+		WHERE plan_id =
+		#{planId}
+	</delete>
+
+</mapper>

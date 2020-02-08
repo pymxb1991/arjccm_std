@@ -1,0 +1,564 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.arjjs.ccm.modules.ccm.tree.dao.CcmTreeDao">
+
+	<sql id="ccmTreeColumns">
+		a.id AS "id",
+		a.parent_id AS "parent.id",
+		a.parent_ids AS
+		"parentIds",
+		a.name AS "name",
+		a.sort AS "sort",
+		a.type AS "type",
+		a.area_point AS "areaPoint",
+		a.area_map AS "areaMap",
+		a.create_by AS
+		"createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS
+		"updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag"
+	</sql>
+
+	<sql id="ccmTreeJoins">
+	</sql>
+
+	<select id="get" resultType="CcmTree">
+		SELECT
+		<include refid="ccmTreeColumns" />
+		FROM ccm_tree a
+		<include refid="ccmTreeJoins" />
+		WHERE a.id = #{id}
+	</select>
+
+
+
+	<!-- 地图标注树状图 -->
+	<select id="findListTree" resultType="CcmTree">
+		SELECT
+		a.id AS "id",
+		a.parent_id AS "parent.id",
+		a. NAME AS "name",
+		CONCAT("area",a.type) AS "type",
+		a_ex.area_point AS "areaPoint",
+		a_ex.area_map AS "areaMap",
+		"" as "more1",
+		a_ex.area_color as "color"
+		FROM
+		sys_area
+		a
+		LEFT JOIN ccm_org_area a_ex ON a_ex.area_id = a.id
+		WHERE
+		a.parent_id IS
+		NOT NULL
+		 <if test="param3 != null and param3.id != null and param3.id != ''">
+		AND ( a.parent_ids LIKE  CONCAT('%',#{param3.id},'%') or a.id=#{param3.id} )
+		 </if>
+		AND a.del_flag = 0
+		UNION ALL
+		-- 楼栋
+		 		
+		SELECT
+		b.id AS "id",
+		b.area_id
+		AS "parent.id",
+		b.buildname AS "name",
+		"build" AS "type",
+		b.area_point AS
+		"areaPoint",
+		b.area_map AS "areaMap",
+        "" as "more1",
+        "" as "color"
+		FROM
+		ccm_house_buildmanage b,
+		sys_area area
+		WHERE
+		b.area_id IS NOT NULL
+		AND b.area_id = area.id
+		 <if test="param3 != null and param3.id != null and param3.id != ''">
+		AND (area.parent_ids LIKE  CONCAT('%',#{param3.id},'%')  or b.area_id = #{param3.id} )
+		 </if>
+		AND
+		b.del_flag = 0
+		AND area.del_flag = 0
+		UNION ALL 
+		-- 公共机构
+		SELECT
+		commonality.id AS "id",
+		commonality.area_id AS "parent.id",
+		commonality. NAME AS "name",
+-- 		"commonality" AS "type",
+		CASE
+			WHEN commonality.type = 10 THEN "policeroom"
+			WHEN commonality.type = 11 THEN "workstation"
+			ELSE		"commonality"
+		END AS type,
+		commonality.area_point AS "areaPoint",
+		commonality.area_map AS
+		"areaMap",
+        "" as "more1",
+        "" as "color"
+		FROM
+		ccm_org_commonality commonality,
+		sys_area area
+		WHERE
+		commonality.area_id IS NOT NULL
+		AND commonality.area_id = area.id
+		 <if test="param3 != null and param3.id != null and param3.id != ''">
+		AND (area.parent_ids LIKE  CONCAT('%',#{param3.id},'%')  or commonality.area_id = #{param3.id})
+		 </if>
+		AND
+		commonality.del_flag = 0
+		AND area.del_flag = 0
+		UNION ALL
+		-- 重点及风险单位
+		SELECT
+		npse.id AS "id",
+		npse.area_id AS "parent.id",
+		npse.comp_name AS "name",
+		"npse" AS "type",
+		npse.area_point AS "areaPoint",
+		npse.area_map AS
+		"areaMap",
+        "" as "more1",
+        "" as "color"
+		FROM
+		ccm_org_npse npse,
+		sys_area area
+		WHERE
+		npse.area_id IS NOT
+		NULL
+		<!-- AND (npse.comp_impo_type IN ('01', '02', '03', '04', '05') or npse.risk_rank IN ('02', '03', '04', '05') ) -->
+		AND
+		npse.area_id = area.id
+		 <if test="param3 != null and param3.id != null and param3.id != ''">
+		AND (area.parent_ids LIKE  CONCAT('%',#{param3.id},'%')  or npse.area_id = #{param3.id})
+		 </if>
+		AND npse.del_flag = 0
+		AND area.del_flag = 0
+		UNION
+		ALL
+		-- 重点部位：学校
+		SELECT
+		school.id AS "id",
+		school.area_id AS "parent.id",
+		school.school_name AS "name",
+		"school" AS "type",
+		school.area_point AS
+		"areaPoint",
+		school.area_map AS "areaMap",
+        "" as "more1",
+        "" as "color"
+		FROM
+		ccm_house_schoolrim
+		school,
+		sys_area area
+		WHERE
+		school.area_id IS NOT NULL
+		AND school.area_id
+		= area.id
+		 <if test="param3 != null and param3.id != null and param3.id != ''">
+		AND (area.parent_ids LIKE  CONCAT('%',#{param3.id},'%')  or school.area_id = #{param3.id})
+		 </if>
+		AND school.del_flag = 0
+		AND area.del_flag = 0
+		UNION ALL
+		-- 城市部件
+		SELECT
+		ccm_city_components.id AS "id",
+		ccm_city_components.area_id AS "parent.id",
+		ccm_city_components.`name` AS "name",
+		"citycomponents" AS "type",
+		ccm_city_components.area_point AS "areaPoint",
+		ccm_city_components.area_map AS "areaMap",
+		ccm_city_components.spatial_form as "more1",
+        "" as "color"
+		FROM
+		ccm_city_components, sys_area area
+		WHERE
+		ccm_city_components.area_id IS NOT NULL
+		AND ccm_city_components.area_id = area.id
+		 <if test="param3 != null and param3.id != null and param3.id != ''">
+		AND (area.parent_ids LIKE  CONCAT('%',#{param3.id},'%')  or ccm_city_components.area_id = #{param3.id})
+		 </if>
+		AND area.del_flag = 0
+		AND ccm_city_components.del_flag = 0
+		UNION ALL
+		-- 摄像机
+		SELECT
+		device.id AS "id",
+		device.area_id AS "parent.id",
+		device. NAME AS "name",
+		"camera" AS "type",
+		device.coordinate AS "areaPoint",
+		"" AS "areaMap",
+        "" as "more1",
+        "" as "color"
+		FROM
+		ccm_device device,
+		sys_area area
+		WHERE
+		device.area_id IS NOT NULL
+		AND device.area_id = area.id
+		 <if test="param3 != null and param3.id != null and param3.id != ''">
+		AND (area.parent_ids LIKE  CONCAT('%',#{param3.id},'%')  or device.area_id = #{param3.id})
+		 </if>
+		AND device.del_flag = 0
+		AND
+		area.del_flag = 0
+		union ALL
+		-- 土地
+		SELECT
+		ccm_land.id AS "id",
+		ccm_land.area_id AS "parent.id",
+		ccm_land.`name` AS "name",
+		"land" AS "type",
+		ccm_land.area_point AS "areaPoint",
+		ccm_land.area_map AS "areaMap",
+        "" as "more1",
+        "" as "color"
+		FROM
+		ccm_land,
+		sys_area area
+		WHERE
+		ccm_land.area_id IS NOT NULL AND
+		ccm_land.area_id = area.id
+		 <if test="param3 != null and param3.id != null and param3.id != ''">
+		AND (area.parent_ids LIKE  CONCAT('%',#{param3.id},'%')  or ccm_land.area_id = #{param3.id})
+		 </if>
+		AND area.del_flag = 0
+		AND ccm_land.del_flag = 0
+		UNION ALL
+		-- 综治机构
+		SELECT
+			v.id AS "id",
+			v.area_id AS "parent.id",
+			v.name AS "name",
+			"vccmorg" AS "type",
+			v.area_point AS "areaPoint",
+			v.area_map AS "areaMap",
+	        "" as "more1",
+            "" as "color"
+		FROM
+			v_ccm_org v
+			LEFT JOIN sys_area area ON area.id = v.area_id
+		WHERE
+        	v.del_flag = 0
+		AND  v.area_id IS NOT NULL
+	    AND v.area_id !=''
+	    <if test="param3 != null and param3.id != null and param3.id != ''">
+	    AND (area.parent_ids LIKE  CONCAT('%',#{param3.id},'%')  or v.area_id = #{param3.id})
+	    </if>
+	    AND v.id != '1'
+	    
+		UNION ALL
+		-- 场所
+		SELECT
+			b.id AS "id",
+			b.administrative_division	AS "parent.id",
+			b.place_name AS "name",
+			"basePlace" AS "type",
+			b.area_point AS	"areaPoint",
+			b.area_map AS "areaMap",
+	        "" as "more1",
+            "" as "color"
+		FROM
+			ccm_base_place b,
+			sys_area area
+		WHERE
+		b.administrative_division IS NOT NULL 
+		AND b.administrative_division &lt;&gt;''
+		AND b.administrative_division = area.id
+		 <if test="param3 != null and param3.id != null and param3.id != ''">
+		AND (area.parent_ids LIKE  CONCAT('%',#{param3.id},'%')  or b.administrative_division = #{param3.id} )
+		 </if>
+		AND
+		b.del_flag = 0
+		AND area.del_flag = 0
+
+		UNION ALL
+		-- 广播站
+		SELECT
+		broadcast.id AS "id",
+		broadcast.area_id AS "parent.id",
+		broadcast.NAME AS "name",
+		"broadcast" AS "type",
+		broadcast.coordinate AS "areaPoint",
+		"" AS "areaMap",
+		"" AS "more1",
+        "" as "color"
+		FROM
+		ccm_device_broadcast broadcast,
+		sys_area area
+		WHERE
+		broadcast.area_id IS NOT NULL
+		AND broadcast.area_id = area.id
+		<if test="param3 != null and param3.id != null and param3.id != ''">
+			AND (area.parent_ids LIKE  CONCAT('%',#{param3.id},'%')  or broadcast.area_id = #{param3.id} )
+		</if>
+		AND broadcast.del_flag = 0
+		AND area.del_flag = 0
+	</select>
+	
+	
+	<!-- 社区网格楼栋房屋 -->
+	<select id="findListArea" resultType="CcmTree">
+		SELECT
+            a.id AS "id",
+            a.parent_id AS "parent.id",
+            a.NAME AS "name",
+			a.type AS "type"
+        FROM
+            sys_area a
+        WHERE
+            a.parent_id IS NOT NULL
+        AND a.del_flag = 0
+        UNION ALL
+            SELECT
+                b.id AS "id",
+                b.area_id AS "parent.id",
+                b.buildname AS "name",
+				"8" AS "type"
+            FROM
+                ccm_house_buildmanage b,
+                sys_area area
+            WHERE
+                b.area_id IS NOT NULL
+            AND b.area_id = area.id
+            AND b.del_flag = 0
+            AND area.del_flag = 0
+            UNION ALL
+                SELECT
+                    t.id AS "id",
+                    t.building_id AS "parent.id",
+                    t.house_build AS "name",
+					"9" AS "type"
+                FROM
+                    ccm_pop_tenant t,
+                    ccm_house_buildmanage build,
+                    sys_area area
+                WHERE
+                    t.building_id IS NOT NULL
+                AND t.building_id = build.id
+                AND build.area_id = area.id
+                AND t.del_flag = 0
+                AND build.del_flag = 0
+                AND area.del_flag = 0
+	
+	</select>
+	<!-- 社区网格楼栋房屋 -->
+	<select id="findTreeAll" resultType="com.arjjs.ccm.modules.sys.entity.Area">
+		SELECT
+				a.id,
+				a.parent_id AS "parent.id",
+				a.name,
+				a.type
+				FROM sys_area a
+				WHERE a.del_flag = 0
+				<if test="id != null and id != ''">
+				  AND a.parent_id = #{id}
+				</if>
+				<if test="type != null and type == 6">
+				AND a.type != '7'
+				</if>
+		<if test="type != null and (type == 8 or type == 9)">
+		UNION ALL
+		SELECT
+				b.id AS "id",
+				b.area_id AS "parent.id",
+				b.buildname AS "name",
+				"8" AS "type"
+				FROM
+				ccm_house_buildmanage b,
+				sys_area area
+				WHERE
+				b.area_id IS NOT NULL
+				AND b.area_id = area.id
+				AND b.del_flag = 0
+				AND area.del_flag = 0
+				<if test="id != null and id != ''">
+				  AND (area.id = #{id} or area.parent_id = #{id})
+				</if>
+		</if>
+		<if test="type != null and type == 9 ">
+		UNION ALL
+				SELECT
+				t.id AS "id",
+				t.building_id AS "parent.id",
+				t.house_build AS "name",
+				"9" AS "type"
+				FROM
+				ccm_pop_tenant t,
+				ccm_house_buildmanage build,
+				sys_area area
+				WHERE
+				t.building_id IS NOT NULL
+				AND t.building_id = build.id
+				AND build.area_id = area.id
+				AND t.del_flag = 0
+				AND build.del_flag = 0
+				AND area.del_flag = 0
+				<if test="id != null and id != ''">
+				  AND (area.id = #{id} or area.parent_id = #{id})
+				</if>
+		</if>
+
+	
+	</select>
+	
+	
+	<!-- 地图标注树状图app -->
+	<select id="findListTreeApp" resultType="CcmTree">
+		SELECT
+			app.id AS "id",
+			"10000" AS "parent.id",
+			app.device_id AS "name",
+			"appEfence" AS "type",
+			app.efence_point AS "areaPoint",
+			app.efence_scope AS "areaMap",
+	   		u3.name as "more1"
+		FROM
+			ccm_mobile_device app
+		LEFT JOIN v_ccm_team u3 ON u3.id = app.user_id
+		WHERE
+			app.del_flag = 0
+	</select>
+
+
+	<!-- 电子围栏tree -->
+	<select id="findListTreeElecFence" resultType="CcmTree">
+		SELECT
+			elec.id AS "id",
+			"10000" AS "parent.id",
+			elec.fence_name AS "name",
+			elec.alarm_rule AS "type",
+			elec.area_point AS "areaPoint",
+			elec.area_map AS "areaMap",
+	   		elec.gravity as "more1"
+		FROM
+			ccm_electronic_fence elec
+		WHERE
+			elec.del_flag = 0
+	</select>
+
+	<!-- -->
+	<select id="findList" resultType="CcmTree">
+		SELECT
+		<include refid="ccmTreeColumns" />
+		FROM ccm_tree a
+		<include refid="ccmTreeJoins" />
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="parent != null and parent.id != null and parent.id != ''">
+				AND a.parent_id = #{parent.id}
+			</if>
+			<if test="parentIds != null and parentIds != ''">
+				AND a.parent_ids LIKE
+				<if test="dbName == 'oracle'">'%'||#{parentIds}||'%'</if>
+				<if test="dbName == 'mssql'">'%'+#{parentIds}+'%'</if>
+				<if test="dbName == 'mysql'">concat('%',#{parentIds},'%')</if>
+			</if>
+			<if test="name != null and name != ''">
+				AND a.name LIKE
+				<if test="dbName == 'oracle'">'%'||#{name}||'%'</if>
+				<if test="dbName == 'mssql'">'%'+#{name}+'%'</if>
+				<if test="dbName == 'mysql'">concat('%',#{name},'%')</if>
+			</if>
+		</where>
+		ORDER BY a.sort ASC
+	</select>
+
+	<select id="findAllList" resultType="CcmTree">
+		SELECT
+		<include refid="ccmTreeColumns" />
+		FROM ccm_tree a
+		<include refid="ccmTreeJoins" />
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>
+		ORDER BY a.sort ASC
+	</select>
+
+	<select id="findByParentIdsLike" resultType="CcmTree">
+		SELECT
+		a.id,
+		a.parent_id AS "parent.id",
+		a.parent_ids
+		FROM ccm_tree a
+		<include refid="ccmTreeJoins" />
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			AND a.parent_ids LIKE
+			#{parentIds}
+		</where>
+		ORDER BY a.sort ASC
+	</select>
+
+	<insert id="insert">
+		INSERT INTO ccm_tree(
+		id,
+		parent_id,
+		parent_ids,
+		name,
+		sort,
+		type,
+		area_point,
+		area_map,
+		create_by,
+		create_date,
+		update_by,
+		update_date,
+		remarks,
+		del_flag
+		) VALUES (
+		#{id},
+		#{parent.id},
+		#{parentIds},
+		#{name},
+		#{sort},
+		#{type},
+		#{areaPoint},
+		#{areaMap},
+		#{createBy.id},
+		#{createDate},
+		#{updateBy.id},
+		#{updateDate},
+		#{remarks},
+		#{delFlag}
+		)
+	</insert>
+
+	<update id="update">
+		UPDATE ccm_tree SET
+		parent_id = #{parent.id},
+		parent_ids = #{parentIds},
+		name = #{name},
+		sort = #{sort},
+		type =
+		#{type},
+		area_point = #{areaPoint},
+		area_map = #{areaMap},
+		update_by =
+		#{updateBy.id},
+		update_date = #{updateDate},
+		remarks = #{remarks}
+		WHERE
+		id = #{id}
+	</update>
+
+	<update id="updateParentIds">
+		UPDATE ccm_tree SET
+		parent_id = #{parent.id},
+		parent_ids = #{parentIds}
+		WHERE id = #{id}
+	</update>
+
+	<update id="delete">
+		UPDATE ccm_tree SET
+		del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id} OR parent_ids LIKE
+		'%,'||#{id}||',%'
+	</update>
+</mapper>

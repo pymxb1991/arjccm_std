@@ -1,0 +1,32 @@
+.btn-bgcoler {
+	background: #C5C5C7
+}
+
+.index-style {
+	margin: 20px 100px;
+}
+.index-style2 {
+	margin: 10px 100px;
+}
+.padding-style {
+	margin: 10px 50px
+}
+
+div#rMenu {
+	position: absolute;
+	visibility: hidden;
+	top: 0;
+	background-color: #555;
+	text-align: left;
+	padding: 2px;
+}
+div#rMenu ul{
+	margin:0
+}
+div#rMenu ul li {
+	margin: 1px 0;
+	padding: 0 5px;
+	cursor: pointer;
+	list-style: none outside none;
+	background-color: #DFDFDF;
+}

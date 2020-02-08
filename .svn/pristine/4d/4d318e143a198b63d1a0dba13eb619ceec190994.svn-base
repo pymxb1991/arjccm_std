@@ -1,0 +1,210 @@
+/**
+ * Copyright &copy; 2012-2016 <a href="https://github.com/thinkgem/jeesite">JeeSite</a> All rights reserved.
+ */
+package com.arjjs.ccm.modules.ccm.org.web;
+
+import com.arjjs.ccm.common.config.Global;
+import com.arjjs.ccm.common.persistence.Page;
+import com.arjjs.ccm.common.utils.StringUtils;
+import com.arjjs.ccm.common.web.BaseController;
+import com.arjjs.ccm.modules.ccm.org.entity.CcmOrgArea;
+import com.arjjs.ccm.modules.ccm.org.entity.CcmOrgGropprevent;
+import com.arjjs.ccm.modules.ccm.org.entity.CcmOrgOrgprevent;
+import com.arjjs.ccm.modules.ccm.org.entity.CcmOrgSyncentre;
+import com.arjjs.ccm.modules.ccm.org.service.CcmOrgAreaService;
+import com.arjjs.ccm.modules.ccm.org.service.CcmOrgGroppreventService;
+import com.arjjs.ccm.modules.ccm.org.service.CcmOrgOrgpreventService;
+import com.arjjs.ccm.modules.ccm.org.service.CcmOrgSyncentreService;
+import com.arjjs.ccm.modules.sys.entity.Area;
+import com.arjjs.ccm.modules.sys.service.AreaService;
+import com.arjjs.ccm.tool.CommUtil;
+import com.arjjs.ccm.tool.EchartType;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.util.ArrayList;
+import java.util.List;
+
+/**
+ * 群防群治组织Controller
+ * @author liang
+ * @version 2018-01-13
+ */
+@Controller
+@RequestMapping(value = "${adminPath}/org/ccmOrgOrgprevent")
+public class CcmOrgOrgpreventController extends BaseController {
+
+	@Autowired
+	private CcmOrgOrgpreventService ccmOrgOrgpreventService;
+	@Autowired
+	private AreaService areaService;
+	@Autowired
+	private CcmOrgAreaService ccmOrgAreaService;
+	@Autowired
+	private CcmOrgGroppreventService ccmOrgGroppreventService;
+	@Autowired
+	private CcmOrgSyncentreService ccmOrgSyncentreService;
+	
+	
+	@ModelAttribute
+	public CcmOrgOrgprevent get(@RequestParam(required=false) String id) {
+		CcmOrgOrgprevent entity = null;
+		if (StringUtils.isNotBlank(id)){
+			entity = ccmOrgOrgpreventService.get(id);
+		}
+		if (entity == null){
+			entity = new CcmOrgOrgprevent();
+		}
+		return entity;
+	}
+	/**
+	 * 组织队伍建设数据-大屏-滨海新区社会网格化管理信息平台
+	 * 
+	 * @param model
+	 * @return
+	 */
+	@ResponseBody
+	@RequestMapping(value = "getOrgpreventData")
+	public List<String> getOrgpreventData(Model model) {
+		// 返回对象结果
+		List<String> list = new ArrayList<>();
+		
+		//街道
+		Area area = new Area();
+		area.setType("4");//街道 // by maoxb form chenby
+		List<Area> list1 = areaService.findList(area);
+		if(list1.size()>0){
+			list.add(list1.size()+"");
+		}else{
+			list.add("0");
+		}
+		
+		//网格
+		area.setType("7");//网格
+		List<Area> list2 = areaService.findList(area);
+		if(list2.size()>0){
+			list.add(list2.size()+"");
+		}else{
+			list.add("0");
+		}
+		
+		//社区
+		area.setType("6");//社区
+		List<Area> list3 = areaService.findList(area);
+		if(list3.size()>0){
+			list.add(list3.size()+"");
+		}else{
+			list.add("0");
+		}
+		
+		//网格员
+		int a=0;
+		List<CcmOrgArea> list4 = ccmOrgAreaService.findList(new CcmOrgArea());
+		if(list4.size()>0){
+			for(CcmOrgArea areas:list4){
+				if(areas.getNetPeoNum()!=null){
+					a +=areas.getNetPeoNum();
+				}
+			}
+		}
+		list.add(a+"");//网格人员
+		
+		//群防群治组织
+		List<CcmOrgOrgprevent> list5 = ccmOrgOrgpreventService.findList(new CcmOrgOrgprevent());
+		if(list5.size()>0){
+			list.add(list5.size()+"");
+		}else{
+			list.add("0");
+		}
+		
+		//群防群治队伍人数
+		List<CcmOrgGropprevent> list6 = ccmOrgGroppreventService.findList(new CcmOrgGropprevent());
+		if(list6.size()>0){
+			list.add(list6.size()+"");
+		}else{
+			list.add("0");
+		}
+		
+		//综治中心
+		List<CcmOrgSyncentre> list7 = ccmOrgSyncentreService.findList(new CcmOrgSyncentre());
+		if(list7.size()>0){
+			list.add(list7.size()+"");
+		}else{
+			list.add("0");
+		}
+		
+		return list;
+	}
+	/**
+	 * 群防群治组织结构-大屏-滨海新区社会网格化管理信息平台
+	 * 
+	 * @param model
+	 * @return
+	 */
+	@ResponseBody
+	@RequestMapping(value = "findOrgpreventComTypeType")
+	public List<EchartType> findOrgpreventComTypeType(Model model) {
+		// 返回对象结果
+		List<EchartType> list = ccmOrgOrgpreventService.findOrgpreventComTypeType(new CcmOrgSyncentre());
+		return list;
+	}
+	
+	
+	
+	
+	
+	
+	@RequiresPermissions("org:ccmOrgOrgprevent:view")
+	@RequestMapping(value = {"list", ""})
+	public String list(CcmOrgOrgprevent ccmOrgOrgprevent, HttpServletRequest request, HttpServletResponse response, Model model) {
+		Page<CcmOrgOrgprevent> page = ccmOrgOrgpreventService.findPage(new Page<CcmOrgOrgprevent>(request, response), ccmOrgOrgprevent); 
+		model.addAttribute("page", page);
+		return "ccm/org/ccmOrgOrgpreventList";
+	}
+
+	@RequiresPermissions("org:ccmOrgOrgprevent:view")
+	@RequestMapping(value = "form")
+	public String form(CcmOrgOrgprevent ccmOrgOrgprevent, Model model) {
+		model.addAttribute("ccmOrgOrgprevent", ccmOrgOrgprevent);
+		return "ccm/org/ccmOrgOrgpreventForm";
+	}
+
+	@RequiresPermissions("org:ccmOrgOrgprevent:edit")
+	@RequestMapping(value = "save")
+	public void save(CcmOrgOrgprevent ccmOrgOrgprevent, Model model, RedirectAttributes redirectAttributes,
+			HttpServletResponse response) {
+		if (!beanValidator(model, ccmOrgOrgprevent)){
+			//return form(ccmOrgOrgprevent, model);
+		}
+		ccmOrgOrgpreventService.save(ccmOrgOrgprevent);
+		PrintWriter out = null;
+		try {
+			out = response.getWriter();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		CommUtil.openWinExpDiv(out, "保存群防群治组织成功");
+		/*addMessage(redirectAttributes, "保存群防群治组织成功");
+		return "redirect:"+Global.getAdminPath()+"/org/ccmOrgOrgprevent/?repage";*/
+	}
+	
+	@RequiresPermissions("org:ccmOrgOrgprevent:edit")
+	@RequestMapping(value = "delete")
+	public String delete(CcmOrgOrgprevent ccmOrgOrgprevent, RedirectAttributes redirectAttributes) {
+		ccmOrgOrgpreventService.delete(ccmOrgOrgprevent);
+		addMessage(redirectAttributes, "删除群防群治组织成功");
+		return "redirect:"+Global.getAdminPath()+"/org/ccmOrgOrgprevent/?repage";
+	}
+
+}

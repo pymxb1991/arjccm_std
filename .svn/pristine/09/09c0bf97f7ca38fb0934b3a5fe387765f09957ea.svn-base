@@ -1,0 +1,248 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:context="http://www.springframework.org/schema/context" xmlns:jdbc="http://www.springframework.org/schema/jdbc"  
+	xmlns:jee="http://www.springframework.org/schema/jee" xmlns:tx="http://www.springframework.org/schema/tx"
+    xmlns:util="http://www.springframework.org/schema/util" xmlns:task="http://www.springframework.org/schema/task" xsi:schemaLocation="
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.1.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.1.xsd
+		http://www.springframework.org/schema/jdbc http://www.springframework.org/schema/jdbc/spring-jdbc-4.1.xsd
+		http://www.springframework.org/schema/jee http://www.springframework.org/schema/jee/spring-jee-4.1.xsd
+		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-4.1.xsd
+		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-4.1.xsd
+		http://www.springframework.org/schema/task http://www.springframework.org/schema/task/spring-task-4.1.xsd"
+	default-lazy-init="true">
+
+	<description>Spring Configuration</description>
+	
+    <!-- 加载配置属性文件 -->
+	<context:property-placeholder ignore-unresolvable="true" location="classpath:arjccm.properties" />
+	
+	<!-- 加载应用属性实例，可通过  @Value("#{APP_PROP['jdbc.driver']}") String jdbcDriver 方式引用 -->
+    <util:properties id="APP_PROP" location="classpath:arjccm.properties" local-override="true"/>
+	
+	<!-- 使用Annotation自动注册Bean，解决事物失效问题：在主容器中不扫描@Controller注解，在SpringMvc中只扫描@Controller注解。  -->
+	<context:component-scan base-package="com.arjjs.ccm"><!-- base-package 如果多个，用“,”分隔 -->
+		<context:exclude-filter type="annotation" expression="org.springframework.stereotype.Controller"/>
+	</context:component-scan>
+	
+ 	<!-- MyBatis begin -->
+    <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+        <property name="dataSource" ref="dataSource"/>
+        <property name="typeAliasesPackage" value="com.arjjs.ccm"/>
+        <property name="typeAliasesSuperType" value="com.arjjs.ccm.common.persistence.BaseEntity"/>
+        <property name="mapperLocations" value="classpath:/mappings/**/*.xml"/>
+		<property name="configLocation" value="classpath:/mybatis-config.xml"></property>
+    </bean>
+    
+    <!-- 扫描basePackage下所有以@MyBatisDao注解的接口 -->
+    <bean id="mapperScannerConfigurer" class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+        <property name="sqlSessionFactoryBeanName" value="sqlSessionFactory" />
+        <property name="basePackage" value="com.arjjs.ccm"/>
+        <property name="annotationClass" value="com.arjjs.ccm.common.persistence.annotation.MyBatisDao"/>
+    </bean>
+    
+    <!-- 定义事务 -->
+	<bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+		<property name="dataSource" ref="dataSource" />
+	</bean>
+	
+	<!-- 配置 Annotation 驱动，扫描@Transactional注解的类定义事务  -->
+	<tx:annotation-driven transaction-manager="transactionManager" proxy-target-class="true"/>
+    <!-- MyBatis end -->
+    
+	<!-- 配置 JSR303 Bean Validator 定义 -->
+	<bean id="validator" class="org.springframework.validation.beanvalidation.LocalValidatorFactoryBean" />
+
+	<!-- 缓存配置 -->
+	<bean id="cacheManager" class="org.springframework.cache.ehcache.EhCacheManagerFactoryBean">
+		<property name="configLocation" value="classpath:${ehcache.configFile}" />
+	</bean>
+	
+	<!-- 计划任务配置，用 @Service @Lazy(false)标注类，用@Scheduled(cron = "0 0 2 * * ?")标注方法 -->
+    <task:executor id="executor" pool-size="10"/> <task:scheduler id="scheduler" pool-size="10"/>
+    <task:annotation-driven scheduler="scheduler" executor="executor" proxy-target-class="true"/>
+    
+	<!-- 数据源配置, 使用 BoneCP 数据库连接池 -->
+	<bean id="dataSource" class="com.alibaba.druid.pool.DruidDataSource" init-method="init" destroy-method="close"> 
+	    <!-- 数据源驱动类可不写，Druid默认会自动根据URL识别DriverClass -->
+	    <property name="driverClassName" value="${jdbc.driver}" />
+	    
+		<!-- 基本属性 url、user、password -->
+		<property name="url" value="${jdbc.url}" />
+		<property name="username" value="${jdbc.username}" />
+		<property name="password" value="${jdbc.password}" />
+		
+		<!-- 配置初始化大小、最小、最大 -->
+		<property name="initialSize" value="${jdbc.pool.init}" />
+		<property name="minIdle" value="${jdbc.pool.minIdle}" /> 
+		<property name="maxActive" value="${jdbc.pool.maxActive}" />
+		
+		<!-- 配置获取连接等待超时的时间 -->
+		<property name="maxWait" value="60000" />
+		
+		<!-- 配置间隔多久才进行一次检测，检测需要关闭的空闲连接，单位是毫秒 -->
+		<property name="timeBetweenEvictionRunsMillis" value="60000" />
+		
+		<!-- 配置一个连接在池中最小生存的时间，单位是毫秒 -->
+		<property name="minEvictableIdleTimeMillis" value="300000" />
+		
+		<property name="validationQuery" value="${jdbc.testSql}" />
+		<property name="testWhileIdle" value="true" />
+		<property name="testOnBorrow" value="false" />
+		<property name="testOnReturn" value="false" />
+		
+		<!-- 打开PSCache，并且指定每个连接上PSCache的大小（Oracle使用）
+		<property name="poolPreparedStatements" value="true" />
+		<property name="maxPoolPreparedStatementPerConnectionSize" value="20" /> -->
+		
+		<!-- 配置监控统计拦截的filters -->
+	    <property name="filters" value="stat" /> 
+	</bean>
+	
+	<!-- 数据源配置, 使用应用服务器的数据库连接池 
+	<jee:jndi-lookup id="dataSource" jndi-name="java:comp/env/jdbc/jeesite" />-->
+
+	<!-- 数据源配置, 不使用连接池 
+	<bean id="dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+		<property name="driverClassName" value="${jdbc.driver}" />
+		<property name="url" value="${jdbc.url}" />
+		<property name="username" value="${jdbc.username}"/>
+		<property name="password" value="${jdbc.password}"/>
+	</bean>-->
+	
+	<bean id="ccmRestEvent" class="com.arjjs.ccm.modules.ccm.rest.web.CcmRestEvent" />
+	<!-- 启动并定时检测消息中间件 -->
+	<bean id="amqDaemonJob" class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+		<property name="targetObject" ref="ccmRestEvent" />
+		<property name="targetMethod" value="initializeAmq" />
+		<property name="concurrent" value="false" />
+	</bean>
+	<bean id="amqDaemonTrigger" class="org.springframework.scheduling.quartz.SimpleTriggerFactoryBean">
+		<property name="jobDetail" ref="amqDaemonJob" />
+		<property name="startDelay" value="0" />
+		<property name="repeatInterval" value="120000" />
+	</bean>
+		<!-- 启动并定时检测消息中间件 -->
+	<bean id="rabbitMQTools" class="com.arjjs.ccm.tool.RabbitMQTools" />
+	<bean id="initRabbitMQJob" class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+		<property name="targetObject" ref="rabbitMQTools" />
+		<property name="targetMethod" value="initRabbitMQ" />
+		<property name="concurrent" value="false" />
+	</bean>
+	<bean id="initRabbitMQTrigger" class="org.springframework.scheduling.quartz.SimpleTriggerFactoryBean">
+		<property name="jobDetail" ref="initRabbitMQJob" />
+		<property name="startDelay" value="10000" />
+		<property name="repeatInterval" value="120000" />
+	</bean>
+	<!-- 定时提醒 -->
+	<bean id="timingOaNotifyTrigger" class="org.springframework.scheduling.quartz.SimpleTriggerFactoryBean">
+		<property name="jobDetail" ref="timingOaNotifyJob" />
+		<property name="startDelay" value="0" />
+		<property name="repeatInterval" value="600000" />
+	</bean>	
+	<bean id="timingOaNotifyJob" class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+		<property name="targetObject" ref="oaNotify" />
+		<property name="targetMethod" value="saveOaNotify" />
+		<property name="concurrent" value="false" />
+	</bean>
+	<bean id="oaNotify" class="com.arjjs.ccm.modules.oa.web.OaNotifyController" />
+	
+	<!-- 启动并定时上传数据至上级平台 -->
+	<bean id="ccmRestUploadLog" class="com.arjjs.ccm.modules.ccm.rest.web.CcmRestUploadLog" />
+	<bean id="uploadCcmDataJob" class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+		<property name="targetObject" ref="ccmRestUploadLog" />
+		<property name="targetMethod" value="uploadLog" />
+		<property name="concurrent" value="false" />
+	</bean>
+	<bean id="uploadCcmDataAppJob" class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+		<property name="targetObject" ref="ccmRestUploadLog" />
+		<property name="targetMethod" value="uploadLogApp" />
+		<property name="concurrent" value="false" />
+	</bean>
+	<bean id="uploadCcmDataTrigger" class="org.springframework.scheduling.quartz.SimpleTriggerFactoryBean">
+		<property name="jobDetail" ref="uploadCcmDataJob" />
+		<property name="startDelay" value="50000" />
+		<property name="repeatInterval" value="90000" />
+	</bean>	
+	<bean id="uploadCcmDataAppTrigger" class="org.springframework.scheduling.quartz.SimpleTriggerFactoryBean">
+		<property name="jobDetail" ref="uploadCcmDataAppJob" />
+		<property name="startDelay" value="50000" />
+		<property name="repeatInterval" value="5000" />
+	</bean>	
+	
+	<bean id="CcmHouseEmphasisService" class="com.arjjs.ccm.modules.ccm.house.service.CcmHouseEmphasisService" />
+	<bean id="dictListJob" class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+		<property name="targetObject" ref="CcmHouseEmphasisService" />
+		<property name="targetMethod" value="dictList" />
+		<property name="concurrent" value="false" />
+	</bean>
+	<bean id="dictListDataTrigger" class="org.springframework.scheduling.quartz.SimpleTriggerFactoryBean">
+		<property name="jobDetail" ref="dictListJob" />
+		<property name="startDelay" value="10000" />
+		<property name="repeatCount" value="0" />  <!--  重复次数  -->
+	</bean>
+	<!-- 系统初始化设置 -->
+	<bean id="sysConfigInit" class="com.arjjs.ccm.tool.SysConfigInit" />
+	<bean id="sysInitJob" class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+		<property name="targetObject" ref="sysConfigInit" />
+		<property name="targetMethod" value="sysInit" />
+		<property name="concurrent" value="false" />
+	</bean>
+	<bean id="sysInitTrigger" class="org.springframework.scheduling.quartz.SimpleTriggerFactoryBean">
+		<property name="jobDetail" ref="sysInitJob" />
+		<property name="startDelay" value="5000" />
+		<property name="repeatInterval" value="300000" />
+	</bean>	
+	
+	<!-- 获取表数据初始化设置 -->
+	<bean id="cacheTableData" class="com.arjjs.ccm.tool.CacheTableData" />
+	<bean id="clearTimeoutData" class="com.arjjs.ccm.tool.ClearTimeoutData" />
+	<bean id="initTableInfoJob" class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+		<property name="targetObject" ref="cacheTableData" />
+		<property name="targetMethod" value="runAllMethod" />
+		<property name="concurrent" value="false" />
+	</bean>
+	<bean id="clearTimeoutDataJob" class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+		<property name="targetObject" ref="clearTimeoutData" />
+		<property name="targetMethod" value="runAllMethodData" />
+		<property name="concurrent" value="false" />
+	</bean>
+	<bean id="initTableInfoTrigger" class="org.springframework.scheduling.quartz.SimpleTriggerFactoryBean">
+		<property name="jobDetail" ref="initTableInfoJob" />
+		<property name="startDelay" value="5000" />
+		<property name="repeatInterval" value="1800000" />
+	</bean>
+	<bean id="clearTimeoutDataTrigger" class="org.springframework.scheduling.quartz.SimpleTriggerFactoryBean">
+		<property name="jobDetail" ref="clearTimeoutDataJob" />
+		<property name="startDelay" value="200000" />
+		<property name="repeatInterval" value="60000" />
+	</bean>
+	<bean id="bphAlarmInfoService" class="com.arjjs.ccm.modules.flat.alarm.service.BphAlarmInfoService" />
+	<bean id="insertDockingDataJob" class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+		<property name="targetObject" ref="bphAlarmInfoService" />
+		<property name="targetMethod" value="insertDockingData" />
+		<property name="concurrent" value="false" />
+	</bean>
+	<bean id="insertDockingDataTrigger" class="org.springframework.scheduling.quartz.SimpleTriggerFactoryBean">
+		<property name="jobDetail" ref="insertDockingDataJob" />
+		<property name="startDelay" value="10000" />
+		<property name="repeatInterval" value="2000" />
+	</bean>
+ 	<bean id="schedulerFactoryBean" lazy-init="false" class="org.springframework.scheduling.quartz.SchedulerFactoryBean">
+ 	  <property name="triggers">
+   		<list>
+   			<!-- <ref bean="amqDaemonTrigger" /> -->
+<!--  			<ref bean="uploadCcmDataTrigger" /> -->
+<!--    			<ref bean="uploadCcmDataAppTrigger" /> -->
+   			<ref bean="initRabbitMQTrigger" /> <!-- 定时检测rabbitMQ连接状态 -->
+			<ref bean="sysInitTrigger" /> <!-- 初始化系统数据 -->
+   			<ref bean="timingOaNotifyTrigger" />
+			<ref bean="initTableInfoTrigger" /> <!-- 初始化表数据 -->
+   			<ref bean="clearTimeoutDataTrigger" /> <!-- 清除超时数据 -->
+			<ref bean="insertDockingDataTrigger"/><!-- 插入对接数据 -->
+			<ref bean="dictListDataTrigger" />
+   		</list>
+  	  </property>
+ 	</bean>
+	
+</beans>

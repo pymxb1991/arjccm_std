@@ -1,0 +1,169 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.arjjs.ccm.modules.plm.car.dao.apply.PlmCarApplyBuyDao">
+    
+	<sql id="plmCarApplyBuyColumns">
+		a.id AS "id",
+		a.proc_ins_id AS "procInsId",
+		a.title AS "title",
+		a.user_id AS "user.id",
+		a.reason AS "reason",
+		a.car_desc AS "carDesc",
+		a.num AS "num",
+		a.is_end AS "isEnd",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag",
+		u4.name AS "user.name",
+		u4.phone AS "user.phone",
+		o.name AS "user.office.name"	
+	</sql>
+	
+	<sql id="plmCarApplyBuyJoins">
+		LEFT JOIN sys_user u4 ON u4.id = a.user_id
+		LEFT JOIN sys_office o ON o.id = u4.office_id
+	</sql>
+    
+	<select id="get" resultType="PlmCarApplyBuy">
+		SELECT 
+			<include refid="plmCarApplyBuyColumns"/>
+		FROM plm_car_apply_buy a
+		<include refid="plmCarApplyBuyJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="getByProcInsId" resultType="PlmCarApplyBuy">
+		SELECT 
+			<include refid="plmCarApplyBuyColumns"/>
+		FROM plm_car_apply_buy a
+		<include refid="plmCarApplyBuyJoins"/>
+		WHERE a.proc_ins_id = #{procInsId}
+	</select>	
+	<update id="updateProcInsId">
+		UPDATE plm_car_apply_buy SET 
+			proc_ins_id = #{procInsId},
+			update_by = #{updateBy.id}, 
+			update_date = #{updateDate}
+		WHERE id = #{id}
+	</update>	
+	
+	<update id="updateIsEnd">
+		UPDATE plm_room_apply SET 
+			is_end = #{isEnd},
+			update_by = #{updateBy.id}, 
+			update_date = #{updateDate}
+		WHERE id = #{id}
+	</update>	
+	
+	<select id="findList" resultType="PlmCarApplyBuy">
+		SELECT 
+			act.status AS "plmAct.status",
+			<include refid="plmCarApplyBuyColumns"/>
+		FROM plm_car_apply_buy a
+		LEFT JOIN plm_act act ON a.id = act.table_id
+		<include refid="plmCarApplyBuyJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="title != null and title != ''">
+				AND a.title LIKE 
+					<if test="dbName == 'oracle'">'%'||#{title}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{title}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{title},'%')</if>
+			</if>
+			<if test="user != null and user.id != null and user.id != ''">
+				AND a.user_id = #{user.id}
+			</if>
+			<if test="beginNum != null and endNum != null and beginNum != '' and endNum != ''">
+				AND a.num BETWEEN #{beginNum} AND #{endNum}
+			</if>
+			<if test="num != null and num != ''">
+				AND a.num &gt;= #{num}
+			</if>				
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="PlmCarApplyBuy">
+		SELECT 
+			<include refid="plmCarApplyBuyColumns"/>
+		FROM plm_car_apply_buy a
+		<include refid="plmCarApplyBuyJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO plm_car_apply_buy(
+			id,
+			proc_ins_id,
+			title,
+			user_id,
+			reason,
+			car_desc,
+			num,
+			is_end,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag
+		) VALUES (
+			#{id},
+			#{procInsId},
+			#{title},
+			#{user.id},
+			#{reason},
+			#{carDesc},
+			#{num},
+			#{isEnd},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE plm_car_apply_buy SET 	
+			proc_ins_id = #{procInsId},
+			title = #{title},
+			user_id = #{user.id},
+			reason = #{reason},
+			car_desc = #{carDesc},
+			num = #{num},
+			is_end = #{isEnd},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE plm_car_apply_buy SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

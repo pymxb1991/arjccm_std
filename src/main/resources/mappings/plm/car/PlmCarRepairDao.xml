@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.arjjs.ccm.modules.plm.car.dao.PlmCarRepairDao">
+    
+	<sql id="plmCarRepairColumns">
+		a.id AS "id",
+		a.name AS "name",
+		a.photo AS "photo",
+		a.num AS "num",
+		a.addr AS "addr",
+		a.tel AS "tel",
+		a.leader AS "leader",
+		a.phone AS "phone",
+		a.files AS "files",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag"
+	</sql>
+	
+	<sql id="plmCarRepairJoins">
+	</sql>
+    
+	<select id="get" resultType="PlmCarRepair">
+		SELECT 
+			<include refid="plmCarRepairColumns"/>
+		FROM plm_car_repair a
+		<include refid="plmCarRepairJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="PlmCarRepair">
+		SELECT 
+			<include refid="plmCarRepairColumns"/>
+		FROM plm_car_repair a
+		<include refid="plmCarRepairJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="name != null and name != ''">
+				AND a.name LIKE 
+					<if test="dbName == 'oracle'">'%'||#{name}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{name}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{name},'%')</if>
+			</if>
+			<if test="num != null and num != ''">
+				AND a.num LIKE 
+					<if test="dbName == 'oracle'">'%'||#{num}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{num}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{num},'%')</if>
+			</if>
+			<if test="addr != null and addr != ''">
+				AND a.addr LIKE 
+					<if test="dbName == 'oracle'">'%'||#{addr}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{addr}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{addr},'%')</if>
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="PlmCarRepair">
+		SELECT 
+			<include refid="plmCarRepairColumns"/>
+		FROM plm_car_repair a
+		<include refid="plmCarRepairJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	<select id="findSelect2Type" resultType="com.arjjs.ccm.tool.Select2Type">
+		SELECT 
+			a.id AS "id",
+			a.name AS "text"
+		FROM plm_car_repair a
+		<include refid="plmCarRepairJoins"/>
+		<where>
+			a.del_flag = '0'
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO plm_car_repair(
+			id,
+			name,
+			photo,
+			num,
+			addr,
+			tel,
+			leader,
+			phone,
+			files,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag
+		) VALUES (
+			#{id},
+			#{name},
+			#{photo},
+			#{num},
+			#{addr},
+			#{tel},
+			#{leader},
+			#{phone},
+			#{files},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE plm_car_repair SET 	
+			name = #{name},
+			photo = #{photo},
+			num = #{num},
+			addr = #{addr},
+			tel = #{tel},
+			leader = #{leader},
+			phone = #{phone},
+			files = #{files},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE plm_car_repair SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

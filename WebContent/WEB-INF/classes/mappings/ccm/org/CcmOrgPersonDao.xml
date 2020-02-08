@@ -1,0 +1,181 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.arjjs.ccm.modules.ccm.org.dao.CcmOrgPersonDao">
+    
+	<sql id="ccmOrgPersonColumns">
+		a.id AS "id",
+		a.images AS "images",
+		a.name AS "name",
+		a.area_id AS "area.id",
+		a.organize AS "organize",
+		a.sex AS "sex",
+		a.edu AS "edu",
+		a.age AS "age",
+		a.nation AS "nation",
+		a.health AS "health",
+		a.duty AS "duty",
+		a.phone AS "phone",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag",
+		a3.name AS "area.name"
+	</sql>
+	
+	<sql id="ccmOrgPersonJoins">
+		LEFT JOIN sys_area a3 ON a3.id = a.area_id
+	</sql>
+    
+	<select id="get" resultType="CcmOrgPerson">
+		SELECT 
+			<include refid="ccmOrgPersonColumns"/>
+		FROM ccm_org_person a
+		<include refid="ccmOrgPersonJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="CcmOrgPerson">
+		SELECT 
+			<include refid="ccmOrgPersonColumns"/>
+		FROM ccm_org_person a
+		<include refid="ccmOrgPersonJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="name != null and name != ''">
+				AND a.name LIKE 
+					<if test="dbName == 'oracle'">'%'||#{name}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{name}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{name},'%')</if>
+			</if>
+			<if test="area != null and area.id != null and area.id != ''">
+				AND a.area_id LIKE 
+					<if test="dbName == 'oracle'">'%'||#{area.id}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{area.id}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{area.id},'%')</if>
+			</if>
+			<if test="organize != null and organize != ''">
+				AND a.organize LIKE 
+					<if test="dbName == 'oracle'">'%'||#{organize}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{organize}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{organize},'%')</if>
+			</if>
+			<if test="sex != null and sex != ''">
+				AND a.sex LIKE 
+					<if test="dbName == 'oracle'">'%'||#{sex}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{sex}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{sex},'%')</if>
+			</if>
+			<if test="edu != null and edu != ''">
+				AND a.edu LIKE 
+					<if test="dbName == 'oracle'">'%'||#{edu}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{edu}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{edu},'%')</if>
+			</if>
+			<if test="age != null and age != ''">
+				AND a.age LIKE 
+					<if test="dbName == 'oracle'">'%'||#{age}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{age}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{age},'%')</if>
+			</if>
+			<if test="nation != null and nation != ''">
+				AND a.nation LIKE 
+					<if test="dbName == 'oracle'">'%'||#{nation}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{nation}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{nation},'%')</if>
+			</if>
+			<if test="duty != null and duty != ''">
+				AND a.duty=#{duty}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="CcmOrgPerson">
+		SELECT 
+			<include refid="ccmOrgPersonColumns"/>
+		FROM ccm_org_person a
+		<include refid="ccmOrgPersonJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO ccm_org_person(
+			id,
+			images,
+			name,
+			area_id,
+			organize,
+			sex,
+			edu,
+			age,
+			nation,
+			health,
+			duty,
+			phone,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag
+		) VALUES (
+			#{id},
+			#{images},
+			#{name},
+			#{area.id},
+			#{organize},
+			#{sex},
+			#{edu},
+			#{age},
+			#{nation},
+			#{health},
+			#{duty},
+			#{phone},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE ccm_org_person SET 	
+			name = #{name},
+			area_id = #{area.id},
+			images = #{images},
+			organize = #{organize},
+			sex = #{sex},
+			edu = #{edu},
+			age = #{age},
+			nation = #{nation},
+			health = #{health},
+			duty = #{duty},
+			phone = #{phone},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE ccm_org_person SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+</mapper>

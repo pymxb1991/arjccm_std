@@ -1,0 +1,310 @@
+/**
+ * Copyright &copy; 2012-2016 <a href="https://github.com/thinkgem/jeesite">JeeSite</a> All rights reserved.
+ */
+package com.arjjs.ccm.modules.ccm.pop.entity;
+
+import javax.validation.constraints.NotNull;
+import org.hibernate.validator.constraints.Length;
+
+import com.arjjs.ccm.modules.ccm.house.entity.CcmHouseBuildmanage;
+import com.arjjs.ccm.modules.sys.entity.Area;
+import com.arjjs.ccm.modules.sys.entity.User;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.arjjs.ccm.common.persistence.DataEntity;
+import com.arjjs.ccm.common.utils.excel.annotation.ExcelField;
+
+/**
+ * 房屋Entity
+ * @author wwh
+ * @version 2018-01-10
+ */
+public class CcmPopTenant extends DataEntity<CcmPopTenant> {
+	
+	private static final long serialVersionUID = 1L;
+	private String houseBuild;		// 房屋编号
+	private String housePlace;		// 房屋地址
+	private String housePrup;		// 建筑用途
+	private CcmHouseBuildmanage buildingId;		// 所属楼栋
+    private String buildDoorNum;	// 楼门号
+	private String floorNum;		// 层数
+	private String doorNum;		    // 门牌号
+	private Double houseArea;		// 建筑面积(平方米）
+	private String houseType;		// 状态
+	private String idenCode;		// 证件代码
+	private String idenNum;		// 证件号码
+	private String houseName;		// 房主姓名
+	private String houseTl;		// 房主联系方式
+	private String houseCur;		// 房主现在居住详细地址
+	private String rentPur;		// 出租用途
+	private String hazard;		// 隐患类型
+	private String tenantId;		// 承租人公民身份号码
+	private String tenantName;		// 承租人姓名
+	private String tenantTl;		// 承租人联系方式
+	private Area area;		// 所在区域
+	private String areaMap; // 区域图
+	private String areaPoint;		// 中心点
+	private String image;		// 图标
+	private String more1;      // 额外参数
+	private String count;
+	private User checkUser;		// 拦截器中使用该用户进行权限拦截，App的rest接口使用
+
+	public String getCount() {
+		return count;
+	}
+
+	public void setCount(String count) {
+		this.count = count;
+	}
+
+	public User getCheckUser() {
+		return checkUser;
+	}
+
+	public void setCheckUser(User checkUser) {
+		this.checkUser = checkUser;
+	}
+
+	
+	public CcmPopTenant() {
+		super();
+	}
+
+	public CcmPopTenant(String id){
+		super(id);
+	}
+	
+	@ExcelField(title="房屋编号", align=2, sort=1)
+	@NotNull(message="房屋编号不能为空")
+	public String getHouseBuild() {
+		return houseBuild;
+	}
+
+	public void setHouseBuild(String houseBuild) {
+		this.houseBuild = houseBuild;
+	}
+	
+	@ExcelField(title="房屋地址", align=2, sort=2)
+	@Length(min=1, max=200, message="房屋地址长度必须介于 1 和 200 之间")
+	public String getHousePlace() {
+		return housePlace;
+	}
+
+	public void setHousePlace(String housePlace) {
+		this.housePlace = housePlace;
+	}
+	
+	@ExcelField(title="建筑用途", align=2, sort=3)
+	@Length(min=0, max=2, message="建筑用途长度必须介于 0 和 2 之间")
+	public String getHousePrup() {
+		return housePrup;
+	}
+
+	
+	public void setHousePrup(String housePrup) {
+		this.housePrup = housePrup;
+	}
+	
+	@ExcelField(title="建筑面积", align=2, sort=4)
+	public Double getHouseArea() {
+		return houseArea;
+	}
+
+	public void setHouseArea(Double houseArea) {
+		this.houseArea = houseArea;
+	}
+	
+	@ExcelField(title="状态", align=2, sort=5,dictType="ccm_pop_tenant_type")
+	@Length(min=0, max=2, message="状态必须介于 0 和 2 之间")
+	public String getHouseType() {
+		return houseType;
+	}
+
+	public void setHouseType(String houseType) {
+		this.houseType = houseType;
+	}
+
+	@ExcelField(title="证件代码", align=2, sort=6,dictType="sys_ccm_org_papers")
+	public String getIdenCode() {
+		return idenCode;
+	}
+
+	public void setIdenCode(String idenCode) {
+		this.idenCode = idenCode;
+	}
+
+	@ExcelField(title="证件号码", align=2, sort=7)
+	public String getIdenNum() {
+		return idenNum;
+	}
+
+	public void setIdenNum(String idenNum) {
+		this.idenNum = idenNum;
+	}
+
+	@ExcelField(title="房主姓名", align=2, sort=8)
+	@Length(min=0, max=50, message="房主姓名长度必须介于 0 和 50 之间")
+	public String getHouseName() {
+		return houseName;
+	}
+
+	public void setHouseName(String houseName) {
+		this.houseName = houseName;
+	}
+
+	@ExcelField(title="房主联系方式", align=2, sort=9)
+	public String getHouseTl() {
+		return houseTl;
+	}
+
+	public void setHouseTl(String houseTl) {
+		this.houseTl = houseTl;
+	}
+
+	@ExcelField(title="房主现在居住详细地址", align=2, sort=10)
+	@Length(min=0, max=200, message="房主现在居住详细地址长度必须介于 0 和 200 之间")
+	public String getHouseCur() {
+		return houseCur;
+	}
+
+	public void setHouseCur(String houseCur) {
+		this.houseCur = houseCur;
+	}
+
+	@ExcelField(title="出租用途", align=2, sort=11)
+	@Length(min=0, max=2, message="出租用途长度必须介于 0 和 2 之间")
+	public String getRentPur() {
+		return rentPur;
+	}
+
+	public void setRentPur(String rentPur) {
+		this.rentPur = rentPur;
+	}
+
+	@ExcelField(title="隐患类型", align=2, sort=12,dictType="ccm_hidd_type")
+	@Length(min=0, max=2, message="隐患类型长度必须介于 0 和 2 之间")
+	public String getHazard() {
+		return hazard;
+	}
+
+	public void setHazard(String hazard) {
+		this.hazard = hazard;
+	}
+
+	@ExcelField(title="承租人公民身份号码", align=2, sort=13)
+	public String getTenantId() {
+		return tenantId;
+	}
+
+	public void setTenantId(String tenantId) {
+		this.tenantId = tenantId;
+	}
+
+	@ExcelField(title="承租人姓名", align=2, sort=14)
+	@Length(min=0, max=50, message="承租人姓名长度必须介于 0 和 50 之间")
+	public String getTenantName() {
+		return tenantName;
+	}
+
+	public void setTenantName(String tenantName) {
+		this.tenantName = tenantName;
+	}
+
+	@ExcelField(title="承租人联系方式", align=2, sort=15)
+	public String getTenantTl() {
+		return tenantTl;
+	}
+
+	public void setTenantTl(String tenantTl) {
+		this.tenantTl = tenantTl;
+	}
+
+	@ExcelField(title="所在区域", align=2, sort=16)
+	public Area getArea() {
+		return area;
+	}
+
+	public void setArea(Area area) {
+		this.area = area;
+	}
+
+	@ExcelField(title="中心点", align=2, sort=17)
+	@Length(min=0, max=40, message="中心点长度必须介于 0 和 40 之间")
+	public String getAreaPoint() {
+		return areaPoint;
+	}
+
+	public void setAreaPoint(String areaPoint) {
+		this.areaPoint = areaPoint;
+	}
+
+	
+	@Length(min=0, max=255, message="图标长度必须介于 0 和 255 之间")
+	public String getImage() {
+		return image;
+	}
+
+	public void setImage(String image) {
+		this.image = image;
+	}
+	
+	public CcmHouseBuildmanage getBuildingId() {
+		return buildingId;
+	}
+
+	public void setBuildingId(CcmHouseBuildmanage buildingId) {
+		this.buildingId = buildingId;
+	}
+	
+	@JsonIgnore
+	@ExcelField(title="所属楼栋", align=2, sort=18)
+	public String getBuildingName() {
+		return buildingId.getBuildname();
+	}
+
+	@ExcelField(title="楼门号", align=2, sort=19)
+	@Length(min=0, max=4, message="楼门号长度必须介于 0 和 4 之间")
+	public String getBuildDoorNum() {
+		return buildDoorNum;
+	}
+
+	public void setBuildDoorNum(String buildDoorNum) {
+		this.buildDoorNum = buildDoorNum;
+	}
+
+	@ExcelField(title="层数", align=2, sort=20)
+	@Length(min=0, max=3, message="层数长度必须介于 0 和 3 之间")
+	public String getFloorNum() {
+		return floorNum;
+	}
+
+	public void setFloorNum(String floorNum) {
+		this.floorNum = floorNum;
+	}
+
+	@ExcelField(title="门牌号", align=2, sort=21)
+	@Length(min=0, max=6, message="门牌号长度必须介于 0 和 6 之间")
+	public String getDoorNum() {
+		return doorNum;
+	}
+	
+	public void setDoorNum(String doorNum) {
+		this.doorNum = doorNum;
+	}
+
+	public String getAreaMap() {
+		return areaMap;
+	}
+
+	public void setAreaMap(String areaMap) {
+		this.areaMap = areaMap;
+	}
+	
+	public String getMore1() {
+		return more1;
+	}
+
+	public void setMore1(String more1) {
+		this.more1 = more1;
+	}
+
+}

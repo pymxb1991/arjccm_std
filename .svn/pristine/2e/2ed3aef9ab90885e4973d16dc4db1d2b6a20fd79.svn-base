@@ -1,0 +1,176 @@
+<%@ page contentType="text/html;charset=UTF-8"%>
+<%@ include file="/WEB-INF/views/include/taglib.jsp"%>
+<html>
+<head>
+<title>人车/联系/网络关系表管理</title>
+<meta name="decorator" content="default" />
+<script type="text/javascript">
+	$(document).ready(
+			function() {
+				//$("#name").focus();
+				$("#inputForm")
+						.validate(
+								{
+									submitHandler : function(form) {
+										loading('正在提交，请稍等...');
+										form.submit();
+									},
+									errorContainer : "#messageBox",
+									errorPlacement : function(error, element) {
+										$("#messageBox").text("输入有误，请先更正。");
+										if (element.is(":checkbox")
+												|| element.is(":radio")
+												|| element.parent().is(
+														".input-append")) {
+											error.appendTo(element.parent()
+													.parent());
+										} else {
+											error.insertAfter(element);
+										}
+									}
+								});
+			});
+	
+	function deletex(id) {
+		 confirmx('确认要删除该条信息吗？', function () {
+			
+			 
+			 $.post("${ctx}/cpp/cppPopVehile/ajaxdelete",{						  										
+					"id":id								
+					}, function(data) {
+						var index = parent.layer.getFrameIndex(window.name);
+						parent.layer.close(index);
+						parent.alertInfo(data.message);
+						if('${cppPopVehile.type}'=='02'){
+							parent.window.frames['mainFrame'].vehilePhoneList();
+						}else if ('${cppPopVehile.type}'=='01') {
+							parent.window.frames['mainFrame'].vehileVehileList();
+						}else if ('${cppPopVehile.type}'=='03') {
+							parent.window.frames['mainFrame'].vehileWebList();
+						}else if ('${cppPopVehile.type}'=='04') {
+							parent.window.frames['mainFrame'].vehileBasicList();
+						}
+						
+				   });	
+		})
+	}
+</script>
+<style type="text/css">
+.form-horizontal .control-label{
+width: 80px;
+}
+.form-horizontal .controls{
+  margin-left: 100px;
+}
+</style>
+</head>
+<body>
+	
+	<br />
+	<form:form id="inputForm" modelAttribute="cppPopVehile"
+		action="${ctx}/cpp/cppPopVehile/save" method="post"
+		class="form-horizontal">
+		<sys:message content="${message}" />
+		<form:hidden path="id" />
+		<form:hidden path="idCard" />
+		<c:if test="${cppPopVehile.type==02}">
+		<form:hidden path="type" value="02" />
+        <div class="control-group">
+			<label class="control-label">类型：</label>
+			<div class="controls">
+				<form:select path="subType" class="input-xlarge required">
+					<form:option value="" label="" />
+					<form:options items="${fns:getDictList('cpp_phone_type')}"
+						itemLabel="label" itemValue="value" htmlEscape="false" />
+				</form:select>
+				<span class="help-inline"><font color="red" >*</font></span>
+			</div>
+		</div>
+		<div class="control-group">
+			<label class="control-label">联系方式：</label>
+			<div class="controls">
+				<form:input path="textName" htmlEscape="false" maxlength="64"
+					class="input-xlarge required phone" />
+					<span class="help-inline"><font color="red" >*</font></span>
+			</div>
+		</div>
+		</c:if>
+		
+		
+		
+		<c:if test="${cppPopVehile.type==01}">
+		<form:hidden path="type" value="01" />
+        <div class="control-group">
+			<label class="control-label">车辆类型：</label>
+			<div class="controls">
+				<form:select path="subType" class="input-xlarge required">
+					<form:option value="" label="" />
+					<form:options items="${fns:getDictList('cpp_vehile_type')}"
+						itemLabel="label" itemValue="value" htmlEscape="false" />
+				</form:select>
+				<span class="help-inline"><font color="red" >*</font></span>
+			</div>
+		</div>
+		<div class="control-group">
+			<label class="control-label">车牌号：</label>
+			<div class="controls">
+				<form:input path="textName" htmlEscape="false" maxlength="64"
+					class="input-xlarge required" />
+					<span class="help-inline"><font color="red" >*</font></span>
+			</div>
+		</div>
+		</c:if>
+		
+		<c:if test="${cppPopVehile.type==03}">
+		<form:hidden path="type" value="03" />
+        <div class="control-group">
+			<label class="control-label">账号类型：</label>
+			<div class="controls">
+				<form:select path="subType" class="input-xlarge required">
+					<form:option value="" label="" />
+					<form:options items="${fns:getDictList('cpp_web_type')}"
+						itemLabel="label" itemValue="value" htmlEscape="false" />
+				</form:select>
+				<span class="help-inline"><font color="red" >*</font></span>
+			</div>
+		</div>
+		<div class="control-group">
+			<label class="control-label">网络账号：</label>
+			<div class="controls">
+				<form:input path="textName" htmlEscape="false" maxlength="64"
+					class="input-xlarge required" />
+					<span class="help-inline"><font color="red" >*</font></span>
+			</div>
+		</div>
+		</c:if>
+		
+		<c:if test="${cppPopVehile.type==04}">
+		<form:hidden path="type" value="04" />
+        <div class="control-group">
+			<label class="control-label">补充类型：</label>
+			<div class="controls">
+				<form:input path="otherTypeName" htmlEscape="false" maxlength="20"
+					class="input-xlarge required" />
+				<span class="help-inline"><font color="red" >*</font></span>
+			</div>
+		</div>
+		<div class="control-group">
+			<label class="control-label">补充信息：</label>
+			<div class="controls">
+				<form:input path="textName" htmlEscape="false" maxlength="64"
+					class="input-xlarge required" />
+					<span class="help-inline"><font color="red" >*</font></span>
+			</div>
+		</div>
+		</c:if>
+		
+		<div class="form-actions">
+				<input id="btnSubmit" class="btn btn-primary" type="submit"
+					value="保 存" />&nbsp;&nbsp;
+					<c:if test="${not empty cppPopVehile.id}">
+			    <input id="btnDelete" class="btn btn-danger" type="button" onclick="deletex('${cppPopVehile.id}')" value="删除" />
+		</c:if>
+		</div>
+	</form:form>
+</body>
+</html>

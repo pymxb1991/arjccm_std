@@ -1,0 +1,180 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.arjjs.ccm.modules.pbs.question.dao.PbsChoiceItemDao">
+    
+	<sql id="pbsChoiceItemColumns">
+		DISTINCT(a.id) AS "id",
+		a.s_type AS "sType",
+		a.s_parentid AS "sParentid.id" ,
+		objective.s_body AS "sParentid.sBody",
+		a.s_key AS "sKey",
+		a.s_body AS "sBody",
+		a.i_sort AS "iSort",
+		a.s_spare01 AS "sSpare01",
+		a.s_spare02 AS "sSpare02",
+		a.s_spare03 AS "sSpare03",
+		a.s_spare04 AS "sSpare04",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag"
+	</sql>
+	
+	<sql id="pbsChoiceItemJoins">
+	LEFT JOIN pbs_question_objective objective on objective.id = a.s_parentid
+	</sql>
+    
+	<select id="get" resultType="PbsChoiceItem">
+		SELECT 
+			<include refid="pbsChoiceItemColumns"/>
+		FROM pbs_choice_item a
+		<include refid="pbsChoiceItemJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="PbsChoiceItem">
+		SELECT 
+			<include refid="pbsChoiceItemColumns"/>
+		FROM pbs_choice_item a
+		<include refid="pbsChoiceItemJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+				<if test="sParentid != null and sParentid != '' and sParentid.id != null and sParentid.id != ''">
+				AND a.s_parentid = #{sParentid.id}
+			</if>
+			<if test="sParentid != null and sParentid != '' and sParentid.sBody != null and sParentid.sBody != ''">
+				AND objective.s_body like  
+				<if test="dbName == 'oracle'">'%'||#{sParentid.sBody}||'%'</if>
+				<if test="dbName == 'mssql'">'%'+#{sParentid.sBody}+'%'</if>
+				<if test="dbName == 'mysql'">concat('%',#{sParentid.sBody},'%')</if>
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.s_parentid,a.i_sort ASC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="PbsChoiceItem">
+		SELECT 
+			<include refid="pbsChoiceItemColumns"/>
+		FROM pbs_choice_item a
+		<include refid="pbsChoiceItemJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO pbs_choice_item(
+			id,
+			s_type,
+			s_parentid,
+			s_key,
+			s_body,
+			i_sort,
+			s_spare01,
+			s_spare02,
+			s_spare03,
+			s_spare04,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag
+		) VALUES (
+			#{id},
+			#{sType},
+			#{sParentid.id},
+			#{sKey},
+			#{sBody},
+			#{iSort},
+			#{sSpare01},
+			#{sSpare02},
+			#{sSpare03},
+			#{sSpare04},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE pbs_choice_item SET 	
+			s_type = #{sType},
+			s_parentid = #{sParentid.id},
+			s_key = #{sKey},
+			s_body = #{sBody},
+			i_sort = #{iSort},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE pbs_choice_item SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+	<select id="findListByPaper" resultType="PbsChoiceItem">
+		SELECT 
+			<include refid="pbsChoiceItemColumns"/>
+		FROM pbs_choice_item a
+		LEFT JOIN pbs_question_objective objective ON objective.id = a.s_parentid
+		LEFT JOIN pbs_exampaperitem item  on item.s_item = objective.id
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+				<if test="paperid != null and paperid != ''">
+				and item.del_flag = #{DEL_FLAG_NORMAL}
+				AND item.s_exampaper = #{paperid}
+			</if>
+		</where>
+		<choose>
+			 
+			<otherwise>
+				ORDER BY a.s_parentid ,a.i_sort
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findListByParentId" resultType="PbsChoiceItem">
+		SELECT 
+			<include refid="pbsChoiceItemColumns"/>
+		FROM pbs_choice_item a
+		LEFT JOIN pbs_question_objective objective ON objective.id = a.s_parentid
+		LEFT JOIN pbs_exampaperitem item  on item.s_item = objective.id
+		<where>
+			a.del_flag = #{flag}
+			and item.del_flag = #{flag}
+			and a.s_parentid in
+			<foreach collection="list" item="list" open="(" separator="," close=")" index="index">
+				#{list}
+			</foreach>
+		</where>
+		<choose>
+			<otherwise>
+				ORDER BY a.s_parentid ,a.i_sort
+			</otherwise>
+		</choose>
+	</select>
+</mapper>

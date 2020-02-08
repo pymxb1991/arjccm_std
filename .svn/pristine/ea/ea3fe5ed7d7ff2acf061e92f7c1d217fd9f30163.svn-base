@@ -1,0 +1,209 @@
+<%@ page contentType="text/html;charset=UTF-8"%>
+<%@ include file="/WEB-INF/views/include/taglib.jsp"%>
+<%@ include file="/WEB-INF/views/include/head.jsp"%>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="renderer" content="webkit|ie-comp|ie-stand" />
+<title>社会网格化管理信息平台</title>
+<script src="${ctxStatic}/jquery/jquery-1.9.1.min.js"></script>
+<script src="${ctxStatic}/common/index/Scripts/js/echarts.js"></script>
+<link rel="stylesheet"
+	href="${ctxStatic}/bootstrap/bootstrap3.0/css/bootstrap.min.css">
+<link rel="stylesheet"
+	href="${ctxStatic}/common/index/css/indexZongZhi.css">
+<link rel="stylesheet"
+	href="${ctxStatic}/iconfont/iconfont.css">
+<script src="${ctxStatic}/bootstrap/bootstrap3.0/js/bootstrap.min.js"></script>
+<script type="text/javascript">
+	var ctxStatic = '${ctxStatic}', ctx = '${ctx}';
+</script>
+<script src="${ctxStatic}/common/index/Scripts/js/indexZongZhi.js"></script>
+<div class="container-fluid">
+	<div class="row" style="height: 33%">
+		<div class="col-md-3 common">
+			<div class="center">
+			  <div class="center-header zongzhi-color1">实有人口</div>
+			  <div class="center-main">
+			     <div class="center-main-center zongzhi-color5"><i class="nav-icon iconfont  icon-qushi"></i>户籍信息<span>3117</span>人</div>
+			     <div class="center-main-center zongzhi-color5"><i class="nav-icon iconfont  icon-qushi"></i>流动信息<span>46</span>人</div>
+			     <div class="center-main-center zongzhi-color5"><i class="nav-icon iconfont  icon-qushi"></i>境外信息<span>0</span>人</div>
+			     <div class="center-main-center zongzhi-color5"><i class="nav-icon iconfont  icon-qushi"></i>人户一致<span>0</span>人</div>
+			     <div class="center-main-center zongzhi-color5"><i class="nav-icon iconfont  icon-qushi"></i>人户分离<span>0</span>人</div>
+			  </div>
+			</div>
+		</div>
+		<div class="col-md-3 common">
+			<div class="center">
+			  <div class="center-header zongzhi-color2">实有房屋</div>
+			   <div class="center-main">
+			     <div class="center-main-header zongzhi-color5">自住房</div>
+			     <div class="center-main-center zongzhi-color5"><i class="nav-icon iconfont  icon-qushi"></i>总数<span>3117</span>人</div>
+			     <div class="center-main-header zongzhi-color5">空置房</div>
+			     <div class="center-main-center zongzhi-color5"><i class="nav-icon iconfont  icon-qushi"></i>总数<span>46</span>人</div>
+			     <div class="center-main-header zongzhi-color5">出租房</div>
+			     <div class="center-main-center zongzhi-color5"><i class="nav-icon iconfont  icon-qushi"></i>总数<span>0</span>人</div>
+			        <div class="center-main-header zongzhi-color5">其他</div>
+			     <div class="center-main-center zongzhi-color5"><i class="nav-icon iconfont  icon-qushi"></i>总数<span>0</span>人</div>
+			  </div>
+			</div>
+		</div>
+		<div class="col-md-3 common">
+			<div class="center">
+			  <div class="center-header zongzhi-color3">地址库</div>
+			   <div class="center-main">
+			     <div class="center-main-header zongzhi-color5">建筑物</div>
+			     <div class="center-main-center zongzhi-color5"><i class="nav-icon iconfont  icon-qushi"></i>总数<span>3117</span>人</div>
+			     <div class="center-main-header zongzhi-color5">街路巷</div>
+			     <div class="center-main-center zongzhi-color5"><i class="nav-icon iconfont  icon-qushi"></i>总数<span>3117</span>人</div>
+			  </div>
+			</div>
+		</div>
+		<div class="col-md-3 common">
+			<div class="center">
+			    <div class="center-header zongzhi-color4">出租房屋</div>
+			    <div class="center-main">
+			     <div class="center-main-center zongzhi-color5"><i class="nav-icon iconfont  icon-qushi"></i>宿舍<span>0</span>个</div>
+			 	 <div class="center-main-center zongzhi-color5"><i class="nav-icon iconfont  icon-qushi"></i>住房<span>0</span>个</div>
+			     <div class="center-main-center zongzhi-color5"><i class="nav-icon iconfont  icon-qushi"></i>商铺<span>0</span>个</div>
+			 	 <div class="center-main-center zongzhi-color5"><i class="nav-icon iconfont  icon-qushi"></i>办公<span>0</span>个</div>
+			     <div class="center-main-center zongzhi-color5"><i class="nav-icon iconfont  icon-qushi"></i>仓库<span>0</span>个</div>
+			 	 <div class="center-main-center zongzhi-color5"><i class="nav-icon iconfont  icon-qushi"></i>厂房<span>0</span>个</div>
+			 	<div class="center-main-center zongzhi-color5"><i class="nav-icon iconfont  icon-qushi"></i>其他<span>0</span>个</div>
+			 
+			  </div>
+			</div>
+		</div>
+	</div>
+	<div class="row" style="height: 33%">
+		<div class="col-md-6 common">
+			<div class="center">
+			  <div class="center-header center-echarts-name"><span class="zongzhi-color4"></span>人口迁入迁出变化情况</div>
+			  <div class="center-main">
+			     <div id="CaiJi" style="width:100%;height:220px;"></div>
+			  
+			  </div>
+			</div>
+		</div>
+		<div class="col-md-6 common">
+			<div class="center">
+			    <div class="center-header center-echarts-name"><span class="zongzhi-color2"></span>矛盾排查处理</div>
+			    <div class="center-main">
+			     <div id="MaoDun" style="width:100%;height:220px;"></div>
+			  
+			  </div>
+			</div>
+		</div>
+	</div>
+	<div class="row" style="height: 33%">
+		<div class="col-md-3 common">
+			<div class="center">
+			  <div class="center-header zongzhi-color4">重点青年</div>
+			  <div class="center-main">
+			     <div class="center-main-center zongzhi-color5"><i class="nav-icon iconfont  icon-qushi"></i>闲散青少年<span>0</span>人</div>
+			 	 <div class="center-main-center zongzhi-color5"><i class="nav-icon iconfont  icon-qushi"></i>有不良行为或严重不良行为青少年<span>0</span>人</div>
+			     <div class="center-main-center zongzhi-color5"><i class="nav-icon iconfont  icon-qushi"></i>流浪乞讨未成年人<span>0</span>人</div>
+			 	 <div class="center-main-center zongzhi-color5"><i class="nav-icon iconfont  icon-qushi"></i>服刑人员未成年子女<span>0</span>人</div>
+			     <div class="center-main-center zongzhi-color5"><i class="nav-icon iconfont  icon-qushi"></i>农村留守儿童<span>0</span>人</div>
+			 	<div class="center-main-center zongzhi-color5"><i class="nav-icon iconfont  icon-qushi"></i>其他<span>0</span>人</div>
+			  </div>
+			</div>
+		</div>
+		<div class="col-md-3 common">
+			<div class="center">
+			  <div class="center-header zongzhi-color3">两新组织</div>
+			   <div class="center-main">
+			     <div class="center-main-center zongzhi-color5"><i class="nav-icon iconfont  icon-qushi"></i>法人企业<span>0</span>个</div>
+			 	 <div class="center-main-center zongzhi-color5"><i class="nav-icon iconfont  icon-qushi"></i>个体工商户<span>0</span>个</div>
+			     <div class="center-main-center zongzhi-color5"><i class="nav-icon iconfont  icon-qushi"></i>机关单位<span>0</span>个</div>
+			 	 <div class="center-main-center zongzhi-color5"><i class="nav-icon iconfont  icon-qushi"></i>事业单位<span>0</span>个</div>
+			     <div class="center-main-center zongzhi-color5"><i class="nav-icon iconfont  icon-qushi"></i>社团组织<span>0</span>个</div>
+			  </div>
+			</div>
+		</div>
+		<div class="col-md-3 common">
+			<div class="center">
+			  <div class="center-header zongzhi-color2">社会治安</div>
+			 <div class="center-main">
+			     <div class="center-main-center zongzhi-color5"><i class="nav-icon iconfont  icon-qushi"></i>学校<span>0</span>个</div>
+			 	 <div class="center-main-center zongzhi-color5"><i class="nav-icon iconfont  icon-qushi"></i>物流安全<span>0</span>个</div>
+			     <div class="center-main-center zongzhi-color5"><i class="nav-icon iconfont  icon-qushi"></i>安全生产重点<span>0</span>个</div>
+			 	 <div class="center-main-center zongzhi-color5"><i class="nav-icon iconfont  icon-qushi"></i>消防重点<span>0</span>个</div>
+			     <div class="center-main-center zongzhi-color5"><i class="nav-icon iconfont  icon-qushi"></i>治安重点<span>0</span>个</div>
+			 	<div class="center-main-center zongzhi-color5"><i class="nav-icon iconfont  icon-qushi"></i>其他重点<span>0</span>个</div>
+			 
+			  </div>
+			</div>
+		</div>
+		<div class="col-md-3 common">
+			<div class="center">
+			    <div class="center-header zongzhi-color1">矛盾纠纷</div>
+			    <div class="center-main">
+			     <div class="center-main-center zongzhi-color5"><i class="nav-icon iconfont  icon-qushi"></i>全部<span id="DisputesStatusAll">0</span>个</div>
+			     <div class="center-main-center zongzhi-color5"><i class="nav-icon iconfont  icon-qushi"></i>未处理<span id="DisputesStatus0">0</span>个</div>
+			     <div class="center-main-center zongzhi-color5"><i class="nav-icon iconfont  icon-qushi"></i>处理中<span id="DisputesStatus1">0</span>个</div>
+			     <div class="center-main-center zongzhi-color5"><i class="nav-icon iconfont  icon-qushi"></i>已完成<span id="DisputesStatus2">0</span>个</div>
+
+			  </div>
+			</div>
+		</div>
+	</div>
+	<div class="row" style="height: 33%">
+		<div class="col-md-3 common">
+			<div class="center">
+			  <div class="center-header zongzhi-color1">护路护线</div>
+			   <div class="center-main">
+			     <div class="center-main-header zongzhi-color5">线路信息</div>
+			     <div class="center-main-center zongzhi-color5"><i class="nav-icon iconfont  icon-qushi"></i>总数<span>0</span>个</div>
+			     <div class="center-main-header zongzhi-color5">涉及线、路案件</div>
+			     <div class="center-main-center zongzhi-color5"><i class="nav-icon iconfont  icon-qushi"></i>总数<span>0</span>个</div>
+			  </div>
+			</div>
+		</div>
+		<div class="col-md-3 common">
+			<div class="center">
+			  <div class="center-header zongzhi-color2">校园周边</div>
+			   <div class="center-main">
+			     <div class="center-main-header zongzhi-color5">学校信息</div>
+			     <div class="center-main-center zongzhi-color5"><i class="nav-icon iconfont  icon-qushi"></i>总数<span>0</span>个</div>
+			     <div class="center-main-header zongzhi-color5">师生安全</div>
+			     <div class="center-main-center zongzhi-color5"><i class="nav-icon iconfont  icon-qushi"></i>总数<span>0</span>个</div>
+			  </div>
+			</div>
+		</div>
+		<div class="col-md-3 common">
+			<div class="center">
+			  <div class="center-header zongzhi-color3">机构队伍</div>
+			  <div class="center-main">
+			     <div class="center-main-header zongzhi-color5">综治机构</div>
+			     <div class="center-main-center zongzhi-color5"><i class="nav-icon iconfont  icon-qushi"></i>总数<span id="OfficeCount">0</span>个</div>
+			     <div class="center-main-header zongzhi-color5">机构队伍</div>
+			     <div class="center-main-center zongzhi-color5"><i class="nav-icon iconfont  icon-qushi"></i>总数<span id="TeamCoun">0</span>个</div>
+			  
+			  </div>
+			</div>
+		</div>
+		<div class="col-md-3 common">
+			<div class="center">
+			    <div class="center-header zongzhi-color4">重点人员</div>
+			     <div class="center-main-header  zongzhi-color5">治安重点</div>
+			     <div class="center-main-center zongzhi-color5">吸毒人员<span>0</span>人&nbsp;非正常上访人员<span>0</span>人</div>
+			  <div class="center-main-center zongzhi-color5">肇事肇祸精神病人员<span>0</span>人&nbsp;严重刑事犯罪活动嫌疑人员<span>0</span>人</div>
+			  <div class="center-main-center zongzhi-color5">危害国家安全活动嫌疑人员<span>0</span>人&nbsp;在逃人员<span>0</span>人</div>
+			   <div class="center-main-center zongzhi-color5">闹事行凶报复嫌疑人员<span>0</span>人&nbsp;故意违法刑释不足5年人员<span>0</span>人</div>
+			  <div class="center-main-header  zongzhi-color5">综治重点</div>
+		     <div class="center-main-center zongzhi-color5">刑释教解人员<span>0</span>人&nbsp;社区矫正人员<span>0</span>人</div>
+		     <div class="center-main-center zongzhi-color5">艾滋病危险人员<span>0</span>人&nbsp;涉教人员<span>0</span>人</div>
+		     <div class="center-main-center zongzhi-color5">危险品从业人员<span>0</span>人</div>
+			  
+			</div>
+		</div>
+	</div>
+
+</div>
+</head>
+<body>
+</body>

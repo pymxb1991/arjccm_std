@@ -1,0 +1,46 @@
+var Map;
+$(function(){
+	//加载地图
+	initMap();
+  $('.tab-title li').click(function(){
+	  Tab(this)
+  })
+		  
+})
+function initMap(){
+	// 地图默认数据设置
+	var defaultPrams = {
+		id : 'map',
+		centerCoordinate : centerCoordinate,
+		zoom : zoomIndex,
+		maxZoom : maxZoom,
+		minZoom : minZoom,
+		baseUrl : baseUrlT,
+		zoomShowOrHide : false,// 缩小放大
+		overviewMap : false,
+		selectPointerFlag : true
+	// 鹰眼图
+	}
+	Map = new ArjMap.Map(defaultPrams);
+	// 加载地图
+	Map.init();
+	map=Map.map;
+}
+function Tab(obj) {
+    $(obj).addClass("active").siblings().removeClass("active");
+    var index = $(obj).index(); //获取索引号
+    $(".tab-item").eq(index).addClass("active").siblings().removeClass("active");
+}
+function QueryEvents(){
+	var caseName=$('#caseName').val();
+	var beginHappenDateEvent=$('#beginHappenDateEvent').val();
+	var endHappenDateEvent=$('#endHappenDateEvent').val();
+	$.getJSON(ctx+'/sys/map/queryEventIncidentMap?beginHappenDate='+beginHappenDateEvent+'&endHappenDate='+endHappenDateEvent+'&caseName='+caseName+'',function(data){
+		Map.addJSON1([ {
+			'type' : 'videos',
+			'id' : 'shipinjiankong',
+			'data' : data,
+			'isShow' : true
+		} ])
+	})
+}

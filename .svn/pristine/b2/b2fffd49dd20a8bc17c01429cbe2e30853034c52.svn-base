@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.arjjs.ccm.modules.ccm.org.dao.CcmOrgLeaddutyDao">
+    
+	<sql id="ccmOrgLeaddutyColumns">
+		a.id AS "id",
+		a.implemented_add AS "implementedAdd",
+		a.implemented_add_scale AS "implementedAddScale",
+		a.implement_name AS "implementName",
+		a.implement_scale AS "implementScale",
+		a.policy_type AS "policyType",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag"
+	</sql>
+	
+	<sql id="ccmOrgLeaddutyJoins">
+	</sql>
+    
+	<select id="get" resultType="CcmOrgLeadduty">
+		SELECT 
+			<include refid="ccmOrgLeaddutyColumns"/>
+		FROM ccm_org_leadduty a
+		<include refid="ccmOrgLeaddutyJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="CcmOrgLeadduty">
+		SELECT 
+			<include refid="ccmOrgLeaddutyColumns"/>
+		FROM ccm_org_leadduty a
+		<include refid="ccmOrgLeaddutyJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="implementedAdd != null and implementedAdd != ''">
+				AND a.implemented_add LIKE 
+					<if test="dbName == 'oracle'">'%'||#{implementedAdd}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{implementedAdd}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{implementedAdd},'%')</if>
+			</if>
+			<if test="implementName != null and implementName != ''">
+				AND a.implement_name LIKE 
+					<if test="dbName == 'oracle'">'%'||#{implementName}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{implementName}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{implementName},'%')</if>
+			</if>
+			<if test="policyType != null and policyType != ''">
+				AND a.policy_type LIKE 
+					<if test="dbName == 'oracle'">'%'||#{policyType}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{policyType}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{policyType},'%')</if>
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="CcmOrgLeadduty">
+		SELECT 
+			<include refid="ccmOrgLeaddutyColumns"/>
+		FROM ccm_org_leadduty a
+		<include refid="ccmOrgLeaddutyJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+
+	<select id="getByPolicyType" resultType="com.arjjs.ccm.tool.EchartType">
+		SELECT
+	sysDict.label AS "type",
+	COUNT( 1 ) AS "value"
+FROM
+	ccm_org_leadduty a
+	LEFT JOIN sys_dict sysDict ON sysDict.`value` = a.policy_type
+	AND sysDict.type = 'ccm_ply_rat'
+WHERE
+	a.del_flag = 0
+GROUP BY
+	sysDict.label
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO ccm_org_leadduty(
+			id,
+			implemented_add,
+			implemented_add_scale,
+			implement_name,
+			implement_scale,
+			policy_type,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag
+		) VALUES (
+			#{id},
+			#{implementedAdd},
+			#{implementedAddScale},
+			#{implementName},
+			#{implementScale},
+			#{policyType},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE ccm_org_leadduty SET 	
+			implemented_add = #{implementedAdd},
+			implemented_add_scale = #{implementedAddScale},
+			implement_name = #{implementName},
+			implement_scale = #{implementScale},
+			policy_type = #{policyType},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE ccm_org_leadduty SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

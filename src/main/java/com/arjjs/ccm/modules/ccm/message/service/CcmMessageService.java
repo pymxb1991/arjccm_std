@@ -1,0 +1,109 @@
+/**
+ * Copyright &copy; 2012-2016 <a href="https://github.com/thinkgem/jeesite">JeeSite</a> All rights reserved.
+ */
+package com.arjjs.ccm.modules.ccm.message.service;
+
+import com.arjjs.ccm.common.service.CrudService;
+import com.arjjs.ccm.modules.ccm.event.entity.CcmEventCasedeal;
+import com.arjjs.ccm.modules.ccm.event.entity.CcmEventIncident;
+import com.arjjs.ccm.modules.ccm.message.dao.CcmMessageDao;
+import com.arjjs.ccm.modules.ccm.message.entity.CcmMessage;
+import com.arjjs.ccm.modules.ccm.rest.web.CcmRestEvent;
+import com.arjjs.ccm.modules.sys.entity.User;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.List;
+
+/**
+ * 跟踪信息Service
+ * @author arj
+ * @version 2018-01-23
+ */
+@Service
+@Transactional(readOnly = true)
+public class CcmMessageService extends CrudService<CcmMessageDao, CcmMessage> {
+//
+//	@Autowired
+//	private CcmMessageDao ccmMessageDao;
+
+	public CcmMessage get(String id) {
+		return super.get(id);
+	}
+
+	@Transactional(readOnly = false)
+	public void insertEventAll(List<CcmMessage> list) {
+		dao.insertEventAll(list);
+	}
+
+	public List<CcmMessage> getListTodayAndUnread(String userId){
+		return dao.getListTodayAndUnread(userId);
+	}
+
+	@Transactional(readOnly = false)
+	public void updateRead(CcmMessage ccmMessage){
+		dao.update(ccmMessage);
+	}
+
+	public List<CcmMessage> getListTodayAndUnreadBymessage(CcmMessage ccmMessage){
+		return dao.getListTodayAndUnreadBymessage(ccmMessage);
+	}
+
+	//事件签收消息
+	@Transactional(readOnly = false)
+	public void signingMessage(CcmEventCasedeal ccmEventCasedeal, User user){
+		CcmMessage ccmMessage = new CcmMessage();
+		//为了兼容app上传，传入user
+		ccmMessage.setCreateBy(user);
+		ccmMessage.setUpdateBy(user);
+
+		ccmMessage.setType("02");//事件上报消息
+		Date createDate = ccmEventCasedeal.getUpdateDate();
+		String str = "MM-dd HH:mm:ss";
+		SimpleDateFormat sdf = new SimpleDateFormat(str);
+		ccmMessage.setContent(sdf.format(createDate)+"："+ccmEventCasedeal.getCaseName()+"事件已被"+ user.getName()+"签收");
+		ccmMessage.setReadFlag("0");//未读
+		ccmMessage.setObjId(ccmEventCasedeal.getId());
+		ccmMessage.setUserId(ccmEventCasedeal.getCreateBy().getId());		//批量添加
+		save(ccmMessage);
+		//发送MQ
+		CcmRestEvent.sendOneMessageToMq(ccmMessage);
+	}
+
+	////事件拒绝消息
+	@Transactional(readOnly = false)
+	public void rejectMessage(CcmEventCasedeal ccmEventCasedeal, User user){
+		CcmMessage ccmMessage = new CcmMessage();
+		ccmMessage.setCreateBy(user);
+		ccmMessage.setUpdateBy(user);
+		ccmMessage.setType("02");//事件上报消息
+		Date createDate = ccmEventCasedeal.getUpdateDate();
+		String str = "MM-dd HH:mm:ss";
+		SimpleDateFormat sdf = new SimpleDateFormat(str);
+		ccmMessage.setContent(sdf.format(createDate) + "：" + ccmEventCasedeal.getCaseName() + "事件已被" + user.getName() + "拒签");
+		ccmMessage.setReadFlag("0");//未读
+		ccmMessage.setObjId(ccmEventCasedeal.getId());
+		ccmMessage.setUserId(ccmEventCasedeal.getCreateBy().getId());
+
+		//批量添加
+		save(ccmMessage);
+		CcmRestEvent.sendOneMessageToMq(ccmMessage);
+	}
+
+	////任务超期消息
+	@Transactional(readOnly = false)
+	public void deadlineMessage(CcmEventIncident ccmEventIncident,CcmEventCasedeal ccmEventCasedeal,User user){
+		CcmMessage ccmMessage = new CcmMessage();
+		ccmMessage.setType("04");//任务消息
+		String str = "MM-dd HH:mm:ss";
+		SimpleDateFormat sdf = new SimpleDateFormat(str);
+		ccmMessage.setContent("任务："+ccmEventIncident.getCaseName()+" 已超期，截止时间："+sdf.format(ccmEventCasedeal.getHandleDeadline()));
+		ccmMessage.setReadFlag("0");//未读
+		ccmMessage.setObjId(ccmEventIncident.getId());
+		ccmMessage.setUserId(user.getId());
+		ccmMessage.setDeadline(ccmEventCasedeal.getHandleDeadline());
+		save(ccmMessage);
+	}
+}

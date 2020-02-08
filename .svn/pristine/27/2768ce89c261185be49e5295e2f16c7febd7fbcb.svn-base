@@ -1,0 +1,775 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.arjjs.ccm.modules.ccm.pop.dao.CcmPopTenantDao">
+
+    <sql id="ccmPopTenantColumns">
+        a.trance_id AS "tranceId",
+        a.id AS "id",
+        a.house_build AS "houseBuild",
+        a.house_place AS
+        "housePlace",
+        a.house_prup AS "housePrup",
+        a.building_id AS
+        "buildingId.id",
+        a.build_door_num AS "buildDoorNum",
+        a.floor_num AS
+        "floorNum",
+        a.door_num AS "doorNum",
+        a.house_area AS "houseArea",
+        a.property_type as "propertyType",
+        a.building_years as "buildingYears",
+        a.building_type as "buildingType",
+        a.house_type AS "houseType",
+        a.iden_code AS "idenCode",
+        a.iden_num AS
+        "idenNum",
+        a.house_name AS "houseName",
+        a.house_tl AS "houseTl",
+        a.house_cur AS "houseCur",
+        a.rent_pur AS "rentPur",
+        a.hazard AS
+        "hazard",
+        a.tenant_id AS "tenantId",
+        a.tenant_name AS "tenantName",
+        a.tenant_tl AS "tenantTl",
+        a.area_id AS "area.id",
+        a.area_map AS
+        "areaMap",
+        a.area_point AS "areaPoint",
+        a.image AS "image",
+        a.create_by
+        AS "createBy.id",
+        a.create_date AS "createDate",
+        a.update_by AS
+        "updateBy.id",
+        a.update_date AS "updateDate",
+        a.remarks AS "remarks",
+        a.del_flag AS "delFlag",
+        a17.name AS "area.name",
+        (case when a18.buildname is null then '' else a18.buildname end) AS "buildingId.buildname"
+    </sql>
+
+    <sql id="ccmPopTenantJoins">
+        LEFT JOIN sys_area a17 ON a17.id = a.area_id
+    </sql>
+    <sql id="ccmHouseBuildJoins">
+        LEFT JOIN ccm_house_buildmanage a18 ON a18.id =
+        a.building_id
+    </sql>
+
+    <select id="get" resultType="CcmPopTenant">
+        SELECT DISTINCT
+        <include refid="ccmPopTenantColumns" />
+        ,entrance.entrance_name AS "buildDoorName"
+        FROM ccm_pop_tenant a
+        <include refid="ccmPopTenantJoins" />
+        <include refid="ccmHouseBuildJoins" />
+        LEFT JOIN ccm_house_buildentrance entrance ON entrance.entrance_num = a.build_door_num AND entrance.building_id = a.building_id  AND entrance.del_flag = 0
+        WHERE a.id = #{id}
+    </select>
+
+    <select id="findByTranceId" resultType="CcmPopTenant">
+        SELECT DISTINCT
+        <include refid="ccmPopTenantColumns" />
+        ,entrance.entrance_name AS "buildDoorName"
+        FROM ccm_pop_tenant a
+        <include refid="ccmPopTenantJoins" />
+        <include refid="ccmHouseBuildJoins" />
+        LEFT JOIN ccm_house_buildentrance entrance ON entrance.entrance_num = a.build_door_num AND entrance.building_id = a.building_id  AND entrance.del_flag = 0
+        WHERE a.trance_id = #{tranceId}
+    </select>
+    
+    <!-- 首页实有房屋统计 -->
+    <select id="findCountByHouseType" resultType="com.arjjs.ccm.modules.ccm.pop.entity.CcmPopTenantCopy">
+		SELECT 
+			 c.value AS "houseType",
+			 IFNULL(d.count,0) AS "count"
+		FROM
+		(SELECT d.value AS "value" from sys_dict d WHERE d.del_flag = 0 AND d.type = 'ccm_pop_tenant_type' ) c
+		LEFT JOIN 
+		(SELECT
+			count( a.id ) AS "count",
+			a.house_type AS "houseType" 
+		FROM
+			ccm_pop_tenant a 
+		WHERE
+			a.del_flag = 0 
+		GROUP BY
+			a.house_type ) d ON c.value = d.houseType
+    </select>
+
+	<!-- 首页统计出租房屋数量 -->
+    <select id="findCountByRentPur" resultType="com.arjjs.ccm.modules.ccm.pop.entity.CcmPopTenantCopy">
+		SELECT
+			c.value AS "rentPur",
+			IFNULL(d.count,0) AS "count"
+		FROM
+		(SELECT d.value AS "value" from sys_dict d WHERE d.del_flag = 0 AND d.type = 'ccm_let_use' ) c
+		LEFT JOIN
+		(SELECT
+			count( a.id ) AS "count",
+            a.rent_pur AS "rentPur"
+		FROM
+			ccm_pop_tenant a
+		WHERE
+			a.del_flag = 0
+		GROUP BY
+			a.rent_pur ) d ON c.value = d.rentPur
+	</select>
+
+	<!--<select id="findCountByHousePrup" resultType="com.arjjs.ccm.modules.ccm.pop.entity.CcmPopTenantCopy">
+		SELECT 
+			c.value AS "housePrup",
+			IFNULL(d.count,0) AS "count"
+		FROM
+		(SELECT d.value AS "value" from sys_dict d WHERE d.del_flag = 0 AND d.type = 'ccm_str_use' ) c
+		LEFT JOIN 
+		(SELECT
+			count( a.id ) AS "count",
+			a.house_prup AS "housePrup"
+		FROM
+			ccm_pop_tenant a 
+		WHERE
+			a.del_flag = 0 
+		GROUP BY
+			a.house_prup ) d ON c.value = d.housePrup
+	</select>-->
+
+    <select id="findListId" resultType="CcmPopTenant">
+        SELECT
+            a.id
+        FROM ccm_pop_tenant a
+        <where>
+            a.del_flag = #{DEL_FLAG_NORMAL}
+            <if test="houseBuild != null and houseBuild != ''">
+                AND a.house_build LIKE
+                <if test="dbName == 'oracle'">'%'||#{houseBuild}||'%'</if>
+                <if test="dbName == 'mssql'">'%'+#{houseBuild}+'%'</if>
+                <if test="dbName == 'mysql'">concat('%',#{houseBuild},'%')</if>
+            </if>
+            <if test="housePlace != null and housePlace != ''">
+                AND a.house_place LIKE
+                <if test="dbName == 'oracle'">'%'||#{housePlace}||'%'</if>
+                <if test="dbName == 'mssql'">'%'+#{housePlace}+'%'</if>
+                <if test="dbName == 'mysql'">concat('%',#{housePlace},'%')</if>
+            </if>
+            <if test="houseName != null and houseName != ''">
+                AND a.house_name LIKE
+                <if test="dbName == 'oracle'">'%'||#{houseName}||'%'</if>
+                <if test="dbName == 'mssql'">'%'+#{houseName}+'%'</if>
+                <if test="dbName == 'mysql'">concat('%',#{houseName},'%')</if>
+            </if>
+            <if
+                    test="buildingId != null and buildingId.id != null and buildingId.id != ''">
+                AND a.building_id = #{buildingId.id}
+            </if>
+            <if test="area != null and area.id != null and area.id != ''">
+                AND a.area_id = #{area.id}
+            </if>
+            <if test="houseType != null and houseType != ''">
+                AND a.house_type = #{houseType}
+            </if>
+        </where>
+        <choose>
+            <when test="page !=null and page.orderBy != null and page.orderBy != ''">
+                ORDER BY ${page.orderBy}
+            </when>
+            <otherwise>
+                ORDER BY a.area_id,a.building_id
+            </otherwise>
+        </choose>
+    </select>
+    <select id="findList_V2" resultType="CcmPopTenant">
+        SELECT
+        <include refid="ccmPopTenantColumns" />
+        FROM ccm_pop_tenant a
+        <include refid="ccmPopTenantJoins" />
+        <include refid="ccmHouseBuildJoins" />
+        <where>
+            a.del_flag = #{DEL_FLAG_NORMAL}
+            <if test="listLimite != null and listLimite.size > 0">
+                AND (
+                <foreach collection="listLimite" item="n"  separator=" OR " >
+                    <if test="n != null and n != ''">
+                        a.id = #{n}
+                    </if>
+                </foreach>
+                )
+            </if>
+        </where>
+        <choose>
+            <when test="page !=null and page.orderBy != null and page.orderBy != ''">
+                ORDER BY ${page.orderBy}
+            </when>
+            <otherwise>
+                ORDER BY a.area_id,a.building_id
+            </otherwise>
+        </choose>
+    </select>
+
+    <select id="findList" resultType="CcmPopTenant">
+        SELECT
+        <include refid="ccmPopTenantColumns" />
+        FROM ccm_pop_tenant a
+        <include refid="ccmPopTenantJoins" />
+        <include refid="ccmHouseBuildJoins" />
+        <where>
+            a.del_flag = #{DEL_FLAG_NORMAL}
+            <if test="houseBuild != null and houseBuild != ''">
+                AND a.house_build LIKE
+                <if test="dbName == 'oracle'">'%'||#{houseBuild}||'%'</if>
+                <if test="dbName == 'mssql'">'%'+#{houseBuild}+'%'</if>
+                <if test="dbName == 'mysql'">concat('%',#{houseBuild},'%')</if>
+            </if>
+            <if test="housePlace != null and housePlace != ''">
+                AND a.house_place LIKE
+                <if test="dbName == 'oracle'">'%'||#{housePlace}||'%'</if>
+                <if test="dbName == 'mssql'">'%'+#{housePlace}+'%'</if>
+                <if test="dbName == 'mysql'">concat('%',#{housePlace},'%')</if>
+            </if>
+            <if test="houseName != null and houseName != ''">
+                AND a.house_name LIKE
+                <if test="dbName == 'oracle'">'%'||#{houseName}||'%'</if>
+                <if test="dbName == 'mssql'">'%'+#{houseName}+'%'</if>
+                <if test="dbName == 'mysql'">concat('%',#{houseName},'%')</if>
+            </if>
+            <if
+                test="buildingId != null and buildingId.id != null and buildingId.id != ''">
+                AND a.building_id = #{buildingId.id}
+            </if>
+            <if test="area != null and area.id != null and area.id != ''">
+                AND a.area_id = #{area.id}
+            </if>
+            <if test="houseType != null and houseType != ''">
+                AND a.house_type = #{houseType}
+            </if>
+        </where>
+        <choose>
+            <when test="page !=null and page.orderBy != null and page.orderBy != ''">
+                ORDER BY ${page.orderBy}
+            </when>
+            <otherwise>
+                ORDER BY a.area_id,a.building_id
+            </otherwise>
+        </choose>
+    </select>
+
+    <select id="findListOrderby" resultType="CcmPopTenant">
+        SELECT
+        <include refid="ccmPopTenantColumns" />
+        FROM ccm_pop_tenant a
+        <include refid="ccmPopTenantJoins" />
+        <include refid="ccmHouseBuildJoins" />
+        <where>
+            a.del_flag = #{DEL_FLAG_NORMAL}
+            <if test="buildingId != null and buildingId.id != null and buildingId.id != ''">
+                AND a.building_id = #{buildingId.id}
+            </if>
+            <if test="area != null and area.id != null and area.id != ''">
+                AND a.area_id = #{area.id}
+            </if>
+            <if test="houseType != null and houseType != ''">
+                AND a.house_type = #{houseType}
+            </if>
+        </where>
+            ORDER BY a.floor_num,a.door_num
+    </select>
+
+    <!-- 楼栋调用listBuild -->
+    <select id="listBuild" resultType="CcmPopTenant">
+        SELECT
+        <include refid="ccmPopTenantColumns" />
+        FROM ccm_pop_tenant a
+        <include refid="ccmPopTenantJoins" />
+        <include refid="ccmHouseBuildJoins" />
+        <where>
+            a.del_flag = "0"
+            AND a.building_id = #{buildingId}
+        </where>
+        <choose>
+            <when test="page !=null and page.orderBy != null and page.orderBy != ''">
+                ORDER BY ${page.orderBy}
+            </when>
+            <otherwise>
+                ORDER BY a.update_date DESC
+            </otherwise>
+        </choose>
+    </select>
+
+    <!-- 楼栋房屋弹框 -->
+    <select id="getHouseList" resultType="CcmPopTenant">
+        SELECT
+        <include refid="ccmPopTenantColumns" />
+        FROM ccm_pop_tenant a
+        <include refid="ccmPopTenantJoins" />
+        <include refid="ccmHouseBuildJoins" />
+        <where>
+            a.del_flag = #{DEL_FLAG_NORMAL}
+            AND a.building_id =
+            #{buildingId.id}
+        </where>
+        ORDER BY a.floor_num DESC, a.build_door_num ASC, a.door_num
+    </select>
+        
+    
+    
+    <!-- 首页社区弹框:出租屋总数-->
+    <select id="findHouseRentArea" resultType="CcmPopTenant">
+        SELECT
+        <include refid="ccmPopTenantColumns" />
+        FROM ccm_pop_tenant a
+        <include refid="ccmPopTenantJoins" />
+        <include refid="ccmHouseBuildJoins" />
+        <where>
+            a.del_flag = #{DEL_FLAG_NORMAL}
+            AND a.building_id =
+            #{buildingId.id}
+            AND a.house_type = "02"
+        </where>
+        ORDER BY a.floor_num DESC, a.build_door_num , a.door_num
+    </select>
+    
+    <!-- 报表:楼栋房屋 -->
+    <select id="findHouseAndBuild" resultType="com.arjjs.ccm.tool.SearchTabMore">
+       SELECT
+			(
+				CASE c.param_str
+				WHEN '1' THEN cm.id
+				WHEN '2' THEN cm.parent_id
+				ELSE cm.parent_id
+				END
+			)AS "type",
+			(
+				CASE c.param_str
+				WHEN '1' THEN cm.name
+				WHEN '2' THEN s.name
+				ELSE s.name
+				END
+			) AS "value1",
+			count(bd.buildname) AS "value2",
+			sum(bd.floor_area) AS "value3",
+			sum(bd_pop.contPop) AS "value4"
+		FROM
+			ccm_house_buildmanage bd,
+			sys_area net,
+			sys_area cm,
+			sys_area s,
+			sys_config c,
+			(
+				SELECT
+					bd.id,
+					bd.buildname,
+					count(pop.id) contPop
+				FROM
+					ccm_house_buildmanage bd,
+					ccm_pop_tenant pop
+				WHERE
+					pop.building_id = bd.id
+					AND bd.del_flag = "0"
+					AND pop.del_flag = "0"
+					<if test="value5 != 'all'">
+		                AND pop.house_type = #{value5}
+		            </if>
+					<if test="value8 != 'all'">
+		                AND pop.hazard = #{value8}
+		            </if>
+				GROUP BY
+					bd.id
+			) bd_pop
+		WHERE
+			bd.area_id = net.id
+		AND bd.del_flag = "0"
+		AND net.del_flag = "0"
+		AND cm.del_flag = "0"
+		AND s.del_flag = "0"
+		AND net.parent_id = cm.id
+		AND cm.parent_id = s.id
+		AND bd_pop.id = bd.id
+		AND c.id = 'system_level' 
+		GROUP BY
+			(
+				CASE c.param_str
+				WHEN '1' THEN cm.id
+				WHEN '2' THEN cm.parent_id
+				ELSE cm.parent_id
+				END
+			)
+    </select>
+    <!-- 报表:房屋类型-->
+    <select id="findHouseType" resultType="com.arjjs.ccm.tool.EchartType">
+       SELECT
+			a.house_type AS "typeO",
+			COUNT(*) AS "value"
+		FROM
+			ccm_pop_tenant a
+		WHERE
+			a.del_flag = "0"
+			AND a.house_type IS NOT NULL
+			AND a.house_type != ""
+		GROUP BY
+			a.house_type
+    </select>
+    <!-- 房屋总数-街道-->
+    <select id="findListNum" resultType="int">
+       	SELECT
+			COUNT(*)
+		FROM
+			ccm_pop_tenant a
+		<if test="area != null and area.id != null and area.id != ''">
+			LEFT JOIN sys_area a17 ON a17.id = a.area_id
+			LEFT JOIN ccm_house_buildmanage a18 ON a18.id = a.building_id
+			LEFT JOIN sys_area net ON net.id = a18.area_id
+			LEFT JOIN sys_area community ON community.id = net.parent_id
+			LEFT JOIN sys_area street ON street.id = community.parent_id
+		</if>
+		WHERE
+			a.del_flag = '0'
+			<if test="area != null and area.id != null and area.id != ''">
+				AND a18.del_flag = '0'
+				AND net.del_flag = '0'
+				AND community.del_flag = '0'
+				AND street.del_flag = '0'
+				AND street.id = #{area.id}
+			</if>
+    </select>
+    <!-- 出租房数量-社区-->
+    <select id="findListNumCommunity" resultType="int">
+       	SELECT
+			COUNT(*)
+		FROM
+			ccm_pop_tenant a
+		<if test="area != null and area.id != null and area.id != ''">
+			LEFT JOIN sys_area a17 ON a17.id = a.area_id
+			LEFT JOIN ccm_house_buildmanage a18 ON a18.id = a.building_id
+			LEFT JOIN sys_area net ON net.id = a18.area_id
+			LEFT JOIN sys_area community ON community.id = net.parent_id
+		</if>
+		WHERE
+			a.del_flag = '0'
+			<if test="area != null and area.id != null and area.id != ''">
+				AND a18.del_flag = '0'
+				AND net.del_flag = '0'
+				AND community.del_flag = '0'
+				AND community.id = #{area.id}
+			</if>
+    </select>
+    <!-- 房屋安全隐患统计-->
+    <select id="getHouseHazard" resultType="com.arjjs.ccm.tool.EchartType">
+        SELECT
+			a.hazard AS "typeO",
+			COUNT(*) AS "value"
+		FROM
+			ccm_pop_tenant a
+		WHERE
+			a.del_flag = "0"
+			AND a.hazard IS NOT NULL
+			AND a.hazard != ""
+		GROUP BY
+			a.hazard
+    </select>
+    
+    
+    <!-- -->
+    <select id="findAllList" resultType="CcmPopTenant">
+        SELECT
+        <include refid="ccmPopTenantColumns" />
+        FROM ccm_pop_tenant a
+        <include refid="ccmPopTenantJoins" />
+        <include refid="ccmHouseBuildJoins" />
+        <where>
+            a.del_flag = #{DEL_FLAG_NORMAL}
+        </where>
+        <choose>
+            <when test="page !=null and page.orderBy != null and page.orderBy != ''">
+                ORDER BY ${page.orderBy}
+            </when>
+            <otherwise>
+                ORDER BY a.update_date DESC
+            </otherwise>
+        </choose>
+    </select>
+
+
+    <select id="findAreaBuildTenantList" resultType="CcmPopTenant">
+        SELECT
+            a.id AS "id",
+            a.parent_id AS "buildingId.id",
+            a. NAME AS "houseBuild",
+            "true" AS "houseType"
+        FROM
+            sys_area a
+        WHERE
+            a.parent_id IS NOT NULL
+        AND a.del_flag = 0
+        UNION ALL
+            SELECT
+                b.id AS "id",
+                b.area_id AS "buildingId.id",
+                b.buildname AS "houseBuild",
+            	"false" AS "houseType"
+            FROM
+                ccm_house_buildmanage b,
+                sys_area area
+            WHERE
+                b.area_id IS NOT NULL
+            AND b.area_id = area.id
+            AND b.del_flag = 0
+            AND area.del_flag = 0
+            UNION ALL
+                SELECT
+                    t.id AS "id",
+                    t.building_id AS "buildingId.id",
+                    t.house_build AS "houseBuild",
+            		"false" AS "houseType"
+                FROM
+                    ccm_pop_tenant t,
+                    ccm_house_buildmanage build,
+                    sys_area area
+                WHERE
+                    t.building_id IS NOT NULL
+                AND t.building_id = build.id
+                AND build.area_id = area.id
+                AND t.del_flag = 0
+                AND build.del_flag = 0
+                AND area.del_flag = 0
+    </select>
+
+
+
+
+    <insert id="insert">
+        INSERT INTO ccm_pop_tenant(
+        trance_id,
+        id,
+        house_build,
+        house_place,
+        house_prup,
+        building_id,
+        build_door_num,
+        floor_num,
+        door_num,
+        house_area,
+        property_type,
+        building_years,
+        building_type,
+        house_type,
+        iden_code,
+        iden_num,
+        house_name,
+        house_tl,
+        house_cur,
+        rent_pur,
+        hazard,
+        tenant_id,
+        tenant_name,
+        tenant_tl,
+        area_id,
+        area_map,
+        area_point,
+        image,
+        create_by,
+        create_date,
+        update_by,
+        update_date,
+        remarks,
+        del_flag
+        ) VALUES (
+        #{tranceId},
+        #{id},
+        #{houseBuild},
+        #{housePlace},
+        #{housePrup},
+        #{buildingId.id},
+        #{buildDoorNum},
+        #{floorNum},
+        #{doorNum},
+        #{houseArea},
+        #{propertyType},
+        #{buildingYears},
+        #{buildingType},
+        #{houseType},
+        #{idenCode},
+        #{idenNum},
+        #{houseName},
+        #{houseTl},
+        #{houseCur},
+        #{rentPur},
+        #{hazard},
+        #{tenantId},
+        #{tenantName},
+        #{tenantTl},
+        #{area.id},
+        #{areaMap},
+        #{areaPoint},
+        #{image},
+        #{createBy.id},
+        #{createDate},
+        #{updateBy.id},
+        #{updateDate},
+        #{remarks},
+        #{delFlag}
+        )
+    </insert>
+
+    <update id="update">
+        UPDATE ccm_pop_tenant SET
+        trance_id = #{tranceId},
+        house_build = #{houseBuild},
+        house_place = #{housePlace},
+        house_prup = #{housePrup},
+        building_id = #{buildingId.id},
+        build_door_num = #{buildDoorNum},
+        floor_num = #{floorNum},
+        door_num = #{doorNum},
+        house_area = #{houseArea},
+        property_type = #{propertyType},
+        building_years = #{buildingYears},
+        building_type = #{buildingType},
+        house_type = #{houseType},
+        iden_code = #{idenCode},
+        iden_num = #{idenNum},
+        house_name = #{houseName},
+        house_tl = #{houseTl},
+        house_cur = #{houseCur},
+        rent_pur = #{rentPur},
+        hazard = #{hazard},
+        tenant_id = #{tenantId},
+        tenant_name = #{tenantName},
+        tenant_tl = #{tenantTl},
+        area_id = #{area.id},
+        area_map = #{areaMap},
+        area_point = #{areaPoint},
+        image = #{image},
+        update_by = #{updateBy.id},
+        update_date = #{updateDate},
+        remarks = #{remarks}
+        WHERE id = #{id}
+    </update>
+
+    <update id="delete">
+        UPDATE ccm_pop_tenant SET
+        del_flag = #{DEL_FLAG_DELETE}
+        WHERE id = #{id}
+    </update>
+    
+    <!-- 重点人员 -->
+    <select id="getStringSpecial" resultType="java.lang.String">
+        SELECT DISTINCT(b.id) FROM ccm_pop_tenant b
+        LEFT JOIN sys_area a17 ON a17.id = b.area_id
+        LEFT JOIN ccm_house_buildmanage a18 ON a18.id = b.building_id
+        LEFT JOIN ccm_people a ON a.room_id =b.id
+        <where>
+            b.del_flag = #{DEL_FLAG_NORMAL}
+            and a17.del_flag = #{DEL_FLAG_NORMAL}
+            and a18.del_flag = #{DEL_FLAG_NORMAL}
+            and a.del_flag = #{DEL_FLAG_NORMAL} 
+            <if test="more1 != null and more1 != ''">
+                and (${more1})
+            </if>
+            <if test="buildingId != null and buildingId.id != null and buildingId.id != ''">
+                and b.building_id = #{buildingId.id}
+            </if>
+        </where>
+        GROUP BY b.id
+    </select>
+    
+    <!-- 重点人员More -->
+    <select id="getStringSpecialMore" resultType="com.arjjs.ccm.tool.SearchTabMM">
+        SELECT 
+        	DISTINCT (b.id) AS type,
+			a.is_aids AS value1,
+			a.is_psychogeny AS value2,
+			a.is_kym AS value3,
+			a.is_drugs AS value4,
+			a.is_release AS value5,
+			a.is_rectification AS value6,
+			a.is_behind AS value7,
+			a.is_visit AS value8,
+			a.is_heresy AS value9,
+			a.is_dangerous AS value10,
+			(case when a.birthday &lt; DATE_SUB(curdate(), INTERVAL 65 YEAR) then 1 else 0 end) AS value11,
+			(case when instr(a.special_care_type,'a')>0 then 1 else 0 end)value12,
+			(case when instr(a.special_care_type,'b')>0 then 1 else 0 end)value13,
+			(case when instr(a.special_care_type,'c')>0 then 1 else 0 end)value14,
+			(case when instr(a.special_care_type,'d')>0 then 1 else 0 end)value15,
+			(case when instr(a.special_care_type,'e')>0 then 1 else 0 end)value16,
+			(case when instr(a.special_care_type,'f')>0 then 1 else 0 end)value17,
+			(case when instr(a.special_care_type,'g')>0 then 1 else 0 end)value18,
+			(case when instr(a.special_care_type,'h')>0 then 1 else 0 end)value19,
+			(case when instr(a.special_care_type,'i')>0 then 1 else 0 end)value20,
+			(case when instr(a.special_care_type,'j')>0 then 1 else 0 end)value21,
+			(case when instr(a.special_care_type,'k')>0 then 1 else 0 end)value22
+ 
+        FROM ccm_pop_tenant b
+        LEFT JOIN sys_area a17 ON a17.id = b.area_id
+        LEFT JOIN ccm_house_buildmanage a18 ON a18.id = b.building_id
+        LEFT JOIN ccm_people a ON a.room_id =b.id
+        <where>
+            b.del_flag = #{DEL_FLAG_NORMAL}
+            and a17.del_flag = #{DEL_FLAG_NORMAL}
+            and a18.del_flag = #{DEL_FLAG_NORMAL}
+            and a.del_flag = #{DEL_FLAG_NORMAL} 
+            <if test="more1 != null and more1 != ''">
+                and (${more1})
+            </if>
+            <if test="buildingId != null and buildingId.id != null and buildingId.id != ''">
+                and b.building_id = #{buildingId.id}
+            </if>
+        </where>
+        GROUP BY b.id
+    </select>
+    
+    
+    <select id="findAreaByRoom" resultType="CcmPeople" parameterType="CcmPopTenant">
+        SELECT
+			a.id AS "roomId.id",
+			c.parent_id AS "areaComId.id",
+			c.id AS "areaGridId.id",
+			b.id AS "buildId.id"
+		FROM
+			ccm_pop_tenant a
+		LEFT JOIN ccm_house_buildmanage b ON a.building_id = b.id
+		LEFT JOIN sys_area c ON b.area_id = c.id
+		WHERE
+			a.id = #{id}
+    </select>
+    <!-- 街道信息-大屏-滨海新区社会网格化管理信息平台 -->
+    <select id="findListAllData" resultType="com.arjjs.ccm.tool.SearchTab">
+        SELECT
+        <!--  <include refid="ccmPopTenantColumns" />-->
+	        a.id AS "type",
+	        a.house_build AS "value",
+	        a.area_map AS "value1",
+	        a.area_point AS "value2"
+        FROM ccm_pop_tenant a
+		LEFT JOIN sys_area a17 ON a17.id = a.area_id
+		LEFT JOIN ccm_house_buildmanage a18 ON a18.id = a.building_id
+		LEFT JOIN sys_area net ON net.id = a18.area_id
+		LEFT JOIN sys_area community ON community.id = net.parent_id
+		LEFT JOIN sys_area street ON street.id = community.parent_id
+		WHERE
+			a.del_flag = '0'
+			AND a18.del_flag = '0'
+			AND net.del_flag = '0'
+			AND community.del_flag = '0'
+			AND street.del_flag = '0'
+			<if test="area != null and area.id != null and area.id != ''">
+				AND street.id = #{area.id}
+			</if>
+    </select>
+    <select id="selectByBuildIdAndName" resultType="String" parameterType="com.arjjs.ccm.modules.ccm.sys.entity.CcmAreaPointVo">
+        SELECT
+           a.id
+        FROM
+        ccm_pop_tenant a
+        WHERE
+         a.del_flag = 0 and a.house_type = '02'
+        <if test="areaId != null and areaId !=''">
+            and a.building_id = #{areaId}
+        </if>
+        <if test="name != null and name !=''">
+            and a.house_place like  '%${name}%'
+        </if>
+
+    </select>
+</mapper>

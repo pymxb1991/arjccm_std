@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.arjjs.ccm.modules.iot.place.dao.CcmPlaceControlDao">
+    
+	<sql id="ccmPlaceControlColumns">
+		a.id AS "id",
+		a.name AS "name",
+		a.control_type AS "controlType",
+		a.controltime AS "controltime",
+		a.grade AS "grade",
+		a.reason AS "reason",
+		a.control_range AS "controlRange",
+		a.control_by AS "controlBy",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag"
+	</sql>
+	
+	<sql id="ccmPlaceControlJoins">
+	</sql>
+    
+	<select id="get" resultType="CcmPlaceControl">
+		SELECT 
+			<include refid="ccmPlaceControlColumns"/>
+		FROM ccm_place_control a
+		<include refid="ccmPlaceControlJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="CcmPlaceControl">
+		SELECT 
+			<include refid="ccmPlaceControlColumns"/>
+		FROM ccm_place_control a
+		<include refid="ccmPlaceControlJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="name != null and name != ''">
+				AND a.name LIKE 
+					<if test="dbName == 'oracle'">'%'||#{name}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{name}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{name},'%')</if>
+			</if>
+			<if test="controlType != null and controlType != ''">
+				AND a.control_type = #{controlType}
+			</if>
+			<if test="controltime != null and controltime != ''">
+				AND a.controltime = #{controltime}
+			</if>
+			<if test="grade != null and grade != ''">
+				AND a.grade = #{grade}
+			</if>
+			<if test="reason != null and reason != ''">
+				AND a.reason = #{reason}
+			</if>
+			<if test="controlRange != null and controlRange != ''">
+				AND a.control_range = #{controlRange}
+			</if>
+			<if test="controlBy != null and controlBy != ''">
+				AND a.control_by = #{controlBy}
+			</if>
+			<if test="updateDate != null and updateDate != ''">
+				AND a.update_date = #{updateDate}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="CcmPlaceControl">
+		SELECT 
+			<include refid="ccmPlaceControlColumns"/>
+		FROM ccm_place_control a
+		<include refid="ccmPlaceControlJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO ccm_place_control(
+			id,
+			name,
+			control_type,
+			controltime,
+			grade,
+			reason,
+			control_range,
+			control_by,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag
+		) VALUES (
+			#{id},
+			#{name},
+			#{controlType},
+			#{controltime},
+			#{grade},
+			#{reason},
+			#{controlRange},
+			#{controlBy},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE ccm_place_control SET 	
+			name = #{name},
+			control_type = #{controlType},
+			controltime = #{controltime},
+			grade = #{grade},
+			reason = #{reason},
+			control_range = #{controlRange},
+			control_by = #{controlBy},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE ccm_place_control SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

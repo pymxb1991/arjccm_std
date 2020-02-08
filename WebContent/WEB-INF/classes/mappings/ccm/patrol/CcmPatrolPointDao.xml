@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.arjjs.ccm.modules.ccm.patrol.dao.CcmPatrolPointDao">
+    
+    <sql id="ccmPatrolPointColumns">
+        a.id AS "id",
+        a.area_point AS "areaPoint",
+        a.name AS "name",
+        a.property AS "property",
+        a.create_by AS "createBy.id",
+        a.create_date AS "createDate",
+        a.update_by AS "updateBy.id",
+        a.update_date AS "updateDate",
+        a.remarks AS "remarks",
+        a.del_flag AS "delFlag"
+    </sql>
+    
+    <sql id="ccmPatrolPointJoins">
+    </sql>
+    
+    <select id="get" resultType="CcmPatrolPoint">
+        SELECT 
+            <include refid="ccmPatrolPointColumns"/>
+        FROM ccm_patrol_point a
+        <include refid="ccmPatrolPointJoins"/>
+        WHERE a.id = #{id}
+    </select>
+    
+    <select id="findList" resultType="CcmPatrolPoint">
+        SELECT 
+            <include refid="ccmPatrolPointColumns"/>
+        FROM ccm_patrol_point a
+        <include refid="ccmPatrolPointJoins"/>
+        <where>
+            a.del_flag = #{DEL_FLAG_NORMAL}
+            <if test="areaPoint != null and areaPoint != ''">
+                AND a.area_point = #{areaPoint}
+            </if>
+            <if test="name != null and name != ''">
+                AND a.name LIKE 
+                    <if test="dbName == 'oracle'">'%'||#{name}||'%'</if>
+                    <if test="dbName == 'mssql'">'%'+#{name}+'%'</if>
+                    <if test="dbName == 'mysql'">concat('%',#{name},'%')</if>
+            </if>
+        </where>
+        <choose>
+            <when test="page !=null and page.orderBy != null and page.orderBy != ''">
+                ORDER BY ${page.orderBy}
+            </when>
+            <otherwise>
+                ORDER BY a.update_date DESC
+            </otherwise>
+        </choose>
+    </select>
+    
+    <select id="findAllList" resultType="CcmPatrolPoint">
+        SELECT 
+            <include refid="ccmPatrolPointColumns"/>
+        FROM ccm_patrol_point a
+        <include refid="ccmPatrolPointJoins"/>
+        <where>
+            a.del_flag = #{DEL_FLAG_NORMAL}
+        </where>        
+        <choose>
+            <when test="page !=null and page.orderBy != null and page.orderBy != ''">
+                ORDER BY ${page.orderBy}
+            </when>
+            <otherwise>
+                ORDER BY a.update_date DESC
+            </otherwise>
+        </choose>
+    </select>
+    
+    <insert id="insert">
+        INSERT INTO ccm_patrol_point(
+            id,
+            area_point,
+            name,
+            property,
+            create_by,
+            create_date,
+            update_by,
+            update_date,
+            remarks,
+            del_flag
+        ) VALUES (
+            #{id},
+            #{areaPoint},
+            #{name},
+            #{property},
+            #{createBy.id},
+            #{createDate},
+            #{updateBy.id},
+            #{updateDate},
+            #{remarks},
+            #{delFlag}
+        )
+    </insert>
+    
+    <update id="update">
+        UPDATE ccm_patrol_point SET     
+            area_point = #{areaPoint},
+            name = #{name},
+            property = #{property},
+            update_by = #{updateBy.id},
+            update_date = #{updateDate},
+            remarks = #{remarks}
+        WHERE id = #{id}
+    </update>
+    
+    <update id="delete">
+        UPDATE ccm_patrol_point SET 
+            del_flag = #{DEL_FLAG_DELETE}
+        WHERE id = #{id}
+    </update>
+    
+    
+    <!-- 巡逻路线 -->
+	<select id="findPatrolPointPlanMap" resultType="com.arjjs.ccm.tool.EchartType">
+		SELECT
+			b.id AS "type",
+			b.name AS "typeO",
+			c.area_point AS "value"
+			<!-- 
+			c.name AS "value1",
+			a.id AS "value2",
+			a.plan_id AS "value3",
+			a.point_id AS "value4",
+			a.sort AS "value5" -->
+		FROM
+			ccm_patrol_pointsort a
+		LEFT JOIN ccm_patrol_plan b ON b.id = a.plan_id
+		LEFT JOIN ccm_patrol_point c ON c.id = a.point_id
+		WHERE
+			a.del_flag = 0
+			AND b.del_flag = 0
+			AND c.del_flag = 0
+		ORDER BY a.plan_id, a.sort
+	</select>
+	
+	
+	
+	
+	
+	
+	
+	
+</mapper>

@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.arjjs.ccm.modules.pbs.flow.dao.PbsFlowdefinitionDao">
+
+	<sql id="pbsFlowdefinitionColumns">
+		a.id AS "id",
+		a.s_name AS "sName",
+		a.s_typeid AS
+		"sTypeid.id",
+		a.s_startstat AS "sStartstat",
+		a.s_lockstat AS
+		"sLockstat",
+		a.s_revoke AS "sRevoke",
+		a.s_description AS "sDescription",
+		a.s_typecode AS "sTypecode",
+		a.s_spare01 AS "sSpare01",
+		a.s_spare02 AS
+		"sSpare02",
+		a.s_spare03 AS
+		"sSpare03",
+		a.s_spare04 AS "sSpare04",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks
+		AS "remarks",
+		a.del_flag AS "delFlag",
+		flowtype.s_name AS "sTypeid.sName"
+	</sql>
+
+	<sql id="pbsFlowdefinitionJoins">
+		LEFT JOIN pbs_flowtype flowtype ON flowtype.id = a.s_typeid
+	</sql>
+
+	<select id="get" resultType="PbsFlowdefinition">
+		SELECT
+		<include refid="pbsFlowdefinitionColumns" />
+		FROM pbs_flowdefinition a
+		<include refid="pbsFlowdefinitionJoins" />
+		WHERE a.id = #{id}
+	</select>
+
+	<select id="findList" resultType="PbsFlowdefinition">
+		SELECT
+		<include refid="pbsFlowdefinitionColumns" />
+		FROM pbs_flowdefinition a
+		<include refid="pbsFlowdefinitionJoins" />
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="sTypecode != null and sTypecode != '' ">
+                AND a.s_typecode = #{sTypecode}
+            </if>
+            <if test="sStartstat != null and sStartstat != '' ">
+                AND a.s_startstat = #{sStartstat}
+            </if>
+            <if test="sName != null and sName != '' ">
+                AND a.s_name LIKE CONCAT('%',#{sName},'%') 
+            </if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+
+	<select id="findAllList" resultType="PbsFlowdefinition">
+		SELECT
+		<include refid="pbsFlowdefinitionColumns" />
+		FROM pbs_flowdefinition a
+		<include refid="pbsFlowdefinitionJoins" />
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+
+	<insert id="insert">
+		INSERT INTO pbs_flowdefinition(
+		id,
+		s_name,
+		s_typeid,
+		s_startstat,
+		s_lockstat,
+		s_revoke,
+		s_description,
+		s_typecode ,
+		create_by,
+		create_date,
+		update_by,
+		update_date,
+		del_flag
+		) VALUES (
+		#{id},
+		#{sName},
+		#{sTypeid.id},
+		#{sStartstat},
+		#{sLockstat},
+		#{sRevoke},
+		#{sDescription},
+		#{sTypecode},
+		#{createBy.id},
+		#{createDate},
+		#{updateBy.id},
+		#{updateDate},
+		#{delFlag}
+		)
+	</insert>
+
+	<update id="update">
+		UPDATE pbs_flowdefinition SET
+		s_name = #{sName},
+		s_typeid = #{sTypeid.id},
+		s_startstat = #{sStartstat},
+		s_lockstat =
+		#{sLockstat},
+		s_revoke = #{sRevoke},
+		s_description = #{sDescription},
+		 s_typecode = #{sTypecode},
+		update_by = #{updateBy.id},
+		update_date = #{updateDate}
+		WHERE id = #{id}
+	</update>
+
+	<update id="delete">
+		UPDATE pbs_flowdefinition SET
+		del_flag =
+		#{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+
+</mapper>

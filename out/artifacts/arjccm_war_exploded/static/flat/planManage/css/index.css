@@ -1,0 +1,451 @@
+
+::-webkit-scrollbar{width:5px;}
+::-webkit-scrollbar{height:5px;}
+::-webkit-scrollbar-track{background-color:#bee1eb;}
+::-webkit-scrollbar-thumb{background-color:#00aff0;}
+::-webkit-scrollbar-thumb:hover {background-color:#9c3}
+::-webkit-scrollbar-thumb:active {background-color:#00aff0}
+body{
+    font-size:12px;
+}
+
+.esriViewPopup .mainSection .attrTable td{
+    padding-bottom:0;
+}
+.esriViewPopup .break{
+    height:0;
+}
+
+html, body{
+    height: 100%;
+    width: 100%;
+}
+
+#toolbar{
+    position: absolute;
+    right: 255px;
+    bottom: 40px;
+    z-index: 999;
+}
+#toolbar .dropdown-menu{
+    min-width:50px;
+}
+#toolbar .panel{
+    border-radius:0;
+    border-top:none;
+    display:none; 
+}
+#toolbar .panel-body{
+    height:400px;
+    overflow:auto;
+}
+#toolbar .panel .panel-footer{
+    padding:5px 10px;
+}
+#toolbar .panel-footer .checkbox-inline{
+    padding-top:6px;
+}
+#toolbar .btn-group > .btn{
+    border-radius:0;
+}
+#reviewTime .col-sm-9,#reviewTime .col-sm-3{
+    padding-left:0;
+}
+#reviewTime label{
+    font-weight:normal;
+}
+
+#speedSlider{
+    margin-top:8px;
+}
+.noUi-horizontal{
+    height:12px;
+}
+.noUi-horizontal .noUi-handle{
+    height:22px;
+}
+.noUi-handle:before, .noUi-handle:after{
+    top:4px;
+}
+.noUi-base{
+    width:95%;
+}
+#quitBtn{
+    position:absolute;
+    right:20px;
+    top:-100px;
+    z-index:999999;
+}
+#reviewInfoWindow{
+    z-index: 40; 
+    left: 5px; 
+    bottom: 5px;
+    display:none;
+}
+#reviewInfoWindow .contentPane{
+    max-width:270px;
+    max-height:186px;
+    overflow:auto;
+}
+.police-city,.police-result {
+	text-overflow: ellipsis;
+	word-break: keep-all;
+	-o-text-overflow: ellipsis;
+}
+.police-city > ul,.police-result > ul {
+    background-color:#fff;
+}
+.police-city input,.police-result input {
+    background-color:transparent;
+}
+
+.police-city ul q,.police-result ul q {
+	background-position: -350px -442px;
+}
+.right-nav i {
+    position: absolute;
+    top: -2px;
+    left: 12px;
+    width: 30px;
+    height: 35px;
+}
+.right-nav .result i {
+    background-position: -25px -1900px;
+    background:url("../images/1-5.png") no-repeat center;
+}
+.right-nav .police-force i {
+    background-position: -25px -1153px;
+    margin-top:2px;
+    background:url("../images/1-4.png") no-repeat center;
+}
+
+.police-city ul p,.police-city ul q,.police-result ul p,.police-result ul q {
+	float: left;
+	display: block;
+	margin-left: 10px;
+	width: 20px;
+	height: 20px;
+}
+
+.police-city .police-list .man,.police-result .police-list .man {
+	background-position: -350px -550px;
+}
+
+.police-city .police-list .woman,.police-result .police-list .woman {
+	background-position: -350px -655px;
+}
+
+.Tools .triangle-down {
+	background-position:-288px -325px;
+}
+
+.police-city .cat-list p,.police-result .cat-list p {
+	background-position: -352px -210px;
+}
+
+.police-city .inner-video p,.police-result .inner-video p {
+	background-position: -352px -327px;
+}
+
+.range ul i {
+	display: inline-block;
+	margin-right: 10px;
+	width: 30px;
+	height: 100%;
+	border-right: 1px solid #dcdcda;
+}
+
+.range li {
+	height: 30px;
+}
+
+.range li i {
+	float: left;
+	display: inline-block;
+	margin-right: 10px;
+	width: 30px;
+	height: 30px;
+	border-right: 1px solid #dcdcda;
+}
+
+.range li:first-child i {
+	background-position: -280px -818px;
+}
+
+.range li:nth-child(2) i {
+	background-position: -282px -963px;
+}
+
+.range li:nth-child(3) i {
+	background-position: -280px -1720px;
+}
+
+.slides-wrap .date-time {
+    padding-top:5px;
+	padding-bottom:10px;
+}
+
+.slides-wrap .date-time p:first-child {
+	margin-left: 0;
+}
+
+.slides-wrap .date-time p {
+	float: left;
+	margin-left:12px;
+}
+
+.slides-wrap p b {
+	
+}
+
+i {
+	font-style: normal;
+}
+.cat-list,.inner-video,.police-list {
+    overflow-x:hidden;
+	overflow-y: auto;
+	margin: 5px 8px;
+    padding:5px 0;
+    border:1px solid #ccc;
+    border-radius:10px;
+    box-shadow:-1px 0 2px #ccc, /*左边阴影*/  
+    1px 0 2px #ccc, /*右边阴影*/  
+    0 -1px 2px #ccc, /*顶部阴影*/  
+    0 1px 2px #ccc; /*底边阴影*/  
+}
+/*.police-city > ul > li > ul > li , .police-result > ul > li > li {
+    border-bottom:1px solid #ccc;
+}*/
+.cat-list,.inner-video {
+	display: none;
+}
+
+.cat-list li,.inner-video li,.police-list li {
+	text-overflow: ellipsis;
+	white-space: nowrap;
+	line-height: 20px;
+	-o-text-overflow: ellipsis;
+}
+
+.cat-list span,.inner-video span,.police-list span {
+	/* display: block; */
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+	cursor: pointer;
+	-o-text-overflow: ellipsis;
+}
+
+.cat-list input,.inner-video input,.police-list input {
+	float: left;
+	display: block;
+	margin-top: 3px;
+}
+
+.cat-list ul,.inner-video ul,.police-list ul {
+/* 	display: none;
+ */	margin-left: 15px;
+}
+.box {
+    padding-bottom:12px;
+}
+.box span {
+    padding:5px 10px;
+    background-color:#0e54a9;
+    color:#fff;
+    border-radius:5px;
+    cursor:pointer;
+    margin-left:195px;
+}
+.dispatch .bd {
+	overflow-y: auto;
+	margin: 10px;
+	height: 160px;
+	background-color:#fff;
+    border:1px solid #ccc;
+    border-radius:10px;
+    box-shadow:-1px 0 2px #ccc, /*左边阴影*/  
+    1px 0 2px #ccc, /*右边阴影*/  
+    0 -1px 2px #ccc, /*顶部阴影*/  
+    0 1px 2px #ccc; /*底边阴影*/  
+}
+
+.dispatch .bd span {
+	display: block;
+    float:left;
+    position:relative;
+	padding: 5px 15px 5px 10px;
+    background-color:#ebebeb;
+    color:#000;
+    font-size:12px;
+    margin:5px;
+}
+.dispatch .bd i {
+    position: absolute;
+    right: 0px;
+    top: 0px;
+    cursor: pointer;
+}
+
+.panel-hide{
+    display:none;
+}
+#reviewTime{
+    display:none;
+}
+#LocateButton {
+    position: absolute;
+    top: 95px;
+    left: 20px;
+    z-index: 50;
+}
+.esriPopupWrapper .maximize{
+    display:none;
+}
+
+.radio-inline + .radio-inline, .checkbox-inline + .checkbox-inline{
+    margin-left:20px;
+}
+.police .right-nav span {
+    position:relative;
+    display: inline-block;
+	width: 50%;
+	height: 35px;
+    background-color: #ebebeb;
+	cursor: pointer;
+    color:#000;
+    border-bottom:1px solid #ccc;
+}
+
+
+.police-force p,.result p {
+	margin-left: 40px;
+	font-size:16px;
+    height: 30px;
+    line-height: 30px;
+    margin-top: 2px;
+}
+.police-force p {
+    border-right:1px solid #ccc;
+}
+
+.alarm table {
+	position: absolute;
+	top: 0;
+	left: 100%;
+	display: none;
+	width: 250px;
+	height: 290px;
+	border: solid #ececec;
+	border-width: 1px 0 0 1px;
+	background-color: #fff;
+}
+
+.police .police-go {
+	position: fixed;
+	right: 125px;
+	bottom: 0;
+	z-index: 100;
+	display: block;
+	width: 125px;
+	height: 35px;
+	border-right: 1px solid #fff;
+    background-color: #e1e1e1;
+	cursor: pointer;
+    font-size:16px;
+    line-height: 35px;
+    text-align:center;
+}
+.police-go i,.interaction i {
+    position:absolute;
+    display:block;
+    height:35px;
+    width:35px;
+    left:10px;
+}
+.police-go i {
+    background-position:-234px -886px;
+}
+.interaction i {
+    background-position:-234px -973px;
+}
+.police .interaction {
+	position: fixed;
+	right: 0;
+	bottom: 0;
+	z-index: 100;
+	display: block;
+	width: 125px;
+	height: 35px;
+    font-size:16px;
+    line-height: 35px;
+    text-align:center;
+    background-color: #e1e1e1;
+	cursor: pointer;
+}
+.inner-nav {
+    position:relative;
+}
+.inner-nav span {
+    border-bottom: 1px solid #ccc;
+}
+.inner-nav p {
+    height:26px;
+    margin-top:2px;
+    border-right:1px solid #ccc;
+}
+.inner-nav i {
+    display:block;
+    position:absolute;
+    width:103.56px;
+    height:3px;
+    bottom:1px;
+
+}
+.police .right-nav .fff{
+	background-color: #fff;
+    color:#000;
+} 
+.police .fff {
+    background-color: #0e54aa;
+    color:#fff;
+}
+.status-explain {
+	border-top: 1px solid #c6c6c6;
+	border-bottom: 1px solid #c6c6c6;
+	background-color: #f5f5f5;
+}
+
+.slides-wrap {
+	overflow: hidden;
+    color:#000;
+}
+.slides-wrap ul {
+    background: #fff;
+}
+
+/* .police-result {
+	display: none;
+} */
+
+.police-cat,.police-man,.police-video{
+    float: left;
+	width: 33.3%;
+	height: 30px;
+	background-color: #fff;
+	text-align: center;
+	font-size:16px;
+	line-height: 28px;
+	cursor: pointer;
+}
+
+.inner-nav span i {
+    background-color:#fff;
+}
+.inner-nav span.blue i {
+    background-color:#0f6bdb;
+}
+.radio label::after {
+    left: 3px;
+    top: 3px;
+}

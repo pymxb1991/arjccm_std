@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.arjjs.ccm.modules.flat.flow.dao.PlanFlowManageDao">
+    
+	<sql id="planFlowManageColumns">
+	</sql>
+	
+	<sql id="planFlowManageJoins">
+	</sql>
+    
+	<select id="getAllList" resultType="PlanFlowManage">
+		SELECT a.* 
+			FROM
+			( SELECT
+			bpi.id AS "id",
+			bpi.NAME AS "name",
+			bpi.type_code AS "typeCode",
+			"-1" AS "pId",
+			"plan" AS "typeClass" 
+			FROM
+				bph_plan_info bpi 
+			WHERE
+				 bpi.del_flag = 0 
+			<if test="typeCode != null and typeCode != ''">
+				AND bpi.type_code = #{typeCode} 
+			</if>
+				UNION ALL SELECT
+				bsi.id AS "id",
+				bsi.NAME AS "name",
+				"" AS "typeCode",
+				bps.plan_id AS "pId",
+				"step" AS "typeClass" 
+			FROM
+				bph_step_info bsi
+				LEFT JOIN bph_plan_step bps ON bps.step_id = bsi.id 
+				AND bps.del_flag = 0 
+			WHERE
+				bsi.del_flag = 0 
+				AND bps.plan_id IS NOT NULL 
+			UNION ALL SELECT
+				bai.id AS "id",
+				bai.NAME AS "name",
+				"" AS "typeCode",
+				bsa.step_id AS "pId",
+				"action" AS "typeClass" 
+			FROM
+				bph_action_info bai
+				LEFT JOIN bph_step_action bsa ON bai.id = bsa.action_id 
+				AND bsa.del_flag = 0 
+			WHERE
+				bai.del_flag = 0 
+				AND bsa.step_id IS NOT NULL 
+				) a
+	</select>
+	
+	<select id="getActionStep" resultType="PlanFlowManage">
+		SELECT a.* 
+			FROM
+			(
+			SELECT
+				bsi.id AS "id",
+				bsi.NAME AS "name",
+				CASE 
+				WHEN bps.plan_id is null THEN
+					'-1'
+				ELSE
+					bps.plan_id
+				END  AS "pId",
+				"step" AS "typeClass" 
+			FROM
+				bph_step_info bsi
+				LEFT JOIN bph_plan_step bps ON bps.step_id = bsi.id 
+				AND bps.del_flag = 0 
+			WHERE
+				bsi.del_flag = 0 
+				 UNION ALL
+			SELECT
+				bai.id AS "id",
+				bai.NAME AS "name",
+				bsa.step_id AS "pId",
+				"action" AS "typeClass" 
+			FROM
+				bph_action_info bai
+				LEFT JOIN bph_step_action bsa ON bai.id = bsa.action_id 
+				AND bsa.del_flag = 0 
+			WHERE
+				bai.del_flag = 0 
+				AND bsa.step_id IS NOT NULL 
+				) a
+	</select>
+	<select id="planTree" resultType="PlanFlowManage">
+		SELECT
+			'-1' AS "pId",
+			bpi.id AS "id",
+			bpi.name AS "name",
+			bpi.is_important AS "isImportant",
+			bpi.type_code AS "typeCode",
+			bpi.content AS "content"
+		FROM
+			bph_plan_info bpi
+		WHERE 
+		bpi.del_flag = 0
+	</select>
+</mapper>

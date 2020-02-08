@@ -1,0 +1,186 @@
+/**
+ * Copyright &copy; 2012-2016 <a href="https://github.com/thinkgem/jeesite">JeeSite</a> All rights reserved.
+ */
+package com.arjjs.ccm.modules.ccm.scenic.entity;
+
+import java.util.Date;
+import java.util.List;
+
+import org.apache.commons.lang3.StringUtils;
+import org.hibernate.validator.constraints.Length;
+
+import com.arjjs.ccm.common.persistence.DataEntity;
+import com.arjjs.ccm.modules.ccm.place.entity.CcmBasePlace;
+import com.arjjs.ccm.modules.sys.entity.Area;
+import com.google.common.collect.Lists;
+
+/**
+ * 旅游景点Entity
+ * 
+ * @author ljd
+ * @version 2019-04-29
+ */
+public class CcmPlaceScenic extends DataEntity<CcmPlaceScenic> {
+
+	private static final long serialVersionUID = 1L;
+	private CcmBasePlace ccmBasePlace;
+	private String scenicRank; // 景区级别（A AA AAA AAAA AAAAA）
+	private String type; // 场所类型
+	private String isFree; // 是否免费（01 否 02是）
+	private String ticketPrice; // 门票价格
+	private String basePlaceId; // 场所id
+	private Date beginCreateDate; // 开始 创建时间
+	private Date endCreateDate; // 结束 创建时间
+	// 基础场所属性
+	private String placeName; // 场所名称
+	private String relevanceOrg; // 关联组织机构
+	private String leaderName; // 负责人姓名
+	private String leaderIdCard; // 负责人身份证号码
+	private String leaderContact; // 负责人联系方式
+	private Area area;
+
+	public List<String> getKeyPointList() {
+		List<String> list = Lists.newArrayList();
+		if (ccmBasePlace.getKeyPoint() != null) {
+			for (String s : StringUtils.split(ccmBasePlace.getKeyPoint(), ",")) {
+				list.add(s);
+			}
+		}
+		return list;
+	}
+
+	public void setKeyPointList(List<String> keyPointList) {
+		ccmBasePlace.setKeyPoint("," + StringUtils.join(keyPointList, ",") + ",");
+	}
+
+	public Area getArea() {
+		return area;
+	}
+
+	public void setArea(Area area) {
+		this.area = area;
+	}
+
+	public CcmBasePlace getCcmBasePlace() {
+		return ccmBasePlace;
+	}
+
+	public void setCcmBasePlace(CcmBasePlace ccmBasePlace) {
+		this.ccmBasePlace = ccmBasePlace;
+	}
+
+	@Length(min = 1, max = 255, message = "场所名称长度必须介于 1 和 255 之间")
+	public String getPlaceName() {
+		return placeName;
+	}
+
+	public void setPlaceName(String placeName) {
+		this.placeName = placeName;
+	}
+
+	@Length(min = 0, max = 255, message = "关联组织机构长度必须介于 0 和 255 之间")
+	public String getRelevanceOrg() {
+		return relevanceOrg;
+	}
+
+	public void setRelevanceOrg(String relevanceOrg) {
+		this.relevanceOrg = relevanceOrg;
+	}
+
+	@Length(min = 0, max = 255, message = "负责人姓名长度必须介于 0 和 255 之间")
+	public String getLeaderName() {
+		return leaderName;
+	}
+
+	public void setLeaderName(String leaderName) {
+		this.leaderName = leaderName;
+	}
+
+	@Length(min = 0, max = 255, message = "负责人身份证号码长度必须介于 0 和 255 之间")
+	public String getLeaderIdCard() {
+		return leaderIdCard;
+	}
+
+	public void setLeaderIdCard(String leaderIdCard) {
+		this.leaderIdCard = leaderIdCard;
+	}
+
+	@Length(min = 0, max = 255, message = "负责人联系方式长度必须介于 0 和 255 之间")
+	public String getLeaderContact() {
+		return leaderContact;
+	}
+
+	public void setLeaderContact(String leaderContact) {
+		this.leaderContact = leaderContact;
+	}
+
+	public CcmPlaceScenic() {
+		super();
+	}
+
+	public CcmPlaceScenic(String id) {
+		super(id);
+	}
+
+	@Length(min = 0, max = 255, message = "景区级别（A AA AAA AAAA AAAAA）长度必须介于 0 和 255 之间")
+	public String getScenicRank() {
+		return scenicRank;
+	}
+
+	public void setScenicRank(String scenicRank) {
+		this.scenicRank = scenicRank;
+	}
+
+	@Length(min = 0, max = 2, message = "场所类型长度必须介于 0 和 2 之间")
+	public String getType() {
+		return type;
+	}
+
+	public void setType(String type) {
+		this.type = type;
+	}
+
+	@Length(min = 0, max = 2, message = "是否免费（01 否 02是）长度必须介于 0 和 2 之间")
+	public String getIsFree() {
+		return isFree;
+	}
+
+	public void setIsFree(String isFree) {
+		this.isFree = isFree;
+	}
+
+	@Length(min = 0, max = 10, message = "门票价格长度必须介于 0 和 10 之间")
+	public String getTicketPrice() {
+		return ticketPrice;
+	}
+
+	public void setTicketPrice(String ticketPrice) {
+		this.ticketPrice = ticketPrice;
+	}
+
+	@Length(min = 0, max = 64, message = "场所id长度必须介于 0 和 64 之间")
+	public String getBasePlaceId() {
+		return basePlaceId;
+	}
+
+	public void setBasePlaceId(String basePlaceId) {
+		this.basePlaceId = basePlaceId;
+	}
+
+	public Date getBeginCreateDate() {
+		return beginCreateDate;
+	}
+
+	public void setBeginCreateDate(Date beginCreateDate) {
+		this.beginCreateDate = beginCreateDate;
+	}
+
+	public Date getEndCreateDate() {
+		return endCreateDate;
+	}
+
+	public void setEndCreateDate(Date endCreateDate) {
+		this.endCreateDate = endCreateDate;
+	}
+
+}

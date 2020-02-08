@@ -1,0 +1,236 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.arjjs.ccm.modules.kpi.special.dao.KpiSpecialScoreDao">
+    
+	<sql id="kpiSpecialScoreColumns">
+		a.id AS "id",
+		a.keyname AS "keyname",
+		a.name AS "name",
+		a.weights AS "weights",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag"
+	</sql>
+	
+	<sql id="kpiSpecialScoreJoins">
+	</sql>
+    
+	<select id="get" resultType="KpiSpecialScore">
+		SELECT 
+			<include refid="kpiSpecialScoreColumns"/>
+		FROM kpi_special_score a
+		<include refid="kpiSpecialScoreJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="KpiSpecialScore">
+		SELECT 
+			<include refid="kpiSpecialScoreColumns"/>
+		FROM kpi_special_score a
+		<include refid="kpiSpecialScoreJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="id != null and id != ''">
+				AND a.id = #{id}
+			</if>
+			<if test="keyname != null and keyname != ''">
+				AND a.keyname = #{keyname}
+			</if>
+			<if test="name != null and name != ''">
+				AND a.name LIKE 
+					<if test="dbName == 'oracle'">'%'||#{name}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{name}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{name},'%')</if>
+			</if>
+			<if test="createDate != null and createDate != ''">
+				AND a.create_date = #{createDate}
+			</if>
+			<if test="updateDate != null and updateDate != ''">
+				AND a.update_date = #{updateDate}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="KpiSpecialScore">
+		SELECT 
+			<include refid="kpiSpecialScoreColumns"/>
+		FROM kpi_special_score a
+		<include refid="kpiSpecialScoreJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO kpi_special_score(
+			id,
+			keyname,
+			name,
+			weights,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag
+		) VALUES (
+			#{id},
+			#{keyname},
+			#{name},
+			#{weights},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE kpi_special_score SET 	
+			weights = #{weights},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE kpi_special_score SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+	<select id="getForWG" resultType="KpiSpecialScore">
+		SELECT
+			a.NAME AS name,
+			s.score 
+		FROM
+			kpi_special_score_sum s
+			LEFT JOIN sys_area a ON s.area_id = a.id
+		<if test="beginDate != null and beginDate != '' and endDate != null and endDate != ''">
+			WHERE
+				s.MONTH &gt;= date_format(#{beginDate},'%Y-%m') 
+				AND s.MONTH &lt;= date_format(#{endDate},'%Y-%m')
+		</if>
+		<if test="beginDate == null or beginDate == '' and endDate == null or endDate == ''">
+			<if test="time != null and time != ''">
+				<if test="type =='02'">
+					WHERE
+						s.MONTH = date_format(#{time},'%Y-%m')
+				</if>
+				<if test="type =='04'">
+					WHERE
+						left(s.month,4) = date_format(#{time},'%Y') 
+				</if>
+			</if>
+		</if>
+			ORDER BY
+			s.score DESC
+	</select>
+	
+	<select id="getForSQ" resultType="KpiSpecialScore">
+		SELECT
+			ss.NAME AS name,
+			sum( q.score ) AS score 
+		FROM
+			(
+		SELECT
+			a.parent_id,
+			a.NAME,
+			s.score 
+		FROM
+			kpi_special_score_sum s
+			LEFT JOIN sys_area a ON s.area_id = a.id 
+		<if test="beginDate != null and beginDate != '' and endDate != null and endDate != ''">
+			WHERE
+				s.MONTH &gt;= date_format(#{beginDate},'%Y-%m') 
+				AND s.MONTH &lt;= date_format(#{endDate},'%Y-%m')
+		</if>
+		<if test="beginDate == null or beginDate == '' and endDate == null or endDate == ''">
+			<if test="time != null and time != ''">
+				<if test="type =='02'">
+					WHERE
+						s.MONTH = date_format(#{time},'%Y-%m')
+				</if>
+				<if test="type =='04'">
+					WHERE
+						left(s.month,4) = date_format(#{time},'%Y')
+				</if>
+			</if>
+		</if>
+			) q
+			LEFT JOIN sys_area ss ON ss.id = q.parent_id 
+		GROUP BY
+			q.parent_id 
+		ORDER BY
+			sum( q.score ) DESC
+	</select>
+	
+	<select id="getForQX" resultType="KpiSpecialScore">
+		SELECT
+			sss.NAME AS name,
+			sum( p.score ) AS score 
+		FROM
+			(
+		SELECT
+			ss.NAME,
+			ss.parent_id,
+			sum( q.score ) AS score 
+		FROM
+			(
+		SELECT
+			a.parent_id,
+			a.NAME,
+			s.score 
+		FROM
+			kpi_special_score_sum s
+			LEFT JOIN sys_area a ON s.area_id = a.id 
+		<if test="beginDate != null and beginDate != '' and endDate != null and endDate != ''">
+			WHERE
+				s.MONTH &gt;= date_format(#{beginDate},'%Y-%m') 
+				AND s.MONTH &lt;= date_format(#{endDate},'%Y-%m')
+		</if>
+		<if test="beginDate == null or beginDate == '' and endDate == null or endDate == ''">
+			<if test="time != null and time != ''">
+				<if test="type =='02'">
+					WHERE
+						s.MONTH = date_format(#{time},'%Y-%m')
+				</if>
+				<if test="type =='04'">
+					WHERE
+						left(s.month,4) = date_format(#{time},'%Y')
+				</if>
+			</if>
+		</if>
+			) q
+			LEFT JOIN sys_area ss ON ss.id = q.parent_id 
+		GROUP BY
+			q.parent_id 
+			) p
+			LEFT JOIN sys_area sss ON sss.id = p.parent_id 
+		GROUP BY
+			p.parent_id
+	</select>
+	
+</mapper>

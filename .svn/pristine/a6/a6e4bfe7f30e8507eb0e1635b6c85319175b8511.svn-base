@@ -1,0 +1,987 @@
+<%@ page contentType="text/html;charset=UTF-8"%>
+<%@ include file="/WEB-INF/views/include/taglib.jsp"%>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="renderer" content="webkit|ie-comp|ie-stand" /> 
+<title>${fns:getConfig('productName')}</title>
+<script src="${ctxStatic}/jquery/jquery-1.9.1.min.js"></script>
+<link rel="stylesheet"
+	href="${ctxStatic}/bootstrap/2.3.1/css_default/bootstrap.min.css">
+<script src="${ctxStatic}/bootstrap/2.3.1/js/bootstrap.min.js"></script>
+<link rel="stylesheet"
+	href="${ctxStatic}/bootstrap/2.3.1/awesome/font-awesome.min.css">
+<link rel="stylesheet"
+	href="${ctxStatic}/iconfont/iconfont.css">
+<!--[if lte IE 7]>
+    <link rel="stylesheet" href="../bootstrap/2.3.1/awesome/font-awesome-ie7.css">
+    <![endif]-->
+<!--[if lte IE 6]>
+    <link rel="stylesheet" href="../bootstrap/bsie/css/bootstrap-ie6.min.css">
+    <script src="../bootstrap/bsie/js/bootstrap-ie.min.js"></script>
+    <![endif]-->
+    <link rel="stylesheet" href="${ctxStatic}/asidenav/asidenav.css">
+    <script type="text/javascript">
+	var ctx = '${ctx}', ctxStatic = '${ctxStatic}';
+</script>
+<script src="${ctxStatic}/asidenav/asidenav.js"></script>
+<script src="${ctxStatic}/asidenav/jquery.min.js"></script>
+<link rel="stylesheet" href="${ctxStatic}/jquery/swiper/swiper-4.3.2.min.css">
+<link rel="stylesheet" href="${ctxStatic}/ol/ol.css" type="text/css">
+	<link rel="stylesheet" href="${ctxStatic}/modules/map/css/map.css"
+	type="text/css">
+<link rel="stylesheet"
+	href="${ctxStatic}/common/index/css/indexCommon.css">
+	
+<link rel="stylesheet" href="${ctxStatic}/common/index/css/PopInfo.css">
+<script src="${ctxStatic}/ol/ol.js"></script>
+<script src="${ctxStatic}/modules/map/js/mapconfig.js"></script>
+<script src="${ctxStatic}/modules/map/js/commonMap.js"></script>
+<script src="${ctxStatic}/common/index/Scripts/js/echarts.js"></script>
+<script src="${ctxStatic}/jquery/swiper/swiper-4.3.2.min.js"></script>
+<script src="${ctxStatic}/jquery/swiper/swiper.animate1.0.3.min.js"></script>
+<script src="${ctxStatic}/common/index/Scripts/js/partyConstruction.js"></script>
+<style>
+.results {
+	margin-top: 2%;
+}
+.common-pading{
+width: auto;
+
+}
+.shoulishijian {
+	font-size: 20px;
+    margin-left: 40px;
+    margin-top: 10px;
+}
+
+.shoulishijiannum {
+	color: #A53A52;
+	font-size: 45px;
+    margin-left: 50px;
+}
+
+.jianfont {
+	marfin-top: 5px;
+	font-size: 16px;
+	color: #A53A52;
+}
+
+.shijian-common {
+	font-size: 20px;
+    margin-left: 40px;
+    line-height: 40px;
+    margin-top: 10px;
+}
+
+.shijian-common-num {
+	margin-left: 7px;
+	color: #5AAFB2;
+	font-size: 28px;
+}
+
+.shijian-common-jian {
+	color: #fff;
+	font-size: 14px;
+}
+
+.shijian1 {
+	border: 1px solid #10559a;
+	    width: 260px;
+    height: 113px;
+	line-height: 40px;
+	    margin-top: 20px;
+}
+
+.shijian2 {
+	border: 1px solid #10559a;
+	width: 200px;
+	height: 100px;
+	line-height: 24px;
+	position: absolute;
+	left: 376px;
+	top: 53px;
+}
+
+.shijian3 {
+    border: 1px solid #10559a;
+    width: 200px;
+    height: 100px;
+    line-height: 24px;
+    position: absolute;
+    left: 685px;
+    top: 53px;
+}
+
+.shijian4 {
+	border: 1px solid #10559a;
+	width: 200px;
+	height: 100px;
+	line-height: 24px;
+	position: absolute;
+	left: 30px;
+	 top: 220px;
+}
+
+.shijian5 {
+	border: 1px solid #10559a;
+	width: 200px;
+	height:100px;
+	line-height: 24px;
+	position: absolute;
+	left: 247px;
+    top: 220px;
+}
+
+.shijian6 {
+	border: 1px solid #10559a;
+	width: 200px;
+	height: 100px;
+	line-height: 24px;
+	position: absolute;
+	left: 466px;
+ top: 220px;
+}
+.shijian7 {
+	border: 1px solid #10559a;
+	width: 200px;
+	height: 100px;
+	line-height: 24px;
+	position: absolute;
+	    left: 685px;
+	 top: 220px;
+}
+
+</style>
+<script>
+$(function(){
+	$("#indexhover,#indexNav").hover(function(){
+		$('#indexNav').show();
+	},function(){
+		$('#indexNav').hide();
+	})
+})
+
+</script>
+</head>
+<body>
+	<div class="container-fluid" style="height: 100%; overflow: hidden"
+		id="main">
+		<div class="context" content="${ctx}"></div>
+		<%-- <div class="row-fluid header">
+			<div class="span3" style="position: relative;margin-top: 5px">
+			  <!-- 菜单 -->
+			       	<div style="z-index: 9999;display: block;position: absolute;">
+						<svg width="0" height="0">
+					        <defs>
+					            <filter id="goo">
+					                <fegaussianblur in="SourceGraphic" stdDeviation="10"
+													result="blur"></fegaussianblur>
+					                <fecolormatrix in="blur" mode="matrix"
+													values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 19 -9"
+													result="goo"></fecolormatrix>
+					                <fecomposite in="SourceGraphic" in2="goo"
+													operator="atop"></fecomposite>
+					            </filter>
+					        </defs>
+					    </svg>
+						<div class="aside-nav bounceInUp animated" id="aside-nav">
+							<label for="" class="aside-menu" title=""><a href="${ctx}" class="menu-item">主面板</a></label>
+							 <a  href="${ctx}/index" title="首页" class="menu-item menu-second">首页</a>
+							 <a href="${ctx}/sys/map/statIncidentStatistics" title="事件" class="menu-item menu-third">事件</a> 
+						     <a href="${ctx}/sys/map/statIndexCom" title="概况" class="menu-item  menu-fourth">概况</a>
+						</div>
+					</div> 
+                    <!-- 菜单 -->
+				<!-- <div class="index-nav-common">
+					<span id="indexhover"> <a href="###"> <i
+							class="icon-th-list align-top bigger-125"></i> 导航
+					</a>
+					</span>
+				</div>
+				<div class="clearfix" id="indexNav">
+					<ul class="indexnav clearfix">
+						<li><a href="${ctx}/index"> <i
+								class="icon-home align-top bigger-125"></i> 首页
+						</a></li>
+						<li class="lastli"><a href="${ctx}"> <i
+								class="icon-folder-close align-top bigger-125"></i> 事件
+						</a></li>
+					</ul>
+				</div> -->
+			</div>
+			<div class="span6">
+				<h5>${fns:getConfig('productName')}</h5>
+			</div>
+			<div class="span3">
+				<div class="Logout">
+					<span> <a href="${ctx}/logout"> <i
+							class="icon-off align-top bigger-125"></i> 退出
+					</a>
+					</span>
+				</div>
+			</div>
+		</div> --%>
+		<div class="row-fluid header" style="">
+				<%-- <div class="span1">
+					<!-- 菜单 -->
+					<!-- 
+			       	<div style="z-index: 9999;position: absolute;width:1000px; top: 21px;left: 106px;" >
+							<div class="">
+								<span style="float: left;margin-left: 100px"><a href="${ctx}"><i class=""></i>主面板</a></span>
+								<span style="float: left;margin-left: 30px"><a href=""><i class=""></i>电子沙盘</a></span>
+								<span style="float: left;margin-left: 30px"><a href=""><i class=""></i>视频融合</a></span>
+								<span style="float: left;margin-left: 30px"><a href="${ctx}/index"><i class=""></i>网格化首页</a></span>
+							</div>
+					</div> 
+                    -->
+					<!-- 菜单 -->
+					<div style="z-index: 10000; display: block; position: absolute;">
+						<svg width="0" height="0">
+					        <defs>
+					            <filter id="goo">
+					                <fegaussianblur in="SourceGraphic"
+								stdDeviation="10" result="blur"></fegaussianblur>
+					                <fecolormatrix in="blur" mode="matrix"
+								values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 19 -9"
+								result="goo"></fecolormatrix>
+					                <fecomposite in="SourceGraphic" in2="goo"
+								operator="atop"></fecomposite>
+					            </filter>
+					        </defs>
+					    </svg>
+						<div class="aside-nav bounceInUp animated" id="aside-nav">
+							<label for="" class="aside-menu" title=""><a
+								href="${ctx}" class="menu-item">主面板</a></label> <a href="${ctx}/index"
+								title="首页" class="menu-item menu-second">首页</a> <a
+								href="${ctx}/sys/map/statPop" title="人口"
+								class="menu-item menu-third">人口</a> <a
+								href="${ctx}/sys/map/statIncidentStatistics" title="事件"
+								class="menu-item  menu-fourth">事件</a>
+						</div>
+					</div>
+				</div> --%>
+
+				<div class="span11">
+					<h5 class="header-logo">${fns:getConfig('productName')}</h5>
+				</div>
+					<div class="header-nav" >
+					   <ul>
+					      <li><a href="${ctx}">主面板</a></li>
+					      <li><a href="${ctx}/index">地图首页</a></li>
+					      <li class="active"><a href="${ctx}/sys/map/partyConstruction">党建架构</a></li>
+					      <li><a href="${ctx}/sys/map/statIndexCom">基本组成</a></li> 
+					   </ul>
+					</div>
+					<div class="header-nav1" >
+					<ul>
+					  <li><a href="${ctx}/sys/map/statPop">关注对象</a></li>
+					      <li><a href="${ctx}/sys/map/shakeOffPoverty">脱贫攻坚</a></li>
+					      <li><a href="${ctx}/sys/map/statIncidentStatistics">治安态势</a></li>
+					      <li><a href="${ctx}/sys/map/gridManagement">网格管理</a></li>
+					</ul>
+					</div>
+				<div class="span1">
+					<div class="Logout">
+						<span> <a href="${ctx}/logout"> <i
+								class="icon-off align-top bigger-125"></i> 退出
+						</a>
+						</span>
+					</div>
+				</div>
+			</div>
+		<div class="row-fluid height100" style="margin-top:5px;">
+			<div class="span3  height100">
+				<div class="height33">
+						<div class="common-header">
+									<div>各级组织党员分布统计</div>
+								</div>
+					<div class="common-pading shadow">
+						<div id="RightTypeEcharts" class="echarts"></div>
+					</div>
+				</div>
+				<div class="height33" id="DutyUL">
+						<div class="common-header">
+									<div>镇办在职人员及党员统计</div>
+								</div>
+					<div class="common-pading shadow">
+						<div id="PopKeyEcharts" class="echarts"></div>
+					</div>
+				</div>
+				<div class="height33">
+					<!-- <div class="top-header">重点青少年分析</div> -->
+						<div class="common-header">
+									<div>村居党员统计</div>
+								</div>
+					<div class="common-pading shadow" style="height:87%">
+						<div id="PopFlowTable"  class="echarts"></div>
+					</div>
+				</div>
+			</div>
+			<div class="span6  height100">
+				<div class="height66" style="height:100%">
+						<div class="common-header">
+									<div>党建架构</div>
+								</div>
+					<div class="common-pading shadow" style="height:95.5%">
+					<div class="qzf_zzjg ani  flipInY animated" swiper-animate-effect="flipInY" swiper-animate-duration="1s" swiper-animate-delay="0s" swiper-animate-style-cache=" " style="visibility: visible;animation-duration:1s;-webkit-animation-duration:1s;animation-delay:0s;-webkit-animation-delay:0s;">
+									<h1>
+										开发区管委会组织架构
+										<span style="position: absolute;top: 26px; left: 93px; font-weight: normal; font-size: 14px;">(31个)</span>
+									</h1>
+									<div class="qzf_zzjg_list1">
+									<div class="qzf_zzjg_list swiper-container-horizontal">
+										<div class="swiper-wrapper" style="transition-duration: 0ms; transform: translate3d(-1335.7px, 0px, 0px);"><div class="swiper-slide swiper-slide-duplicate" data-swiper-slide-index="21" style="width: 47.3px; margin-right: 23px;">
+												<span class="qzf_zzjg_lab">卫计局</span>
+											</div><div class="swiper-slide swiper-slide-duplicate" data-swiper-slide-index="22" style="width: 47.3px; margin-right: 23px;">
+												<span class="qzf_zzjg_lab">审计局</span>
+											</div><div class="swiper-slide swiper-slide-duplicate" data-swiper-slide-index="23" style="width: 47.3px; margin-right: 23px;">
+												<span class="qzf_zzjg_lab">安监局</span>
+											</div><div class="swiper-slide swiper-slide-duplicate" data-swiper-slide-index="24" style="width: 47.3px; margin-right: 23px;">
+												<span class="qzf_zzjg_lab">农林牧水局</span>
+											</div><div class="swiper-slide swiper-slide-duplicate" data-swiper-slide-index="25" style="width: 47.3px; margin-right: 23px;">
+												<span class="qzf_zzjg_lab">教育局</span>
+											</div><div class="swiper-slide swiper-slide-duplicate" data-swiper-slide-index="26" style="width: 47.3px; margin-right: 23px;">
+												<span class="qzf_zzjg_lab">招商引资局</span>
+											</div><div class="swiper-slide swiper-slide-duplicate" data-swiper-slide-index="27" style="width: 47.3px; margin-right: 23px;">
+												<span class="qzf_zzjg_lab">住建局</span>
+											</div><div class="swiper-slide swiper-slide-duplicate" data-swiper-slide-index="28" style="width: 47.3px; margin-right: 23px;">
+												<span class="qzf_zzjg_lab">工业和经济贸易局</span>
+											</div><div class="swiper-slide swiper-slide-duplicate" data-swiper-slide-index="29" style="width: 47.3px; margin-right: 23px;">
+												<span class="qzf_zzjg_lab">财政局</span>
+											</div><div class="swiper-slide swiper-slide-duplicate" data-swiper-slide-index="30" style="width: 47.3px; margin-right: 23px;">
+												<span class="qzf_zzjg_lab">工会</span>
+											</div>
+											<div class="swiper-slide" data-swiper-slide-index="0" style="width: 47.3px; margin-right: 23px;">
+												<span class="qzf_zzjg_lab">党工委管委会办公室</span>
+											</div>
+											<div class="swiper-slide" data-swiper-slide-index="1" style="width: 47.3px; margin-right: 23px;">
+												<span class="qzf_zzjg_lab">宣传部</span>
+											</div>
+											<div class="swiper-slide" data-swiper-slide-index="2" style="width: 47.3px; margin-right: 23px;">
+												<span class="qzf_zzjg_lab">组织人事部</span>
+											</div>
+											<div class="swiper-slide" data-swiper-slide-index="3" style="width: 47.3px; margin-right: 23px;">
+												<span class="qzf_zzjg_lab">纪工委</span>
+											</div>
+											<div class="swiper-slide" data-swiper-slide-index="4" style="width: 47.3px; margin-right: 23px;">
+												<span class="qzf_zzjg_lab">政法委</span>
+											</div>
+											<div class="swiper-slide" data-swiper-slide-index="5" style="width: 47.3px; margin-right: 23px;">
+												<span class="qzf_zzjg_lab">政务服务中心</span>
+											</div>
+											<div class="swiper-slide" data-swiper-slide-index="6" style="width: 47.3px; margin-right: 23px;">
+												<span class="qzf_zzjg_lab">市场监督管理局</span>
+											</div>
+											<div class="swiper-slide" data-swiper-slide-index="7" style="width: 47.3px; margin-right: 23px;">
+												<span class="qzf_zzjg_lab">劳动和社会保障局</span>
+											</div>
+											<div class="swiper-slide swiper-slide-prev" data-swiper-slide-index="8" style="width: 47.3px; margin-right: 23px;">
+												<span class="qzf_zzjg_lab">编委办</span>
+											</div>
+											<div class="swiper-slide swiper-slide-active" data-swiper-slide-index="9" style="width: 47.3px; margin-right: 23px;">
+												<span class="qzf_zzjg_lab">统计办公室</span>
+											</div>
+											<div class="swiper-slide swiper-slide-next" data-swiper-slide-index="10" style="width: 47.3px; margin-right: 23px;">
+												<span class="qzf_zzjg_lab">社会事务管理局</span>
+											</div>
+											<div class="swiper-slide" data-swiper-slide-index="11" style="width: 47.3px; margin-right: 23px;">
+												<span class="qzf_zzjg_lab">发展改革局</span>
+											</div>
+											<div class="swiper-slide" data-swiper-slide-index="12" style="width: 47.3px; margin-right: 23px;">
+												<span class="qzf_zzjg_lab">民政局</span>
+											</div>
+											<div class="swiper-slide" data-swiper-slide-index="13" style="width: 47.3px; margin-right: 23px;">
+												<span class="qzf_zzjg_lab">规划分局</span>
+											</div>
+											<div class="swiper-slide" data-swiper-slide-index="14" style="width: 47.3px; margin-right: 23px;">
+												<span class="qzf_zzjg_lab">综合执法大队</span>
+											</div>
+											<div class="swiper-slide" data-swiper-slide-index="15" style="width: 47.3px; margin-right: 23px;">
+												<span class="qzf_zzjg_lab">国土分局</span>
+											</div>
+											<div class="swiper-slide" data-swiper-slide-index="16" style="width: 47.3px; margin-right: 23px;">
+												<span class="qzf_zzjg_lab">棚改办</span>
+											</div>
+											<div class="swiper-slide" data-swiper-slide-index="17" style="width: 47.3px; margin-right: 23px;">
+												<span class="qzf_zzjg_lab">创建办</span>
+											</div>
+											<div class="swiper-slide" data-swiper-slide-index="18" style="width: 47.3px; margin-right: 23px;">
+												<span class="qzf_zzjg_lab">民用航空基地办公室</span>
+											</div>
+											<div class="swiper-slide" data-swiper-slide-index="19" style="width: 47.3px; margin-right: 23px;">
+												<span class="qzf_zzjg_lab">交通局</span>
+											</div>
+											<div class="swiper-slide" data-swiper-slide-index="20" style="width: 47.3px; margin-right: 23px;">
+												<span class="qzf_zzjg_lab">城管局</span>
+											</div>
+											<div class="swiper-slide" data-swiper-slide-index="21" style="width: 47.3px; margin-right: 23px;">
+												<span class="qzf_zzjg_lab">卫计局</span>
+											</div>
+											<div class="swiper-slide" data-swiper-slide-index="22" style="width: 47.3px; margin-right: 23px;">
+												<span class="qzf_zzjg_lab">审计局</span>
+											</div>
+											<div class="swiper-slide" data-swiper-slide-index="23" style="width: 47.3px; margin-right: 23px;">
+												<span class="qzf_zzjg_lab">安监局</span>
+											</div>
+											<div class="swiper-slide" data-swiper-slide-index="24" style="width: 47.3px; margin-right: 23px;">
+												<span class="qzf_zzjg_lab">农林牧水局</span>
+											</div>
+											<div class="swiper-slide" data-swiper-slide-index="25" style="width: 47.3px; margin-right: 23px;">
+												<span class="qzf_zzjg_lab">教育局</span>
+											</div>
+											<div class="swiper-slide" data-swiper-slide-index="26" style="width: 47.3px; margin-right: 23px;">
+												<span class="qzf_zzjg_lab">招商引资局</span>
+											</div>
+											<div class="swiper-slide" data-swiper-slide-index="27" style="width: 47.3px; margin-right: 23px;">
+												<span class="qzf_zzjg_lab">住建局</span>
+											</div>
+											<div class="swiper-slide" data-swiper-slide-index="28" style="width: 47.3px; margin-right: 23px;">
+												<span class="qzf_zzjg_lab">工业和经济贸易局</span>
+											</div>
+											<div class="swiper-slide" data-swiper-slide-index="29" style="width: 47.3px; margin-right: 23px;">
+												<span class="qzf_zzjg_lab">财政局</span>
+											</div>
+											<div class="swiper-slide" data-swiper-slide-index="30" style="width: 47.3px; margin-right: 23px;">
+												<span class="qzf_zzjg_lab">工会</span>
+											</div>
+										<div class="swiper-slide swiper-slide-duplicate" data-swiper-slide-index="0" style="width: 47.3px; margin-right: 23px;">
+												<span class="qzf_zzjg_lab">党工委管委会办公室</span>
+											</div><div class="swiper-slide swiper-slide-duplicate" data-swiper-slide-index="1" style="width: 47.3px; margin-right: 23px;">
+												<span class="qzf_zzjg_lab">宣传部</span>
+											</div><div class="swiper-slide swiper-slide-duplicate" data-swiper-slide-index="2" style="width: 47.3px; margin-right: 23px;">
+												<span class="qzf_zzjg_lab">组织人事部</span>
+											</div><div class="swiper-slide swiper-slide-duplicate" data-swiper-slide-index="3" style="width: 47.3px; margin-right: 23px;">
+												<span class="qzf_zzjg_lab">纪工委</span>
+											</div><div class="swiper-slide swiper-slide-duplicate" data-swiper-slide-index="4" style="width: 47.3px; margin-right: 23px;">
+												<span class="qzf_zzjg_lab">政法委</span>
+											</div><div class="swiper-slide swiper-slide-duplicate" data-swiper-slide-index="5" style="width: 47.3px; margin-right: 23px;">
+												<span class="qzf_zzjg_lab">政务服务中心</span>
+											</div><div class="swiper-slide swiper-slide-duplicate" data-swiper-slide-index="6" style="width: 47.3px; margin-right: 23px;">
+												<span class="qzf_zzjg_lab">市场监督管理局</span>
+											</div><div class="swiper-slide swiper-slide-duplicate" data-swiper-slide-index="7" style="width: 47.3px; margin-right: 23px;">
+												<span class="qzf_zzjg_lab">劳动和社会保障局</span>
+											</div><div class="swiper-slide swiper-slide-duplicate swiper-slide-duplicate-prev" data-swiper-slide-index="8" style="width: 47.3px; margin-right: 23px;">
+												<span class="qzf_zzjg_lab">编委办</span>
+											</div><div class="swiper-slide swiper-slide-duplicate swiper-slide-duplicate-active" data-swiper-slide-index="9" style="width: 47.3px; margin-right: 23px;">
+												<span class="qzf_zzjg_lab">统计办公室</span>
+											</div></div>
+										<!-- 如果需要导航按钮 -->
+										<div class="swiper-button-prev" tabindex="0" role="button" aria-label="Previous slide" aria-disabled="false"></div>
+										<div class="swiper-button-next" tabindex="0" role="button" aria-label="Next slide" aria-disabled="false"></div>
+									<span class="swiper-notification" aria-live="assertive" aria-atomic="true"></span></div></div>
+								</div>
+						<div class="zb_cj_zzjg ani  " >
+									<h1>镇办组织架构情况
+									<span style="position: absolute; top: 26px;left:92px; font-weight: normal; font-size: 14px;">(5个)</span>
+									</h1>
+									<div class="common_tab">
+										<ol class="common_tab_tit clearfix">
+											<li class="common_tab_current_tit">
+												<a href="javascript:void(0)">幺铺镇</a>
+											</li>
+											<li>
+												<a href="javascript:void(0)">西航办事处 </a>
+											</li>
+											<li>
+												<a href="javascript:void(0)">宋旗镇</a>
+											</li>
+											<li>
+												<a href="javascript:void(0)">星光社区服务中心</a>
+											</li>
+											<li>
+												<a href="javascript:void(0)">春雷社区服务中心</a>
+											</li>
+										</ol>
+										<div class="common_tab_cont">
+											<h1>村居组织架构情况
+											<span style="position: absolute; top: 355px;left:340px; font-weight: normal; font-size: 14px;">(30个)</span>
+											</h1>
+											<div class="cj_list1">
+											<div class="cj_list swiper-container-horizontal">
+												<div class="swiper-wrapper">
+													<div class="swiper-slide swiper-slide-active" style="    width: 47.3px;margin-right: 23px;">
+														<span class="qzf_zzjg_lab">颜旗村</span>
+													</div>
+													<div class="swiper-slide swiper-slide-next" style="    width: 47.3px;margin-right: 23px;">
+														<span class="qzf_zzjg_lab">上头铺村</span>
+													</div>
+													<div class="swiper-slide" style="    width: 47.3px;margin-right: 23px;">
+														<span class="qzf_zzjg_lab">杨家桥村</span>
+													</div>
+													<div class="swiper-slide" style="    width: 47.3px;margin-right: 23px;">
+														<span class="qzf_zzjg_lab">石板村</span>
+													</div>
+													<div class="swiper-slide" style="    width: 47.3px;margin-right: 23px;">
+														<span class="qzf_zzjg_lab">四旗村</span>
+													</div>
+													<div class="swiper-slide" style="    width: 47.3px;margin-right: 23px;">
+														<span class="qzf_zzjg_lab">陶官村</span>
+													</div>
+													<div class="swiper-slide" style="    width: 47.3px;margin-right: 23px;">
+														<span class="qzf_zzjg_lab">石塔村</span>
+													</div>
+													<div class="swiper-slide" style="    width: 47.3px;margin-right: 23px;">
+														<span class="qzf_zzjg_lab">三合村</span>
+													</div>
+													<div class="swiper-slide" style="    width: 47.3px;margin-right: 23px;">
+														<span class="qzf_zzjg_lab">羊场村</span>
+													</div>
+													<div class="swiper-slide" style="    width: 47.3px;margin-right: 23px;">
+														<span class="qzf_zzjg_lab">菜支村</span>
+													</div>
+													<div class="swiper-slide" style="    width: 47.3px;margin-right: 23px;">
+														<span class="qzf_zzjg_lab">青方村</span>
+													</div>
+													<div class="swiper-slide" style="    width: 47.3px;margin-right: 23px;">
+														<span class="qzf_zzjg_lab">龙井村</span>
+													</div>
+													<div class="swiper-slide" style="    width: 47.3px;margin-right: 23px;">
+														<span class="qzf_zzjg_lab">荡上村</span>
+													</div>
+													<div class="swiper-slide" style="    width: 47.3px;margin-right: 23px;">
+														<span class="qzf_zzjg_lab">两河村</span>
+													</div>
+													<div class="swiper-slide" style="    width: 47.3px;margin-right: 23px;">
+														<span class="qzf_zzjg_lab">大屯村</span>
+													</div>
+													<div class="swiper-slide" style="    width: 47.3px;margin-right: 23px;">
+														<span class="qzf_zzjg_lab">邵小村</span>
+													</div>
+													<div class="swiper-slide" style="    width: 47.3px;margin-right: 23px;">
+														<span class="qzf_zzjg_lab">板凳山村</span>
+													</div>
+													<div class="swiper-slide" style="    width: 47.3px;margin-right: 23px;">
+														<span class="qzf_zzjg_lab">尚兴村</span>
+													</div>
+													<div class="swiper-slide" style="    width: 47.3px;margin-right: 23px;">
+														<span class="qzf_zzjg_lab">鲍家村</span>
+													</div>
+													<div class="swiper-slide" style="    width: 47.3px;margin-right: 23px;">
+														<span class="qzf_zzjg_lab">潘苑村</span>
+													</div>
+													<div class="swiper-slide" style="    width: 47.3px;margin-right: 23px;">
+														<span class="qzf_zzjg_lab">磊跨村</span>
+													</div>
+													<div class="swiper-slide" style="    width: 47.3px;margin-right: 23px;">
+														<span class="qzf_zzjg_lab">小屯村</span>
+													</div>
+													<div class="swiper-slide" style="    width: 47.3px;margin-right: 23px;">
+														<span class="qzf_zzjg_lab">幺铺居委会</span>
+													</div>
+													<div class="swiper-slide" style="    width: 47.3px;margin-right: 23px;">
+														<span class="qzf_zzjg_lab">清源村</span>
+													</div>
+													<div class="swiper-slide" style="    width: 47.3px;margin-right: 23px;">
+														<span class="qzf_zzjg_lab">红龙村</span>
+													</div>
+													<div class="swiper-slide" style="    width: 47.3px;margin-right: 23px;">
+														<span class="qzf_zzjg_lab">白马村</span>
+													</div>
+													<div class="swiper-slide" style="    width: 47.3px;margin-right: 23px;">
+														<span class="qzf_zzjg_lab">南山村</span>
+													</div>
+													<div class="swiper-slide" style="    width: 47.3px;margin-right: 23px;">
+														<span class="qzf_zzjg_lab">兴铺村</span>
+													</div>
+													<div class="swiper-slide" style="    width: 47.3px;margin-right: 23px;">
+														<span class="qzf_zzjg_lab">安湖村</span>
+													</div>
+													<div class="swiper-slide" style="    width: 47.3px;margin-right: 23px;">
+														<span class="qzf_zzjg_lab">张胜村</span>
+													</div>
+												</div>
+												<!-- 如果需要导航按钮 -->
+												<div class="swiper-button-prev" tabindex="0" role="button" aria-label="Previous slide" aria-disabled="false"></div>
+												<div class="swiper-button-next" tabindex="0" role="button" aria-label="Next slide" aria-disabled="false"></div>
+											<span class="swiper-notification" aria-live="assertive" aria-atomic="true"></span></div>
+											</div>
+										</div>
+										<div class="common_tab_cont fohide">
+											<h1>村居组织架构情况
+											<span style="position: absolute; top: 355px;left:340px; font-weight: normal; font-size: 14px;">(12个)</span>
+											</h1>
+											<div class="cj_list swiper-container-horizontal">
+												<div class="swiper-wrapper" style="transition-duration: 0ms;">
+													<div class="swiper-slide">
+														<span class="qzf_zzjg_lab">西市居委会</span>
+													</div>
+													<div class="swiper-slide">
+														<span class="qzf_zzjg_lab">南马居委会</span>
+													</div>
+													<div class="swiper-slide">
+														<span class="qzf_zzjg_lab">西王山居委会</span>
+													</div>
+													<div class="swiper-slide">
+														<span class="qzf_zzjg_lab">西兴居委会</span>
+													</div>
+													<div class="swiper-slide">
+														<span class="qzf_zzjg_lab">西航居委会</span>
+													</div>
+													<div class="swiper-slide">
+														<span class="qzf_zzjg_lab">王庄居委会</span>
+													</div>
+													<div class="swiper-slide">
+														<span class="qzf_zzjg_lab">雅沐园居委会</span>
+													</div>
+													<div class="swiper-slide">
+														<span class="qzf_zzjg_lab">西湖村委会</span>
+													</div>
+													<div class="swiper-slide">
+														<span class="qzf_zzjg_lab">西花村委会</span>
+													</div>
+													<div class="swiper-slide">
+														<span class="qzf_zzjg_lab">马厂村委会</span>
+													</div>
+													<div class="swiper-slide">
+														<span class="qzf_zzjg_lab">土桥村委会</span>
+													</div>
+													<div class="swiper-slide">
+														<span class="qzf_zzjg_lab">新阳村委会</span>
+													</div>
+												</div>
+												<!-- 如果需要导航按钮 -->
+												<div class="swiper-button-prev" tabindex="0" role="button" aria-label="Previous slide" aria-disabled="false"></div>
+												<div class="swiper-button-next" tabindex="0" role="button" aria-label="Next slide" aria-disabled="false"></div>
+											<span class="swiper-notification" aria-live="assertive" aria-atomic="true"></span></div>
+										</div>
+										<div class="common_tab_cont fohide">
+											<h1>村居组织架构情况
+											<span style="position: absolute; top: 355px;left:340px; font-weight: normal; font-size: 14px;">(13个)</span>
+											</h1>
+											<div class="cj_list swiper-container-horizontal">
+												<div class="swiper-wrapper" style="transition-duration: 0ms;">
+													<div class="swiper-slide">
+														<span class="qzf_zzjg_lab">大云居委会</span>
+													</div>
+													<div class="swiper-slide">
+														<span class="qzf_zzjg_lab">宋旗村</span>
+													</div>
+													<div class="swiper-slide">
+														<span class="qzf_zzjg_lab">新屯村</span>
+													</div>
+													<div class="swiper-slide">
+														<span class="qzf_zzjg_lab">白果村</span>
+													</div>
+													<div class="swiper-slide">
+														<span class="qzf_zzjg_lab">隆鑫村</span>
+													</div>
+													<div class="swiper-slide">
+														<span class="qzf_zzjg_lab">石板村</span>
+													</div>
+													<div class="swiper-slide">
+														<span class="qzf_zzjg_lab">平寨村</span>
+													</div>
+													<div class="swiper-slide">
+														<span class="qzf_zzjg_lab">和兴村</span>
+													</div>
+													<div class="swiper-slide">
+														<span class="qzf_zzjg_lab">湖兴村</span>
+													</div>
+													<div class="swiper-slide">
+														<span class="qzf_zzjg_lab">打纸村</span>
+													</div>
+													<div class="swiper-slide">
+														<span class="qzf_zzjg_lab">创新村</span>
+													</div>
+													<div class="swiper-slide">
+														<span class="qzf_zzjg_lab">青杠村</span>
+													</div>
+													<div class="swiper-slide">
+														<span class="qzf_zzjg_lab">张坪村</span>
+													</div>
+												</div>
+												<!-- 如果需要导航按钮 -->
+												<div class="swiper-button-prev" tabindex="0" role="button" aria-label="Previous slide" aria-disabled="false"></div>
+												<div class="swiper-button-next" tabindex="0" role="button" aria-label="Next slide" aria-disabled="false"></div>
+											<span class="swiper-notification" aria-live="assertive" aria-atomic="true"></span></div>
+										</div>
+										<div class="common_tab_cont fohide">
+											<h1>村居组织架构情况
+											<span style="position: absolute; top: 355px;left:340px; font-weight: normal; font-size: 14px;">(6个)</span>
+											</h1>
+											<div class="cj_list swiper-container-horizontal" style="margin: 20px 0 0 27%;">
+												<div class="swiper-wrapper" style="transition-duration: 0ms;">
+													<div class="swiper-slide">
+														<span class="qzf_zzjg_lab">玉龙居委会</span>
+													</div>
+													<div class="swiper-slide">
+														<span class="qzf_zzjg_lab">将军岩居委会</span>
+													</div>
+													<div class="swiper-slide">
+														<span class="qzf_zzjg_lab">南新居委会</span>
+													</div>
+													<div class="swiper-slide">
+														<span class="qzf_zzjg_lab">北航居委会</span>
+													</div>
+													<div class="swiper-slide">
+														<span class="qzf_zzjg_lab">学苑居委会</span>
+													</div>
+													<div class="swiper-slide">
+														<span class="qzf_zzjg_lab">龙井村委会</span>
+													</div>		
+												</div>
+												
+											<span class="swiper-notification" aria-live="assertive" aria-atomic="true"></span></div>
+										</div>
+										<div class="common_tab_cont fohide">
+											<h1>村居组织架构情况
+											<span style="position: absolute; top: 355px;left:340px; font-weight: normal; font-size: 14px;">(4个)</span>
+											</h1>
+											<div class="cj_list swiper-container-horizontal" style="margin: 20px 0 0 33%;">
+												<div class="swiper-wrapper" style="transition-duration: 0ms;">
+													<div class="swiper-slide">
+														<span class="qzf_zzjg_lab">双阳居委会</span>
+													</div>
+													<div class="swiper-slide">
+														<span class="qzf_zzjg_lab">龙飞居委会</span>
+													</div>
+													<div class="swiper-slide">
+														<span class="qzf_zzjg_lab">安酒居委会</span>
+													</div>
+													<div class="swiper-slide">
+														<span class="qzf_zzjg_lab">青松居委会</span>
+													</div>		
+												</div>
+												
+											<span class="swiper-notification" aria-live="assertive" aria-atomic="true"></span></div>
+										</div>
+									</div>
+								</div>
+					</div>
+				</div>
+
+			</div>
+			<div class="span3  height100">
+				<div class="height33">
+	
+						<div class="common-header">
+									<div>五员式管理</div>
+								</div>
+					<div class="common-pading shadow">
+						<div id="PopsNumEcharts" class="echarts"></div>
+					</div>
+				</div>
+					<div class="height33">
+	
+						<div class="common-header">
+									<div>七个一工作法</div>
+								</div>
+					<div class="common-pading shadow">
+						<!-- <div id="HealthyEcharts" class="echarts"></div> -->
+						<div id="p1_r_2">
+										<ul>
+											<li>
+												<h3>民意汇集</h3>
+											<div class="m_line">
+												<a href="javascript:void(0)" title="2018-08-01"></a>
+												<a href="javascript:void(0)" title="2018-08-02"></a>
+												<a href="javascript:void(0)" title="2018-08-03"></a>
+												<a href="javascript:void(0)" title="2018-08-04"></a>
+												<a href="javascript:void(0)" title="2018-08-05"></a>
+												<a href="javascript:void(0)" title="2018-08-06"></a>
+												<a href="javascript:void(0)" title="2018-08-07"></a>
+												<a href="javascript:void(0)" title="2018-08-08"></a>
+												<a href="javascript:void(0)" title="2018-08-09"></a>
+												<a href="javascript:void(0)" title="2018-08-10"></a>
+												<a href="javascript:void(0)" title="2018-08-11"></a>
+												<a href="javascript:void(0)" title="2018-08-12"></a>
+												<a href="javascript:void(0)" title="2018-08-13"></a>
+												<a href="javascript:void(0)" title="2018-08-14"></a>
+												<a href="javascript:void(0)" title="2018-08-15"></a>
+												<a href="javascript:void(0)" title="2018-08-16"></a>
+												<a href="javascript:void(0)" title="2018-08-17"></a>
+												<a href="javascript:void(0)" title="2018-08-18"></a>
+												<a href="javascript:void(0)" title="2018-08-19"></a>
+												<a href="javascript:void(0)" title="2018-08-20"></a>
+												<a href="javascript:void(0)" title="2018-08-21"></a>
+												<a href="javascript:void(0)" title="2018-08-22"></a>
+												<a href="javascript:void(0)" title="2018-08-23"></a>
+												<a href="javascript:void(0)" title="2018-08-24"></a>
+												<a href="javascript:void(0)" title="2018-08-25"></a>
+												<a href="javascript:void(0)" title="2018-08-26"></a>
+												<a href="javascript:void(0)" title="2018-08-27"></a>
+												<a href="javascript:void(0)" title="2018-08-28"></a>
+												<a href="javascript:void(0)" title="2018-08-29"></a>
+												<a href="javascript:void(0)" title="2018-08-30"></a>
+											</div>
+											<span>(天)</span>
+											</li>
+											<li>
+												<h3>村民议事会</h3>
+												<div class="m_line">
+													<a href="javascript:void(0)" title=""></a>
+													<a href="javascript:void(0)"></a>
+													<a href="javascript:void(0)"></a>
+													<a href="javascript:void(0)" title=""></a>
+												</div>
+												<span>(周)</span>
+											</li>
+											<li>
+												<h3>公益活动</h3>
+												<div class="m_line">
+													<a href="javascript:void(0)" title=""></a>
+													<a href="javascript:void(0)" title=""></a>
+													<a href="javascript:void(0)" title=""></a>
+												</div>
+												<span>(旬)</span>
+											</li>
+											<li>
+												<h3>理财会</h3>
+												<div class="m_line">
+													<a href="javascript:void(0)" title=""></a>
+													<a href="javascript:void(0)" title=""></a>
+												</div>
+												<span>(月)</span>
+											</li>
+											<li>
+												<h3>绩效考核</h3>
+												<div class="y_line">
+													<a href="javascript:void(0)" title="一季度绩效考核"></a>
+													<a href="javascript:void(0)" title="二季度绩效考核"></a>
+													<a href="javascript:void(0)" title="三季度绩效考核"></a>
+													<a href="javascript:void(0)" title="四季度绩效考核"></a>
+												</div>
+												<span>(季度)</span>
+											</li>
+											<li>
+												<h3>谈心会</h3>
+												<div class="y_line">
+													<a href="javascript:void(0)" title=""></a>
+													<a href="javascript:void(0)" title=""></a>
+													<a href="javascript:void(0)" title=""></a>
+												</div>
+												<span>(半年)</span>
+											</li>
+											<li>
+												<h3>述职述廉</h3>
+												<div class="y_line">
+													<a href="javascript:void(0)" title=""></a>
+													<a href="javascript:void(0)" title=""></a>
+												</div>
+												<span>(年)</span>
+											</li>
+											</ul>
+										</div>
+					</div>
+				</div>
+						<div class="height33">
+	
+						<div class="common-header">
+									<div>先进模范展示</div>
+								</div>
+					<div class="common-pading shadow" style="height:87%">
+						<div id="p1_r_3" class="shengji">
+    <div class="swiper-wrapper">
+        <div class="swiper-slide">
+            <dl>
+                <dt>
+                    <img src="${ctxStatic}/images/mofan/方鹏.jpg" />
+                    <h1>敬业奉献道德模范</h1>
+                    <h3>方鹏</h3>
+                </dt>
+                <dd>
+                    <p>方鹏是开发区西航办事处派出所所长，作为一名人民警察，从警14年来，13年在外过春节，在党和人民群众需要的时候，就是我挺身而出的时候。作为一名年轻的共产党员，他爱岗敬业，积极奉献，将青春和热血投入到所爱的公安工作中，是贵州省第二届全省敬业奉献道德模范</p>
+                </dd>
+            </dl>
+        </div>
+        <div class="swiper-slide">
+            <dl>
+                <dt>
+                    <img src="${ctxStatic}/images/mofan/秦祖德图片1.png" />
+                    <h1>见义勇为道德模范</h1>
+                    <h3>秦祖德</h3>
+                </dt>
+                <dd>
+                    <p style="letter-spacing: 0px; line-height: 20px;">2010年10月7日18时，一名中年男子持刀挟持一名12岁儿童。值班轮休在家的他接到指令后，火速赶到现场解救人质。犯罪嫌疑人情绪失控，不停地用刀背拍打被劫持男孩的头部、颈部，犯罪嫌疑人挥刀凶狠地砍向小孩后脑。在这千钧一发之际，秦祖德同志奋不顾身地冲向前用身体挡住砍向小孩的致命一刀，小孩得救了，可是他却因伤势过重晕倒在血泊之中... 他忠诚担当，将群众的冷暖安危放在心头，为民解忧止纷，守护群众平安，在平凡的岗位上干出了不平凡的业绩，赢得了人民群众的信任和赞誉。</p>
+                </dd>
+            </dl>
+        </div>
+        <div class="swiper-slide">
+            <dl>
+                <dt>
+                    <img src="${ctxStatic}/images/mofan/赵勇波.jpg" />
+                    <h1>见义勇为道德模范</h1>
+                    <h3>赵勇波</h3>
+                </dt>
+                <dd>
+                    <p>赵勇波是武警安顺支队第一大队机动中队政治指导员，他两次挺身而出、救群众于危难，赤手空拳勇斗持刀歹徒，机智果断搜救落水儿童，树立了“有灵魂、有本事、有血性、有品德”的新一代革命军人形象，2015年被中央文明委评为第五届全国见义勇为道德模范。</p>
+                </dd>
+            </dl>
+        </div>
+        <div class="swiper-slide">
+            <dl>
+                <dt>
+                    <img src="${ctxStatic}/images/mofan/郭永平.png" />
+                    <h1>敬业奉献道德模范</h1>
+                    <h3>郭永平</h3>
+                </dt>
+                <dd>
+                    <p style="letter-spacing: 0px; line-height: 19px;">郭永平，开发区环卫处桁车员。从1988年12月参加环卫工作至今，曾从事过一线环卫工人、环卫垃圾转运站桁车员。29年来，他服从分工，哪里最苦最难，哪里就有他的身影。郭永平作为一名一线环卫工人，他发扬了“不怕苦、不怕累”“脏了我一人，换来万家洁”的环卫精神，为责任路段的清扫保洁，他不知洒下了多少汗水。早晨4点钟开始工作，凌晨清扫完8000多平方米道路，运走三板车垃圾后，还要继续一天的保洁工作。每天要干10个小时，别人对他的工作不理解，他总说：“这是我的职业，干好它就是我的本份。”</p>
+                </dd>
+            </dl>
+        </div>
+        <div class="swiper-slide">
+            <dl>
+                <dt>
+                    <img src="${ctxStatic}/images/mofan/刘正顺.jpg" />
+                    <h1>孝老爱亲道德模范</h1>
+                    <h3>刘正顺</h3>
+                </dt>
+                <dd>
+                    <p>男，1953年2月生，开发区幺铺镇方牛村村民。刘正顺同志现有家庭人口4人，家庭经济拮据，生活较为困难。其子刘于新2006年考入贵州大学计算机学院学习计算机科学与技术专业。刘于新由于自幼身患残疾，行动不变，生活无法自理，考入贵州大学后，在生活方面主要是靠其父亲刘正顺照料。</p>
+                </dd>
+            </dl>
+        </div>
+        <div class="swiper-slide">
+            <dl>
+                <dt>
+                    <img src="${ctxStatic}/images/mofan/杨开芬照片3.png" />
+                    <h1>孝老爱亲道德模范</h1>
+                    <h3>杨开芬</h3>
+                </dt>
+                <dd>
+                    <p style="letter-spacing: 0px; line-height: 19px;">杨开芬：女，1967年9月生，开发区国税局科员。2000年，丈夫突遭车祸，造成的左侧脑瘫且难以恢复，得知噩耗人她犹如晴天霹雳，儿子正在读书，年迈体衰公婆需要人照管，如植物人丈夫更需要人照管顾，她痛苦万分，心如刀割，亲人们劝她乘早离开，重新寻求幸福。面对风烛残年的老人、幼小的儿子、心智不全的丈夫，用毅然用自己瘦弱的身躯，用一颗善良的心默默支撑起这个家，不离不弃，让这个家家庭感受人间冷暖。她是生活中孝老爱亲的好榜样！</p>
+                </dd>
+            </dl>
+        </div>
+        <div class="swiper-slide">
+            <dl>
+                <dt>
+                    <img src="${ctxStatic}/images/mofan/杨苧一寸照.JPG" />
+                    <h1>优秀少先队辅导员</h1>
+                    <h3>杨苧</h3>
+                </dt>
+                <dd>
+                    <p style="letter-spacing: 0px; line-height: 19px;">杨苧，安顺市少先队副总辅导员、开发区少先队总辅导员，安顺市市级骨干教师，安顺市“十三五”第一批市级教学名师，贵州省教育学会中小学外语专业委员会理事。热爱少年儿童，热爱少先队工作。一直坚持让爱心与智慧同行，尊重个性多元发展，以俯下身去聆听队员的声音为工作方式。在担任辅导员期间，精心组织策划各种少先队活动，赢得了辅导员们和学生们的充分肯定，为推动开发区少先队工作做出积极贡献。
+                    </p>
+                </dd>
+            </dl>
+        </div>
+        <div class="swiper-slide">
+            <dl>
+                <dt>
+                    <img src="${ctxStatic}/images/mofan/张雨柔.jpg" />
+                    <h1>优秀的少先队员</h1>
+                    <h3>张雨柔</h3>
+                </dt>
+                <dd>
+                    <p style="letter-spacing: 1px; line-height: 24px;">张雨柔同学尊师守纪、热爱集体、热爱劳动、团结同学、乐于助人，是一个德、智、体、美、劳全面发展的学生，是同学们学习的好榜样，是老师工作的好帮手。她积极向上，不仅乐于助人，而且热爱学习，善于钻研，学习中总是知之为知之，不知为不知，实事求是。她的这种端正的学习态度，一直被其他同学效仿。</p>
+                </dd>
+            </dl>
+        </div>
+    </div>
+    <!-- 如果需要导航按钮 -->
+    <div class="swiper-button-prev"></div>
+    <div class="swiper-button-next"></div>
+</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</body>
+</html>

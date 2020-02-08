@@ -1,0 +1,185 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.arjjs.ccm.modules.iot.grabber.dao.CcmGrabberManageDao">
+    
+	<sql id="ccmGrabberManageColumns">
+		a.id AS "id",
+		a.grabber_name AS "grabberName",
+		a.grabber_type AS "grabberType",
+		a.grabber_num AS "grabberNum",
+		a.resources_num AS "resourcesNum",
+		a.grabber_ip AS "grabberIp",
+		a.grabber_port AS "grabberPort",
+		a.username AS "username",
+		a.password AS "password",
+		a.grabber_passway AS "grabberPassway",
+		a.monitor_num AS "monitorNum",
+		a.grabber_longitude AS "grabberLongitude",
+		a.grabber_latitude AS "grabberLatitude",
+		a.synchro_state AS "synchroState",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag",
+		a.grabber_coefficient AS "grabberCoefficient",
+		a.grabber_offset AS "grabberOffset",
+		a.val_max AS "valMax",
+		a.val_min AS "valMin",
+		a.report_state AS "reportState",
+		a.access_type AS "accessType"
+	</sql>
+	
+	<sql id="ccmGrabberManageJoins">
+	</sql>
+    
+	<select id="get" resultType="CcmGrabberManage">
+		SELECT 
+			<include refid="ccmGrabberManageColumns"/>
+		FROM ccm_grabber_manage a
+		<include refid="ccmGrabberManageJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="CcmGrabberManage">
+		SELECT 
+			<include refid="ccmGrabberManageColumns"/>
+		FROM ccm_grabber_manage a
+		<include refid="ccmGrabberManageJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="grabberName != null and grabberName != ''">
+				AND a.grabber_name Like '%${grabberName}%'
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="CcmGrabberManage">
+		SELECT 
+			<include refid="ccmGrabberManageColumns"/>
+		FROM ccm_grabber_manage a
+		<include refid="ccmGrabberManageJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO ccm_grabber_manage(
+			id,
+			grabber_name,
+			grabber_type,
+			grabber_num,
+			resources_num,
+			grabber_ip,
+			grabber_port,
+			username,
+			password,
+			grabber_passway,
+			monitor_num,
+			grabber_longitude,
+			grabber_latitude,
+			synchro_state,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag,
+			grabber_coefficient,
+			grabber_offset,
+			val_max,
+			val_min,
+			report_state,
+			access_type
+		) VALUES (
+			#{id},
+			#{grabberName},
+			#{grabberType},
+			#{grabberNum},
+			#{resourcesNum},
+			#{grabberIp},
+			#{grabberPort},
+			#{username},
+			#{password},
+			#{grabberPassway},
+			#{monitorNum},
+			#{grabberLongitude},
+			#{grabberLatitude},
+			#{synchroState},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag},
+			#{grabberCoefficient},
+			#{grabberOffset},
+			#{valMax},
+			#{valMin},
+			#{reportState},
+			#{accessType}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE ccm_grabber_manage SET 	
+			grabber_name = #{grabberName},
+			grabber_type = #{grabberType},
+			grabber_num = #{grabberNum},
+			resources_num = #{resourcesNum},
+			grabber_ip = #{grabberIp},
+			grabber_port = #{grabberPort},
+			username = #{username},
+			password = #{password},
+			grabber_passway = #{grabberPassway},
+			monitor_num = #{monitorNum},
+			grabber_longitude = #{grabberLongitude},
+			grabber_latitude = #{grabberLatitude},
+			grabber_coefficient = #{grabberCoefficient},
+			grabber_offset = #{grabberOffset},
+			val_max = #{valMax},
+			val_min = #{valMin},
+			report_state = #{reportState},
+			access_type = #{accessType}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE ccm_grabber_manage SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+
+	<update id="updateState">
+		UPDATE ccm_grabber_manage SET
+			synchro_state = #{synchroState}
+	</update>
+
+	<select id="getCount" resultType="Integer">
+	SELECT
+		COUNT(1)
+	FROM ccm_grabber_manage a
+	<include refid="ccmGrabberManageJoins"/>
+	<where>
+		a.del_flag = #{DEL_FLAG_NORMAL}
+	</where>
+	</select>
+</mapper>

@@ -1,0 +1,636 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>实时警情</title>
+<link rel="stylesheet" href="../../../flat/commandDispatch/css/reset.css" />
+<link rel="stylesheet" href="../../../flat/commandDispatch/css/style.css" />
+<link rel="stylesheet" href="../../../flat/commandDispatch/css/index.css" />
+<link rel="stylesheet" href="../../../modules/map/css/pop-info-animate.css" />
+<link rel="stylesheet" href="../../../modules/map/css/publicinstitutions.css" />
+<link rel="stylesheet" href="../../../flat/commandDispatch/css/jquery.eeyellow.Timeline.css" />
+<link rel="stylesheet" href="../../../ol/ol.css" />
+<link rel="stylesheet" href="../../../modules/map/js/draw/css/p-ol3.min.css" />
+<link rel="stylesheet" href="../../../modules/map/css/mapFlat.css" />
+<link rel="stylesheet" href="../../../jquery-ztree/3.5.12/css/zTreeStyle/zTreeStyle.min.css" />
+<link rel="stylesheet" href="../../../jquery-ui-1.12.1/jquery-ui.min.css" />
+<link rel="stylesheet" href="../../../layim/layui/css/layui.css" />
+<link rel="stylesheet" href="../../../audio/audio.css" />
+<link rel="stylesheet" href="../../../flat/commandDispatch/css/table.css" />
+<link rel="stylesheet" href="../../../bootstrap/2.3.1/awesome/font-awesome.min.css">
+<link rel="stylesheet" href="../../../bootstrap/checkbox-radio.css">
+<link rel="stylesheet" href="../../../modules/map/css/publicinstitutions.css">
+<link rel="stylesheet" href="../../../layui_ext/dtree/dtree.css">
+<link rel="stylesheet" href="../../../layui_ext/dtree/font/dtreefont.css">
+<script src="../../../jquery/jquery-1.9.1.min.js" type="text/javascript"></script>
+<script src="../../../jquery/jquery.cookie.js" type="text/javascript"></script>
+<script src="../../../layim/layui/layui.js" type="text/javascript"></script>
+<script src="../../../common/common.js" type="text/javascript"></script>
+<script src="../../../common/alarm.js" type="text/javascript"></script>
+<script src="../../../common/jeesite.min.js" type="text/javascript"></script>
+<script src="../../../ckplayer/ckplayer.js" type="text/javascript"></script>
+<script src="../../../jquery/hammer.js" type="text/javascript"></script>
+<script src="../../../common/ztreeSech.js" type="text/javascript"></script>
+<script src="../../../jquery-ui-1.12.1/jquery-ui.js" type="text/javascript"></script>
+<script src="../../../jquery-ztree/3.5.12/js/jquery.ztree.all-3.5.js" type="text/javascript"></script>
+<script src="../../../flat/commandDispatch/jquery.eeyellow.Timeline.js" type="text/javascript" ></script>
+<script src="../../../flat/hammerCommon.js" type="text/javascript"></script>
+<script src="../../../audio/audio.min.js" type="text/javascript"></script>
+<script src="../../../ol/ol.js" type="text/javascript"></script>
+<script src="../../../modules/map/js/draw/js/p-ol3.debug.js" type="text/javascript"></script>
+<script src="../../../modules/map/js/mapconfig.js" type="text/javascript"></script>
+<script src="../../../modules/map/js/commonMapFlat.js" type="text/javascript"></script>
+<script src="../../../flat/alarmCommon.js" type="text/javascript"></script>
+<script src="../../../flat/layerCommon.js" type="text/javascript"></script>
+<script>
+if($.cookie('theme')==undefined){
+	$('head').append('<link href="../../../bootstrap/2.3.1/css_cerulean/custom.css" type="text/css" rel="stylesheet">');
+	$('head').append('<link href="../../../bootstrap/2.3.1/css_cerulean/custom.css" type="text/css" rel="stylesheet">');
+}else if($.cookie('theme')=='cerulean'){
+	$('head').append('<link href="../../../bootstrap/2.3.1/css_cerulean/custom.css" type="text/css" rel="stylesheet">');
+	$('head').append('<link href="../../../bootstrap/2.3.1/css_cerulean/custom.css" type="text/css" rel="stylesheet">');
+}else if($.cookie('theme')=='black'){
+	$('head').append('<link href="../../../bootstrap/2.3.1/css_black/custom.css" type="text/css" rel="stylesheet">');
+	$('head').append('<link href="../../../bootstrap/2.3.1/css_black/custom.css" type="text/css" rel="stylesheet">');
+}
+	$(document).ready(function() {
+		var type = "bph_alarm_info_state";
+		$.post(ctx+'/sys/sysDicts/findAlarmInfoByTypeName',{'type':type},function(data){
+			var sysDict = JSON.parse(data);
+			var len = sysDict.length;
+			var cla = '';
+			$('#alarmSta').append('<span class="grey" onclick="getAlarm()"><i class="all-message" id="alarmstatus"></i>全部</span>');
+			for(var i = 0;i < len;i++){
+				if(sysDict[i].value == '0'){
+					cla = "not-handle";
+				}else if(sysDict[i].value == '1'){
+					cla = "has-signIn";
+				}else if(sysDict[i].value == '2'){
+					cla = "handling";
+				}else{
+					cla = "has-handle";
+				}
+				$('#alarmSta').append('<span onclick="getAlarm(\''+sysDict[i].value+'\')"><i class="'+cla+'" id="alarmstatus_'+sysDict[i].value+'"></i>'+sysDict[i].label+'</span>');
+			}
+		});
+	});
+</script>
+<script type="text/html" id="barDemo">
+	<i class="icon-phone" id="callPhone" onclick="callPhone(this)" style="color: deepskyblue;font-size: 16px; margin-left: 10px; cursor: pointer;" title="拨打电话"></i>
+  	<i class="icon-comment" id="sendNote" onclick="sendNote(this)" style="color: deepskyblue;font-size: 16px; margin-left: 10px; cursor: pointer;" title="发送信息"></i>
+  	<i class="icon-map-marker" id="locationConstable" onclick="locationConstable(this)" style="color: deepskyblue;font-size: 16px; margin-left: 10px; cursor: pointer;" title="定位"></i>
+</script>
+<script type="text/html" id="barPeo">
+	<i class="icon-phone" id="callPhone" onclick="callPhone(this)" style="color: deepskyblue;font-size: 16px; margin-left: 10px; cursor: pointer;" title="拨打电话"></i>
+  	<i class="icon-comment" id="sendNote" onclick="sendNote(this)" style="color: deepskyblue;font-size: 16px; margin-left: 10px; cursor: pointer;" title="发送信息"></i>
+  	<i class="icon-map-marker" id="locationConstable" onclick="locationConstable(this)" style="color: deepskyblue;font-size: 16px; margin-left: 10px; cursor: pointer;" title="定位"></i>
+</script>
+<script type="text/html" id="sexTpl">
+    {{#  if(d.state === '离线'){ }}
+        <div style="color: #f5f5f500;background-color: #928d8d;height: 100%;width: 10px;">{{ d.state }}</div>
+    {{#  } else if(d.state === '备勤') { }}
+        <div style="color: #f5f5f500;background-color: #17a056;height: 100%;width: 10px;">{{ d.state }}</div>
+    {{#  } else if(d.state === '忙碌') { }}
+		<div style="color: #f5f5f500;background-color: #f7cb49;height: 100%;width: 10px;">{{ d.state }}</div>
+    {{# } }}
+</script>
+<style>
+.radio label::after {
+	display: inline-block;
+	position: absolute;
+	content: " ";
+	width: 11px;
+	height: 11px;
+	left: 3px;
+	top: 3px;
+}
+
+.checkbox label::after {
+	left: -1px;
+	top: -2px;
+}
+
+#delete-wrapper {
+	position: absolute;
+	bottom: 0px;
+	width: 100%;
+	text-align: center;
+	padding-bottom: 8px;
+	z-index: 9;
+}
+
+#delete-wrapper #btn-delete {
+	display: inline-block;
+	color: rgb(255, 255, 255);
+	cursor: pointer;
+	padding: 8px 16px;
+	background: #19a7f0;
+}
+
+#delete-wrapper #btn-cancle {
+	display: inline-block;
+	color: rgb(255, 255, 255);
+	cursor: pointer;
+	padding: 8px 16px;
+	background: #19a7f0;
+}
+
+.tooltip {
+	position: relative;
+	background: rgba(0, 0, 0, 0.5);
+	border-radius: 4px;
+	color: white;
+	padding: 4px 8px;
+	opacity: 0.7;
+	white-space: nowrap;
+}
+
+.tooltip-measure {
+	opacity: 1;
+	font-weight: bold;
+}
+
+.tooltip-static {
+	background-color: #ffcc33;
+	color: black;
+	border: 1px solid white;
+}
+
+.tooltip-measure:before, .tooltip-static:before {
+	border-top: 6px solid rgba(0, 0, 0, 0.5);
+	border-right: 6px solid transparent;
+	border-left: 6px solid transparent;
+	content: "";
+	position: absolute;
+	bottom: -6px;
+	margin-left: -7px;
+	left: 50%;
+}
+
+.tooltip-static:before {
+	border-top-color: #ffcc33;
+}
+
+.ztree {
+	margin: 0;
+	_margin-top: 10px;
+	padding: 10px 0 0 10px;
+}
+
+#left {
+	background: none;
+}
+
+.accordion-heading {
+	background-image: none;
+}
+
+.checkbox .police-type {
+	display: inline-block;
+}
+
+.checkbox label.police-label {
+	padding-left: 0px;
+	width: 45px;
+}
+
+.checkbox label.police-label::before {
+	display: block;
+	position: relative;
+	width: 20px;
+	height: 20px;
+	left: 38px;
+	margin-left: -34px;
+	border: 1px solid #cccccc;
+	border-radius: 25%;
+}
+
+.checkbox label.police-label::after {
+	width: 25px;
+	height: 25px;
+	left: 36px;
+	margin-left: -34px;
+	border-radius: 50%;
+	font-size: 20px;
+	padding-top: 2px;
+}
+.layui-table-header{
+	display:none;
+}
+.layui-table-view,.layui-table-view .layui-table td{
+    border:none;
+}
+.layui-table-cell{
+	padding: 0 0px;
+}
+.layui-table-grid-down{
+	display: none;
+}
+
+/* .twinkle{ */
+/*     -webkit-animation: twinkling 1s infinite ease-in-out */
+/* } */
+/* .animated{ */
+/*     -webkit-animation-duration: 1s; */
+/*     animation-duration: 1s; */
+/*     -webkit-animation-fill-mode: both; */
+/*     animation-fill-mode: both */
+/* } */
+/* @-webkit-keyframes twinkling{ */
+/*     0%{ */
+/*         opacity: 0.2; */
+/*     } */
+/*     100%{ */
+/*         opacity: 1; */
+/*     } */
+/* } */
+/* @keyframes twinkling{ */
+/*     0%{ */
+/*         opacity: 0.2; */
+/*     } */
+/*     100%{ */
+/*         opacity: 1; */
+/*     } */
+/* } */
+</style>
+</head>
+<body>
+<!-- 	<div style="display: none;"> -->
+<!-- 		<div id="basicInfo"> -->
+<!-- 			这些是基础信息<font color="red">****</font> -->
+<!-- 		</div> -->
+<!-- 	</div> -->
+	<div id="content" class="row-fluid">
+		<div id="right">
+			<div class="wrapper clearfix" style="overflow: hidden;">
+				<!-- 新警情 -->
+				<div class="map-wrapper">
+					<div id="map" class="map">
+						<!-- 图层 -->
+						<div id="onparentdiv" style="position: absolute;width: 1230px;height: 30px;background-color: white;left: 330px;z-index: 9;border-radius: 5px;top: 10px;border: 1px solid #ccc;">
+							<!-- 视频监控 -->
+							<div class="pub-flag" onclick="shipinjiankongFun(this)" >
+								<span class="pub-icon icon-shipin"></span> <span class="pub-name">视频监控</span>
+							</div>
+							<!-- 警员-->
+							<div class="pub-flag" onclick="jingyuanFun(this)">
+								<span class="pub-icon icon-jingyuan"></span> <span class="pub-name">警员</span>
+							</div>
+							<!-- 警车-->
+							<div class="pub-flag" onclick="jingcheFun(this)">
+								<span class="pub-icon icon-jingche"></span> <span class="pub-name">警车</span>
+							</div>
+							<!--学校  -->
+							<div class="pub-flag" onclick="xuexiaoFun(this)">
+								<span class="pub-icon icon-xuexiao"></span> <span class="pub-name">学校</span>
+							</div>
+							<!-- 医院 -->
+							<div class="pub-flag" onclick="yiyuanFun(this)">
+								<span class="pub-icon icon-yiyuan"></span> <span class="pub-name">医院</span>
+							</div>
+							<!-- 加油站 -->
+							<div class="pub-flag" onclick="jiayouzhanFun(this)">
+								<span class="pub-icon icon-jiayouzhan"></span> <span class="pub-name">加油站</span>
+							</div>
+							<!-- 商场超市 -->
+							<div class="pub-flag" onclick="shangchangFun(this)">
+								<span class="pub-icon icon-shangchang"></span> <span class="pub-name">商场超市</span>
+							</div>
+							<!-- 娱乐场所 -->
+							<div class="pub-flag" onclick="yuleFun(this)">
+								<span class="pub-icon icon-yule"></span> <span class="pub-name">娱乐场所</span>
+							</div>
+							<!-- 宾馆 -->
+							<div class="pub-flag" onclick="binguanFun(this)">
+								<span class="pub-icon icon-bingguan"></span> <span class="pub-name">酒店宾馆</span>
+							</div>
+							<!-- 涉危涉爆单位 -->
+							<div class="pub-flag" onclick="sheweishebaoFun(this)">
+								<span class="pub-icon icon-sheweishebao"></span> <span class="pub-name">涉危涉爆</span>
+							</div>
+							<!-- 警务室-->
+							<div class="pub-flag" onclick="jingwushiFun(this)">
+								<span class="pub-icon icon-jingwushi"></span> <span class="pub-name">警务室</span>
+							</div>
+							<!-- 工作站-->
+							<div class="pub-flag" onclick="gongzuozhanFun(this)">
+								<span class="pub-icon icon-gongzuozhan"></span> <span class="pub-name">工作站</span>
+							</div>
+						</div>
+						<!-- 工具栏 -->
+						<div id="delete-wrapper">
+							<div id="btn-delete" style="display: none;">查询</div>
+						</div>
+						<!-- 开关 -->
+						<a href="#" id="alarmDMS" class="toggle toggle--on"
+							style="position: absolute; left: 330px; bottom: 865px; top: 50px; z-index: 99">
+						</a>
+<!-- 						<a href="#" id="videoDMS" class="toggle toggle--off" -->
+<!-- 							style="position: absolute; left: 320px; bottom: 170px; top: auto; z-index: 99"> -->
+<!-- 						</a>  -->
+<!-- 						<a href="#" id="policeDMS" class="toggle toggle--off" -->
+<!-- 							style="position: absolute; left: 320px; bottom: 135px; top: auto; z-index: 99"> -->
+<!-- 						</a>  -->
+<!-- 						<a href="#" id="carDMS" class="toggle toggle--off" -->
+<!-- 							style="position: absolute; left: 320px; bottom: 100px; top: auto; z-index: 99"> -->
+<!-- 						</a> -->
+						<!-- 开关 -->
+						<!-- 弹框 -->
+						<div id="popup" class="ol-popup">
+							<div class="popup-top">
+								<span class="popup-title"></span> <a href="#" id="popup-closer" class="ol-popup-closer"></a>
+							</div>
+							<div class="popup-content" id="popup-content"></div>
+						</div>
+						<div id="pubMap"></div>
+						<!-- 弹框 -->
+						<!-- 工具栏 -->
+						<span id="floatingLayer">工具</span> <span class="refurbish left-length" onclick="window.location.reload()">刷新</span>
+						<div class="mymovement">
+							<div class="movement"></div>
+						</div>
+						<div class="toolmenu" id="toolMenu">
+							<div class="toolbar" id="toolbar">
+								<div class="all-map">
+									<span>全屏</span>
+								</div>
+								<div class="return-map">
+									<span>返回</span>
+								</div>
+								<div class="Tools">
+									<span>工具</span>
+								</div>
+								<div class="range" id="range">
+									<span>范围</span>
+								</div>
+								<div class="plotting" id="plotting">
+									<span>标绘</span>
+								</div>
+								<div class="historyCoordinate" id="historyCoordinate">
+									<span>暂无</span>
+								</div>
+								<div id="clear">
+									<span onclick="clearAllGraphic()">清除</span>
+								</div>
+								<div id="turn-off">
+									<span>关闭</span>
+								</div>
+							</div>
+							<div class="inner-menu">
+								<ul class="toolbars">
+									<li><span id="lengthMeasure" title="测线" onclick="Map.measureMap('length')"></span></li>
+									<li><span id="pointMeasure" title="测面" onclick="Map.measureMap('area')"></span></li>
+									<li><span id="vector" title="地图切换" onclick="Map.switchMap()"></span></li>
+								</ul>
+								<ul class="range-query">
+									<li><span id="circleSelect" title="圈选" onclick="Map.selectQuery('Circle')"></span></li>
+									<li><span id="rectangSelect" title="框选" style="display: none"></span></li>
+									<li><span id="polygonSelect" title="多边形选" style="display: none"></span></li>
+									<li></li>
+									<li></li>
+								</ul>
+								<ul class="plottingbar">
+									<li><span id="labelCircle" title="圆形" onclick="activate(P.PlotTypes.CIRCLE)"></span></li>
+									<li><span id="labelEclipse" title="椭圆" onclick="activate(P.PlotTypes.ELLIPSE)"></span></li>
+									<li><span id="labelRect" title="矩形" onclick="activate(P.PlotTypes.RECTANGLE)"></span></li>
+									<li><span id="labelFreePolygon" title="自由面" onclick="activate(P.PlotTypes.FREEHAND_POLYGON)"></span></li>
+									<li><span id="labelFreePolyline" title="自由线" onclick="activate(P.PlotTypes.FREEHAND_LINE)"></span></li>
+									<li><span id="labelLeftArrow" title="细直箭头" onclick="activate(P.PlotTypes.FINE_ARROW)"></span></li>
+									<li><span id="labelRightArrow" title="钳击" onclick="activate(P.PlotTypes.DOUBLE_ARROW)"></span></li>
+									<li><span id="labelUpArrow" title="直箭头" onclick="activate(P.PlotTypes.STRAIGHT_ARROW)"></span></li>
+									<li><span id="labelDownArrow" title="突击方向标绘" onclick="activate(P.PlotTypes.ASSAULT_DIRECTION)"></span></li>
+									<li><span id="labelSave" title="弧线" onclick="activate(P.PlotTypes.ARC)"></span></li>
+									<li><span id="labelHistory" title="折线" onclick="activate(P.PlotTypes.POLYLINE)"></span></li>
+									<li><span id="labelStop" title="曲线" onclick="activate(P.PlotTypes.CURVE)"></span></li>
+								</ul>
+							</div>
+						</div>
+						<!-- 工具栏 -->
+					</div>
+				</div>
+				
+				<div class="alarm" id="alarm">
+					<input type="hidden" id="active_rcvalarm_ordernum"
+						name="active_rcvalarm_ordernum" value="" />
+					<div class="left-lists">
+						<h5>
+							警情列表&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+								<a class="layui-btn layui-btn-normal layui-btn-sm" style="height: 31px;background-color: #20c694;margin-left: 70px;font-size: 15px;width: 60px;padding-left: 25px;margin-bottom: 2px;" type="button" onclick="seaDialog()">
+									<i class="icon-search"  style="margin-left: 156px;width: 15px;height: 17px;background-image: none;margin-top: 9px;"></i>查询
+								</a>
+						</h5>
+					</div>
+					<div id="slides" class="slides-wrap clearfix">
+						<ul id="all-message" class="slide active"></ul>
+						<ul id="not-handle" class="slide"></ul>
+						<ul id="has-signIn" class="slide"></ul>
+						<ul id="handling" class="slide"></ul>
+						<ul id="has-handle" class="slide"></ul>
+					</div>
+					<div id="alarmSta" class="status-explain clearfix">
+						<!-- <span class="grey" onclick="getAlarm()"><i class="all-message" id="alarmstatus"></i>全部</span> 
+						<span onclick="getAlarm('0')"><i class="not-handle" id="alarmstatus_0"></i>未处理</span> 
+						<span onclick="getAlarm('1')"><i class="has-signIn" id="alarmstatus_1"></i>已派发</span> 
+						<span onclick="getAlarm('2')"><i class="handling" id="alarmstatus_2"></i>处理中</span> 
+						<span onclick="getAlarm('3')"><i class="has-handle" id="alarmstatus_3"></i>已完成</span> -->
+					</div>
+				</div>
+				<div id="policeData" class="policeSenData" style="display: none;">
+					<div class="control-group" style="margin-top: 10px;">
+						<label class="control-label" style="margin-left: 15px;float: left;margin-top: 8px;">目的地</label>
+						<div class="controls" style="display: inline-block;">
+							<input class="input-medium" id="destinyX" type="text" readonly="readonly" style="width: 160px; height: 30px; margin-left: 20px;" onmouseover="this.title=this.value" />
+							<input class="input-medium" id="destinyY" type="text" readonly="readonly" style="width: 160px; height: 30px;" onmouseover="this.title=this.value" /> 
+							<i class="icon-map-marker" id="destinLocation" onclick="locationP_er_destiny(this)" style="font-size: 16px; margin-left: 10px; cursor: pointer;"></i>
+						</div>
+					</div>
+					<div class="control-group" style="margin-top: 10px;">
+						<label class="control-label" style="padding-top: 10px; margin-left: 15px;float: left; margin-top: 8px;">出警安排</label>
+						<div class="controls" style="display: inline-block;">
+							<textarea id="taskTextarea" style="margin-left: 8px; width: 324px;" name="eduhistory" align="center"></textarea>
+						</div>
+					</div>
+				</div>
+				<div class="police" >
+					<div class="right-lists">
+						<h5>警力列表</h5>
+					</div>
+					<div class="right-nav">
+						<span class="police-force fff hidden"> <i></i>
+							<p>全部警力</p>
+						</span> <span class="result hidden"> <i></i>
+							<p>查询结果</p>
+						</span>
+					</div>
+					<div class="swipeleft">
+						<div class="police-city hidden">
+							<div class="inner-nav">
+								<span class="police-man blue"><p>警力</p> <i></i></span>
+								<span class="police-cat"><p>警车</p> <i></i></span>
+								<span class="police-video"><p>视频</p> <i></i></span>
+							</div>
+							<ul class="police-list" id="policeAll">
+								<div class="checkbox checkbox-success radio-div tab-content-bg" style="margin-top: 5px;">
+									<div class="police-type">
+										<input type="checkbox" name="police" value="01" class="type-input" id="AuxiliaryPolice"> 
+										<label for="AuxiliaryPolice" class="police-label">刑侦</label>
+									</div>
+									<div class="police-type">
+										<input type="checkbox" name="police" value="02" class="type-input" id="PeoplePolice"> 
+										<label for="PeoplePolice" class="police-label">治安</label>
+									</div>
+									<div class="police-type">
+										<input type="checkbox" name="police" value="03" class="type-input" id="TrafficPolice"> 
+										<label for="TrafficPolice" class="police-label">交警</label>
+									</div>
+									<div class="police-type">
+										<input type="checkbox" name="police" value="04" class="type-input" id="SWAT"> 
+										<label for="SWAT" class="police-label">特警</label>
+									</div>
+									<div class="police-type">
+										<input type="checkbox" name="police" value="05" class="type-input" id="ArmedPolice"> 
+										<label for="ArmedPolice" class="police-label">巡警</label>
+									</div>
+								</div>
+								<li>
+									<div id="ztreePolice" class="ztree" style="margin-left: 10px;"></div>
+								</li>
+							</ul>
+							<ul class="cat-list" id="carAll">
+								<li>
+									<div id="carAllUl" class="ztree"></div>
+								</li>
+							</ul>
+							<ul class="inner-video" id="videoAll">
+								<li>
+									<div id="ztreeVideo" class="ztree"></div>
+								</li>
+							</ul>
+						</div>
+						<div class="police-result hidden">
+							<div class="inner-nav">
+								<span class="police-man blue"><p>警力结果</p> <i></i></span> 
+								<span class="police-cat"><p>警车结果</p> <i></i></span> 
+								<span class="police-video"><p>视频结果</p> <i></i></span>
+							</div>
+							<ul class="police-list ztree" style="margin: 5px 8px;" id="policeResult">
+								<table class="layui-hide" id="queryPolice" lay-filter="test">
+								
+								</table>
+							</ul>
+							<ul id="carResult" style="margin: 5px 8px;" class="cat-list ztree"></ul>
+							<ul class="inner-video ztree" style="margin: 5px 8px;" id="videoResult"></ul>
+						</div>
+						<div class="box dispatch hidden">
+							<div class="hd">
+								<h5>调度区域</h5>
+							</div>
+							<div class="bd clearfix" id="dispatch"></div>
+							<button id="btncontrolpolice" class="layui-btn layui-btn-normal layui-btn-sm" style="margin-left: 20px;" type="button" onclick="policeClick()">出警</button>
+						</div>
+					</div>
+					<div class="chat">
+						<div class="police-interaction">
+							<h5>出警互动</h5>
+							<span></span>
+						</div>
+						<div class="message-list clearfix" id="messageList"></div>
+						<div style="position: relative">
+							<form name="messageForm" id="messageForm" action="" method="post">
+								<input type="hidden" name="maxMessageId" id="maxMessageId" value="0" /> 
+								<input type="hidden" id="User_id" name="User_id" value="" /> 
+								<input type="hidden" id="Uid_send" name="Uid_send" value="" /> 
+								<input type="hidden" id="Uid_receive" name="Uid_receive" value="" /> 
+								<input type="hidden" id="hidPoliceDetailCount" />
+								<textarea name="Content_text" id="Content_text" class="information-input"></textarea>
+								<span class="voice"></span> <span class="expression"></span> 
+								<span class="transmitter" onclick="send()">发送</span> 
+								<span class="upload-image"></span>
+							</form>
+							<!--电话键盘-->
+						</div>
+						<!--融合通讯完-->
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!-- 周边查询弹框 -->
+	<div id="nearSearchDialog" style="display: none; padding-top: 10px;padding-left: 10px;">
+		<div style="display: flex;">
+			<label>图层：</label>
+			<div class="checkbox checkbox-success radio-div tab-content-bg"
+				style="display: flex; margin-bottom: 5px; padding-top: 2px; padding-bottom: 5px;padding-left: 20px;">
+				<input type="checkbox" name="layer" value="1" class="type-input" id="carLayer" checked="checked"> 
+				<label for="carLayer" style="padding: 0; width: 65px;">
+				<i title="车辆" class="icon iconfont icon-cheliangguanli"></i>车辆</label> 
+				<input type="checkbox" name="layer" value="1" class="type-input" id="peoLayer" checked="checked"> 
+				<label for="peoLayer" style="padding: 0; width: 65px;">
+				<i title="人员" class="icon iconfont icon-xingren"></i>人员</label> 
+				<input type="checkbox" name="layer" value="1" class="type-input" id="videoLayer" checked="checked"> 
+				<label for="videoLayer" style="padding: 0; width: 65px;">
+				<i title="视频" class="icon iconfont icon-shipinjiankong1"></i>视频</label>
+			</div>
+		</div>
+		<div style="display: flex;">
+			<label>范围：</label>
+			<div class="radio  radio-success" style="display: inline-block;">
+				<input type="radio" id="TodayRadio" value="300" name="distance" checked="checked"> 
+				<label for="TodayRadio">300m</label>
+			</div>
+			<div class="radio  radio-success" style="display: inline-block;">
+				<input type="radio" id="WeekRadio" value="500" name="distance">
+				<label for="WeekRadio">500m</label>
+			</div>
+			<div class="radio  radio-success" style="display: inline-block;">
+				<input type="radio" id="YearRadio" value="1000" name="distance">
+				<label for="YearRadio">1000m</label>
+			</div>
+			<div class="radio  radio-success" style="display: inherit;">
+				<input type="radio" id="customRadio" value="custom" name="distance">
+				<label for="customRadio">自定义</label> 
+				<input type="number" min="0" id="customKM" value="" style="width: 65px;" name="distance" disabled="disabled">m
+			</div>
+		</div>
+	</div>
+	<!-- 智能布控弹框 -->
+	<div id="setControlDialog"
+		style="display: none; margin: 15px 8px 0 8px">
+		<div class="control-group">
+			<div class="controls" style="display: inline-block; padding: 5px;">
+				<label>案发时间：</label> <label id="alarmTime"></label>
+			</div>
+			<div class="controls" style="display: inline-block; padding: 5px;">
+				<label class="laycontrol-labelui-form-label">逃跑时长：</label> 
+				<input id="escapeTime" type="number" min='0' value="" name="escapeTime" style='width: 174px; height: 25px'> 
+				<label>分钟</label>
+			</div>
+			<div class="controls" style="display: inline-block; padding: 5px;">
+				<label>逃跑方式：</label>
+				<select id="runWay" class="input-medium" style='width: 175px;'>
+					<option selected="selected" value="">请选择</option>
+				</select>
+			</div>
+		</div>
+	</div>
+	<script type="text/javascript" src="../../../jquery/hammer.js"></script>
+	<script type="text/javascript" src="../../../flat/realtimeAlarmSituation/bphRealtimeAlarm.js"></script>
+	<script type="text/javascript" src="../../../flat/realtimeAlarmSituation/video.js"></script>
+	<script type="text/javascript">
+		var leftWidth = 0; // 左侧窗口大小
+		var htmlObj = $("html"), mainObj = $("#main"), frameObj = $("#right,.wrapper,.map-wrapper"), headObj = $("#header"), slidesWrap = $('.slides-wrap');
+		function wSize() {
+			var strs = getWindowSize().toString().split(",");
+			frameObj.height(strs[0]);
+			//var leftWidth = ($("#left").width() < 0 ? 0 : $("#left").width());
+			frameObj.width($("#content").width() - leftWidth);
+			slidesWrap.height(frameObj.height() - $('.left-lists').height() - $('.status-explain').height());
+			var ulHeight = frameObj.height() - $('.right-lists').height() - $('.right-nav').height() - $('.inner-nav').height() - $('.box').height() - $('.police-go').height() - 25;
+			$(".police div>ul").height(ulHeight);
+			var messageHeight = frameObj.height() - $('.right-lists').height() - $('.information-input').height() - $('.police-go').height() - $('.right-nav').height() - $('.police-interaction').height();
+			$(".message-list").height(messageHeight);
+		}
+	</script>
+	<script src="../../../common/wsize.min.js" type="text/javascript"></script>
+</body>
+</html>

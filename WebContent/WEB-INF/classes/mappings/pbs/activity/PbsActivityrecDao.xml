@@ -1,0 +1,301 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.arjjs.ccm.modules.pbs.activity.dao.PbsActivityrecDao">
+
+	<sql id="pbsActivityrecColumns">
+		a.id AS "id",
+		a.s_title AS "sTitle",
+		a.s_type AS "sType.id",
+		type.s_name AS "sType.sName",
+		type.s_group AS "sType.sGroup",
+		a.s_content AS "sContent",
+		a.s_mastermem AS "sMastermem.id",
+		mem.s_name
+		AS "sMastermem.sName",
+		a.s_attendorgs AS "sAttendorgs",
+		a.s_attendants
+		AS "sAttendants",
+		a.dt_starttime AS "dtStarttime",
+		a.dt_endtime AS
+		"dtEndtime",
+		a.s_place
+		AS "sPlace",
+		a.s_stat AS "sStat",
+		a.s_description
+		AS "sDescription",
+		a.s_url AS "sUrl",
+		a.s_flag AS "sFlag",
+		a.s_file01 AS
+		"sFile01",
+		a.s_file02 AS "sFile02",
+		a.s_file03 AS "sFile03",
+		a.s_file04
+		AS
+		"sFile04",
+		a.s_enrolment AS "sEnrolment",
+		a.s_registnum AS
+		"sRegistnum",
+		a.s_actualnum AS "sActualnum",
+		a.s_spare01 AS "sSpare01",
+		a.s_spare02 AS
+		"sSpare02",
+		a.s_spare03 AS "sSpare03",
+		a.s_spare04 AS
+		"sSpare04",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks
+		AS "remarks",
+		a.del_flag AS "delFlag"
+	</sql>
+
+	<sql id="pbsActivityrecJoins">
+		LEFT JOIN pbs_activitytype type ON type.id = a.s_type
+		LEFT
+		JOIN pbs_partymem mem ON mem.id = a.s_mastermem
+	</sql>
+
+	<sql id="pbsActivityrecJoinsnotice">
+		LEFT JOIN pbs_actinotifications notice ON a.id =
+		notice.s_activityid
+	</sql>
+
+	<select id="get" resultType="PbsActivityrec">
+		SELECT
+		<include refid="pbsActivityrecColumns" />
+		FROM pbs_activityrec a
+		<include refid="pbsActivityrecJoins" />
+		WHERE a.id = #{id}
+	</select>
+
+	<select id="findList" resultType="PbsActivityrec">
+		SELECT
+		<include refid="pbsActivityrecColumns" />
+		FROM pbs_activityrec a
+		<include refid="pbsActivityrecJoins" />
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="sTitle != null and sTitle != ''">
+				AND a.s_title LIKE
+				<if test="dbName == 'oracle'">'%'||#{sTitle}||'%'</if>
+				<if test="dbName == 'mssql'">'%'+#{sTitle}+'%'</if>
+				<if test="dbName == 'mysql'">concat('%',#{sTitle},'%')</if>
+			</if>
+			<if test="sType != null and sType != ''">
+				AND a.s_type = #{sType}
+			</if>
+			<if test="sAttendorgs != null and sAttendorgs != ''">
+				AND a.s_attendorgs LIKE
+				<if test="dbName == 'oracle'">'%'||#{sAttendorgs}||'%'</if>
+				<if test="dbName == 'mssql'">'%'+#{sAttendorgs}+'%'</if>
+				<if test="dbName == 'mysql'">concat('%',#{sAttendorgs},'%')</if>
+			</if>
+			<if test="sAttendants != null and sAttendants != ''">
+				AND a.s_attendants LIKE CONCAT('%',#{sAttendants},'%')
+			</if>
+			<if
+				test="sMastermem != null and sMastermem != '' and sMastermem.id != null and sMastermem.id != ''">
+				AND a.s_mastermem = #{sMastermem.id}
+			</if>
+			<if
+				test="sMastermem != null and sMastermem != '' and sMastermem.sName != null and sMastermem.sName != ''">
+				AND mem.s_name like "%${sMastermem.sName}%"
+			</if>
+			<if test="dtStarttime != null and dtStarttime != ''">
+				AND a.dt_starttime &gt;= #{dtStarttime}
+			</if>
+			<if test="dtEndtime != null and dtEndtime != ''">
+				AND a.dt_endtime &lt;= #{dtEndtime}
+			</if>
+			<if test="sGroupType != null and sGroupType != ''">
+				AND type.s_group = #{sGroupType}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+
+	<select id="findAllList" resultType="PbsActivityrec">
+		SELECT
+		<include refid="pbsActivityrecColumns" />
+		FROM pbs_activityrec a
+		<include refid="pbsActivityrecJoins" />
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+
+	<insert id="insert">
+		INSERT INTO pbs_activityrec(
+		id,
+		s_title,
+		s_type,
+		s_content,
+		s_mastermem,
+		s_attendorgs,
+		s_attendants,
+		dt_starttime,
+		dt_endtime,
+		s_place,
+		s_stat,
+		s_description,
+		s_url,
+		s_flag,
+		s_file01,
+		s_file02,
+		s_file03,
+		s_file04,
+		s_enrolment,
+		s_registnum,
+		s_actualnum,
+		s_spare01,
+		s_spare02,
+		s_spare03,
+		s_spare04,
+		create_by,
+		create_date,
+		update_by,
+		update_date,
+		remarks,
+		del_flag
+		) VALUES (
+		#{id},
+		#{sTitle},
+		#{sType.id},
+		#{sContent},
+		#{sMastermem.id},
+		#{sAttendorgs},
+		#{sAttendants},
+		#{dtStarttime},
+		#{dtEndtime},
+		#{sPlace},
+		#{sStat},
+		#{sDescription},
+		#{sUrl},
+		#{sFlag},
+		#{sFile01},
+		#{sFile02},
+		#{sFile03},
+		#{sFile04},
+		#{sEnrolment},
+		#{sRegistnum},
+		#{sActualnum},
+		#{sSpare01},
+		#{sSpare02},
+		#{sSpare03},
+		#{sSpare04},
+		#{createBy.id},
+		#{createDate},
+		#{updateBy.id},
+		#{updateDate},
+		#{remarks},
+		#{delFlag}
+		)
+	</insert>
+
+	<update id="update">
+		UPDATE pbs_activityrec SET
+		s_title = #{sTitle},
+		s_type
+		= #{sType.id},
+		s_content = #{sContent},
+		s_mastermem = #{sMastermem.id},
+		s_attendorgs = #{sAttendorgs},
+		s_attendants = #{sAttendants},
+		dt_starttime = #{dtStarttime},
+		dt_endtime = #{dtEndtime},
+		s_place =
+		#{sPlace},
+		s_stat = #{sStat},
+		s_description = #{sDescription},
+		s_url =
+		#{sUrl},
+		s_flag = #{sFlag},
+		s_file01 = #{sFile01},
+		s_file02 = #{sFile02},
+		s_file03 = #{sFile03},
+		s_file04 = #{sFile04},
+		s_enrolment =
+		#{sEnrolment},
+		s_registnum = #{sRegistnum},
+		s_actualnum = #{sActualnum},
+		update_by = #{updateBy.id},
+		update_date = #{updateDate},
+		remarks =
+		#{remarks}
+		WHERE id = #{id}
+	</update>
+
+	<update id="updateNum">
+		UPDATE pbs_activityrec SET
+		s_enrolment =(SELECT
+		count(1) FROM
+		pbs_activityregist WHERE
+		pbs_activityregist.s_activityid =
+		#{id}
+		AND pbs_activityregist.del_flag = #{DEL_FLAG_NORMAL}),
+		s_registnum =
+		(SELECT count(1) FROM
+		pbs_activityleave
+		WHERE
+		pbs_activityleave.s_activityid = #{id}
+		AND pbs_activityleave.del_flag =
+		#{DEL_FLAG_NORMAL})+
+		(SELECT count(1) FROM pbs_activitysignin
+		WHERE
+		pbs_activitysignin.s_activityid = #{id}
+		AND pbs_activitysignin.del_flag
+		= #{DEL_FLAG_NORMAL})
+		,
+		s_actualnum = (SELECT count(1) FROM
+		pbs_activitysignin
+		WHERE pbs_activitysignin.s_activityid = #{id}
+		AND
+		pbs_activitysignin.del_flag = #{DEL_FLAG_NORMAL})
+		WHERE id = #{id}
+	</update>
+
+	<update id="delete">
+		UPDATE pbs_activityrec SET
+		del_flag =
+		#{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	<select id="findListBysAcceptorid" resultType="PbsActivityrec">
+		SELECT
+		<include refid="pbsActivityrecColumns" />
+		FROM
+		pbs_activityrec a
+		<include refid="pbsActivityrecJoins" />
+		<include refid="pbsActivityrecJoinsnotice" />
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			and type.del_flag = #{DEL_FLAG_NORMAL}
+			and mem.del_flag = #{DEL_FLAG_NORMAL}
+			and notice.del_flag =
+			#{DEL_FLAG_NORMAL}
+			<if
+				test="sAcceptorid != null and sAcceptorid != '' and sAcceptorid.id != null and sAcceptorid.id != ''">
+				and notice.s_acceptorid = #{sAcceptorid.id}
+			</if>
+		</where>
+		GROUP BY a.id
+		ORDER BY a.dt_starttime
+	</select>
+</mapper>

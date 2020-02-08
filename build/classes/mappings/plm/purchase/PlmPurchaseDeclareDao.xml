@@ -1,0 +1,175 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.arjjs.ccm.modules.plm.purchase.dao.PlmPurchaseDeclareDao">
+    
+	<sql id="plmPurchaseDeclareColumns">
+		a.id AS "id",
+		a.proc_ins_id AS "procInsId",
+		a.depart_id AS "depart.id",
+		a.apply_id AS "applyId",
+		a.apply_date AS "applyDate",
+		a.declare_total AS "declareTotal",
+		a.verify_total AS "verifyTotal",
+		a.describes AS "describes",
+		a.files AS "files",
+		a.type AS "type",
+		a.extend1 AS "extend1",
+		a.extend2 AS "extend2",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		u12.name AS "createBy.name",
+	    o3.name As  "depart.name",
+		a.del_flag AS "delFlag"
+	</sql>
+	
+	<sql id="plmPurchaseDeclareJoins">
+		LEFT JOIN sys_office o3 ON o3.id = a.depart_id
+		LEFT JOIN sys_user u12 ON u12.id = a.create_by
+	</sql>
+    
+	<select id="get" resultType="PlmPurchaseDeclare">
+		SELECT 
+			<include refid="plmPurchaseDeclareColumns"/>
+		FROM plm_purchase_declare a
+		<include refid="plmPurchaseDeclareJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="getByProcInsId" resultType="PlmPurchaseDeclare">
+		SELECT 
+			<include refid="plmPurchaseDeclareColumns"/>
+		FROM plm_purchase_declare a
+		<include refid="plmPurchaseDeclareJoins"/>
+		WHERE a.proc_ins_id = #{procInsId}
+	</select>
+	
+	<update id="updateProcInsId">
+		UPDATE plm_purchase_declare SET 
+			proc_ins_id = #{procInsId},
+			update_by = #{updateBy.id}, 
+			update_date = #{updateDate}
+		WHERE id = #{id}
+	</update>
+	
+	<select id="findList" resultType="PlmPurchaseDeclare">
+		SELECT 
+		   act.status AS "plmAct.status",
+			<include refid="plmPurchaseDeclareColumns"/>
+		FROM plm_purchase_declare a
+		LEFT JOIN plm_act act ON a.id = act.table_id
+		<include refid="plmPurchaseDeclareJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			 AND a.create_by = #{currentUser.id}
+			<if test="depart != null and depart.id != null and depart.id != ''">
+				AND a.depart_id = #{depart.id}
+			</if>
+			<if test="applyId != null and applyId != ''">
+				AND a.apply_id LIKE 
+					<if test="dbName == 'oracle'">'%'||#{applyId}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{applyId}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{applyId},'%')</if>
+			</if>
+			<if test="beginApplyDate != null and endApplyDate != null and beginApplyDate != '' and endApplyDate != ''">
+				AND a.apply_date BETWEEN #{beginApplyDate} AND #{endApplyDate}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="PlmPurchaseDeclare">
+		SELECT 
+			<include refid="plmPurchaseDeclareColumns"/>
+		FROM plm_purchase_declare a
+		<include refid="plmPurchaseDeclareJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO plm_purchase_declare(
+			id,
+			proc_ins_id,
+			depart_id,
+			apply_id,
+			apply_date,
+			declare_total,
+			verify_total,
+			describes,
+			files,
+			type,
+			extend1,
+			extend2,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag
+		) VALUES (
+			#{id},
+			#{procInsId},
+			#{depart.id},
+			#{applyId},
+			#{applyDate},
+			#{declareTotal},
+			#{verifyTotal},
+			#{describes},
+			#{files},
+			#{type},
+			#{extend1},
+			#{extend2},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE plm_purchase_declare SET 	
+			proc_ins_id = #{procInsId},
+			depart_id = #{depart.id},
+			apply_id = #{applyId},
+			apply_date = #{applyDate},
+			declare_total = #{declareTotal},
+			verify_total = #{verifyTotal},
+			describes = #{describes},
+			files = #{files},
+			type = #{type},
+			extend1 = #{extend1},
+			extend2 = #{extend2},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE plm_purchase_declare SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.arjjs.ccm.modules.pbs.flow.dao.PbsFnodeapproverDao">
+
+	<sql id="pbsFnodeapproverColumns">
+		a.id AS "id",
+		a.s_flowid AS "sFlowid.id",
+		a.s_flownodeid AS "sFlownodeid.id",
+		a.s_departmentid AS "sDepartmentid.id",
+		a.s_approver AS "sApprover.id",
+		a.s_description AS "sDescription",
+		a.s_spare01 AS
+		"sSpare01",
+		a.s_spare02 AS "sSpare02",
+		a.s_spare03 AS "sSpare03",
+		a.s_spare04 AS "sSpare04",
+		a.create_by AS "createBy.id",
+		a.create_date
+		AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS
+		"updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag",
+		flowdefinition.s_name AS "sFlowid.sName",
+		flownode.s_name AS "sFlownodeid.sName",
+		u5.s_name AS "sApprover.sName",
+        o4. NAME AS "sDepartmentid.name"
+	</sql>
+
+	<sql id="pbsFnodeapproverJoins">
+		LEFT JOIN sys_office o4 ON o4.id = a.s_departmentid
+		LEFT JOIN pbs_partymem u5 ON u5.id = a.s_approver
+		LEFT JOIN pbs_flowdefinition flowdefinition on
+		flowdefinition.id = a.s_flowid
+		LEFT JOIN pbs_flownode flownode on
+		flownode.id = a.s_flownodeid
+	</sql>
+
+	<select id="get" resultType="PbsFnodeapprover">
+		SELECT
+		<include refid="pbsFnodeapproverColumns" />
+		FROM pbs_fnodeapprover a
+		<include refid="pbsFnodeapproverJoins" />
+		WHERE a.id = #{id}
+	</select>
+
+	<select id="findList" resultType="PbsFnodeapprover">
+		SELECT
+		<include refid="pbsFnodeapproverColumns" />
+		FROM pbs_fnodeapprover a
+		<include refid="pbsFnodeapproverJoins" />
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>
+		<if test="sFlowid != null and sFlowid.sName !='' and sFlowid.sName != null">
+			AND flowdefinition.s_name LIKE CONCAT('%',#{sFlowid.sName},'%')
+		</if>
+		<if test="sFlownodeid != null and sFlownodeid.sName !='' and sFlownodeid.sName != null">
+			AND flownode.s_name LIKE CONCAT('%',#{sFlownodeid.sName},'%')
+		</if>
+		GROUP BY  a.id
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+
+	<select id="findAllList" resultType="PbsFnodeapprover">
+		SELECT
+		<include refid="pbsFnodeapproverColumns" />
+		FROM pbs_fnodeapprover a
+		<include refid="pbsFnodeapproverJoins" />
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+
+	<insert id="insert">
+		INSERT INTO pbs_fnodeapprover(
+		id,
+		s_flowid,
+		s_flownodeid,
+		s_departmentid,
+		s_approver,
+		s_description,
+		create_by,
+		create_date,
+		update_by,
+		update_date,
+		remarks,
+		del_flag
+		) VALUES (
+		#{id},
+		#{sFlowid.id},
+		#{sFlownodeid.id},
+		#{sDepartmentid.id},
+		#{sApprover.id},
+		#{sDescription},
+		#{createBy.id},
+		#{createDate},
+		#{updateBy.id},
+		#{updateDate},
+		#{remarks},
+		#{delFlag}
+		)
+	</insert>
+
+	<update id="update">
+		UPDATE pbs_fnodeapprover SET
+		s_flowid = #{sFlowid.id},
+		s_flownodeid = #{sFlownodeid.id},
+		s_departmentid = #{sDepartmentid.id},
+		s_approver = #{sApprover.id},
+		s_description = #{sDescription},
+		update_by = #{updateBy.id},
+		update_date = #{updateDate},
+		remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+
+	<update id="delete">
+		UPDATE pbs_fnodeapprover SET
+		del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+
+</mapper>

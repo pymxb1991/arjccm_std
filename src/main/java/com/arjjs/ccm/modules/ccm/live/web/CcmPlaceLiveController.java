@@ -1,0 +1,251 @@
+/**
+ * Copyright &copy; 2012-2016 <a href="https://github.com/thinkgem/jeesite">JeeSite</a> All rights reserved.
+ */
+package com.arjjs.ccm.modules.ccm.live.web;
+
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.util.List;
+import java.util.UUID;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.apache.shiro.authz.annotation.RequiresPermissions;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
+import com.arjjs.ccm.common.config.Global;
+import com.arjjs.ccm.common.persistence.Page;
+import com.arjjs.ccm.common.web.BaseController;
+import com.arjjs.ccm.common.utils.StringUtils;
+import com.arjjs.ccm.modules.ccm.live.entity.CcmPlaceLive;
+import com.arjjs.ccm.modules.ccm.live.service.CcmPlaceLiveService;
+import com.arjjs.ccm.modules.ccm.place.entity.CcmBasePlace;
+import com.arjjs.ccm.modules.ccm.place.service.CcmBasePlaceService;
+import com.arjjs.ccm.tool.CommUtil;
+
+/**
+ * 生活配套场所表Controller
+ * 
+ * @author lgh
+ * @version 2019-04-23
+ */
+@Controller
+@RequestMapping(value = "${adminPath}/live/ccmPlaceLive")
+public class CcmPlaceLiveController extends BaseController {
+
+	@Autowired
+	private CcmPlaceLiveService ccmPlaceLiveService;
+	@Autowired
+	private CcmBasePlaceService ccmBasePlaceService;
+
+	@ModelAttribute
+	public CcmPlaceLive get(@RequestParam(required = false) String id) {
+		CcmPlaceLive entity = null;
+		if (StringUtils.isNotBlank(id)) {
+			entity = ccmPlaceLiveService.get(id);
+		}
+		if (entity == null) {
+			entity = new CcmPlaceLive();
+		}
+		return entity;
+	}
+
+	@RequiresPermissions("live:ccmPlaceLive:view")
+	@RequestMapping(value = { "{type}" })
+	public String list(CcmPlaceLive ccmPlaceLive, HttpServletRequest request, HttpServletResponse response, Model model,
+			@PathVariable("type") String type) {
+		ccmPlaceLive.setType(type);
+		Page<CcmPlaceLive> page = ccmPlaceLiveService.findPage(new Page<CcmPlaceLive>(request, response), ccmPlaceLive);
+		List<CcmPlaceLive> lives = ccmPlaceLiveService.findList(ccmPlaceLive);
+		for (CcmPlaceLive live : lives) {
+			live.setCcmBasePlace(ccmBasePlaceService.get(live.getBasePlaceId()));
+		}
+		page.setList(lives);
+		model.addAttribute("page", page);
+
+		if ("1".equals(type)) {
+			return "ccm/live/ccmPlaceLiveList";
+		}
+		if ("2".equals(type)) {
+			return "ccm/live/ccmPlaceToiletList";
+		}
+		if ("3".equals(type)) {
+			return "ccm/live/ccmPlaceLiveHallList";
+		}
+		return "ccm/live/ccmPlaceLiveList";
+	}
+
+	@RequiresPermissions("live:ccmPlaceLive:view")
+	@RequestMapping(value = "form")
+	public String form1(CcmPlaceLive ccmPlaceLive, Model model) {
+		CcmBasePlace ccmBasePlace = new CcmBasePlace();
+		ccmBasePlace.setId(ccmPlaceLive.getBasePlaceId());
+		CcmBasePlace ccmBasePlace2 = ccmBasePlaceService.get(ccmBasePlace);
+		ccmPlaceLive.setCcmBasePlace(ccmBasePlace2);
+		model.addAttribute("ccmPlaceLive", ccmPlaceLive);
+		if ("1".equals(ccmPlaceLive.getType())) {
+			return "ccm/live/ccmPlaceLiveForm";
+		}
+		if ("2".equals(ccmPlaceLive.getType())) {
+			return "ccm/live/ccmPlaceToiletForm";
+		}
+		if ("3".equals(ccmPlaceLive.getType())) {
+			return "ccm/live/ccmPlaceLiveHallForm";
+		}
+		return "ccm/live/ccmPlaceLiveForm";
+	}
+
+	@RequiresPermissions("live:ccmPlaceLive:view")
+	@RequestMapping(value = "form/toilet")
+	public String form2(CcmPlaceLive ccmPlaceLive, Model model) {
+		CcmBasePlace ccmBasePlace = new CcmBasePlace();
+		ccmBasePlace.setId(ccmPlaceLive.getBasePlaceId());
+		CcmBasePlace ccmBasePlace2 = ccmBasePlaceService.get(ccmBasePlace);
+		ccmPlaceLive.setCcmBasePlace(ccmBasePlace2);
+		model.addAttribute("ccmPlaceLive", ccmPlaceLive);
+		if ("1".equals(ccmPlaceLive.getType())) {
+			return "ccm/live/ccmPlaceLiveForm";
+		}
+		if ("2".equals(ccmPlaceLive.getType())) {
+			return "ccm/live/ccmPlaceToiletForm";
+		}
+        if ("3".equals(ccmPlaceLive.getType())) {
+            return "ccm/live/ccmPlaceLiveHallForm";
+        }
+		return "ccm/live/ccmPlaceToiletForm";
+	}
+
+	@RequiresPermissions("live:ccmPlaceLive:edit")
+	@RequestMapping(value = "save")
+	public void saveLive(CcmPlaceLive ccmPlaceLive, Model model, RedirectAttributes redirectAttributes,
+			HttpServletResponse response) {
+		if (!beanValidator(model, ccmPlaceLive)) {
+			// return form(ccmPlaceLive, model);
+		}
+
+		// 处理场所基本信息
+		if (null == ccmPlaceLive.getBasePlaceId() || "".equals(ccmPlaceLive.getBasePlaceId())) {
+			CcmBasePlace ccmBasePlace = ccmPlaceLive.getCcmBasePlace();
+			String id = UUID.randomUUID().toString();
+			ccmBasePlace.setId(id);
+			ccmBasePlace.setIsNewRecord(true);
+			ccmBasePlace.setPlaceType("ccm_place_live");
+			ccmBasePlaceService.save(ccmBasePlace);
+			ccmPlaceLive.setCcmBasePlace(ccmBasePlace);
+			ccmPlaceLive.setBasePlaceId(id);
+		} else {
+			CcmBasePlace ccmBasePlace = ccmPlaceLive.getCcmBasePlace();
+			ccmBasePlace.setId(ccmPlaceLive.getBasePlaceId());
+			ccmBasePlace.setPlaceType("ccm_place_live");
+			ccmBasePlaceService.save(ccmBasePlace);
+			ccmPlaceLive.setCcmBasePlace(ccmBasePlace);
+		}
+
+		ccmPlaceLive.setType("1");
+		ccmPlaceLiveService.save(ccmPlaceLive);
+		PrintWriter out = null;
+		try {
+			out = response.getWriter();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		CommUtil.openWinExpDiv(out, "保存农贸市场成功");
+	}
+
+	@RequiresPermissions("live:ccmPlaceLive:edit")
+	@RequestMapping(value = "save/toilet")
+	public void saveToilet(CcmPlaceLive ccmPlaceLive, Model model, RedirectAttributes redirectAttributes,
+			HttpServletResponse response) {
+		if (!beanValidator(model, ccmPlaceLive)) {
+			// return form(ccmPlaceLive, model);
+		}
+
+		// 处理场所基本信息
+		if (null == ccmPlaceLive.getBasePlaceId() || "".equals(ccmPlaceLive.getBasePlaceId())) {
+			CcmBasePlace ccmBasePlace = ccmPlaceLive.getCcmBasePlace();
+			String id = UUID.randomUUID().toString();
+			ccmBasePlace.setId(id);
+			ccmBasePlace.setIsNewRecord(true);
+			ccmBasePlace.setPlaceType("ccm_place_live");
+			ccmBasePlaceService.save(ccmBasePlace);
+			ccmPlaceLive.setCcmBasePlace(ccmBasePlace);
+			ccmPlaceLive.setBasePlaceId(id);
+		} else {
+			CcmBasePlace ccmBasePlace = ccmPlaceLive.getCcmBasePlace();
+			ccmBasePlace.setId(ccmPlaceLive.getBasePlaceId());
+			ccmBasePlace.setPlaceType("ccm_place_live");
+			ccmBasePlaceService.save(ccmBasePlace);
+			ccmPlaceLive.setCcmBasePlace(ccmBasePlace);
+		}
+
+		ccmPlaceLive.setType("2");
+		ccmPlaceLiveService.save(ccmPlaceLive);
+		addMessage(redirectAttributes, "保存生活配套场所成功");
+		PrintWriter out = null;
+		try {
+			out = response.getWriter();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		CommUtil.openWinExpDiv(out, "保存公厕场所成功");
+	}
+
+    @RequiresPermissions("live:ccmPlaceLive:edit")
+    @RequestMapping(value = "save/hall")
+    public void saveHall(CcmPlaceLive ccmPlaceLive, Model model, RedirectAttributes redirectAttributes,
+                           HttpServletResponse response) {
+        if (!beanValidator(model, ccmPlaceLive)) {
+            // return form(ccmPlaceLive, model);
+        }
+
+        // 处理场所基本信息
+        if (null == ccmPlaceLive.getBasePlaceId() || "".equals(ccmPlaceLive.getBasePlaceId())) {
+            CcmBasePlace ccmBasePlace = ccmPlaceLive.getCcmBasePlace();
+            String id = UUID.randomUUID().toString();
+            ccmBasePlace.setId(id);
+            ccmBasePlace.setIsNewRecord(true);
+            ccmBasePlace.setPlaceType("ccm_place_live");
+            ccmBasePlaceService.save(ccmBasePlace);
+            ccmPlaceLive.setCcmBasePlace(ccmBasePlace);
+            ccmPlaceLive.setBasePlaceId(id);
+        } else {
+            CcmBasePlace ccmBasePlace = ccmPlaceLive.getCcmBasePlace();
+            ccmBasePlace.setId(ccmPlaceLive.getBasePlaceId());
+            ccmBasePlace.setPlaceType("ccm_place_live");
+            ccmBasePlaceService.save(ccmBasePlace);
+            ccmPlaceLive.setCcmBasePlace(ccmBasePlace);
+        }
+
+        ccmPlaceLive.setType("3");
+        ccmPlaceLiveService.save(ccmPlaceLive);
+        addMessage(redirectAttributes, "保存生活配套场所成功");
+        PrintWriter out = null;
+        try {
+            out = response.getWriter();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        CommUtil.openWinExpDiv(out, "保存营业厅场所成功");
+    }
+
+	@RequiresPermissions("live:ccmPlaceLive:edit")
+	@RequestMapping(value = "delete")
+	public String delete(CcmPlaceLive ccmPlaceLive, RedirectAttributes redirectAttributes) {
+		if (ccmPlaceLive.getBasePlaceId() != null && !ccmPlaceLive.getBasePlaceId().equals("")) {
+			CcmBasePlace ccmBasePlace = ccmBasePlaceService.get(ccmPlaceLive.getBasePlaceId());
+			ccmBasePlaceService.delete(ccmBasePlace);
+		}
+		ccmPlaceLiveService.delete(ccmPlaceLive);
+		addMessage(redirectAttributes, "删除生活配套场所成功");
+		return "redirect:" + Global.getAdminPath() + "/live/ccmPlaceLive/" + ccmPlaceLive.getType() + "?repage";
+	}
+
+}

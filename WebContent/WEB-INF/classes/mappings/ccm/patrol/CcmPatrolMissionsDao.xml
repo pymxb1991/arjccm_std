@@ -1,0 +1,184 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.arjjs.ccm.modules.ccm.patrol.dao.CcmPatrolMissionsDao">
+    
+	<sql id="ccmPatrolMissionsColumns">
+		a.id AS "id",
+		a.patrol_content AS "patrolContent",
+		a.patrol_time AS "patrolTime",
+		a.office_id AS "office",
+		a.number AS "number",
+		a.patrol_routes AS "patrolRoutes",
+		a.area_id AS "area.id",
+		a.status AS "status",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.end_time AS "endTime",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag",
+		a.auditing_status AS "auditingStatus",
+		a7.name AS "area.name"
+	</sql>
+
+	<sql id="ccmPatrolMissionsColumnsNotJoin">
+		a.id AS "id",
+		a.patrol_content AS "patrolContent",
+		a.patrol_time AS "patrolTime",
+		a.office_id AS "office",
+		a.number AS "number",
+		a.patrol_routes AS "patrolRoutes",
+		a.area_id AS "area.id",
+		a.status AS "status",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.end_time AS "endTime",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.auditing_status AS "auditingStatus",
+		a.del_flag AS "delFlag"
+	</sql>
+	
+	<sql id="ccmPatrolMissionsJoins">
+		LEFT JOIN sys_area a7 ON a7.id = a.area_id
+	</sql>
+    
+	<select id="get" resultType="CcmPatrolMissions">
+		SELECT 
+			<include refid="ccmPatrolMissionsColumns"/>
+		FROM ccm_patrol_missions a
+		<include refid="ccmPatrolMissionsJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="CcmPatrolMissions">
+		SELECT 
+			<include refid="ccmPatrolMissionsColumns"/>
+		FROM ccm_patrol_missions a
+		<include refid="ccmPatrolMissionsJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="office != null and office != null and office != ''">
+				AND a.office_id like concat('%',#{office},'%')
+			</if>
+			<if test="area != null and area.id != null and area.id != ''">
+				AND a.area_id = #{area.id}
+			</if>
+			<if test="patrolTime != null and patrolTime != '' ">
+				AND a.patrol_time &gt;  #{patrolTime}
+			</if>
+			<if test="endTime != null and endTime != ''">
+				AND a.end_time &lt; #{endTime}
+			</if>
+			<if test="auditingStatus != null and auditingStatus != ''">
+				AND a.auditing_status = #{auditingStatus}
+			</if>
+			<if test="patrolContent != null and patrolContent != ''">
+				AND a.patrol_content like concat('%',#{patrolContent},'%')
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="CcmPatrolMissions">
+		SELECT 
+			<include refid="ccmPatrolMissionsColumns"/>
+		FROM ccm_patrol_missions a
+		<include refid="ccmPatrolMissionsJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO ccm_patrol_missions(
+			id,
+			patrol_content,
+			patrol_time,
+			office_id,
+			number,
+			patrol_routes,
+			area_id,
+			status,
+			create_by,
+			create_date,
+			end_time,
+			update_by,
+			update_date,
+			remarks,
+			auditing_status,
+			del_flag
+		) VALUES (
+			#{id},
+			#{patrolContent},
+			#{patrolTime},
+			#{office},
+			#{number},
+			#{patrolRoutes},
+			#{area.id},
+			#{status},
+			#{createBy.id},
+			#{createDate},
+			#{endTime},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{auditingStatus},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE ccm_patrol_missions SET 	
+			patrol_content = #{patrolContent},
+			patrol_time = #{patrolTime},
+			office_id = #{office},
+			number = #{number},
+			patrol_routes = #{patrolRoutes},
+			area_id = #{area.id},
+			status = #{status},
+			end_time = #{endTime},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			auditing_status = #{auditingStatus},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+
+	<update id="updateStatus">
+		UPDATE ccm_patrol_missions SET
+			status = #{param1}
+		WHERE id = #{param2}
+	</update>
+	
+	<update id="delete">
+		UPDATE ccm_patrol_missions SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	<select id="findListByDate" resultType="CcmPatrolMissions">
+		SELECT
+		<include refid="ccmPatrolMissionsColumnsNotJoin"/>
+		FROM ccm_patrol_missions a
+		WHERE a.create_date &gt; #{startDate} and a.create_date &lt;#{endDate}
+		and a.del_flag = 0
+		ORDER by a.create_date asc
+	</select>
+</mapper>

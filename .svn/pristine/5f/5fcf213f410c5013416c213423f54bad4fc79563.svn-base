@@ -1,0 +1,89 @@
+/**
+ * Copyright &copy; 2012-2016 <a href="https://github.com/thinkgem/jeesite">JeeSite</a> All rights reserved.
+ */
+package com.arjjs.ccm.modules.ccm.casino.web;
+
+import java.util.List;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.apache.shiro.authz.annotation.RequiresPermissions;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
+import com.arjjs.ccm.common.config.Global;
+import com.arjjs.ccm.common.persistence.Page;
+import com.arjjs.ccm.common.web.BaseController;
+import com.arjjs.ccm.common.utils.StringUtils;
+import com.arjjs.ccm.modules.ccm.casino.entity.CcmPlaceCasino;
+import com.arjjs.ccm.modules.ccm.casino.service.CcmPlaceCasinoService;
+import com.arjjs.ccm.modules.ccm.place.entity.CcmBasePlace;
+import com.arjjs.ccm.modules.ccm.place.service.CcmBasePlaceService;
+
+/**
+ * 娱乐场所Controller
+ * @author ljd
+ * @version 2019-04-25
+ */
+@Controller
+@RequestMapping(value = "${adminPath}/casino/ccmPlaceCasino")
+public class CcmPlaceCasinoController extends BaseController {
+
+	@Autowired
+	private CcmPlaceCasinoService ccmPlaceCasinoService;
+	
+	@ModelAttribute
+	public CcmPlaceCasino get(@RequestParam(required=false) String id) {
+		CcmPlaceCasino entity = null;
+		if (StringUtils.isNotBlank(id)){
+			entity = ccmPlaceCasinoService.get(id);
+		}
+		if (entity == null){
+			entity = new CcmPlaceCasino();
+		}
+		return entity;
+	}
+	
+	@RequiresPermissions("casino:ccmPlaceCasino:view")
+	@RequestMapping(value = {"list", ""})
+	public String list(CcmPlaceCasino ccmPlaceCasino, HttpServletRequest request, HttpServletResponse response, Model model) {
+		Page<CcmPlaceCasino> page = ccmPlaceCasinoService.findPage(new Page<CcmPlaceCasino>(request, response), ccmPlaceCasino);
+		List<CcmPlaceCasino> findList = ccmPlaceCasinoService.findList(ccmPlaceCasino);
+		page.setList(findList);
+		model.addAttribute("page", page);
+		return "ccm/casino/ccmPlaceCasinoList";
+	}
+
+	@RequiresPermissions("casino:ccmPlaceCasino:view")
+	@RequestMapping(value = "form")
+	public String form(CcmPlaceCasino ccmPlaceCasino, Model model) {
+		model.addAttribute("ccmPlaceCasino", ccmPlaceCasino);
+		return "ccm/casino/ccmPlaceCasinoForm";
+	}
+
+	@RequiresPermissions("casino:ccmPlaceCasino:edit")
+	@RequestMapping(value = "save")
+	public String save(CcmPlaceCasino ccmPlaceCasino, Model model, RedirectAttributes redirectAttributes) {
+		if (!beanValidator(model, ccmPlaceCasino)){
+			return form(ccmPlaceCasino, model);
+		}
+		ccmPlaceCasinoService.save(ccmPlaceCasino);
+		addMessage(redirectAttributes, "保存娱乐场所成功");
+		return "redirect:"+Global.getAdminPath()+"/casino/ccmPlaceCasino/?repage";
+	}
+	
+	@RequiresPermissions("casino:ccmPlaceCasino:edit")
+	@RequestMapping(value = "delete")
+	public String delete(CcmPlaceCasino ccmPlaceCasino, RedirectAttributes redirectAttributes) {
+		ccmPlaceCasinoService.delete(ccmPlaceCasino);
+		addMessage(redirectAttributes, "删除娱乐场所成功");
+		return "redirect:"+Global.getAdminPath()+"/casino/ccmPlaceCasino/?repage";
+	}
+
+}

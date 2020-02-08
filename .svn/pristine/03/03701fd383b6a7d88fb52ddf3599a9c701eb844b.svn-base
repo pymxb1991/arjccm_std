@@ -1,0 +1,268 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.arjjs.ccm.modules.ccm.house.dao.CcmHouseAidsDao">
+
+	<sql id="ccmHouseAidsColumns">
+		a.id AS "id",
+		a.people_id AS "peopleId",
+		a.infe_route AS
+		"infeRoute",
+		a.crim_past AS "crimPast",
+		a.crim_stat AS "crimStat",
+		a.cate_case AS "cateCase",
+		a.atte_type AS "atteType",
+		a.help_case AS
+		"helpCase",
+		a.help_name AS "helpName",
+		a.help_tel AS "helpTel",
+		a.trea_case AS "treaCase",
+		a.institutions AS "institutions",
+		a.attention AS "attention",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks
+		AS "remarks",
+		a.del_flag AS "delFlag"
+	</sql>
+
+	<sql id="ccmHouseAidsAllColumns">
+		a.id AS "id",
+		a.people_id AS "peopleId",
+		a.infe_route AS "infeRoute",
+		a.crim_past AS "crimPast",
+		a.crim_stat AS "crimStat",
+		a.cate_case AS "cateCase",
+		a.atte_type AS "atteType",
+		a.help_case AS
+		"helpCase",
+		a.help_name AS "helpName",
+		a.help_tel AS "helpTel",
+		a.trea_case AS "treaCase",
+		a.institutions AS "institutions",
+		a.attention AS "attention",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks
+		AS "remarks",
+		a.del_flag AS "delFlag",
+
+
+		b.ident AS "ident",
+		b. NAME AS
+		"name",
+		b.sex AS "sex",
+		b.censu AS "censu",
+		b.telephone AS "telephone",
+		b.type AS "type",
+		b.domiciledetail AS
+		"domiciledetail",
+		b.residencedetail AS "residencedetail",
+		b.images AS
+		"images",
+		b.birthday AS "birthday",
+		a20.name AS "comName",
+        (case a.atte_type when 01 then '高' when 02 then '中' when 03 then '低' else '' end) "atteTypeLable"
+	</sql>
+
+	<sql id="ccmHouseAidsJoins">
+	</sql>
+	<!--区域-->
+	<sql id="ccmHouseAidsComJoins">
+		LEFT JOIN sys_area a20 ON a20.id = b.area_com_id
+	</sql>
+	<sql id="ccmHouseAidsGridJoins">
+		LEFT JOIN sys_area a21 ON a21.id = b.area_grid_id
+	</sql>
+	<!--主表-->
+	<sql id="ccmHouseAidsPopJoins">
+	</sql>
+	<select id="get" resultType="CcmHouseAids">
+		SELECT
+		<include refid="ccmHouseAidsAllColumns" />
+		FROM
+		ccm_house_aids a
+		LEFT JOIN ccm_people b ON a.people_id = b.id
+		<include refid="ccmHouseAidsJoins" />
+		<include refid="ccmHouseAidsComJoins" />
+		<include refid="ccmHouseAidsGridJoins" />
+		WHERE a.id = #{id}
+	</select>
+
+	<select id="getItemByPeopleId" resultType="CcmHouseAids">
+		SELECT
+		<include refid="ccmHouseAidsAllColumns" />
+		FROM
+		ccm_house_aids a
+		LEFT JOIN ccm_people b  ON a.people_id = b.id
+		<include refid="ccmHouseAidsComJoins" />
+		<include refid="ccmHouseAidsGridJoins" />
+		<where>
+			a.people_id = #{id}
+			and
+			a.del_flag = '0'
+		</where>
+	</select>
+
+	<select id="findList" resultType="CcmHouseAids">
+		SELECT
+		<include refid="ccmHouseAidsAllColumns" />
+		FROM
+		ccm_house_aids a
+		LEFT JOIN ccm_people b ON a.people_id = b.id
+		<include refid="ccmHouseAidsJoins" />
+		<include refid="ccmHouseAidsComJoins" />
+		<include refid="ccmHouseAidsGridJoins" />
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="peopleId != null and peopleId != ''">
+				AND a.people_id = #{peopleId}
+			</if>
+			<if test="name != null and name != ''">
+				AND b.name LIKE
+				<if test="dbName == 'oracle'">'%'||#{name}||'%'</if>
+				<if test="dbName == 'mssql'">'%'+#{name}+'%'</if>
+				<if test="dbName == 'mysql'">concat('%',#{name},'%')</if>
+			</if>
+
+			<if test="ident != null and ident != ''">
+				AND b.ident LIKE
+				<if test="dbName == 'oracle'">'%'||#{ident}||'%'</if>
+				<if test="dbName == 'mssql'">'%'+#{ident}+'%'</if>
+				<if test="dbName == 'mysql'">concat('%',#{ident},'%')</if>
+			</if>
+			<if test="censu != null and censu != ''">
+				AND b.censu LIKE
+				<if test="dbName == 'oracle'">'%'||#{censu}||'%'</if>
+				<if test="dbName == 'mssql'">'%'+#{censu}+'%'</if>
+				<if test="dbName == 'mysql'">concat('%',#{censu},'%')</if>
+			</if>
+			<if test="telephone != null and telephone != ''">
+				AND b.telephone LIKE
+				<if test="dbName == 'oracle'">'%'||#{telephone}||'%'</if>
+				<if test="dbName == 'mssql'">'%'+#{telephone}+'%'</if>
+				<if test="dbName == 'mysql'">concat('%',#{telephone},'%')</if>
+			</if>
+			<if test="sex != null and sex != ''">
+				AND b.sex = #{sex}
+			</if>
+			<if test="crimPast != null and crimPast != ''">
+				AND a.crim_past = #{crimPast}
+			</if>
+			<if test="atteType != null and atteType != ''">
+				AND a.atte_type = #{atteType}
+			</if>
+			<if test="treaCase != null and treaCase != ''">
+				AND a.trea_case = #{treaCase}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+
+	<select id="findAllList" resultType="CcmHouseAids">
+		SELECT
+		<include refid="ccmHouseAidsColumns" />
+		FROM ccm_house_aids a
+		<include refid="ccmHouseAidsJoins" />
+		<include refid="ccmHouseAidsComJoins" />
+		<include refid="ccmHouseAidsGridJoins" />
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+
+	<insert id="insert">
+		INSERT INTO ccm_house_aids(
+		id,
+		people_id,
+		infe_route,
+		crim_past,
+		crim_stat,
+		cate_case,
+		atte_type,
+		help_case,
+		help_name,
+		help_tel,
+		trea_case,
+		institutions,
+		attention,
+		create_by,
+		create_date,
+		update_by,
+		update_date,
+		remarks,
+		del_flag
+		) VALUES (
+		#{id},
+		#{peopleId},
+		#{infeRoute},
+		#{crimPast},
+		#{crimStat},
+		#{cateCase},
+		#{atteType},
+		#{helpCase},
+		#{helpName},
+		#{helpTel},
+		#{treaCase},
+		#{institutions},
+		#{attention},
+		#{createBy.id},
+		#{createDate},
+		#{updateBy.id},
+		#{updateDate},
+		#{remarks},
+		#{delFlag}
+		)
+	</insert>
+
+	<update id="update">
+		UPDATE ccm_house_aids SET
+		people_id = #{peopleId},
+		infe_route = #{infeRoute},
+		crim_past = #{crimPast},
+		crim_stat =
+		#{crimStat},
+		cate_case = #{cateCase},
+		atte_type = #{atteType},
+		help_case
+		= #{helpCase},
+		help_name = #{helpName},
+		help_tel = #{helpTel},
+		trea_case
+		= #{treaCase},
+		institutions = #{institutions},
+		attention = #{attention},
+		update_by =
+		#{updateBy.id},
+		update_date = #{updateDate},
+		remarks = #{remarks}
+		WHERE
+		id = #{id}
+	</update>
+
+	<update id="delete">
+		UPDATE ccm_house_aids SET
+		del_flag =
+		#{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+
+</mapper>

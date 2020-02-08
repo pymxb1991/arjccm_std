@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.arjjs.ccm.modules.ccm.ccmsys.dao.CcmLiveVideoDao">
+    
+	<sql id="ccmLiveVideoColumns">
+		a.id AS "id",
+		a.parent_id AS "parent.id",
+		a.parent_ids AS "parentIds",
+		a.name AS "name",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag"
+	</sql>
+	
+	<sql id="ccmLiveVideoJoins">
+	</sql>
+    
+	<select id="get" resultType="CcmLiveVideo">
+		SELECT 
+			<include refid="ccmLiveVideoColumns"/>
+		FROM sys_area a
+		<include refid="ccmLiveVideoJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findAreaDeviceList" resultType="CcmDevice">
+		SELECT
+			a.id AS "id",
+			a.parent_id AS "parent.id",
+			a.parent_ids AS "parentIds",
+			a. NAME AS "name",
+			'area' AS "typeId"
+		FROM
+			sys_area a
+		WHERE
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			and a.parent_ids LIKE
+			<if test="dbName == 'oracle'">'%'||#{currentUser.office.area.id}||'%'</if>
+			<if test="dbName == 'mssql'">'%'+#{currentUser.office.area.id}+'%'</if>
+			<if test="dbName == 'mysql'">concat('%',#{currentUser.office.area.id},'%')</if>
+			or a.id = #{currentUser.office.area.id}
+			
+		UNION ALL
+			SELECT
+				d.id AS "id",
+				d.area_id AS "parent.id",
+				d.area_id AS "parentIds",
+				d. NAME AS "name",
+				'camera' AS "typeId"
+			FROM
+				ccm_device d
+			LEFT JOIN sys_area a17 ON a17.id = d.area_id
+			WHERE
+				d.type_id = '003'
+			AND d.del_flag = #{DEL_FLAG_NORMAL}	
+		<!--  
+		SELECT
+			d.id AS "id",
+			d.area_id AS "parent.id",
+			d.area_id AS "parentIds",
+			d. NAME AS "name",
+			'camera' AS "typeId"
+		FROM
+			ccm_device d
+		WHERE
+			d.type_id = '003'
+			and  d.del_flag = #{DEL_FLAG_NORMAL}
+		UNION ALL
+			SELECT
+				a.id AS "id",
+				a.parent_id AS "parent.id",
+				a.parent_ids AS "parentIds",
+				a. NAME AS "name",
+				'area' AS "typeId"
+			FROM
+				sys_area a  
+			WHERE a.del_flag = #{DEL_FLAG_NORMAL}
+		-->
+	</select>
+	
+	
+</mapper>

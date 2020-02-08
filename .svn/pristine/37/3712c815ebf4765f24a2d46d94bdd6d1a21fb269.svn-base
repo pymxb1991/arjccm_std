@@ -1,0 +1,140 @@
+<%@ page contentType="text/html;charset=UTF-8"%>
+<%@ include file="/WEB-INF/views/include/taglib.jsp"%>
+<html>
+<head>
+<title>工作日志管理</title>
+<meta name="decorator" content="default" />
+<script type="text/javascript">
+	$(document).ready(function() {
+		debugger;
+		$("#btnSubmit").on("click" ,function(){
+			$("#searchForm").submit();
+		})
+		// $("#btnExport").click(
+		// 	function() {
+		//
+		// 	}
+		// );
+	});
+	function exportExcel() {
+		top.$.jBox.confirm("确认要导出数据吗？", "系统提示", function(v, h, f) {
+			if (v == "ok") {
+				// 借用导出action
+				$("#searchForm").attr("action", "${ctx}/sys/ccmWorkReport/exportWorkReport");
+				$("#searchForm").submit();
+				// 还原查询action
+				$("#searchForm").attr("action", "${ctx}/sys/ccmWorkReport");
+			}
+		}, {
+			buttonsFocus : 1
+		});
+		top.$('.jbox-body .jbox-icon').css('top', '55px');
+	}
+	function page(n, s) {
+		$("#pageNo").val(n);
+		$("#pageSize").val(s);
+		$("#searchForm").submit();
+		return false;
+	}
+</script>
+</head>
+<body>
+
+<%--<img  src="${ctxStatic}/images/shouyedaohang.png"; class="nav-home">--%>
+<%--<span class="nav-position">当前位置 ：</span><span class="nav-menu"><%=session.getAttribute("activeMenuName")%>></span><span class="nav-menu2">个人办公</span>--%>
+<ul class="back-list">
+	<ul class="nav nav-tabs">
+		<li class="active" style="width: 112px"><a class="nav-head" href="${ctx}/sys/ccmWorkReport/">数据列表</a></li>
+		<shiro:hasPermission name="sys:ccmWorkReport:edit">
+			<li style="width: 112px"><a style="text-align: center" href="${ctx}/sys/ccmWorkReport/form">数据添加</a></li>
+		</shiro:hasPermission>
+
+	</ul>
+	<form:form id="searchForm" modelAttribute="ccmWorkReport"
+		action="${ctx}/sys/ccmWorkReport/" method="post"
+		class="breadcrumb form-search">
+		<input id="pageNo" name="pageNo" type="hidden" value="${page.pageNo}" />
+		<input id="pageSize" name="pageSize" type="hidden"
+			value="${page.pageSize}" />
+		<ul class="ul-form">
+			<li class="first-line"><label>类型：</label> <form:select path="type"
+					class="input-medium">
+					<form:option value="" label="全部" />
+					<form:options items="${fns:getDictList('ccm_work_report_type')}"
+						itemLabel="label" itemValue="value" htmlEscape="false" />
+				</form:select></li>
+			<li class="first-line"><label>提交开始日期：</label> <input name="beginDate" type="text"
+				readonly="readonly" maxlength="20" class="input-medium Wdate"
+				value="<fmt:formatDate value="${ccmWorkReport.beginDate}" pattern="yyyy-MM-dd HH:mm:ss"/>" onclick="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss',isShowClear:false});" /></li>
+			<li class="first-line"><label>提交结束日期：</label><input name="endDate" type="text" readonly="readonly"
+				maxlength="20" class="input-medium Wdate"
+				value="<fmt:formatDate value="${ccmWorkReport.endDate}" pattern="yyyy-MM-dd HH:mm:ss"/>"
+				onclick="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss',isShowClear:false});" />
+			</li>
+			<li class="first-line"><label>标题：</label> <form:input path="title"
+					htmlEscape="false" maxlength="100" class="input-medium" /></li>
+			<!-- <li class="btns"><input id="btnSubmit" class="btn btn-primary"
+				type="submit" value="查询" /></li> -->
+
+			<li class="clearfix"></li>
+		</ul>
+	</form:form>
+	<sys:message content="${message}" />
+	<ul>
+		<li class="btns">
+			<button href="javascript:;" id="btnSubmit" class="btn btn-primary" style="width: 75px;display:inline-block;float: right;margin-left: 20px;margin-right: 14px;margin-bottom: 20px">
+				<i></i> <span style="font-size: 12px">查询</span> </button>
+			<a href="javascript:;" id="btnExport" onclick="exportExcel()" class="btn btn-export" style="width: 49px;display:inline-block;float: right;margin-left: 20px;margin-bottom: 20px">
+				<i></i><span style="font-size: 12px">导出</span>
+			</a>
+		</li>
+	</ul>
+	<table id="contentTable"
+		class="table table-striped table-bordered table-condensed table-gradient">
+		<thead>
+			<tr>
+				<th>标题</th>
+				<th>类型</th>
+				<th>日志时间范围</th>
+				<th>提交时间</th>
+				<th>查阅状态</th>
+
+				<shiro:hasPermission name="sys:ccmWorkReport:edit">
+					<th>操作</th>
+				</shiro:hasPermission>
+			</tr>
+		</thead>
+		<tbody>
+			<c:forEach items="${page.list}" var="ccmWorkReport">
+				<tr>
+					<td><a
+						href="${ctx}/sys/ccmWorkReport/form?id=${ccmWorkReport.id}">${ccmWorkReport.title}
+					</a></td>
+					<td>${fns:getDictLabel(ccmWorkReport.type, 'ccm_work_report_type', '')}
+					</td>
+					<td><fmt:formatDate value="${ccmWorkReport.beginDate}"
+							pattern="yyyy-MM-dd" /> - <fmt:formatDate
+							value="${ccmWorkReport.endDate}" pattern="yyyy-MM-dd" /></td>
+
+					<td><fmt:formatDate value="${ccmWorkReport.createDate}"
+							pattern="yyyy-MM-dd HH:mm:ss" /></td>
+					<td><c:if test="${requestScope.ccmWorkReport.self}">
+                        ${fns:getDictLabel(oaNotify.readFlag, 'oa_notify_read', '')}
+                    </c:if> <c:if test="${!requestScope.ccmWorkReport.self}">
+                        ${ccmWorkReport.readNum} / ${ccmWorkReport.readNum + ccmWorkReport.unReadNum}
+                    </c:if></td>
+					<shiro:hasPermission name="sys:ccmWorkReport:edit">
+						<td><a class="btnList"
+							href="${ctx}/sys/ccmWorkReport/form?id=${ccmWorkReport.id}" title="查看"><i class="icon-file"></i></a>
+							<a class="btnList"
+							href="${ctx}/sys/ccmWorkReport/delete?id=${ccmWorkReport.id}"
+							onclick="return confirmx('确认要删除该工作日志吗？', this.href)" title="删除"><i class="icon-trash"></i></a>
+					</shiro:hasPermission>
+				</tr>
+			</c:forEach>
+		</tbody>
+	</table>
+	<div class="pagination" style="float: right; margin-top: 12px">${page}</div>
+</ul>
+</body>
+</html>

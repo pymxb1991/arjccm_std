@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.arjjs.ccm.modules.ccm.rest.dao.AlarmHandleFileDao">
+
+	<insert id="insertAlarmHandleFile" parameterType="com.arjjs.ccm.modules.ccm.rest.entity.AlarmHandleFile">
+        insert into bph_alarm_handle_file
+         (id, alarm_handle_id, type, path,url_path ,content_type,extension,file_name, create_by, create_date, update_by, update_date, remarks, del_flag,duration,thumbnail,md5_value)
+         values
+         (#{id}, #{alarmHandleId}, #{type}, #{path},#{urlPath},#{contentType},#{extension}, #{fileName},  #{createBy}, now(), #{createBy}, now(), #{remarks}, #{delFlag},#{duration},#{thumbnail},#{md5Value})
+    </insert>
+
+</mapper>

@@ -1,0 +1,520 @@
+<%@ page contentType="text/html;charset=UTF-8" %>
+<%@ include file="/WEB-INF/views/include/taglib.jsp"%>
+<html>
+<head>
+	<title>重大事项数据分析</title>
+	<meta name="decorator" content="default"/>
+	<style>
+	.common-pading{
+	  width:100%;
+	  height:200px;
+	  padding:5px;
+	}
+	.echarts{
+	  width:100%;
+	  height:100%;
+	}
+	
+	
+	</style>
+	<script type="text/javascript">
+		$(document).ready(function() {
+			
+		});
+		function page(n,s){
+			$("#pageNo").val(n);
+			$("#pageSize").val(s);
+			$("#searchForm").submit();
+        	return false;
+        }
+	</script>
+</head>
+<body>
+	<ul class="nav nav-tabs">
+		<li class="active"><a href="${ctx}/report/riskEventGreat/map">重大事项数据分析</a></li>
+	</ul>
+	
+	<sys:message content="${message}"/>
+	    <br>
+	    <div class="row-fluid">
+			
+				<div class="span4" >
+					<h4>重大事项报备是否进行调查比例</h4>
+					<div class="common-pading">
+						<div id="riskEventGreatOpinion" class="echarts" ></div>
+					</div>
+				</div>
+				<div class="span4" >	
+					<h4>重大事项报备是否提交报告比例</h4>
+					<div class="common-pading">
+						<div id="riskEventGreatReport" class="echarts" ></div>
+					</div>
+				</div>
+				<div class="span4" >
+				<h4>近几个月事项报备趋势图</h4>
+				<div class="common-pading">
+					<div id="riskEventGreatTrend" class="echarts" ></div>
+				</div>
+			</div>
+		      
+			
+		    
+	    </div>
+	    <br>
+	     <div class="row-fluid">
+	     	  
+			<div class="span12" ><h4>重大事项数据分析</h4>
+					<div style="height:571px;overflow: auto">
+				<table id="contentTable" class="table table-striped table-bordered table-condensed">
+					<thead>
+						<tr>
+							<th>重大事项名称</th>
+							<th>社情民意调查次数</th>
+							<th>事项评估报告数量</th>
+						</tr>
+					</thead>
+					<tbody>
+					<c:forEach items="${searchTab}" var="se">
+						<tr>
+							<td>
+								${se.type}
+							</td>
+							<td>
+								${se.value1}
+							</td>
+							<td>
+								${se.value2}
+							</td>
+						</tr>
+					</c:forEach>
+					</tbody>
+				</table>
+				</div>
+			</div> 
+	    </div>
+<script src="${ctxStatic}/jquery/jquery-1.9.1.min.js"></script>
+<script src="${ctxStatic}/jquery/jquery.cookie.js" type="text/javascript"></script>
+<script src="${ctxStatic}/common/index/Scripts/js/echarts.min.js"></script>
+<script>
+	var color = ['#aa4644', '#4573a7', '#89a54e', '#71588f', '#4298af', '#db843d', '#93a9d0', '#d09392', '#b9ce96', '#a99bbc', '#92c3d4', '#ffdf5f'];
+	//基础参数
+	var windowsHeight, _fontSize = 14,
+
+	_fontSize1 = 26,
+	breakData = 8;
+	legendTop = '30%',
+	radiusData = [90, 65],
+	lengthECharts = 30;
+	var context = $(".context").attr("content");
+
+	var FontColor="#999",backgroundColor="#fff";
+	var theme=$.cookie('theme');
+	if(theme=="black"){
+		FontColor="#fff";
+		backgroundColor="#0e2a4c";
+	}
+	$(function(){
+	    windowsHeight= $(window).width();
+
+	    if (windowsHeight >= 1600) {
+	    	
+	        _fontSize = 14;
+	        legendTop = '15%';
+	        radiusData = [90, 65];
+	        lengthECharts = 20;
+	        _fontSize1 = 26;
+	        breakData = 8;
+	        legendRight="8%"
+	    }else {
+	    	
+	        _fontSize = 12;
+	        legendTop = '15%';
+	        radiusData = [60, 45];
+	        lengthECharts = 5;
+	        _fontSize1 = 12;
+	        breakData = 6;
+	        legendRight="5%"
+	    }
+	   
+		
+		$.GetWorkSheets("riskEventGreatOpinion");
+		$.GetWork2Sheets("riskEventGreatReport");
+		var echartType = ${echartType}
+		$.GetChangeSheets("riskEventGreatTrend", echartType);
+		
+		
+		
+		
+		
+		
+	})	
+	
+	
+	
+	// 饼图pingJson况
+	$.ToConvertA = function(object) {
+        var ajaxData = new Array();
+        for (var one in object) {
+            ajaxData.push({
+                "name": object[one]["type"],
+                "value": Number(object[one]["value"])
+            });
+        }
+        return ajaxData;
+    } 
+	
+	
+	//饼图统计情况
+	$.GetWorkSheets = function(model) {
+		
+        var nameArr = [],
+        DataArr = [];
+        
+        var option = {
+        		backgroundColor: backgroundColor,
+        	    series: [{
+        	            type: 'pie',
+        	            name: '',
+        	            radius : ['40%', '60%'],
+        	            center: ['50%', '50%'],
+        	            hoverAnimation: false,
+        	            silent: true,
+        	            clockwise: false,
+        	            data: [{
+        	                value: 0,
+        	                name: '',
+        	                label: {
+        	                    normal: {
+        	                        show: true,
+        	                        position: 'center',
+        	                        formatter: '重大事项',
+        	                        color: FontColor,
+        	                        fontSize: 10,
+        	                        fontWeight: 'bold'
+        	                    }
+        	                },
+        	                itemStyle: {
+        	                    normal: {
+        	                        color: '#ccc',
+        	                        shadowBlur: 15,
+        	                        shadowColor: '#129BED',
+        	                        show: true
+        	                    }
+        	                }
+        	            }]
+        	        },
+
+        	        {
+        	            type: 'pie',
+        	            radius : ['40%', '60%'],
+        	            center: ['50%', '50%'],
+        	            hoverAnimation: false,
+        	            silent: true,
+        	            data: [{
+        	                value: 0,
+        	                name: '大',
+        	                label: {
+        	                    normal: {
+        	                        show: true,
+        	                        position: 'center',
+        	                        formatter: '\n\n\n调查比例',
+        	                        color: FontColor,
+        	                        fontSize: 10,
+        	                        fontWeight: 'bold'
+        	                    }
+        	                },
+        	                itemStyle: {
+        	                    normal: {
+        	                        color: '#ccc',
+        	                        shadowBlur: 30,
+        	                        shadowColor: '#129BED',
+        	                    }
+        	                }
+        	            }]
+        	        }, {
+        	            type: 'pie',
+        	            radius : ['40%', '60%'],
+        	            center: ['50%', '50%'],
+        	            hoverAnimation: false,
+        	            data: [{
+        	                value: ${sum1},
+        	                name: '未调查',
+        	                label: {
+        	                    normal: {
+        	                        color: FontColor,
+        	                        fontSize: 10,
+        	                        formatter: '{b}：{c}\n\n比例：{d}%'
+        	                    }
+        	                },
+        	                labelLine: {
+        	                    normal: {
+        	                        length: 20
+        	                    }
+        	                }
+        	            }, {
+        	                value: ${sum2},
+        	                name: '已调查',
+        	                label: {
+        	                    normal: {
+        	                        color: FontColor,
+        	                        fontSize: 10,
+        	                        formatter: '{b}：{c}\n\n比例：{d}%'
+        	                    }
+        	                },
+        	                labelLine: {
+        	                    normal: {
+        	                        length: 20
+        	                    }
+        	                }
+        	            }]
+        	        }
+        	    ]
+        	};
+        var Barchart = echarts.init(document.getElementById(model));
+        Barchart.setOption(option);
+
+    }
+	//饼图统计情况
+	$.GetWork2Sheets = function(model) {
+		
+        var nameArr = [],
+        DataArr = [];
+        
+        var option = {
+        		backgroundColor:backgroundColor,
+        	    series: [{
+        	            type: 'pie',
+        	            name: '',
+        	            radius : ['40%', '60%'],
+        	            center: ['50%', '50%'],
+        	            hoverAnimation: false,
+        	            silent: true,
+        	            clockwise: false,
+        	            data: [{
+        	                value: 0,
+        	                name: '',
+        	                label: {
+        	                    normal: {
+        	                        show: true,
+        	                        position: 'center',
+        	                        formatter: '重大事项',
+        	                        color: FontColor,
+        	                        fontSize: 10,
+        	                        fontWeight: 'bold'
+        	                    }
+        	                },
+        	                itemStyle: {
+        	                    normal: {
+        	                        color: '#ccc',
+        	                        shadowBlur: 15,
+        	                        shadowColor: '#129BED',
+        	                        show: true
+        	                    }
+        	                }
+        	            }]
+        	        },
+
+        	        {
+        	            type: 'pie',
+        	            radius : ['40%', '60%'],
+        	            center: ['50%', '50%'],
+        	            hoverAnimation: false,
+        	            silent: true,
+        	            data: [{
+        	                value: 0,
+        	                name: '大',
+        	                label: {
+        	                    normal: {
+        	                        show: true,
+        	                        position: 'center',
+        	                        formatter: '\n\n\n提交报告比例',
+        	                        color: FontColor,
+        	                        fontSize: 10,
+        	                        fontWeight: 'bold'
+        	                    }
+        	                },
+        	                itemStyle: {
+        	                    normal: {
+        	                        color: '#ccc',
+        	                        shadowBlur: 30,
+        	                        shadowColor: '#129BED',
+        	                    }
+        	                }
+        	            }]
+        	        }, {
+        	            type: 'pie',
+        	            radius : ['40%', '60%'],
+        	            center: ['50%', '50%'],
+        	            hoverAnimation: false,
+        	            data: [{
+        	                value: ${sum3},
+        	                name: '未提交',
+        	                label: {
+        	                    normal: {
+        	                        color: FontColor,
+        	                        fontSize: 10,
+        	                        formatter: '{b}：{c}\n\n比例：{d}%'
+        	                    }
+        	                },
+        	                labelLine: {
+        	                    normal: {
+        	                        length: 20
+        	                    }
+        	                }
+        	            }, {
+        	                value: ${sum4},
+        	                name: '已提交',
+        	                label: {
+        	                    normal: {
+        	                        color: FontColor,
+        	                        fontSize: 10,
+        	                        formatter: '{b}：{c}\n\n比例：{d}%'
+        	                    }
+        	                },
+        	                labelLine: {
+        	                    normal: {
+        	                        length: 20
+        	                    }
+        	                }
+        	            }]
+        	        }
+        	    ]
+        	};
+        var Barchart = echarts.init(document.getElementById(model));
+        Barchart.setOption(option);
+
+    }
+	//折现图统计情况
+	$.GetChangeSheets =function(model,data){
+		   var type=[];
+		   var value=[];
+		   for(var i=0;i<data.length;i++){ 
+			   type.push(data[i]['type']);
+			   value.push(data[i]['value']);
+			}
+
+		 var  option = {
+				    backgroundColor: backgroundColor,
+				    title: {
+				        text: '近6个月平均拜访次数',
+				        show: false,
+				        textStyle: {
+				            fontWeight: 'normal',
+				            fontSize: 16,
+				            color: FontColor
+				        },
+				        left: '6%'
+				    },
+				    tooltip: {
+				        trigger: 'axis',
+				        axisPointer: {
+				            lineStyle: {
+				                color: '#333'
+				            }
+				        }
+				    },
+				    legend: {
+				        icon: 'rect',
+				        itemWidth: 14,
+				        itemHeight: 5,
+				        itemGap: 13,
+				        data: ['近6个月事项报备次数'],
+				        right: 'center',
+				        textStyle: {
+				            fontSize: 12,
+				            color: FontColor
+				        }
+				    },
+				    grid: {
+				        left: '3%',
+				        right: '4%',
+				        bottom: '3%',
+				        containLabel: true
+				    },
+				    xAxis: [{
+				        type: 'category',
+				        boundaryGap: false,
+				        axisLine: {
+				            lineStyle: {
+				                color: '#ccc'
+				            }
+				        },
+				        axisLabel: {
+				            margin: 10,
+				            textStyle: {
+				                fontSize: 14,
+				                color: FontColor
+				            }
+				        },
+				        data: type
+				    }],
+				    yAxis: [{
+				        type: 'value',
+				        name: '',
+				        axisTick: {
+				            show: false
+				        },
+				        axisLine: {
+				            lineStyle: {
+				                color: '#fff'
+				            }
+				        },
+				        axisLabel: {
+				            margin: 10,
+				            textStyle: {
+				                fontSize: 14,
+				                color: FontColor
+				            }
+				        },
+				        splitLine: {
+				            lineStyle: {
+				                type: 'solid',
+				                color: '#ccc'
+				            }
+				        }
+				    }],
+				    series: [{
+				        name: '近6个月事项报备次数',
+				        type: 'line',
+				        smooth: true,
+				        symbol: 'circle',
+				        symbolSize: 5,
+				        showSymbol: false,
+				        lineStyle: {
+				            normal: {
+				                width: 1
+				            }
+				        },
+				        areaStyle: {
+				            normal: {
+				                color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [{
+				                    offset: 0,
+				                    color: 'rgba(0, 136, 212, 0.2)'
+				                }, {
+				                    offset: 1,
+				                    color: 'rgba(0, 136, 212, 0)'
+				                }], false),
+				                shadowColor: 'rgba(0, 0, 0, 0.1)',
+				                shadowBlur: 10
+				            }
+				        },
+				        itemStyle: {
+				            normal: {
+				                color: 'rgb(0,136,212)',
+				                borderColor: 'rgba(0,136,212,0.2)',
+				                borderWidth: 12
+
+				            }
+				        },
+				        data: value
+				    }, ]
+				}
+
+		    var Barchart = echarts.init(document.getElementById(model));
+	        Barchart.setOption(option);
+	   }
+	 
+		
+</script>
+</body>
+</html>

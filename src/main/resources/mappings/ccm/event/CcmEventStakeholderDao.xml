@@ -1,0 +1,230 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.arjjs.ccm.modules.ccm.event.dao.CcmEventStakeholderDao">
+    
+	<sql id="ccmEventStakeholderColumns">
+		a.id AS "id",
+		a.incident_id AS "incidentId",
+		b.case_name AS "incidentName",
+		a.prevent_type AS "preventType",
+		a.name AS "name",
+		a.usedname AS "usedname",
+		a.iden_code AS "idenCode",
+		a.iden_num AS "idenNum",
+		a.sex AS "sex",
+		a.birthday AS "birthday",
+		a.nationality AS "nationality",
+		a.nation AS "nation",
+		a.censu AS "censu",
+		a.marriage AS "marriage",
+		a.politics AS "politics",
+		a.education AS "education",
+		a.belief AS "belief",
+		a.prof_type AS "profType",
+		a.profession AS "profession",
+		a.serv_place AS "servPlace",
+		a.domicile AS "domicile",
+		a.domiciledetail AS "domiciledetail",
+		a.residence AS "residence",
+		a.residencedetail AS "residencedetail",
+		a.is_psychogeny AS "isPsychogeny",
+		a.is_nonage AS "isNonage",
+		a.is_kym AS "isKym",
+		a.more1 AS "more1",
+		a.more2 AS "more2",
+		a.more3 AS "more3",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag"
+	</sql>
+	
+	<sql id="ccmEventStakeholderJoins">
+	</sql>
+    
+	<select id="get" resultType="CcmEventStakeholder">
+		SELECT 
+			<include refid="ccmEventStakeholderColumns"/>
+		FROM ccm_event_stakeholder a
+		LEFT JOIN ccm_event_incident b ON a.incident_id = b.id
+		<include refid="ccmEventStakeholderJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="CcmEventStakeholder">
+		SELECT 
+			<include refid="ccmEventStakeholderColumns"/>
+		FROM ccm_event_stakeholder a
+		LEFT JOIN ccm_event_incident b ON a.incident_id = b.id
+		<include refid="ccmEventStakeholderJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="incidentId != null and incidentId != ''">
+				AND a.incident_id = #{incidentId}
+			</if>
+			<if test="preventType != null and preventType != ''">
+				AND a.prevent_type = #{preventType}
+			</if>
+			<if test="name != null and name != ''">
+				AND a.name LIKE 
+					<if test="dbName == 'oracle'">'%'||#{name}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{name}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{name},'%')</if>
+			</if>
+			<if test="idenNum != null and idenNum != ''">
+				AND a.iden_num LIKE 
+					<if test="dbName == 'oracle'">'%'||#{idenNum}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{idenNum}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{idenNum},'%')</if>
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="CcmEventStakeholder">
+		SELECT 
+			<include refid="ccmEventStakeholderColumns"/>
+		FROM ccm_event_stakeholder a
+		LEFT JOIN ccm_event_incident b ON a.incident_id = b.id
+		<include refid="ccmEventStakeholderJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO ccm_event_stakeholder(
+			id,
+			incident_id,
+			prevent_type,
+			name,
+			usedname,
+			iden_code,
+			iden_num,
+			sex,
+			birthday,
+			nationality,
+			nation,
+			censu,
+			marriage,
+			politics,
+			education,
+			belief,
+			prof_type,
+			profession,
+			serv_place,
+			domicile,
+			domiciledetail,
+			residence,
+			residencedetail,
+			is_psychogeny,
+			is_nonage,
+			is_kym,
+			more1,
+			more2,
+			more3,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag
+		) VALUES (
+			#{id},
+			#{incidentId},
+			#{preventType},
+			#{name},
+			#{usedname},
+			#{idenCode},
+			#{idenNum},
+			#{sex},
+			#{birthday},
+			#{nationality},
+			#{nation},
+			#{censu},
+			#{marriage},
+			#{politics},
+			#{education},
+			#{belief},
+			#{profType},
+			#{profession},
+			#{servPlace},
+			#{domicile},
+			#{domiciledetail},
+			#{residence},
+			#{residencedetail},
+			#{isPsychogeny},
+			#{isNonage},
+			#{isKym},
+			#{more1},
+			#{more2},
+			#{more3},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE ccm_event_stakeholder SET 	
+			incident_id = #{incidentId},
+			prevent_type = #{preventType},
+			name = #{name},
+			usedname = #{usedname},
+			iden_code = #{idenCode},
+			iden_num = #{idenNum},
+			sex = #{sex},
+			birthday = #{birthday},
+			nationality = #{nationality},
+			nation = #{nation},
+			censu = #{censu},
+			marriage = #{marriage},
+			politics = #{politics},
+			education = #{education},
+			belief = #{belief},
+			prof_type = #{profType},
+			profession = #{profession},
+			serv_place = #{servPlace},
+			domicile = #{domicile},
+			domiciledetail = #{domiciledetail},
+			residence = #{residence},
+			residencedetail = #{residencedetail},
+			is_psychogeny = #{isPsychogeny},
+			is_nonage = #{isNonage},
+			is_kym = #{isKym},
+			more1 = #{more1},
+			more2 = #{more2},
+			more3 = #{more3},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE ccm_event_stakeholder SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

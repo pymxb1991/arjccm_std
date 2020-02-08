@@ -1,0 +1,28 @@
+/**
+ * Copyright &copy; 2012-2016 <a href="https://github.com/thinkgem/jeesite">JeeSite</a> All rights reserved.
+ */
+package com.arjjs.ccm.modules.ccm.citycomponents.dao;
+
+import java.util.List;
+
+import com.arjjs.ccm.common.persistence.CrudDao;
+import com.arjjs.ccm.common.persistence.annotation.MyBatisDao;
+import com.arjjs.ccm.modules.ccm.citycomponents.entity.CcmCityComponents;
+import com.arjjs.ccm.tool.EchartType;
+
+/**
+ * 城市部件DAO接口
+ * @author pengjianqiang
+ * @version 2018-03-06
+ */
+@MyBatisDao
+public interface CcmCityComponentsDao extends CrudDao<CcmCityComponents> {
+
+	public int updateCoordinates(CcmCityComponents ccmCityComponents);
+
+	//公用设施
+	public List<EchartType> getCityTypeGY(CcmCityComponents ccmCityComponentsCY);
+
+	//城市部件数量
+	public int findListNum();
+}

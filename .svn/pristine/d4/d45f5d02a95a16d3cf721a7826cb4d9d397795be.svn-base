@@ -1,0 +1,195 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.arjjs.ccm.modules.plm.storage.dao.PlmProvideInfoDao">
+    
+	<sql id="plmProvideInfoColumns">
+		a.id AS "id",
+		a.name AS "name",
+		a.short_name AS "shortName",
+		a.pro_id AS "proId",
+		a.area AS "area.id",
+		a.principal AS "principal.id",
+		a.phone_one AS "phoneOne",
+		a.phone_two AS "phoneTwo",
+		a.mobile_phone AS "mobilePhone",
+		a.bank_accounts AS "bankAccounts",
+		a.open_bank AS "openBank",
+		a.email AS "email",
+		a.web AS "web",
+		a.faxes AS "faxes",
+		a.emp_id AS "emp.id",
+		a.calling AS "calling",
+		a.credit_class AS "creditClass",
+		a.extend1 AS "extend1",
+		a.extend2 AS "extend2",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag",
+		a5.name AS "area.name",
+		u6.name AS "principal.name",
+		u15.name AS "emp.name"
+	</sql>
+	
+	<sql id="plmProvideInfoJoins">
+		LEFT JOIN sys_area a5 ON a5.id = a.area
+		LEFT JOIN sys_user u6 ON u6.id = a.principal
+		LEFT JOIN sys_user u15 ON u15.id = a.emp_id
+	</sql>
+    
+	<select id="get" resultType="PlmProvideInfo">
+		SELECT 
+			<include refid="plmProvideInfoColumns"/>
+		FROM plm_provide_info a
+		<include refid="plmProvideInfoJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="PlmProvideInfo">
+		SELECT 
+			<include refid="plmProvideInfoColumns"/>
+		FROM plm_provide_info a
+		<include refid="plmProvideInfoJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="name != null and name != ''">
+				AND a.name LIKE 
+					<if test="dbName == 'oracle'">'%'||#{name}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{name}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{name},'%')</if>
+			</if>
+			<if test="proId != null and proId != ''">
+				AND a.pro_id = #{proId}
+			</if>
+			<if test="area != null and area.id != null and area.id != ''">
+				AND a.area = #{area.id}
+			</if>
+			<if test="principal != null and principal.id != null and principal.id != ''">
+				AND a.principal = #{principal.id}
+			</if>
+			<if test="calling != null and calling != ''">
+				AND a.calling = #{calling}
+			</if>
+			<if test="creditClass != null and creditClass != ''">
+				AND a.credit_class = #{creditClass}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="PlmProvideInfo">
+		SELECT 
+			<include refid="plmProvideInfoColumns"/>
+		FROM plm_provide_info a
+		<include refid="plmProvideInfoJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO plm_provide_info(
+			id,
+			name,
+			short_name,
+			pro_id,
+			area,
+			principal,
+			phone_one,
+			phone_two,
+			mobile_phone,
+			bank_accounts,
+			open_bank,
+			email,
+			web,
+			faxes,
+			emp_id,
+			calling,
+			credit_class,
+			extend1,
+			extend2,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag
+		) VALUES (
+			#{id},
+			#{name},
+			#{shortName},
+			#{proId},
+			#{area.id},
+			#{principal.id},
+			#{phoneOne},
+			#{phoneTwo},
+			#{mobilePhone},
+			#{bankAccounts},
+			#{openBank},
+			#{email},
+			#{web},
+			#{faxes},
+			#{emp.id},
+			#{calling},
+			#{creditClass},
+			#{extend1},
+			#{extend2},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE plm_provide_info SET 	
+			name = #{name},
+			short_name = #{shortName},
+			pro_id = #{proId},
+			area = #{area.id},
+			principal = #{principal.id},
+			phone_one = #{phoneOne},
+			phone_two = #{phoneTwo},
+			mobile_phone = #{mobilePhone},
+			bank_accounts = #{bankAccounts},
+			open_bank = #{openBank},
+			email = #{email},
+			web = #{web},
+			faxes = #{faxes},
+			emp_id = #{emp.id},
+			calling = #{calling},
+			credit_class = #{creditClass},
+			extend1 = #{extend1},
+			extend2 = #{extend2},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE plm_provide_info SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

@@ -1,0 +1,105 @@
+/**
+ * Copyright &copy; 2012-2018 All rights reserved.
+ */
+package com.arjjs.ccm.modules.plm.purchase.service;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.arjjs.ccm.common.persistence.Page;
+import com.arjjs.ccm.common.service.CrudService;
+import com.arjjs.ccm.common.utils.StringUtils;
+import com.arjjs.ccm.modules.act.service.ActTaskService;
+import com.arjjs.ccm.modules.plm.purchase.dao.PlmPurchaseDeclareDao;
+import com.arjjs.ccm.modules.plm.purchase.dao.PlmPurchaseDeclareDetailDao;
+import com.arjjs.ccm.modules.plm.purchase.entity.PlmPurchaseDeclare;
+import com.arjjs.ccm.modules.plm.purchase.entity.PlmPurchaseDeclareDetail;
+import com.arjjs.ccm.modules.sys.service.SysCodesService;
+import com.google.common.collect.Maps;
+
+/**
+ * 采购申报Service
+ * @author liuxue
+ * @version 2018-08-25
+ */
+@Service
+@Transactional(readOnly = true)
+public class PlmPurchaseDeclareService extends CrudService<PlmPurchaseDeclareDao, PlmPurchaseDeclare> {
+	@Autowired
+	private ActTaskService actTaskService;
+	@Autowired
+	private PlmPurchaseDeclareDetailDao plmPurchaseDeclareDetailDao;
+	@Autowired
+	private SysCodesService sysCodesService;
+	
+	public PlmPurchaseDeclare get(String id) {
+		PlmPurchaseDeclare plmPurchaseDeclare = super.get(id);
+		List<PlmPurchaseDeclareDetail> list = new ArrayList<PlmPurchaseDeclareDetail>(); 
+		list = plmPurchaseDeclareDetailDao.findList(new PlmPurchaseDeclareDetail(plmPurchaseDeclare));
+		if(list.size()>0) {
+			plmPurchaseDeclare.setPlmPurchaseDeclareDetailList(list);
+		}
+		return plmPurchaseDeclare;
+	}
+	
+	public List<PlmPurchaseDeclare> findList(PlmPurchaseDeclare plmPurchaseDeclare) {
+		return super.findList(plmPurchaseDeclare);
+	}
+	
+	public Page<PlmPurchaseDeclare> findPage(Page<PlmPurchaseDeclare> page, PlmPurchaseDeclare plmPurchaseDeclare) {
+		return super.findPage(page, plmPurchaseDeclare);
+	}
+	
+	@Transactional(readOnly = false)
+	public void save(PlmPurchaseDeclare plmPurchaseDeclare) {
+		if (StringUtils.isBlank(plmPurchaseDeclare.getId())) {
+			plmPurchaseDeclare.setApplyId(sysCodesService.getCode(PlmPurchaseDeclare.class.getName(), 1).get(0));
+		}
+		super.save(plmPurchaseDeclare);
+		for (PlmPurchaseDeclareDetail plmPurchaseDeclareDetail : plmPurchaseDeclare.getPlmPurchaseDeclareDetailList()){
+			
+			if (plmPurchaseDeclareDetail.getId() == null){
+				continue;
+			}
+			if (PlmPurchaseDeclareDetail.DEL_FLAG_NORMAL.equals(plmPurchaseDeclareDetail.getDelFlag())){
+				if (StringUtils.isBlank(plmPurchaseDeclareDetail.getId())){
+					plmPurchaseDeclareDetail.setPreId(plmPurchaseDeclare);
+					plmPurchaseDeclareDetail.preInsert();
+					plmPurchaseDeclareDetailDao.insert(plmPurchaseDeclareDetail);
+				}else{
+					plmPurchaseDeclareDetail.preUpdate();
+					plmPurchaseDeclareDetailDao.update(plmPurchaseDeclareDetail);
+				}
+			}else{
+				plmPurchaseDeclareDetailDao.delete(plmPurchaseDeclareDetail);
+			}
+		}
+	}
+	
+	@Transactional(readOnly = false)
+	public void delete(PlmPurchaseDeclare plmPurchaseDeclare) {
+		super.delete(plmPurchaseDeclare);
+		plmPurchaseDeclareDetailDao.delete(new PlmPurchaseDeclareDetail(plmPurchaseDeclare));
+	}
+	
+	@Transactional(readOnly = false)
+	public void auditSave(PlmPurchaseDeclare plmPurchaseDeclare) {
+		// 设置意见
+		plmPurchaseDeclare.getAct().setComment(("yes".equals(plmPurchaseDeclare.getAct().getFlag())?"[同意] ":"[驳回] ") + plmPurchaseDeclare.getAct().getComment());
+		plmPurchaseDeclare.preUpdate();
+		
+		
+		
+		
+		// 提交流程任务
+		Map<String, Object> vars = Maps.newHashMap();
+		vars.put("pass", "yes".equals(plmPurchaseDeclare.getAct().getFlag())? "1" : "0");
+		actTaskService.complete(plmPurchaseDeclare.getAct().getTaskId(), plmPurchaseDeclare.getAct().getProcInsId(), plmPurchaseDeclare.getAct().getComment(), vars);
+	}
+	
+}

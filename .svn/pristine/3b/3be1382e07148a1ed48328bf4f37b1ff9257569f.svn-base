@@ -1,0 +1,100 @@
+<%@ page contentType="text/html;charset=UTF-8"%>
+<html style="height: 100%"> 
+   <head>
+       <meta charset="utf-8">
+   </head>
+   <body style="height: 90%; margin: 0">
+       <div id="container${porid}" style="height:85%"></div>
+      
+       <script type="text/javascript">
+var dom = document.getElementById("container${porid}");
+var myChart = echarts.init(dom);
+var app = {};
+option = null;
+
+//基础颜色表
+var color = [ '#79F0C9','#9CDCDE','#F5D883','#ED817C', '#B0DAB4',  '#2ec7c9','#3398DB','#b6a2de','#5ab1ef','#ffb980','#d87a80',
+    '#8d98b3','#97b552','#95706d','#dc69aa',
+    '#07a2a4','#9a7fd1','#588dd5','#f5994e','#c05050',
+    '#59678c','#c9ab00','#7eb00a','#6f5553','#c14089'];
+
+option = {
+		color : color,
+    tooltip: {
+        trigger: 'axis',
+        axisPointer: {
+            type: 'cross',
+            crossStyle: {
+                color: '#fff'
+            }
+        }
+    },
+    toolbox: {
+        feature: {
+            /* dataView: {show: true, readOnly: false},
+            magicType: {show: true, type: ['line', 'bar']},
+            restore: {show: true},*/
+            saveAsImage: {show: true} 
+        }
+    },
+    legend: {
+        data:['出勤次数','违章次数','损坏次数'],
+	    textStyle:{
+	        fontSize:10,
+	        color:'#fff'
+	    }
+    },
+    xAxis: [
+        {
+            type: 'category',
+            data: $.ToConvertLegendA(${jsondata}),
+            axisPointer: {
+                type: 'shadow'
+            }, 
+	        axisLabel: {
+	            show: true,
+	            textStyle: {
+	                color: '#fff'
+	            }
+	        } 
+        }
+    ],
+    yAxis : [
+        {
+            type : 'value',
+            axisLabel: {
+                show: true,
+                textStyle: {
+                    color: '#fff'
+                }
+            }
+        }
+    ],
+    series: [
+
+        {
+            name:'出勤次数',
+            type:'line',
+            data:$.ToConvertSeriesA(${jsondata}),
+        },
+        {
+            name:'违章次数',
+            type:'line',
+            /* yAxisIndex: 1, */
+            data:$.ToConvertSeriesB(${jsondata}),
+        },
+        {
+            name:'损坏次数',
+            type:'line',
+            /* yAxisIndex: 1, */
+            data:$.ToConvertSeriesC(${jsondata}),
+        }        
+    ]
+};
+
+if (option && typeof option === "object") {
+    myChart.setOption(option, true);
+}
+       </script>
+   </body>
+</html>

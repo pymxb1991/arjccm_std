@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.arjjs.ccm.modules.ccm.work.dao.CcmWorkTimingDao">
+    
+	<sql id="ccmWorkTimingColumns">
+		a.id AS "id",
+		a.timing AS "timing",
+		a.user AS "user.id",
+		a.details AS "details",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag",
+		u4.name AS "user.name"
+	</sql>
+	
+	<sql id="ccmWorkTimingJoins">
+		LEFT JOIN sys_user u4 ON u4.id = a.user
+	</sql>
+    
+	<select id="get" resultType="CcmWorkTiming">
+		SELECT 
+			<include refid="ccmWorkTimingColumns"/>
+		FROM ccm_work_timing a
+		<include refid="ccmWorkTimingJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="CcmWorkTiming">
+		SELECT 
+			<include refid="ccmWorkTimingColumns"/>
+		FROM ccm_work_timing a
+		<include refid="ccmWorkTimingJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="beginTiming != null and endTiming != null and beginTiming != '' and endTiming != ''">
+				AND a.timing BETWEEN #{beginTiming} AND #{endTiming}
+			</if>
+			<if test="user != null and user.id != null and user.id != ''">
+				AND a.user = #{user.id}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="CcmWorkTiming">
+		SELECT 
+			<include refid="ccmWorkTimingColumns"/>
+		FROM ccm_work_timing a
+		<include refid="ccmWorkTimingJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO ccm_work_timing(
+			id,
+			timing,
+			user,
+			details,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag
+		) VALUES (
+			#{id},
+			#{timing},
+			#{user.id},
+			#{details},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE ccm_work_timing SET 	
+			timing = #{timing},
+			user = #{user.id},
+			details = #{details},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE ccm_work_timing SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+	
+	<!-- 定时提醒 -->
+	<select id="findTiming" resultType="CcmWorkTiming">
+		SELECT
+			<include refid="ccmWorkTimingColumns"/>
+		FROM
+			ccm_work_timing a
+		<include refid="ccmWorkTimingJoins"/>
+		WHERE
+			a.del_flag = 0
+			AND(a.timing &gt; SUBDATE(now(),interval 0 minute))
+			AND(a.timing &lt; SUBDATE(now(),interval -10 minute))
+		ORDER BY a.create_date DESC
+	</select>
+</mapper>

@@ -1,0 +1,84 @@
+#PopFlowTable td span {
+    background: url(../images/tc2.png) no-repeat center;
+    background-size: 100% 100%;
+    padding: 2px;
+    width: 85px;
+    display: block;
+}
+.pop-flow-type{
+    text-align: left;
+}
+.pop-info-type{
+    margin:0 auto;
+    width:20px;
+    line-height:24px;
+    background: url(../images/tc2.png) no-repeat center;
+    background-size: 100% 100%;
+    margin-top: 150px;
+    padding: 4px;
+    text-align: center;
+}
+#PopInfoType{
+    width: 100%;
+    height:99%;
+}
+#PopFollowPop table td{
+    text-align: left;
+/*     line-height: 40px; */
+}
+.table-div{
+    margin-top: 5%;
+    height:107%;
+}
+#PopFlowTable{
+	height:100%
+}
+#PopFlowTable table{
+	height:100%
+}
+
+.table-bg{
+ /*   background: rgba(20,85,105,0.3) url(../images/tc2.png) no-repeat center;
+    background-size: 100% 100%;*/
+border: 1px solid rgba(20,85,105,1);
+height:100%;
+}
+.tr-bg{
+    background: rgba(20,85,105,0.3) ;
+    border: 1px solid rgba(20,85,105,1);
+}
+@media (min-width: 1441px)and (max-width:1680px)   {
+    #PopFollowPop table td {
+        text-align: left;
+        line-height: 30px;
+    }
+}
+@media (max-width: 1366px) {
+	.table-div {
+    margin-top: 0%;
+    height: 107%;
+}
+    #PopFollowPop table td {
+        text-align: left;
+        line-height: 16px;
+    }
+    .pop-info-type {
+
+        margin-top: 64px;
+    }
+    .common-color {
+        font-size: 68px;
+    }
+    .top-header {
+        margin-bottom: 0px;
+    }
+    #PopFlowTable td{
+        line-height: 18px;
+    }
+    #PopFlowTable td span {
+        padding: 3px;
+    }
+    .results {
+        margin-top: 7%;
+    }
+}

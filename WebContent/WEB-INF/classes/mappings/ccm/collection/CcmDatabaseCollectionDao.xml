@@ -1,0 +1,179 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.arjjs.ccm.modules.ccm.collection.dao.CcmDatabaseCollectionDao">
+    
+	<sql id="ccmDatabaseCollectionColumns">
+		a.id AS "id",
+		a.book_id AS "bookId",
+		a.user_id AS "user.id",
+		a.book_name AS "bookName",
+		a.user_name AS "userName",
+		a.create_date AS "createDate",
+		a.del_flag AS "delFlag",
+		u2.name AS "user.name"
+	</sql>
+	
+	<sql id="ccmDatabaseCollectionJoins">
+		LEFT JOIN sys_user u2 ON u2.id = a.user_id
+	</sql>
+    
+	<select id="get" resultType="CcmDatabaseCollection">
+		SELECT 
+			<include refid="ccmDatabaseCollectionColumns"/>
+		FROM ccm_database_collection a
+		<include refid="ccmDatabaseCollectionJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="CcmDatabaseCollection">
+		SELECT 
+			<include refid="ccmDatabaseCollectionColumns"/>
+		FROM ccm_database_collection a
+		<include refid="ccmDatabaseCollectionJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="CcmDatabaseCollection">
+		SELECT 
+			<include refid="ccmDatabaseCollectionColumns"/>
+		FROM ccm_database_collection a
+		<include refid="ccmDatabaseCollectionJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="getCollectionData" resultType="CcmDatabaseCollection">
+		SELECT 
+			<include refid="ccmDatabaseCollectionColumns"/>
+		FROM ccm_database_collection a
+		<include refid="ccmDatabaseCollectionJoins"/>
+		<where>
+			a.book_id = #{bookId}
+			AND a.user_id = #{user.id}
+		</where>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO ccm_database_collection(
+			id,
+			book_id,
+			user_id,
+			create_date,
+			del_flag
+		) VALUES (
+			#{id},
+			#{bookId},
+			#{user.id},
+			#{createDate},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE ccm_database_collection SET 	
+			book_id = #{bookId},
+			user_id = #{user.id}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="updateCollectionInfo">
+		UPDATE ccm_database_collection SET 
+			del_flag = #{DEL_FLAG_NORMAL},
+			create_date = #{createDate}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE ccm_database_collection SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+
+	<delete id="cancelCollectionInfo">
+		DELETE FROM ccm_database_collection 
+		WHERE book_id = #{bookId}
+		AND user_id = #{user.id}
+	</delete>
+
+	<resultMap id="BaseResultMap" type="com.arjjs.ccm.modules.ccm.book.entity.dataCollectionEntity">
+		<result property="id" column="userId"/>
+		<result property="name" column="userName"/>
+		<result property="photo" column="userPhoto"/>
+		<collection property="bookData" ofType="com.arjjs.ccm.modules.ccm.book.entity.CcmDatabaseBook">
+			<result property="id" column="bookId"/>
+			<result property="name" column="bookName"/>
+			<result property="code" column="bookCode"/>
+			<result property="imageurl" column="bookImageurl"/>
+			<result property="createDate" column="createDate"/>
+		</collection>
+	</resultMap>
+	<select id="findListCollection" resultMap="BaseResultMap">
+		SELECT
+		sysuser.`id` AS userId,
+		sysuser.`name` AS userName,
+		sysuser.`photo` AS userPhoto,
+		dataBook.`id` AS bookId,
+		dataBook.`name` AS bookName,
+		dataBook.`code` AS bookCode,
+		dataBook.`imageurl` AS bookImageurl,
+		dataBook.`create_date` AS createDate
+		FROM
+		sys_user sysuser
+		LEFT JOIN ccm_database_collection collection ON sysuser.id = collection.user_id
+		LEFT JOIN ccm_database_book dataBook ON collection.book_id = dataBook.id
+		<where>
+			sysuser.del_flag = 0
+			AND dataBook.del_flag = 0 AND collection.del_flag = 0
+			<if test="userId != null and userId != ''">
+				AND sysuser.id = #{id}
+			</if>
+			<if test="bookName != null and bookName != ''">
+				AND dataBook.`name` LIKE
+				<if test="dbName == 'oracle'">'%'||#{bookName}||'%'</if>
+				<if test="dbName == 'mssql'">'%'+#{bookName}+'%'</if>
+				<if test="dbName == 'mysql'">concat('%',#{bookName},'%')</if>
+			</if>
+		</where>
+		ORDER BY sysuser.`name` DESC
+	</select>
+
+	<select id="getCollectionInfo" resultType="com.arjjs.ccm.modules.ccm.collection.entity.CcmRestCollection">
+		SELECT
+			book.id AS bookId,
+			book.`code` AS bookCode,
+			book.`name` AS bookName,
+			databaseBook.id AS databaseId,
+			databaseBook.`code` AS databaseCode,
+			databaseBook.`name` AS databaseName,
+			collection.create_date AS createDate
+		FROM
+			ccm_database_collection collection
+			LEFT JOIN ccm_database_book book ON book.id = collection.book_id
+			LEFT JOIN ccm_database_book databaseBook ON databaseBook.id = SUBSTRING_INDEX( SUBSTRING_INDEX( book.parent_ids, ',', 2 ), ',',- 1 ) 
+		<where>
+			collection.del_flag = 0
+			AND book.del_flag = 0 
+			AND databaseBook.del_flag = 0
+			<if test="user.id != null and user.id != ''">
+				AND collection.user_id = #{user.id}
+			</if>
+		</where>
+	</select>
+</mapper>

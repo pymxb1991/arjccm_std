@@ -1,0 +1,108 @@
+
+<html>
+<head>
+
+	<title>采购计划申请管理</title>
+	<meta name="decorator" content="default"/>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<style type="text/css">
+	body{
+	margin-left: 45px;
+	margin-right: 45px;
+	font-family: Arial Unicode MS;
+	font-size: 10px;
+	}
+	h2{
+		margin:0 auto;
+		text-align: center;
+	}	
+	table {
+	
+    border-spacing: 0;
+    margin: auto;
+	width: 100%;
+	border-collapse: collapse;
+	border: 1px solid #444444;
+	}
+	.table td {
+	height: 40px;	
+}
+  .table .shenpi{
+	height: auto;	
+}
+	#table td{
+	 border: 1px solid black;
+	 word-wrap:break-word; 
+	 max-width: 80%;
+	  word-break:break-all;
+     word-wrap:break-word;
+	}
+	#tabletop { 
+	border: 0px
+	}
+	#tabletop .tabletop {
+	border-top: 0px  ;
+	}		
+	.table .trtop{		
+		text-align:center;
+		font-weight:800 ;
+		
+	}	
+	
+	</style>
+	
+</head>
+<body>
+	
+	<form id="inputForm"  class="form-horizontal" >
+
+		<h2>车辆报废申请单</h2>	
+	    <table id="tabletop" class="table">
+			<tr>
+				<td class="tabletop" colspan="2">申请编号:<u><span>${title!''}</span></u></td>
+				<td class="tabletop" colspan="2">申请人:<u><span>${user.name!''}</span></u></td>
+				<td class="tabletop" colspan="2">所属部门:<u><span>${user.office.name!''}</span></u></td>
+				<td class="tabletop" colspan="2">申请日期： <u><span>${createDate!''}</span></u></td>
+			</tr>
+		</table>	
+		<table id="table" class="table table-condensed">
+			<tr>
+				<td class="trtop" colspan="2">报废车辆</td>
+				<td colspan="6">${car.vehicle!''}</td>
+			</tr>
+			<tr>
+				<td class="trtop" colspan="2" style="width: 20%">品牌</td>
+				<td colspan="2" style="width: 30%">${car.brand!''}</td>
+				<td class="trtop" colspan="2" style="width: 20%">型号</td>
+				<td colspan="2" style="width: 30%">${car.vmodel!''}</td>
+			</tr>
+			<tr>
+				<td class="trtop" colspan="2">报废类型</td>
+				<td colspan="6">${type!''}</td>
+			</tr>
+			<tr>
+				<td class="trtop" colspan="2">报废原因</td>
+				<td colspan="6">${reason!''}</td>
+			</tr>		
+			<tr>
+				<td class="trtop" colspan="2">是否督办</td>
+				<td colspan="2">${isSup!''}</td>
+				<td class="trtop" colspan="2">督办人</td>
+				<td colspan="2">${plmAct.supExe.name!''}</td>
+			</tr>		
+			<tr>
+				<td class="trtop" colspan="2">督办明细</td>
+				<td colspan="6">${plmAct.supDetail!''}</td>
+			</tr>				
+			${actProcIns!''}
+		</table>				
+		
+		
+	
+		
+	</form>
+	
+	
+	
+</body>
+</html>

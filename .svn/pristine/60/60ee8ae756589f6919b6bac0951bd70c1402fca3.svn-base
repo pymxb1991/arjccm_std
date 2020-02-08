@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.arjjs.ccm.modules.ccm.news.dao.MessageDao">
+    
+	<sql id="messageColumns">
+		a.id AS "id",
+		a.type AS "type",
+		a.obj_id AS "objId",
+		a.content AS "content",
+		a.user_id AS "user.id",
+		a.read_flag AS "readFlag",
+		a.create_by AS "createBy",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag",
+		a.deadline AS "deadline",
+		u5.name AS "user.name",
+		u7.name AS "createByName"
+	</sql>
+	
+	<sql id="messageJoins">
+		LEFT JOIN sys_user u5 ON u5.id = a.user_id
+		LEFT JOIN sys_user u7 ON u7.id = a.create_by
+		LEFT JOIN sys_user u9 ON u9.id = a.update_by
+	</sql>
+    
+	<select id="get" resultType="Message">
+		SELECT 
+			<include refid="messageColumns"/>
+		FROM ccm_message a
+		<include refid="messageJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="Message">
+		SELECT 
+			<include refid="messageColumns"/>
+		FROM ccm_message a
+		<include refid="messageJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="type != null and type != ''">
+				<if test="type == '02'">
+					AND (a.type = '02' OR a.type = '04') 
+				</if>
+				<if test="type == '03'">
+					AND (a.type = '03' OR a.type = '13' OR a.type = '23') 
+				</if>
+				<if test="type == '01'">
+					AND a.type = '01'
+				</if>
+			</if>
+			<if test="content != null and content != ''">
+				AND a.content LIKE 
+					<if test="dbName == 'oracle'">'%'||#{content}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{content}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{content},'%')</if>
+			</if>
+			<if test="user != null and user.id != null and user.id != ''">
+				AND a.user_id = #{user.id}
+			</if>
+			<if test="createBy != null and createBy.id != null and createBy.id != ''">
+				AND a.create_by = #{createBy.id}
+			</if>
+			<if test="updateDate != null and updateDate != ''">
+				AND a.update_date = #{updateDate}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="Message">
+		SELECT 
+			<include refid="messageColumns"/>
+		FROM ccm_message a
+		<include refid="messageJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO ccm_message(
+			id,
+			type,
+			obj_id,
+			content,
+			user_id,
+			read_flag,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag,
+			deadline
+		) VALUES (
+			#{id},
+			#{type},
+			#{objId},
+			#{content},
+			#{user.id},
+			#{readFlag},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag},
+			#{deadline}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE ccm_message SET 	
+			id = #{id},
+			type = #{type},
+			obj_id = #{objId},
+			content = #{content},
+			user_id = #{user.id},
+			read_flag = #{readFlag},
+			create_by = #{createBy.id},
+			create_date = #{createDate},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks},
+			del_flag = #{delFlag},
+			deadline = #{deadline}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE ccm_message SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

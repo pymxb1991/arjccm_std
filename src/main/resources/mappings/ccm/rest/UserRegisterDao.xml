@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.arjjs.ccm.modules.ccm.rest.dao.UserRegisterDao">
+	<!-- 插入用户 -->
+	<insert id="insertUser">
+		INSERT INTO sys_user(
+			id, 
+			company_id, 
+			office_id, 
+			login_name, 
+			password, 
+			no, 
+			name, 
+			email, 
+			phone, 
+			mobile, 
+			user_type, 
+			create_by, 
+			create_date, 
+			update_by, 
+			update_date, 
+			remarks, 
+			login_flag, 
+			photo, 
+			del_flag
+		) VALUES (
+			#{id}, 
+			#{company.id}, 
+			#{office.id}, 
+			#{loginName}, 
+			#{password}, 
+			#{no}, 
+			#{name}, 
+			#{email}, 
+			#{phone}, 
+			#{mobile}, 
+			#{userType}, 
+			#{createBy.id}, 
+			#{createDate}, 
+			#{updateBy.id}, 
+			#{updateDate}, 
+			#{remarks}, 
+			#{loginFlag}, 
+			#{photo}, 
+			#{delFlag}
+		)
+	</insert>
+	<!-- 更新用户 -->
+	<update id="update">
+		UPDATE sys_user SET 
+			company_id = #{company.id}, 
+			office_id = #{office.id}, 
+			login_name = #{loginName}, 
+			password = #{password}, 
+			no = #{no}, 
+			name = #{name}, 
+			email = #{email}, 
+			phone = #{phone}, 
+			mobile = #{mobile}, 
+			user_type = #{userType}, 
+			update_by = #{updateBy.id}, 
+			update_date = #{updateDate}, 
+			remarks = #{remarks},
+			login_flag = #{loginFlag},
+			has_permission = #{hasPermission},
+			permission_key = #{permissionKey},
+			photo = #{photo}
+		WHERE id = #{id}
+	</update>
+
+
+</mapper>

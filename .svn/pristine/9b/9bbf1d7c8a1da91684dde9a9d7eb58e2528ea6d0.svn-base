@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper
+	namespace="com.arjjs.ccm.modules.flat.deviceuse.dao.CcmDeviceUseDao">
+
+	<sql id="ccmDeviceUseColumns">
+		a.id AS "id",
+		a.device_id AS "deviceId",
+		a.login_time AS
+		"loginTime",
+		a.update_time AS "updateTime",
+		a.del_flag AS "delFlag",
+		a.user_id AS "userId"
+	</sql>
+
+	<sql id="ccmDeviceUseJoins">
+	</sql>
+
+	<select id="get" resultType="CcmDeviceUse">
+		SELECT
+		<include refid="ccmDeviceUseColumns" />
+		FROM ccm_device_use a
+		<include refid="ccmDeviceUseJoins" />
+		WHERE a.id = #{id}
+	</select>
+
+
+	<select id="getByDeviceId" resultType="CcmDeviceUse">
+		SELECT
+		*
+		FROM
+		ccm_device_use
+		d
+		WHERE
+		d.device_id = #{deviceId}
+		ORDER BY
+		d.update_time DESC
+		LIMIT 1
+	</select>
+<!--
+
+
+	<select id="countUseTime"
+		resultType="com.arjjs.ccm.modules.flat.analyst.entity.Count">
+		SELECT
+		DATE_FORMAT( login_time, '%Y-%m-%d' ) AS days,
+		FORMAT(SUM( UNIX_TIMESTAMP( update_time ) - UNIX_TIMESTAMP(
+		login_time) ) / 3600 , 1)
+		as counts,
+		count(*) AS times
+		FROM
+		( SELECT *
+		FROM ccm_device_use d
+		WHERE
+		d.user_Id =
+		#{userId}
+		AND login_time
+		BETWEEN
+		#{beginDate} AND #{endDate}
+		) AS a
+		GROUP BY
+		days
+	</select>
+
+	<select id="getDataByDept"
+		resultType="com.arjjs.ccm.modules.flat.analyst.entity.Count">
+		SELECT
+		user_id AS userId,
+		FORMAT( SUM( UNIX_TIMESTAMP( update_time ) -
+		UNIX_TIMESTAMP( login_time ) ) /
+		60, 1 ) AS counts,
+		count( * ) AS
+		times
+		FROM
+		( SELECT * FROM ccm_device_use d WHERE
+		user_id IN
+		<foreach collection="array" index="index" item="item" open="("
+			separator="," close=")">
+			#{item}
+		</foreach>
+		) AS a
+		GROUP BY
+		user_id
+	</select>
+-->
+
+
+
+	<select id="findList" resultType="CcmDeviceUse">
+		SELECT
+		<include refid="ccmDeviceUseColumns" />
+		FROM ccm_device_use a
+		<include refid="ccmDeviceUseJoins" />
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="id != null and id != ''">
+				AND a.id = #{id}
+			</if>
+			<if test="deviceId != null and deviceId != ''">
+				AND a.device_id = #{deviceId}
+			</if>
+		</where>
+		<choose>
+			<when
+				test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+			</otherwise>
+		</choose>
+	</select>
+
+	<select id="findAllList" resultType="CcmDeviceUse">
+		SELECT
+		<include refid="ccmDeviceUseColumns" />
+		FROM ccm_device_use a
+		<include refid="ccmDeviceUseJoins" />
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>
+		<choose>
+			<when
+				test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+			</otherwise>
+		</choose>
+	</select>
+
+	<insert id="insert">
+		INSERT INTO ccm_device_use(
+		id,
+		device_id,
+		login_time,
+		update_time,
+		user_id,
+		del_flag
+		) VALUES (
+		#{id},
+		#{deviceId},
+		#{loginTime},
+		#{updateTime},
+		#{userId},
+		#{delFlag}
+		)
+	</insert>
+
+	<update id="update">
+		UPDATE ccm_device_use SET
+		device_id = #{deviceId},
+		login_time = #{loginTime},
+		update_time = #{updateTime},
+		user_id =
+		#{userId}
+		WHERE id = #{id}
+	</update>
+
+	<update id="delete">
+		UPDATE ccm_device_use SET
+		del_flag =
+		#{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+
+</mapper>

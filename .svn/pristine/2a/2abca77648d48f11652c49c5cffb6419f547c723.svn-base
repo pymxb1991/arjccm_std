@@ -1,0 +1,203 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.arjjs.ccm.modules.ccm.patrol.dao.CcmPatrolPlanDao">
+
+	<sql id="ccmPatrolPlanColumns">
+		a.id AS "id",
+		a.name AS "name",
+		a.responsibility AS
+		"responsibility",
+		a.begin_date AS "beginDate",
+		a.end_date AS "endDate",
+		a.begin_time AS "beginTime",
+		a.end_time AS "endTime",
+		a.time_type AS
+		"timeType",
+		a.time_rule AS "timeRule",
+		a.content AS "content",
+		a.status
+		AS "status",
+		a.create_by AS "createBy.id",
+		a.create_date AS
+		"createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS
+		"updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag",
+		a.point_type AS "pointType",
+		(case a.status 
+			when 01 then '启动' 
+			when 02 then '暂停' 
+			else '' end) "statusLable",
+		(case a.time_type 
+			when 01 then '每天' 
+			when 02 then '每周' 
+			when 03 then '每月'
+			else '' end) "timeTypeLable"
+	</sql>
+
+	<sql id="ccmPatrolPlanJoins">
+	</sql>
+	<sql id="ccmPatrolPlanJoinUser">
+		LEFT JOIN ccm_patrol_user patusr
+		on patusr.plan_id = a.id
+	</sql>
+
+	<select id="get" resultType="CcmPatrolPlan">
+		SELECT
+		<include refid="ccmPatrolPlanColumns" />
+		FROM ccm_patrol_plan a
+		<include refid="ccmPatrolPlanJoins" />
+		WHERE a.id = #{id}
+	</select>
+
+	<select id="findList" resultType="CcmPatrolPlan">
+		SELECT
+		<include refid="ccmPatrolPlanColumns" />
+		FROM ccm_patrol_plan a
+		<if test="curUser != null and curUser != ''">
+			<include refid="ccmPatrolPlanJoinUser" />
+		</if>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="name != null and name != ''">
+				AND a.name LIKE
+				<if test="dbName == 'oracle'">'%'||#{name}||'%'</if>
+				<if test="dbName == 'mssql'">'%'+#{name}+'%'</if>
+				<if test="dbName == 'mysql'">concat('%',#{name},'%')</if>
+			</if>
+			<if test="responsibility != null and responsibility != ''">
+				AND a.responsibility LIKE
+				<if test="dbName == 'oracle'">'%'||#{responsibility}||'%'</if>
+				<if test="dbName == 'mssql'">'%'+#{responsibility}+'%'</if>
+				<if test="dbName == 'mysql'">concat('%',#{responsibility},'%')</if>
+			</if>
+			<if test="timeType != null and timeType != ''">
+				AND a.time_type = #{timeType}
+			</if>
+			<if test="status != null and status != ''">
+				AND a.status = #{status}
+			</if>
+			<if test="pointType != null and pointType != ''">
+				AND a.point_type = #{pointType}
+			</if>
+			<if test="curDate != null  and curDate != ''  ">
+				AND (a.begin_date &lt; #{curDate} and a.end_date &gt;
+				#{curDate})
+			</if>
+			<if test="curUser != null and curUser != ''">
+				AND patusr.user_id = #{curUser}
+			</if>
+			<if test="curBegin != null and curEnd != ''">
+				AND ( (
+				a.begin_date &gt;= #{curBegin}
+				AND a.end_date &lt;= #{curEnd}
+				)
+				OR (
+				a.begin_date &lt;= #{curBegin}
+				AND a.end_date &gt;= #{curBegin}
+				))
+
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+
+	<select id="findAllList" resultType="CcmPatrolPlan">
+		SELECT
+		<include refid="ccmPatrolPlanColumns" />
+		FROM ccm_patrol_plan a
+		<include refid="ccmPatrolPlanJoins" />
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+
+	<insert id="insert">
+		INSERT INTO ccm_patrol_plan(
+		id,
+		name,
+		responsibility,
+		begin_date,
+		end_date,
+		begin_time,
+		end_time,
+		time_type,
+		time_rule,
+		content,
+		status,
+		create_by,
+		create_date,
+		update_by,
+		update_date,
+		remarks,
+		del_flag,
+		point_type
+		) VALUES (
+		#{id},
+		#{name},
+		#{responsibility},
+		#{beginDate},
+		#{endDate},
+		#{beginTime},
+		#{endTime},
+		#{timeType},
+		#{timeRule},
+		#{content},
+		#{status},
+		#{createBy.id},
+		#{createDate},
+		#{updateBy.id},
+		#{updateDate},
+		#{remarks},
+		#{delFlag},
+		#{pointType}
+		)
+	</insert>
+
+	<update id="update">
+		UPDATE ccm_patrol_plan SET
+		name = #{name},
+		responsibility = #{responsibility},
+		begin_date = #{beginDate},
+		end_date
+		= #{endDate},
+		begin_time = #{beginTime},
+		end_time = #{endTime},
+		time_type = #{timeType},
+		time_rule = #{timeRule},
+		content = #{content},
+		status = #{status},
+		update_by = #{updateBy.id},
+		update_date =
+		#{updateDate},
+		remarks = #{remarks},
+		point_type = #{pointType}
+		WHERE id =
+		#{id}
+	</update>
+
+	<update id="delete">
+		UPDATE ccm_patrol_plan SET
+		del_flag =
+		#{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+
+</mapper>

@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport"
+	content="width=device-width, initial-scale=1.0, user-scalable=no" />
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<link href="mapfiles/css/default.css" rel="stylesheet" type="text/css" />
+<title>添加分组</title>
+<script type="text/javascript">
+	var ctx = "/arjflat/a";
+	var ctxStatic = "/arjflat/static";
+</script>
+<script type="text/javascript" src="../../jquery/jquery-1.9.1.min.js"></script>
+<script type="text/javascript"
+	src="../../jquery/jquery-migrate-1.1.1.min.js"></script>
+<link href="../../bootstrap/2.3.1/css_cerulean/bootstrap.min.css"
+	type="text/css" rel="stylesheet">
+<link href="../../bootstrap/2.3.1/css_cerulean/custom.css"
+	type="text/css" rel="stylesheet">
+<link href="../../bootstrap/2.3.1/css_cerulean/custom.css"
+	type="text/css" rel="stylesheet">
+<script src="../../bootstrap/2.3.1/js/bootstrap.min.js"
+	type="text/javascript"></script>
+<link href="../../bootstrap/2.3.1/awesome/font-awesome.min.css"
+	type="text/css" rel="stylesheet">
+<link rel="stylesheet"
+	href="../../jquery-ztree/3.5.12/css/zTreeStyle/zTreeStyle.min.css"
+	type="text/css">
+<script src="../../jquery-ztree/3.5.12/js/jquery.ztree.all-3.5.js"
+	type="text/javascript"></script>
+	<script src="userGroup.js"
+	type="text/javascript"></script>
+<script type="text/javascript">
+	
+</script>
+<style type="text/css">
+.form-horizontal .control-label {
+	float: left;
+	width: 80px;
+	padding-top: 5px;
+	text-align: right;
+}
+
+.form-horizontal .controls {
+	margin-left: 90px;
+}
+
+.height100 {
+	height: 100%;
+}
+
+.ztree {
+	height: 400px;
+	width:380px;
+	margin-left: 80px;
+	overflow: auto;
+}
+
+.row-fluid {
+	height: 470px
+}
+
+.searchdiv {
+	margin: 10px 0 0 80px;
+}
+
+#inputForm {
+	margin: 10px 0 0 0px;
+}
+
+#search {
+	position: relative;
+	top: -5px;
+}
+
+#userlist {
+	height: 365px;
+	width: 285px;
+	list-style: none;
+	margin-left: 0px;
+	overflow: auto;
+}
+
+.hidden {
+	display: none;
+}
+
+.userli {
+	height: 35px;
+	line-height: 35px;
+	border: 1px solid #e2dfdf;
+	border-radius: 15px;
+    padding: 0 10px 0 20px;
+}
+#form_btn_div{
+  position: absolute;
+ bottom: 8px;
+ right: 8px
+}
+.iconclose{
+font-size: 20px ; 
+float: right;
+ margin-top: 8px;
+ cursor: pointer;
+ color: #989696;
+}
+.iconclose:HOVER{color: #333;}
+</style>
+
+</head>
+<body>
+	<div class="row-fluid">
+		<div class="span6 height100"
+			style="border-right: 0.5px solid #e2dfdf;">
+			<div class="searchdiv">
+				<input id="username" name="username" class="input-xlarge"
+					type="text"> <input id="search" class="btn btn-primary"
+					type="submit" value="查询">
+			</div>
+			<div id="userTree" class="ztree"></div>
+		</div>
+		<div class="span6 height100">
+
+			<form id="inputForm"  class="form-horizontal">
+				<input type="hidden" id="id" class="hidden" />
+				<div class="control-group" style="margin-bottom: 8px;">
+					<label class="control-label">群聊名称：</label>
+					<div class="controls">
+						<input id="groupname" name="groupname"
+							class="input-xlarge   groupname  required" type="text"> <span
+							class="help-inline"><font color="red">*</font></span>
+					</div>
+				</div>
+				<div style="margin-left: 100px;">
+					<span id="xinxi">请勾选需要添加的人</span>
+				</div>
+				<div class="control-group" style="margin-bottom: 8px;">
+					<label class="control-label"> 添加用户：</label>
+					<div class="controls">
+						<ul id="userlist">
+							
+						</ul>
+					</div>
+				</div>
+			<div id="form_btn_div">
+				<input id="btnSubmit" class="btn btn-primary" type="button"
+					value="保 存" />&nbsp;
+		        <input id="btnCancel" class="btn" type="button" value="关闭" onclick=""/>
+		    </div>    
+			</form>
+
+
+
+		</div>
+	</div>
+
+</body>
+</html>

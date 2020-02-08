@@ -1,0 +1,172 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.arjjs.ccm.modules.ccm.sys.dao.SysDictsDao">
+    
+	<sql id="sysDictsColumns">
+		a.id AS "id",
+		a.parent_id AS "parent.id",
+		a.parent_ids AS "parentIds",
+		a.value AS "value",
+		a.label AS "label",
+		a.type AS "type",
+		a.description AS "description",
+		a.sort AS "sort",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag",
+		d.label AS "parent.label"
+	</sql>
+	
+	<sql id="sysDictsJoins">
+		LEFT JOIN sys_dicts d ON d.id = a.parent_id
+	</sql>
+    
+	<select id="get" resultType="SysDicts">
+		SELECT 
+			<include refid="sysDictsColumns"/>
+		FROM sys_dicts a
+		<include refid="sysDictsJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="SysDicts">
+		SELECT 
+			<include refid="sysDictsColumns"/>
+		FROM sys_dicts a
+		<include refid="sysDictsJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="id != null and id != ''">
+				AND a.id = #{id}
+			</if>
+			<if test="parent != null and parent.id != null and parent.id != ''">
+				AND a.parent_id = #{parent.id}
+			</if>
+			<if test="parentIds != null and parentIds != ''">
+				AND a.parent_ids LIKE 
+					<if test="dbName == 'oracle'">'%'||#{parentIds}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{parentIds}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{parentIds},'%')</if>
+			</if>
+			<if test="value != null and value != ''">
+				AND a.value = #{value}
+			</if>
+			<if test="label != null and label != ''">
+				AND a.label LIKE 
+					<if test="dbName == 'oracle'">'%'||#{label}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{label}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{label},'%')</if>
+			</if>
+			<if test="type != null and type != ''">
+				AND a.type = #{type}
+			</if>
+			<if test="description != null and description != ''">
+				AND a.description LIKE 
+					<if test="dbName == 'oracle'">'%'||#{description}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{description}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{description},'%')</if>
+			</if>
+		</where>
+		ORDER BY a.sort ASC
+	</select>
+	
+	<select id="findAllList" resultType="SysDicts">
+		SELECT 
+			<include refid="sysDictsColumns"/>
+		FROM sys_dicts a
+		<include refid="sysDictsJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>
+		ORDER BY a.sort ASC
+	</select>
+	
+	<select id="findByParentIdsLike" resultType="SysDicts">
+		SELECT
+			a.id,
+			a.parent_id AS "parent.id",
+			a.parent_ids
+		FROM sys_dicts a
+		<include refid="sysDictsJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			AND a.parent_ids LIKE #{parentIds}
+		</where>
+		ORDER BY a.sort ASC
+	</select>
+	
+	<select id="findTypeList" resultType="string">
+		SELECT 
+			type 
+		FROM sys_dicts 
+		WHERE del_flag = #{DEL_FLAG_NORMAL} 
+		GROUP BY type
+		ORDER BY type
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO sys_dicts(
+			id,
+			parent_id,
+			parent_ids,
+			value,
+			label,
+			type,
+			description,
+			sort,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag
+		) VALUES (
+			#{id},
+			#{parent.id},
+			#{parentIds},
+			#{value},
+			#{label},
+			#{type},
+			#{description},
+			#{sort},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE sys_dicts SET 	
+			parent_id = #{parent.id},
+			parent_ids = #{parentIds},
+			value = #{value},
+			label = #{label},
+			type = #{type},
+			description = #{description},
+			sort = #{sort},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="updateParentIds">
+		UPDATE sys_dicts SET 
+			parent_id = #{parent.id}, 
+			parent_ids = #{parentIds}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE sys_dicts SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id} OR parent_ids LIKE '%,'||#{id}||',%'
+	</update>
+	
+</mapper>

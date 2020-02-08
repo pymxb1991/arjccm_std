@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.arjjs.ccm.modules.ccm.org.dao.CcmOrgDeviceDao">
+    
+	<sql id="ccmOrgDeviceColumns">
+		a.id AS "id",
+		a.device_id AS "deviceId.id",
+		a2.name AS "deviceId.name",
+		a.org_id AS "orgId",
+		a.more1 AS "more1",
+		a.more2 AS "more2",
+		a.more3 AS "more3"
+	</sql>
+	
+	<sql id="ccmOrgDeviceJoins">
+			LEFT JOIN ccm_device a2 ON a2.id = a.device_id
+	</sql>
+    
+	<select id="get" resultType="CcmOrgDevice">
+		SELECT 
+			<include refid="ccmOrgDeviceColumns"/>
+		FROM ccm_org_device a
+		<include refid="ccmOrgDeviceJoins"/>
+		WHERE a.id = #{id}
+	</select>
+
+
+
+	<resultMap id="BaseResultMap" type="com.arjjs.ccm.modules.ccm.org.entity.CcmOrgDeviceInfo" >
+		<result column="org_id" property="orgId" jdbcType="VARCHAR" />
+		<collection property="deviceList"
+					ofType="com.arjjs.ccm.modules.ccm.org.entity.CcmDeviceVo">
+			<result column="id" property="id" jdbcType="VARCHAR" />
+			<result column="name" property="name" jdbcType="VARCHAR" />
+			<result column="ip" property="ip" jdbcType="VARCHAR" />
+			<result column="param" property="param" jdbcType="VARCHAR" />
+			<result column="code" property="code" jdbcType="VARCHAR" />
+			<result column="port" property="port" jdbcType="VARCHAR" />
+			<result column="account" property="username" jdbcType="VARCHAR" />
+			<result column="password" property="password" jdbcType="VARCHAR" />
+
+		</collection>
+	</resultMap>
+	<select id="queryDeviceByOrgDeviceId" resultMap="BaseResultMap">
+		SELECT
+			t1.org_id,
+			t2.id,		t2.name,	t2.`ip`,			t2.`param`,			t2.`code`,			t2.`port`,			t2.`account`,			t2.`password`
+		FROM
+			ccm_org_device AS t1
+			LEFT JOIN ccm_device AS t2 ON t2.id = t1.device_id
+		WHERE
+			t1.org_id = #{orgId}
+	</select>
+
+	<select id="findList" resultType="CcmOrgDevice">
+		SELECT 
+			<include refid="ccmOrgDeviceColumns"/>
+		FROM ccm_org_device a
+		<include refid="ccmOrgDeviceJoins"/>
+		<where>
+			
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="CcmOrgDevice">
+		SELECT 
+			<include refid="ccmOrgDeviceColumns"/>
+		FROM ccm_org_device a
+		<include refid="ccmOrgDeviceJoins"/>
+		<where>
+			
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO ccm_org_device(
+			id,
+			device_id,
+			org_id,
+			more1,
+			more2,
+			more3
+		) VALUES (
+			#{id},
+			#{deviceId.id},
+			#{orgId},
+			#{more1},
+			#{more2},
+			#{more3}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE ccm_org_device SET 	
+			device_id = #{deviceId.id},
+			org_id = #{orgId},
+			more1 = #{more1},
+			more2 = #{more2},
+			more3 = #{more3}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		DELETE FROM ccm_org_device
+		WHERE id = #{id}
+	</update>
+
+	<update id="deleteOrgDevice">
+		DELETE FROM ccm_org_device		WHERE  org_id = #{orgId}
+	</update>
+</mapper>

@@ -1,0 +1,585 @@
+/**
+ * Copyright &copy; 2012-2016 <a href="https://github.com/thinkgem/jeesite">JeeSite</a> All rights reserved.
+ */
+package com.arjjs.ccm.modules.ccm.rest.web;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.util.List;
+import java.util.UUID;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.apache.shiro.authz.annotation.RequiresPermissions;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
+import com.arjjs.ccm.common.config.Global;
+import com.arjjs.ccm.common.persistence.Page;
+import com.arjjs.ccm.common.web.BaseController;
+import com.arjjs.ccm.common.utils.StringUtils;
+import com.arjjs.ccm.modules.ccm.live.entity.CcmPlaceLive;
+import com.arjjs.ccm.modules.ccm.live.service.CcmPlaceLiveService;
+import com.arjjs.ccm.modules.ccm.place.entity.CcmBasePlace;
+import com.arjjs.ccm.modules.ccm.place.service.CcmBasePlaceService;
+import com.arjjs.ccm.tool.CommUtil;
+import com.arjjs.ccm.common.config.Global;
+import com.arjjs.ccm.common.persistence.Page;
+import com.arjjs.ccm.common.utils.StringUtils;
+import com.arjjs.ccm.common.web.BaseController;
+import com.arjjs.ccm.modules.ccm.casino.entity.CcmPlaceCasino;
+import com.arjjs.ccm.modules.ccm.casino.service.CcmPlaceCasinoService;
+import com.arjjs.ccm.modules.ccm.catering.entity.CcmPlaceCatering;
+import com.arjjs.ccm.modules.ccm.catering.service.CcmPlaceCateringService;
+import com.arjjs.ccm.modules.ccm.chemical.entity.CcmPlaceChemical;
+import com.arjjs.ccm.modules.ccm.chemical.service.CcmPlaceChemicalService;
+import com.arjjs.ccm.modules.ccm.education.entity.CcmPlaceEducation;
+import com.arjjs.ccm.modules.ccm.education.service.CcmPlaceEducationService;
+import com.arjjs.ccm.modules.ccm.event.entity.CcmEventIncident;
+import com.arjjs.ccm.modules.ccm.event.service.CcmEventIncidentService;
+import com.arjjs.ccm.modules.ccm.financial.entity.CcmPlaceFinancial;
+import com.arjjs.ccm.modules.ccm.financial.service.CcmPlaceFinancialService;
+import com.arjjs.ccm.modules.ccm.hospital.entity.CcmPlaceHospital;
+import com.arjjs.ccm.modules.ccm.hospital.service.CcmPlaceHospitalService;
+import com.arjjs.ccm.modules.ccm.hotel.entity.CcmPlaceHotel;
+import com.arjjs.ccm.modules.ccm.hotel.service.CcmPlaceHotelService;
+import com.arjjs.ccm.modules.ccm.live.entity.CcmPlaceLive;
+import com.arjjs.ccm.modules.ccm.live.service.CcmPlaceLiveService;
+import com.arjjs.ccm.modules.ccm.org.entity.CcmOrgNpse;
+import com.arjjs.ccm.modules.ccm.place.entity.CcmBasePlace;
+import com.arjjs.ccm.modules.ccm.place.service.CcmBasePlaceService;
+import com.arjjs.ccm.modules.ccm.religion.entity.CcmPlaceReligion;
+import com.arjjs.ccm.modules.ccm.religion.service.CcmPlaceReligionService;
+import com.arjjs.ccm.modules.ccm.rest.entity.CcmRestResult;
+import com.arjjs.ccm.modules.ccm.rest.entity.CcmRestType;
+import com.arjjs.ccm.modules.ccm.scenic.entity.CcmPlaceScenic;
+import com.arjjs.ccm.modules.ccm.scenic.service.CcmPlaceScenicService;
+import com.arjjs.ccm.modules.ccm.traffic.entity.CcmPlaceTraffic;
+import com.arjjs.ccm.modules.ccm.traffic.service.CcmPlaceTrafficService;
+import com.arjjs.ccm.modules.sys.entity.Area;
+import com.arjjs.ccm.modules.sys.entity.Dict;
+import com.arjjs.ccm.modules.sys.entity.User;
+import com.arjjs.ccm.modules.sys.utils.DictUtils;
+import com.arjjs.ccm.tool.CommUtil;
+import com.arjjs.ccm.tool.EchartType;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
+import com.arjjs.ccm.modules.ccm.rest.entity.CcmRestResult;
+import com.arjjs.ccm.modules.ccm.rest.entity.CcmRestType;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.util.*;
+
+/**
+ * 场所管理接口类
+ * 
+ * @author lgh
+ * @version 2019-04-23
+ */
+@Controller
+@RequestMapping(value = "${appPath}/rest/basePlace")
+public class CcmRestbasePlace extends BaseController {
+
+	
+	
+	@Autowired
+	private CcmBasePlaceService ccmBasePlaceService;
+	@Autowired
+	private CcmPlaceLiveService ccmPlaceLiveService;
+	@Autowired
+	private CcmPlaceCasinoService ccmPlaceCasinoService;
+	@Autowired
+	private CcmPlaceEducationService ccmPlaceEducationService;
+	@Autowired
+	private CcmPlaceHospitalService ccmPlaceHospitalService;
+	@Autowired
+	private CcmPlaceCateringService ccmPlaceCateringService;
+	@Autowired
+	private CcmPlaceTrafficService ccmPlaceTrafficService;
+	@Autowired
+	private CcmPlaceHotelService ccmPlaceHotelService;
+	@Autowired
+	private CcmPlaceScenicService ccmPlaceScenicService;
+	@Autowired
+	private CcmPlaceFinancialService ccmPlaceFinancialService;
+	@Autowired
+	private CcmPlaceReligionService ccmPlaceReligionService;
+	@Autowired
+	private CcmPlaceChemicalService ccmPlaceChemicalService;
+	@Autowired
+	private CcmEventIncidentService ccmEventIncidentService;
+	
+
+	@ResponseBody
+	@RequestMapping(value="/get", method = RequestMethod.GET)
+	public CcmRestResult get(String userId,String placeType,String type,CcmBasePlace ccmBasePlace,HttpServletRequest req, HttpServletResponse resp, String id,String basePlaceId) throws IOException {
+		CcmRestResult result = new CcmRestResult();
+		User sessionUser = (User) req.getSession().getAttribute("user");
+		if (sessionUser== null) {
+			result.setCode(CcmRestType.ERROR_USER_NOT_EXIST);
+			return result;
+		}
+		String sessionUserId = sessionUser.getId();
+		if (userId== null || "".equals(userId) ||!userId.equals(sessionUserId)) {
+			result.setCode(CcmRestType.ERROR_USER_NOT_EXIST);
+			return result;
+		}
+/*		if (id == null || "".equals(id)) {//参数id不对
+			result.setCode(CcmRestType.ERROR_PARAM);
+			return result;
+		}*/
+		
+		if (placeType!= null && placeType.equals("ccm_place_live")) {
+			
+			CcmPlaceLive ccmPlaceLive = new CcmPlaceLive();
+			ccmBasePlace.setId(basePlaceId);
+			CcmBasePlace ccmBasePlace2 = ccmBasePlaceService.get(ccmBasePlace);
+			ccmPlaceLive.setCcmBasePlace(ccmBasePlace2);
+			result.setCode(CcmRestType.OK);
+			result.setResult(ccmPlaceLive);
+		}
+		else if (placeType!= null && placeType.equals("ccm_place_casino")) {
+			/*CcmBasePlace ccmBasePlace = ccmBasePlaceService.get(id);*/
+	/*		ccmPlaceCasino.setType(type);*/
+			result.setCode(CcmRestType.OK);
+			result.setResult(ccmBasePlace);
+		}
+		else if (placeType!= null && placeType.equals("ccm_place_education")) {
+			CcmPlaceEducation ccmPlaceEducation = ccmPlaceEducationService.get(id);
+			ccmPlaceEducation.setType(type);
+			result.setCode(CcmRestType.OK);
+			result.setResult(ccmPlaceEducation);
+		}
+		else if (placeType!= null && placeType.equals("ccm_place_hospital")) {
+			CcmPlaceHospital ccmPlaceHospital = new CcmPlaceHospital();
+			//ccmPlaceHospital.setType(type);
+			ccmPlaceHospital = ccmPlaceHospitalService.get(id);
+			result.setCode(CcmRestType.OK);
+			result.setResult(ccmPlaceHospital);
+		}
+		else if (placeType!= null && placeType.equals("ccm_place_catering")) {
+			CcmPlaceCatering ccmPlaceCatering = new CcmPlaceCatering();
+			ccmPlaceCatering.setType(type);
+			ccmPlaceCatering = ccmPlaceCateringService.get(id);
+			result.setCode(CcmRestType.OK);
+			result.setResult(ccmPlaceCatering);
+		}
+		else if (placeType!= null && placeType.equals("ccm_place_traffic")) {
+			CcmPlaceTraffic ccmPlaceTraffic = ccmPlaceTrafficService.get(id);
+			ccmPlaceTraffic.setType(type);
+			result.setCode(CcmRestType.OK);
+			result.setResult(ccmPlaceTraffic);
+		}
+		else if (placeType!= null && placeType.equals("ccm_place_hotel")) {
+			CcmPlaceHotel ccmPlaceHotel = ccmPlaceHotelService.get(id);
+			ccmPlaceHotel.setType(type);
+			result.setCode(CcmRestType.OK);
+			result.setResult(ccmPlaceHotel);
+		}
+		else if (placeType!= null && placeType.equals("ccm_place_scenic")) {
+			CcmPlaceScenic ccmPlaceScenic = ccmPlaceScenicService.get(id);
+			ccmPlaceScenic.setType(type);
+			result.setCode(CcmRestType.OK);
+			result.setResult(ccmPlaceScenic);
+		}
+		else if (placeType!= null && placeType.equals("ccm_place_religion")) {
+			CcmPlaceReligion ccmPlaceReligion = ccmPlaceReligionService.get(id);
+			ccmPlaceReligion.setType(type);
+			result.setCode(CcmRestType.OK);
+			result.setResult(ccmPlaceReligion);
+		}
+		else if (placeType!= null && placeType.equals("ccm_place_chemical")) {
+			CcmPlaceChemical ccmPlaceChemical = ccmPlaceChemicalService.get(id);
+			ccmPlaceChemical.setType(type);
+			result.setCode(CcmRestType.OK);
+			result.setResult(ccmPlaceChemical);
+		}
+		else if (placeType!= null && placeType.equals("ccm_place_financial")) {
+			CcmPlaceFinancial ccmPlaceFinancial = ccmPlaceFinancialService.get(id);
+			ccmPlaceFinancial.setType(type);
+			result.setCode(CcmRestType.OK);
+			result.setResult(ccmPlaceFinancial);
+		}
+		
+		if(placeType ==null|| "".equals(placeType)) {
+			CcmBasePlace ccmBasePlacea = ccmBasePlaceService.get(id);
+			result.setCode(CcmRestType.OK);
+			result.setResult(ccmBasePlacea);
+		}
+		return result;
+	}
+	
+	/**
+	 * @see  查询基础场所信息
+	 * @param ccmBasePlace
+	 * @param pageNo 页码
+	 * @param pageSize 分页大小
+	 * @return 
+	 * @author pengjianqiang
+	 * @version 2018-02-23
+	 */
+	@ResponseBody
+	@RequestMapping(value="/query", method = RequestMethod.GET)
+	public CcmRestResult query(Integer pageNo,String userId,String placeType, String type,CcmBasePlace ccmBasePlace, HttpServletRequest req, HttpServletResponse resp) throws IOException {
+		CcmRestResult result = new CcmRestResult();
+		User sessionUser = (User) req.getSession().getAttribute("user");
+		if (sessionUser== null) {
+			result.setCode(CcmRestType.ERROR_USER_NOT_EXIST);
+			return result;
+		}
+		String sessionUserId = sessionUser.getId();
+		if (userId== null || "".equals(userId) ||!userId.equals(sessionUserId)) {
+			result.setCode(CcmRestType.ERROR_USER_NOT_EXIST);
+			return result;
+		}
+		
+		ccmBasePlace.setCheckUser(sessionUser);
+		if(placeType ==null|| "".equals(placeType)) {
+			Page<CcmBasePlace> page99 = ccmBasePlaceService.findPage(new Page<CcmBasePlace>(req, resp), ccmBasePlace);
+			result.setCode(CcmRestType.OK);
+			page99.setPageNo(pageNo);
+			result.setResult(page99.getList());
+		}
+		else if (placeType!= null && placeType.equals("ccm_place_live")) { 
+			CcmPlaceLive ccmPlaceLive = new CcmPlaceLive();
+			ccmPlaceLive.setType(type);
+			Page<CcmPlaceLive> page1 = ccmPlaceLiveService.findPage(new Page<CcmPlaceLive>(req, resp), ccmPlaceLive);
+			result.setCode(CcmRestType.OK);
+			page1.setPageNo(pageNo);
+			result.setResult(page1.getList());
+		 }
+		 else if(placeType!= null &&placeType.equals("ccm_place_casino")) {
+			 CcmPlaceCasino ccmPlaceCasino = new CcmPlaceCasino();
+			 ccmPlaceCasino.setType(type);
+				Page<CcmPlaceCasino> page2 = ccmPlaceCasinoService.findPage(new Page<CcmPlaceCasino>(req, resp), ccmPlaceCasino);
+				result.setCode(CcmRestType.OK);
+				page2.setPageNo(pageNo);
+				result.setResult(page2.getList());
+		 }
+		 else if(placeType!= null &&placeType.equals("ccm_place_education")) {
+			 CcmPlaceEducation ccmPlaceEducation = new CcmPlaceEducation();
+			 ccmPlaceEducation.setType(type);
+				Page<CcmPlaceEducation> page3 = ccmPlaceEducationService.findPage(new Page<CcmPlaceEducation>(req, resp), ccmPlaceEducation);
+				result.setCode(CcmRestType.OK);
+				page3.setPageNo(pageNo);
+				result.setResult(page3.getList());
+		 }
+		 else if(placeType!= null &&placeType.equals("ccm_place_hospital")) {
+			 CcmPlaceHospital ccmPlaceHospital = new CcmPlaceHospital();
+			 ccmPlaceHospital.setType(type);
+				Page<CcmPlaceHospital> page4 = ccmPlaceHospitalService.findPage(new Page<CcmPlaceHospital>(req, resp), ccmPlaceHospital);
+				result.setCode(CcmRestType.OK);
+				page4.setPageNo(pageNo);
+				result.setResult(page4.getList());
+		 }
+		 else if(placeType!= null &&placeType.equals("ccm_place_catering")) {
+			 CcmPlaceCatering ccmPlaceCatering = new CcmPlaceCatering();
+			 ccmPlaceCatering.setType(type);
+				Page<CcmPlaceCatering> page = ccmPlaceCateringService.findPage(new Page<CcmPlaceCatering>(req, resp), ccmPlaceCatering);
+				result.setCode(CcmRestType.OK);
+				page.setPageNo(pageNo);
+				result.setResult(page.getList());
+		 }
+		 else if(placeType!= null &&placeType.equals("ccm_place_traffic")) {
+			 CcmPlaceTraffic ccmPlaceTraffic = new CcmPlaceTraffic();
+			 ccmPlaceTraffic.setType(type);
+				Page<CcmPlaceTraffic> page = ccmPlaceTrafficService.findPage(new Page<CcmPlaceTraffic>(req, resp), ccmPlaceTraffic);
+				result.setCode(CcmRestType.OK);
+				page.setPageNo(pageNo);
+				result.setResult(page.getList());
+		 }
+		 else if(placeType!= null &&placeType.equals("ccm_place_hotel")) {
+			 CcmPlaceHotel ccmPlaceHotel = new CcmPlaceHotel();
+			 ccmPlaceHotel.setType(type);
+				Page<CcmPlaceHotel> page7 = ccmPlaceHotelService.findPage(new Page<CcmPlaceHotel>(req, resp), ccmPlaceHotel);
+				result.setCode(CcmRestType.OK);
+				page7.setPageNo(pageNo);
+				result.setResult(page7.getList());
+		 }
+		 else if(placeType!= null &&placeType.equals("ccm_place_scenic")) {
+			 CcmPlaceScenic ccmPlaceScenic = new CcmPlaceScenic();
+			 ccmPlaceScenic.setType(type);
+				Page<CcmPlaceScenic> page8 = ccmPlaceScenicService.findPage(new Page<CcmPlaceScenic>(req, resp), ccmPlaceScenic);
+				result.setCode(CcmRestType.OK);
+				page8.setPageNo(pageNo);
+				result.setResult(page8.getList());
+		 }
+		 else if(placeType!= null &&placeType.equals("ccm_place_financial")) {
+			 CcmPlaceFinancial ccmPlaceFinancial = new CcmPlaceFinancial();
+			 ccmPlaceFinancial.setType(type);
+				Page<CcmPlaceFinancial> page9 = ccmPlaceFinancialService.findPage(new Page<CcmPlaceFinancial>(req, resp), ccmPlaceFinancial);
+				result.setCode(CcmRestType.OK);
+				page9.setPageNo(pageNo);
+				result.setResult(page9.getList());
+		 }
+		 else if(placeType!= null &&placeType.equals("ccm_place_religion")) {
+			 CcmPlaceReligion ccmPlaceReligion = new CcmPlaceReligion();
+			 ccmPlaceReligion.setType(type);
+				Page<CcmPlaceReligion> page10 = ccmPlaceReligionService.findPage(new Page<CcmPlaceReligion>(req, resp), ccmPlaceReligion);
+				result.setCode(CcmRestType.OK);
+				page10.setPageNo(pageNo);
+				result.setResult(page10.getList());
+		 }		 
+		 else if(placeType!= null &&placeType.equals("ccm_place_chemical")) {
+			 CcmPlaceChemical ccmPlaceChemical = new CcmPlaceChemical();
+			 ccmPlaceChemical.setType(type);
+				Page<CcmPlaceChemical> page11 = ccmPlaceChemicalService.findPage(new Page<CcmPlaceChemical>(req, resp), ccmPlaceChemical);
+				result.setCode(CcmRestType.OK);
+				page11.setPageNo(pageNo);
+				result.setResult(page11.getList());
+		 }
+		 else if(placeType!= null &&placeType.equals("ccm_place_financial")) {
+			 CcmPlaceFinancial ccmPlaceFinancial = new CcmPlaceFinancial();
+			 ccmPlaceFinancial.setType(type);
+				Page<CcmPlaceFinancial> page12 = ccmPlaceFinancialService.findPage(new Page<CcmPlaceFinancial>(req, resp), ccmPlaceFinancial);
+				result.setCode(CcmRestType.OK);
+				page12.setPageNo(pageNo);
+				result.setResult(page12.getList());
+		 }
+		
+
+		
+		return result;
+	}
+	
+	/**
+	 * @see  保存重点场所信息
+	 * @param 
+	 * @return 
+	 * @author fuxinshuang
+	 * @version 2018-03-06
+	 */
+	@ResponseBody
+	@RequestMapping(value="/save", method = RequestMethod.POST)
+	public CcmRestResult modify(String type,String userId,String placeType,CcmBasePlace ccmBasePlace,HttpServletRequest req, HttpServletResponse resp) throws IOException {
+		CcmRestResult result = new CcmRestResult();
+		User sessionUser = (User) req.getSession().getAttribute("user");
+		if (sessionUser== null) {
+			result.setCode(CcmRestType.ERROR_USER_NOT_EXIST);
+			return result;
+		}
+		String sessionUserId = sessionUser.getId();
+		if (userId== null || "".equals(userId) ||!userId.equals(sessionUserId)) {
+			result.setCode(CcmRestType.ERROR_USER_NOT_EXIST);
+			return result;
+		}
+		if (placeType==null&& "".equals(placeType)) {
+			result.setCode(CcmRestType.ERROR_USER_NOT_EXIST);
+			return result;
+		}
+
+		else if (placeType!= null && placeType.equals("ccm_place_live")) {
+			CcmPlaceLive ccmPlaceLive = new CcmPlaceLive();
+			ccmPlaceLive.setType(type);
+			if (ccmPlaceLive.getId()!= null && !"".equals(ccmPlaceLive.getId())) {
+				CcmPlaceLive ccmPlaceLiveDB = ccmPlaceLiveService.get(ccmPlaceLive.getId());
+				if (ccmPlaceLiveDB == null ) {//从数据库中没有取到对应数据
+					result.setCode(CcmRestType.ERROR_DB_NOT_EXIST);
+				}
+			}
+			if (ccmPlaceLive.getCreateBy()== null) {
+				ccmPlaceLive.setCreateBy(new User(userId));
+			}
+			ccmPlaceLive.setUpdateBy(new User(userId));
+			ccmPlaceLiveService.save(ccmPlaceLive);
+			result.setCode(CcmRestType.OK);
+			result.setResult("成功");
+		}
+		else if (placeType!= null && placeType.equals("ccm_place_casino")) {
+			CcmPlaceCasino ccmPlaceCasino = new CcmPlaceCasino();
+			ccmPlaceCasino.setType(type);
+			if (ccmPlaceCasino.getId()!= null && !"".equals(ccmPlaceCasino.getId())) {
+				CcmPlaceCasino ccmPlaceCasinoDB = ccmPlaceCasinoService.get(ccmPlaceCasino.getId());
+				if (ccmPlaceCasinoDB == null ) {//从数据库中没有取到对应数据
+					result.setCode(CcmRestType.ERROR_DB_NOT_EXIST);
+				}
+			}
+			if (ccmPlaceCasino.getCreateBy()== null) {
+				ccmPlaceCasino.setCreateBy(new User(userId));
+			}
+			ccmPlaceCasino.setUpdateBy(new User(userId));
+			ccmPlaceCasinoService.save(ccmPlaceCasino);
+			result.setCode(CcmRestType.OK);
+			result.setResult("成功");
+		}
+		else if (placeType!= null && placeType.equals("ccm_place_education")) {
+			CcmPlaceEducation ccmPlaceEducation = new CcmPlaceEducation();
+			ccmPlaceEducation.setType(type);
+			if (ccmPlaceEducation.getId()!= null && !"".equals(ccmPlaceEducation.getId())) {
+				CcmPlaceEducation ccmPlaceEducationDB = ccmPlaceEducationService.get(ccmPlaceEducation.getId());
+				if (ccmPlaceEducationDB == null ) {//从数据库中没有取到对应数据
+					result.setCode(CcmRestType.ERROR_DB_NOT_EXIST);
+				}
+			}
+			if (ccmPlaceEducation.getCreateBy()== null) {
+				ccmPlaceEducation.setCreateBy(new User(userId));
+			}
+			ccmPlaceEducation.setUpdateBy(new User(userId));
+			ccmPlaceEducationService.save(ccmPlaceEducation);
+			result.setCode(CcmRestType.OK);
+			result.setResult("成功");
+		}
+		else if (placeType!= null && placeType.equals("ccm_place_hospital")) {
+			CcmPlaceHospital ccmPlaceHospital = new CcmPlaceHospital();
+			ccmPlaceHospital.setType(type);
+			if (ccmPlaceHospital.getId()!= null && !"".equals(ccmPlaceHospital.getId())) {
+				CcmPlaceHospital ccmPlaceHospitalDB = ccmPlaceHospitalService.get(ccmPlaceHospital.getId());
+				if (ccmPlaceHospitalDB == null ) {//从数据库中没有取到对应数据
+					result.setCode(CcmRestType.ERROR_DB_NOT_EXIST);
+				}
+			}
+			if (ccmPlaceHospital.getCreateBy()== null) {
+				ccmPlaceHospital.setCreateBy(new User(userId));
+			}
+			ccmPlaceHospital.setUpdateBy(new User(userId));
+			ccmPlaceHospitalService.save(ccmPlaceHospital);
+			result.setCode(CcmRestType.OK);
+			result.setResult("成功");
+		}
+		else if (placeType!= null && placeType.equals("ccm_place_catering")) {
+			CcmPlaceCatering ccmPlaceCatering = new CcmPlaceCatering();
+			ccmPlaceCatering.setType(type);
+			if (ccmPlaceCatering.getId()!= null && !"".equals(ccmPlaceCatering.getId())) {
+				CcmPlaceCatering ccmPlaceCateringDB = ccmPlaceCateringService.get(ccmPlaceCatering.getId());
+				if (ccmPlaceCateringDB == null ) {//从数据库中没有取到对应数据
+					result.setCode(CcmRestType.ERROR_DB_NOT_EXIST);
+				}
+			}
+			if (ccmPlaceCatering.getCreateBy()== null) {
+				ccmPlaceCatering.setCreateBy(new User(userId));
+			}
+			ccmPlaceCatering.setUpdateBy(new User(userId));
+			ccmPlaceCateringService.save(ccmPlaceCatering);
+			result.setCode(CcmRestType.OK);
+			result.setResult("成功");
+		}
+		else if (placeType!= null && placeType.equals("ccm_place_traffic")) {
+			CcmPlaceTraffic ccmPlaceTraffic = new CcmPlaceTraffic();
+			ccmPlaceTraffic.setType(type);
+			if (ccmPlaceTraffic.getId()!= null && !"".equals(ccmPlaceTraffic.getId())) {
+				CcmPlaceTraffic ccmPlaceTrafficDB = ccmPlaceTrafficService.get(ccmPlaceTraffic.getId());
+				if (ccmPlaceTrafficDB == null ) {//从数据库中没有取到对应数据
+					result.setCode(CcmRestType.ERROR_DB_NOT_EXIST);
+				}
+			}
+			if (ccmPlaceTraffic.getCreateBy()== null) {
+				ccmPlaceTraffic.setCreateBy(new User(userId));
+			}
+			ccmPlaceTraffic.setUpdateBy(new User(userId));
+			ccmPlaceTrafficService.save(ccmPlaceTraffic);
+			result.setCode(CcmRestType.OK);
+			result.setResult("成功");
+		}
+		else if (placeType!= null && placeType.equals("ccm_place_hotel")) {
+			CcmPlaceHotel ccmPlaceHotel = new CcmPlaceHotel();
+			ccmPlaceHotel.setType(type);
+			if (ccmPlaceHotel.getId()!= null && !"".equals(ccmPlaceHotel.getId())) {
+				CcmPlaceHotel ccmPlaceHotelDB = ccmPlaceHotelService.get(ccmPlaceHotel.getId());
+				if (ccmPlaceHotelDB == null ) {//从数据库中没有取到对应数据
+					result.setCode(CcmRestType.ERROR_DB_NOT_EXIST);
+				}
+			}
+			if (ccmPlaceHotel.getCreateBy()== null) {
+				ccmPlaceHotel.setCreateBy(new User(userId));
+			}
+			ccmPlaceHotel.setUpdateBy(new User(userId));
+			ccmPlaceHotelService.save(ccmPlaceHotel);
+			result.setCode(CcmRestType.OK);
+			result.setResult("成功");
+		}
+		else if (placeType!= null && placeType.equals("ccm_place_scenic")) {
+			CcmPlaceScenic ccmPlaceScenic = new CcmPlaceScenic();
+			ccmPlaceScenic.setType(type);
+			if (ccmPlaceScenic.getId()!= null && !"".equals(ccmPlaceScenic.getId())) {
+				CcmPlaceScenic ccmPlaceScenicDB = ccmPlaceScenicService.get(ccmPlaceScenic.getId());
+				if (ccmPlaceScenicDB == null ) {//从数据库中没有取到对应数据
+					result.setCode(CcmRestType.ERROR_DB_NOT_EXIST);
+				}
+			}
+			if (ccmPlaceScenic.getCreateBy()== null) {
+				ccmPlaceScenic.setCreateBy(new User(userId));
+			}
+			ccmPlaceScenic.setUpdateBy(new User(userId));
+			ccmPlaceScenicService.save(ccmPlaceScenic);
+			result.setCode(CcmRestType.OK);
+			result.setResult("成功");
+		}
+		else if (placeType!= null && placeType.equals("ccm_place_religion")) {
+			CcmPlaceReligion ccmPlaceReligion = new CcmPlaceReligion();
+			ccmPlaceReligion.setType(type);
+			if (ccmPlaceReligion.getId()!= null && !"".equals(ccmPlaceReligion.getId())) {
+				CcmPlaceReligion ccmPlaceReligionDB = ccmPlaceReligionService.get(ccmPlaceReligion.getId());
+				if (ccmPlaceReligionDB == null ) {//从数据库中没有取到对应数据
+					result.setCode(CcmRestType.ERROR_DB_NOT_EXIST);
+				}
+			}
+			if (ccmPlaceReligion.getCreateBy()== null) {
+				ccmPlaceReligion.setCreateBy(new User(userId));
+			}
+			ccmPlaceReligion.setUpdateBy(new User(userId));
+			ccmPlaceReligionService.save(ccmPlaceReligion);
+			result.setCode(CcmRestType.OK);
+			result.setResult("成功");
+		}
+		else if (placeType!= null && placeType.equals("ccm_place_chemical")) {
+			CcmPlaceChemical ccmPlaceChemical = new CcmPlaceChemical();
+			ccmPlaceChemical.setType(type);
+			if (ccmPlaceChemical.getId()!= null && !"".equals(ccmPlaceChemical.getId())) {
+				CcmPlaceChemical ccmPlaceChemicalDB = ccmPlaceChemicalService.get(ccmPlaceChemical.getId());
+				if (ccmPlaceChemicalDB == null ) {//从数据库中没有取到对应数据
+					result.setCode(CcmRestType.ERROR_DB_NOT_EXIST);
+				}
+			}
+			if (ccmPlaceChemical.getCreateBy()== null) {
+				ccmPlaceChemical.setCreateBy(new User(userId));
+			}
+			ccmPlaceChemical.setUpdateBy(new User(userId));
+			ccmPlaceChemicalService.save(ccmPlaceChemical);
+			result.setCode(CcmRestType.OK);
+			result.setResult("成功");
+		}
+		else if (placeType!= null && placeType.equals("ccm_place_financial")) {
+			CcmPlaceFinancial ccmPlaceFinancial = new CcmPlaceFinancial();
+			ccmPlaceFinancial.setType(type);
+			if (ccmPlaceFinancial.getId()!= null && !"".equals(ccmPlaceFinancial.getId())) {
+				CcmPlaceFinancial ccmPlaceFinancialDB = ccmPlaceFinancialService.get(ccmPlaceFinancial.getId());
+				if (ccmPlaceFinancialDB == null ) {//从数据库中没有取到对应数据
+					result.setCode(CcmRestType.ERROR_DB_NOT_EXIST);
+				}
+			}
+			if (ccmPlaceFinancial.getCreateBy()== null) {
+				ccmPlaceFinancial.setCreateBy(new User(userId));
+			}
+			ccmPlaceFinancial.setUpdateBy(new User(userId));
+			ccmPlaceFinancialService.save(ccmPlaceFinancial);
+			result.setCode(CcmRestType.OK);
+			result.setResult("成功");
+		}
+		
+	
+	
+	return result;
+	}
+}
+
+

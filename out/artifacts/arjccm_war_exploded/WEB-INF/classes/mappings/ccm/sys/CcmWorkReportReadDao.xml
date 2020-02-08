@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.arjjs.ccm.modules.ccm.sys.dao.CcmWorkReportReadDao">
+
+	<sql id="ccmWorkReportReadColumns">
+		a.id AS "id",
+		a.report_id AS "reportId",
+		a.user_id AS
+		"user.id",
+		a.read_flag AS "readFlag",
+		a.read_time AS "readTime",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks
+		AS "remarks",
+		a.del_flag AS "delFlag",
+		u3.name AS "user.name",
+		o.name AS
+		"user.office.name"
+	</sql>
+
+	<sql id="ccmWorkReportReadJoins">
+		LEFT JOIN sys_user u3 ON u3.id = a.user_id
+		JOIN sys_office o
+		ON o.id = u3.office_id
+	</sql>
+
+	<select id="get" resultType="CcmWorkReportRead">
+		SELECT
+		<include refid="ccmWorkReportReadColumns" />
+		FROM ccm_work_report_read a
+		<include refid="ccmWorkReportReadJoins" />
+		WHERE a.id = #{id}
+	</select>
+
+	<select id="findList" resultType="CcmWorkReportRead">
+		SELECT
+		<include refid="ccmWorkReportReadColumns" />
+		FROM ccm_work_report_read a
+		<include refid="ccmWorkReportReadJoins" />
+		<where>
+			<!-- a.del_flag = #{DEL_FLAG_NORMAL} -->
+			<if test="user != null and user.id != null and user.id != ''">
+				AND a.user_id = #{user.id}
+			</if>
+			
+			 <if test="reportId != null and reportId != ''">
+                AND a.report_id = #{reportId}
+            </if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+
+	<select id="findAllList" resultType="CcmWorkReportRead">
+		SELECT
+		<include refid="ccmWorkReportReadColumns" />
+		FROM ccm_work_report_read a
+		<include refid="ccmWorkReportReadJoins" />
+		<!-- <where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where> -->
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+
+	<insert id="insert">
+		INSERT INTO ccm_work_report_read(
+		id,
+		report_id,
+		user_id,
+		read_flag,
+		read_time,
+		create_by,
+		create_date,
+		update_by,
+		update_date,
+		remarks,
+		del_flag
+		) VALUES (
+		#{id},
+		#{reportId},
+		#{user.id},
+		#{readFlag},
+		#{readTime},
+		#{createBy.id},
+		#{createDate},
+		#{updateBy.id},
+		#{updateDate},
+		#{remarks},
+		#{delFlag}
+		)
+	</insert>
+
+	<update id="update">
+		UPDATE ccm_work_report_read SET
+		report_id = #{reportId},
+		user_id = #{user.id},
+		read_flag = #{readFlag},
+		read_time = #{readTime},
+		update_by = #{updateBy.id},
+		update_date = #{updateDate},
+		remarks = #{remarks}
+		WHERE report_id = #{reportId}
+		AND USER_ID = #{user.id}
+		AND READ_FLAG != '1'
+	</update>
+	
+	<update id="updateRead">
+		UPDATE ccm_work_report_read SET
+		user_id = #{userId},
+		read_flag = #{readFlag},
+		read_time = #{readTime},
+		update_by = #{userId},
+		update_date = #{updateDate},
+		remarks = #{remarks}
+		WHERE report_id = #{reportId}
+		AND USER_ID = #{userId}
+		AND READ_FLAG != '1'
+	</update>
+
+	<update id="delete">
+		UPDATE ccm_work_report_read SET
+		del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+
+	<delete id="deleteByWorkReportId">
+		DELETE FROM ccm_work_report_read
+		WHERE report_id = #{reportId}
+	</delete>
+	<!-- read_time AS "readTime" -->
+	<insert id="insertAll" parameterType="List">
+		INSERT INTO ccm_work_report_read(
+		id,
+		report_id,
+		user_id,
+		read_flag
+		)
+		<if test="list.get(0).dbName == 'oracle'">
+			<foreach collection="list" item="e" separator=" union all ">
+				SELECT #{e.id},
+				#{e.ccmWorkReport.id},
+				#{e.user.id},
+				#{e.readFlag} FROM dual
+			</foreach>
+		</if>
+		<if test="list.get(0).dbName == 'mssql' or list.get(0).dbName == 'mysql'">
+			VALUES
+			<foreach collection="list" item="e" open="" separator=","
+				close="">
+				(#{e.id},
+				#{e.ccmWorkReport.id},
+				#{e.user.id},
+				#{e.readFlag} )
+			</foreach>
+		</if>
+	</insert>
+</mapper>

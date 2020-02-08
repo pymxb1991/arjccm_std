@@ -1,0 +1,2123 @@
+package com.arjjs.ccm.modules.ccm.rest.web;
+
+import java.io.IOException;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.List;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.apache.shiro.authz.annotation.RequiresPermissions;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
+import com.arjjs.ccm.common.config.Global;
+import com.arjjs.ccm.common.persistence.Page;
+import com.arjjs.ccm.common.utils.StringUtils;
+import com.arjjs.ccm.common.web.BaseController;
+import com.arjjs.ccm.modules.ccm.house.entity.CcmHouseAids;
+import com.arjjs.ccm.modules.ccm.house.entity.CcmHouseBuildmanage;
+import com.arjjs.ccm.modules.ccm.house.entity.CcmHouseDangerous;
+import com.arjjs.ccm.modules.ccm.house.entity.CcmHouseDrugs;
+import com.arjjs.ccm.modules.ccm.house.entity.CcmHouseHeresy;
+import com.arjjs.ccm.modules.ccm.house.entity.CcmHouseKym;
+import com.arjjs.ccm.modules.ccm.house.entity.CcmHousePetition;
+import com.arjjs.ccm.modules.ccm.house.entity.CcmHousePsychogeny;
+import com.arjjs.ccm.modules.ccm.house.entity.CcmHouseRectification;
+import com.arjjs.ccm.modules.ccm.house.entity.CcmHouseRelease;
+import com.arjjs.ccm.modules.ccm.house.service.CcmHouseAidsService;
+import com.arjjs.ccm.modules.ccm.house.service.CcmHouseDangerousService;
+import com.arjjs.ccm.modules.ccm.house.service.CcmHouseDrugsService;
+import com.arjjs.ccm.modules.ccm.house.service.CcmHouseHeresyService;
+import com.arjjs.ccm.modules.ccm.house.service.CcmHouseKymService;
+import com.arjjs.ccm.modules.ccm.house.service.CcmHousePetitionService;
+import com.arjjs.ccm.modules.ccm.house.service.CcmHousePsychogenyService;
+import com.arjjs.ccm.modules.ccm.house.service.CcmHouseRectificationService;
+import com.arjjs.ccm.modules.ccm.house.service.CcmHouseReleaseService;
+import com.arjjs.ccm.modules.ccm.pop.entity.CcmPeople;
+import com.arjjs.ccm.modules.ccm.pop.entity.CcmPopBehind;
+import com.arjjs.ccm.modules.ccm.pop.entity.CcmPopTenant;
+import com.arjjs.ccm.modules.ccm.pop.service.CcmPeopleService;
+import com.arjjs.ccm.modules.ccm.pop.service.CcmPopBehindService;
+import com.arjjs.ccm.modules.ccm.pop.service.CcmPopTenantService;
+import com.arjjs.ccm.modules.ccm.rest.entity.CcmRestResult;
+import com.arjjs.ccm.modules.ccm.rest.entity.CcmRestType;
+import com.arjjs.ccm.modules.sys.entity.Area;
+import com.arjjs.ccm.modules.sys.entity.Dict;
+import com.arjjs.ccm.modules.sys.entity.User;
+import com.arjjs.ccm.modules.sys.service.DictService;
+import com.arjjs.ccm.tool.PlmTypes;
+
+/**
+ * 人口接口类
+ * 
+ * @author pengjianqiang
+ * @version 2018-02-22
+ */
+@Controller
+@RequestMapping(value = "${appPath}/rest/people")
+public class CcmRestPeople extends BaseController {
+
+	@Autowired
+	private CcmPeopleService ccmPeopleService;
+	@Autowired
+	private CcmHouseRectificationService ccmHouseRectificationService;
+	@Autowired
+	private CcmHouseReleaseService ccmHouseReleaseService;
+	@Autowired
+	private CcmHousePsychogenyService ccmHousePsychogenyService;
+	@Autowired
+	private CcmHouseDrugsService ccmHouseDrugsService;
+	@Autowired
+	private CcmHouseAidsService ccmHouseAidsService;
+	@Autowired
+	private CcmHouseKymService ccmHouseKymService;
+	@Autowired
+	private CcmHousePetitionService ccmHousePetitionService;
+	@Autowired
+	private CcmHouseHeresyService ccmHouseHeresyService;
+	@Autowired
+	private CcmHouseDangerousService ccmHouseDangerousService;
+	@Autowired
+	private CcmPopBehindService ccmPopBehindService;
+	@Autowired
+	private DictService dictService;
+	@Autowired
+	private CcmPopTenantService ccmPopTenantService;
+	
+	
+	
+
+
+	/**
+	 * @see  获取单个人员信息
+	 * @param id  ID
+	 * @return 
+	 * @author pengjianqiang
+	 * @version 2018-02-22
+	 */
+	@ResponseBody
+	@RequestMapping(value="/get", method = RequestMethod.GET)
+	public CcmRestResult get(String userId,HttpServletRequest req, HttpServletResponse resp, String id) throws IOException {
+		CcmRestResult result = new CcmRestResult();
+		User sessionUser = (User) req.getSession().getAttribute("user");
+		if (sessionUser== null) {
+			result.setCode(CcmRestType.ERROR_USER_NOT_EXIST);
+			return result;
+		}
+		String sessionUserId = sessionUser.getId();
+		if (userId== null || "".equals(userId) ||!userId.equals(sessionUserId)) {
+			result.setCode(CcmRestType.ERROR_USER_NOT_EXIST);
+			return result;
+		}
+		if (id == null || "".equals(id)) {//参数id不对
+			result.setCode(CcmRestType.ERROR_PARAM);
+			return result;
+		}
+		
+		
+		CcmPeople ccmPeople = ccmPeopleService.get(id);
+		
+		result.setCode(CcmRestType.OK);
+		result.setResult(ccmPeople);
+		
+		return result;
+	}
+	
+	/**
+	 * @see  查询人员信息
+	 * @param name  小区（单位）名称
+	 * @param buildname  楼栋名称 
+	 * @param pageNo 页码
+	 * @param pageSize 分页大小
+	 * @return 
+	 * @author pengjianqiang
+	 * @version 2018-02-22
+	 */
+	@ResponseBody
+	@RequestMapping(value="/query", method = RequestMethod.GET)
+	public CcmRestResult query(String roomid,String userId,CcmPeople ccmPeople, HttpServletRequest req, HttpServletResponse resp) throws IOException {
+		CcmRestResult result = new CcmRestResult();
+		User sessionUser = (User) req.getSession().getAttribute("user");
+		if (sessionUser== null) {
+			result.setCode(CcmRestType.ERROR_USER_NOT_EXIST);
+			return result;
+		}
+		String sessionUserId = sessionUser.getId();
+		if (userId== null || "".equals(userId) ||!userId.equals(sessionUserId)) {
+			result.setCode(CcmRestType.ERROR_USER_NOT_EXIST);
+			return result;
+		}
+		if(StringUtils.isNotEmpty(roomid)) {
+			ccmPeople.setRoomId(new CcmPopTenant(roomid));
+		}
+		ccmPeople.setCheckUser(sessionUser);
+		Page<CcmPeople> page = ccmPeopleService.findPage(new Page<CcmPeople>(req, resp), ccmPeople);
+	
+		//
+		List<CcmPeople> list = page.getList();
+		//
+		CcmPeople ccmPeople2 = new CcmPeople();
+		String[] listLimite = new String[list.size()];
+		if(list.size()>0){
+			for(int i=0;i<list.size();i++){
+				listLimite[i]=list.get(i).getId();
+			}
+			ccmPeople2.setListLimite(listLimite);
+			List<CcmPeople> list2 = ccmPeopleService.findListLimite(ccmPeople2);//数组查询id
+			page.setList(list2);
+			logger.info(""+list2);
+		}
+		result.setCode(CcmRestType.OK);
+		result.setResult(page);
+		return result;
+	}
+	
+	/**
+	 * @see  查询户籍家庭人员信息
+	 * @param account  户号
+	 * @param pageNo 页码
+	 * @param pageSize 分页大小
+	 * @return 
+	 * @author pengjianqiang
+	 * @version 2018-02-22
+	 */
+	@ResponseBody
+	@RequestMapping(value="/familyquery", method = RequestMethod.GET)
+	public CcmRestResult familyquery(String userId,CcmPeople ccmPeople, HttpServletRequest req, HttpServletResponse resp) throws IOException {
+		CcmRestResult result = new CcmRestResult();
+		User sessionUser = (User) req.getSession().getAttribute("user");
+		if (sessionUser== null) {
+			result.setCode(CcmRestType.ERROR_USER_NOT_EXIST);
+			return result;
+		}
+		String sessionUserId = sessionUser.getId();
+		if (userId== null || "".equals(userId) ||!userId.equals(sessionUserId)) {
+			result.setCode(CcmRestType.ERROR_USER_NOT_EXIST);
+			return result;
+		}
+		
+		Page<CcmPeople> page = ccmPeopleService.listAccount(new Page<CcmPeople>(req, resp), ccmPeople);
+	
+		result.setCode(CcmRestType.OK);
+		result.setResult(page);
+		
+		return result;
+	}
+	
+	
+	/**
+	 * @see  保存人员信息
+	 * @param 
+	 * @return 
+	 * @author pengjianqiang
+	 * @version 2018-02-22
+	 */
+	@ResponseBody
+	@RequestMapping(value="/save", method = RequestMethod.POST)
+	public CcmRestResult modify(String userId,CcmPeople ccmPeople, HttpServletRequest req, HttpServletResponse resp) throws IOException {
+		CcmRestResult result = new CcmRestResult();
+		User sessionUser = (User) req.getSession().getAttribute("user");
+		if (sessionUser== null) {
+			result.setCode(CcmRestType.ERROR_USER_NOT_EXIST);
+			return result;
+		}
+		String sessionUserId = sessionUser.getId();
+		if (userId== null || "".equals(userId) ||!userId.equals(sessionUserId)) {
+			result.setCode(CcmRestType.ERROR_USER_NOT_EXIST);
+			return result;
+		}
+		if (ccmPeople.getId()!= null && !"".equals(ccmPeople.getId())) {
+			CcmPeople ccmPeopleDB = ccmPeopleService.get(ccmPeople.getId());
+			if (ccmPeopleDB == null ) {//从数据库中没有取到对应数据
+				result.setCode(CcmRestType.ERROR_DB_NOT_EXIST);
+				return result;
+			}
+			ccmPeople.setIsAids(ccmPeopleDB.getIsAids());
+			ccmPeople.setIsBehind(ccmPeopleDB.getIsBehind());
+			ccmPeople.setIsDangerous(ccmPeopleDB.getIsDangerous());
+			ccmPeople.setIsDrugs(ccmPeopleDB.getIsDrugs());
+			ccmPeople.setIsHeresy(ccmPeopleDB.getIsHeresy());
+			ccmPeople.setIsKym(ccmPeopleDB.getIsKym());
+			ccmPeople.setIsPsychogeny(ccmPeopleDB.getIsPsychogeny());
+			ccmPeople.setIsRectification(ccmPeopleDB.getIsRectification());
+			ccmPeople.setIsRelease(ccmPeopleDB.getIsRelease());
+			ccmPeople.setIsVisit(ccmPeopleDB.getIsVisit());
+		}
+		if (ccmPeople.getRoomId().getId()!= null && !"".equals(ccmPeople.getRoomId().getId())) {
+			CcmPopTenant ccmPopTenantDB = ccmPopTenantService.get(ccmPeople.getRoomId().getId());
+			if (ccmPopTenantDB != null ) {//从数据库中没有取到对应数据 //根据房屋id 给  所在社区  所在网格   赋值
+				CcmPeople ccmPeopleArea = ccmPopTenantService.findAreaByRoom(ccmPopTenantDB);
+				ccmPeople.setAreaComId(new Area(ccmPeopleArea.getAreaComId().getId()));
+				ccmPeople.setAreaGridId(new Area(ccmPeopleArea.getAreaGridId().getId()));
+				ccmPeople.setBuildId(new CcmHouseBuildmanage(ccmPeopleArea.getBuildId().getId()));
+			}
+		}
+		if (ccmPeople.getCreateBy()== null) {
+			ccmPeople.setCreateBy(new User(userId));
+		}
+		ccmPeople.setUpdateBy(new User(userId));
+		ccmPeopleService.save(ccmPeople);
+		result.setCode(CcmRestType.OK);
+		result.setResult("成功");
+		
+		return result;
+		
+	}
+	
+
+
+	/**
+	 * @see  保存社区矫正人员信息
+	 * @param 
+	 * @return 
+	 * @author pengjianqiang
+	 * @version 2018-02-22
+	 */
+	@ResponseBody
+	@RequestMapping(value="/saveRectification", method = RequestMethod.POST)
+	public CcmRestResult saveRectification(String userId,HttpServletRequest req,CcmHouseRectification ccmHouseRectification, Model model, RedirectAttributes redirectAttributes) {
+		CcmRestResult result = new CcmRestResult();
+		if (!beanValidator(model, ccmHouseRectification)) {//参数不对
+			result.setCode(CcmRestType.ERROR_PARAM);
+			return result;
+		}
+		
+		User sessionUser = (User) req.getSession().getAttribute("user");
+		if (sessionUser== null) {
+			result.setCode(CcmRestType.ERROR_USER_NOT_EXIST);
+			return result;
+		}
+		String sessionUserId = sessionUser.getId();
+		if (userId== null || "".equals(userId) ||!userId.equals(sessionUserId)) {
+			result.setCode(CcmRestType.ERROR_USER_NOT_EXIST);
+			return result;
+		}
+		if (ccmHouseRectification.getId() != null && !"".equals(ccmHouseRectification.getId())) {
+			CcmHouseRectification ccmHouseRectificationDB = ccmHouseRectificationService.get(ccmHouseRectification.getId());
+			if (ccmHouseRectificationDB == null) {//从数据库中没有取到对应数据
+				result.setCode(CcmRestType.ERROR_DB_NOT_EXIST);
+				return result;
+			} 
+		}
+		if (ccmHouseRectification.getCreateBy()== null) {
+			ccmHouseRectification.setCreateBy(new User(userId));
+		}
+		ccmHouseRectification.setUpdateBy(new User(userId));
+		ccmHouseRectificationService.save(ccmHouseRectification);
+		// 更新 当前人 是 社区矫正人员
+		CcmPeople ccmPop = ccmPeopleService.get(ccmHouseRectification.getPeopleId());
+		ccmPop.setIsRectification(1);
+		ccmPop.setUpdateBy(new User(userId));
+		ccmPeopleService.save(ccmPop);
+		addMessage(redirectAttributes, "保存社区矫正人员成功");
+		result.setCode(CcmRestType.OK);
+		result.setResult(ccmHouseRectification);
+		
+		return result;
+	}
+	/**
+	 * @see  查询社区矫正人员信息
+	 * @param pageNo 页码
+	 * @param pageSize 分页大小
+	 * @return 
+	 * @author fuxinshuang
+	 * @version 2018-03-09
+	 */
+	@ResponseBody
+	@RequestMapping(value="/queryRectification", method = RequestMethod.GET)
+	public CcmRestResult queryRectification(String userId,CcmHouseRectification ccmHouseRectification, HttpServletRequest req, HttpServletResponse resp) throws IOException {
+		CcmRestResult result = new CcmRestResult();
+		User sessionUser = (User) req.getSession().getAttribute("user");
+		if (sessionUser== null) {
+			result.setCode(CcmRestType.ERROR_USER_NOT_EXIST);
+			return result;
+		}
+		String sessionUserId = sessionUser.getId();
+		if (userId== null || "".equals(userId) ||!userId.equals(sessionUserId)) {
+			result.setCode(CcmRestType.ERROR_USER_NOT_EXIST);
+			return result;
+		}
+
+		ccmHouseRectification.setCheckUser(sessionUser);
+		Page<CcmHouseRectification> page = ccmHouseRectificationService.findPage(new Page<CcmHouseRectification>(req, resp), ccmHouseRectification);
+	
+		result.setCode(CcmRestType.OK);
+		result.setResult(page);
+		
+		return result;
+	}
+	/**
+	 * @see  获取社区矫正人员信息
+	 * @param 
+	 * @return 
+	 * @author pengjianqiang
+	 * @version 2018-02-22
+	 */
+	@ResponseBody
+	@RequestMapping(value="/getRectification", method = RequestMethod.GET)
+	public CcmRestResult getRectification(String userId,HttpServletRequest req, HttpServletResponse resp, @RequestParam(value = "id", required = false) String id,
+			@RequestParam(value = "peopleId", required = false) String peopleId) throws IOException {
+		CcmRestResult result = new CcmRestResult();
+		User sessionUser = (User) req.getSession().getAttribute("user");
+		if (sessionUser== null) {
+			result.setCode(CcmRestType.ERROR_USER_NOT_EXIST);
+			return result;
+		}
+		String sessionUserId = sessionUser.getId();
+		if (userId== null || "".equals(userId) ||!userId.equals(sessionUserId)) {
+			result.setCode(CcmRestType.ERROR_USER_NOT_EXIST);
+			return result;
+		}
+		CcmHouseRectification entity = null;
+		if (StringUtils.isNotBlank(id)) {
+			entity = ccmHouseRectificationService.get(id);
+		} else if (StringUtils.isNotBlank(peopleId)) {
+			entity = ccmHouseRectificationService.getPeopleALL(peopleId);
+		}else{
+			result.setCode(CcmRestType.ERROR_PARAM);
+			return result;
+		}
+		if (entity == null) {
+			entity = new CcmHouseRectification();
+			// 如果 peopleId 不为空 则 添加该ID
+			if (StringUtils.isNotBlank(peopleId)) {
+				entity.setPeopleId(peopleId);
+			}
+		}
+		
+		result.setCode(CcmRestType.OK);
+		result.setResult(entity);
+		
+		return result;
+	}
+	
+
+
+	/**
+	 * @see  保存安置帮教人员信息 saveRelease
+	 * @param 
+	 * @author fuxinshuang
+	 * @version 2018-02-26
+	 */
+	@ResponseBody
+	@RequestMapping(value="/saveRelease", method = RequestMethod.POST)
+	public CcmRestResult saveRelease(String userId,CcmHouseRelease ccmHouseRelease,HttpServletRequest req, Model model, RedirectAttributes redirectAttributes) {
+		CcmRestResult result = new CcmRestResult();
+		if (!beanValidator(model, ccmHouseRelease)) {//参数id不对
+			result.setCode(CcmRestType.ERROR_PARAM);
+			return result;
+		}
+		
+		User sessionUser = (User) req.getSession().getAttribute("user");
+		if (sessionUser== null) {
+			result.setCode(CcmRestType.ERROR_USER_NOT_EXIST);
+			return result;
+		}
+		String sessionUserId = sessionUser.getId();
+		if (userId== null || "".equals(userId) ||!userId.equals(sessionUserId)) {
+			result.setCode(CcmRestType.ERROR_USER_NOT_EXIST);
+			return result;
+		}
+		if (ccmHouseRelease.getId() != null && !"".equals(ccmHouseRelease.getId())) {
+			CcmHouseRelease ccmHouseReleaseDB = ccmHouseReleaseService.get(ccmHouseRelease.getId());
+			if (ccmHouseReleaseDB == null) {//从数据库中没有取到对应数据
+				result.setCode(CcmRestType.ERROR_DB_NOT_EXIST);
+				return result;
+			} 
+		}
+		if (ccmHouseRelease.getCreateBy()== null) {
+			ccmHouseRelease.setCreateBy(new User(userId));
+		}
+		ccmHouseRelease.setUpdateBy(new User(userId));
+		
+		ccmHouseReleaseService.save(ccmHouseRelease);
+		// 更新 当前人 是 安置帮教人员
+		CcmPeople ccmPop = ccmPeopleService.get(ccmHouseRelease.getPeopleId());
+		ccmPop.setIsRelease(1);
+		ccmPop.setUpdateBy(new User(userId));
+		ccmPeopleService.save(ccmPop);
+		addMessage(redirectAttributes, "保存安置帮教人员成功");
+		result.setCode(CcmRestType.OK);
+		result.setResult(ccmHouseRelease);
+		
+		return result;
+	}
+	/**
+	 * @see  查询安置帮教人员信息
+	 * @param pageNo 页码
+	 * @param pageSize 分页大小
+	 * @return 
+	 * @author fuxinshuang
+	 * @version 2018-03-09
+	 */
+	@ResponseBody
+	@RequestMapping(value="/queryRelease", method = RequestMethod.GET)
+	public CcmRestResult queryRelease(String userId,CcmHouseRelease ccmHouseRelease, HttpServletRequest req, HttpServletResponse resp) throws IOException {
+		CcmRestResult result = new CcmRestResult();
+		User sessionUser = (User) req.getSession().getAttribute("user");
+		if (sessionUser== null) {
+			result.setCode(CcmRestType.ERROR_USER_NOT_EXIST);
+			return result;
+		}
+		String sessionUserId = sessionUser.getId();
+		if (userId== null || "".equals(userId) ||!userId.equals(sessionUserId)) {
+			result.setCode(CcmRestType.ERROR_USER_NOT_EXIST);
+			return result;
+		}
+
+		ccmHouseRelease.setCheckUser(sessionUser);
+		Page<CcmHouseRelease> page = ccmHouseReleaseService.findPage(new Page<CcmHouseRelease>(req, resp), ccmHouseRelease);
+	
+		result.setCode(CcmRestType.OK);
+		result.setResult(page);
+		
+		return result;
+	}
+	/**
+	 * @see  获取安置帮教人员信息 getRelease
+	 * @param 
+	 * @author fuxinshuang
+	 * @version 2018-02-26
+	 */
+	@ResponseBody
+	@RequestMapping(value="/getRelease", method = RequestMethod.GET)
+	public CcmRestResult getRelease(String userId,HttpServletRequest req, HttpServletResponse resp, @RequestParam(value = "id", required = false) String id,
+			@RequestParam(value = "peopleId", required = false) String peopleId) throws IOException {
+		CcmRestResult result = new CcmRestResult();
+		User sessionUser = (User) req.getSession().getAttribute("user");
+		if (sessionUser== null) {
+			result.setCode(CcmRestType.ERROR_USER_NOT_EXIST);
+			return result;
+		}
+		String sessionUserId = sessionUser.getId();
+		if (userId== null || "".equals(userId) ||!userId.equals(sessionUserId)) {
+			result.setCode(CcmRestType.ERROR_USER_NOT_EXIST);
+			return result;
+		}
+		CcmHouseRelease entity = null;
+		if (StringUtils.isNotBlank(id)) {
+			entity = ccmHouseReleaseService.get(id);
+		} else if (StringUtils.isNotBlank(peopleId)) {
+			entity = ccmHouseReleaseService.getPeopleALL(peopleId);
+		}else{
+			result.setCode(CcmRestType.ERROR_PARAM);
+			return result;
+		}
+		if (entity == null) {
+			entity = new CcmHouseRelease();
+			// 如果 peopleId 不为空 则 添加该ID
+			if (StringUtils.isNotBlank(peopleId)) {
+				entity.setPeopleId(peopleId);
+			}
+		}
+		
+		result.setCode(CcmRestType.OK);
+		result.setResult(entity);
+		
+		return result;
+	}
+	/**
+	 * @see  保存肇事肇祸等严重精神障碍患者信息 savePsychogeny
+	 * @param 
+	 * @author fuxinshuang
+	 * @version 2018-02-26
+	 */
+	@ResponseBody
+	@RequestMapping(value="/savePsychogeny", method = RequestMethod.POST)
+	public CcmRestResult savePsychogeny(String userId,HttpServletRequest req,CcmHousePsychogeny ccmHousePsychogeny, Model model, RedirectAttributes redirectAttributes) {
+		CcmRestResult result = new CcmRestResult();
+		if (!beanValidator(model, ccmHousePsychogeny)) {//参数id不对
+			result.setCode(CcmRestType.ERROR_PARAM);
+			return result;
+		}
+		
+		User sessionUser = (User) req.getSession().getAttribute("user");
+		if (sessionUser== null) {
+			result.setCode(CcmRestType.ERROR_USER_NOT_EXIST);
+			return result;
+		}
+		String sessionUserId = sessionUser.getId();
+		if (userId== null || "".equals(userId) ||!userId.equals(sessionUserId)) {
+			result.setCode(CcmRestType.ERROR_USER_NOT_EXIST);
+			return result;
+		}
+		if (ccmHousePsychogeny.getId() != null && !"".equals(ccmHousePsychogeny.getId())) {
+			CcmHousePsychogeny ccmHousePsychogenyDB = ccmHousePsychogenyService.get(ccmHousePsychogeny.getId());
+			if (ccmHousePsychogenyDB == null) {//从数据库中没有取到对应数据
+				result.setCode(CcmRestType.ERROR_DB_NOT_EXIST);
+				return result;
+			} 
+		}
+		if (ccmHousePsychogeny.getCreateBy()== null) {
+			ccmHousePsychogeny.setCreateBy(new User(userId));
+		}
+		ccmHousePsychogeny.setUpdateBy(new User(userId));
+		
+		ccmHousePsychogenyService.save(ccmHousePsychogeny);
+		// 更新 当前人 是 肇事肇祸等严重精神障碍患者
+		CcmPeople ccmPop = ccmPeopleService.get(ccmHousePsychogeny.getPeopleId());
+		ccmPop.setIsPsychogeny(1);
+		ccmPop.setUpdateBy(new User(userId));
+		ccmPeopleService.save(ccmPop);
+		addMessage(redirectAttributes, "保存肇事肇祸等严重精神障碍患者成功");
+		result.setCode(CcmRestType.OK);
+		result.setResult(ccmHousePsychogeny);
+		
+		return result;
+	}
+	/**
+	 * @see  查询肇事肇祸等严重精神障碍患者信息
+	 * @param pageNo 页码
+	 * @param pageSize 分页大小
+	 * @return 
+	 * @author fuxinshuang
+	 * @version 2018-03-09
+	 */
+	@ResponseBody
+	@RequestMapping(value="/queryPsychogeny", method = RequestMethod.GET)
+	public CcmRestResult queryPsychogeny(String userId,CcmHousePsychogeny ccmHousePsychogeny, HttpServletRequest req, HttpServletResponse resp) throws IOException {
+		CcmRestResult result = new CcmRestResult();
+		User sessionUser = (User) req.getSession().getAttribute("user");
+		if (sessionUser== null) {
+			result.setCode(CcmRestType.ERROR_USER_NOT_EXIST);
+			return result;
+		}
+		String sessionUserId = sessionUser.getId();
+		if (userId== null || "".equals(userId) ||!userId.equals(sessionUserId)) {
+			result.setCode(CcmRestType.ERROR_USER_NOT_EXIST);
+			return result;
+		}
+
+		ccmHousePsychogeny.setCheckUser(sessionUser);
+		Page<CcmHousePsychogeny> page = ccmHousePsychogenyService.findPage(new Page<CcmHousePsychogeny>(req, resp), ccmHousePsychogeny);
+	
+		result.setCode(CcmRestType.OK);
+		result.setResult(page);
+		
+		return result;
+	} 
+
+	/**
+	 * @see  获取肇事肇祸等严重精神障碍患者信息 getPsychogeny
+	 * @param 
+	 * @author fuxinshuang
+	 * @version 2018-02-26
+	 */
+	@ResponseBody
+	@RequestMapping(value="/getPsychogeny", method = RequestMethod.GET)
+	public CcmRestResult getPsychogeny(String userId,HttpServletRequest req, HttpServletResponse resp, @RequestParam(value = "id", required = false) String id,
+			@RequestParam(value = "peopleId", required = false) String peopleId) throws IOException {
+		CcmRestResult result = new CcmRestResult();
+		User sessionUser = (User) req.getSession().getAttribute("user");
+		if (sessionUser== null) {
+			result.setCode(CcmRestType.ERROR_USER_NOT_EXIST);
+			return result;
+		}
+		String sessionUserId = sessionUser.getId();
+		if (userId== null || "".equals(userId) ||!userId.equals(sessionUserId)) {
+			result.setCode(CcmRestType.ERROR_USER_NOT_EXIST);
+			return result;
+		}
+		
+		CcmHousePsychogeny entity = null;
+		if (StringUtils.isNotBlank(id)) {
+			entity = ccmHousePsychogenyService.get(id);
+		} else if (StringUtils.isNotBlank(peopleId)) {
+			entity = ccmHousePsychogenyService.getPeopleALL(peopleId);
+		}
+		else{
+			result.setCode(CcmRestType.ERROR_PARAM);
+			return result;
+		}
+		if (entity == null) {
+			entity = new CcmHousePsychogeny();
+			// 如果 peopleId 不为空 则 添加该ID
+			if (StringUtils.isNotBlank(peopleId)) {
+				entity.setPeopleId(peopleId);
+			}
+		}
+		
+		result.setCode(CcmRestType.OK);
+		result.setResult(entity);
+		
+		return result;
+	}
+
+	/**
+	 * @see  保存吸毒人员信息 saveDrugs
+	 * @param 
+	 * @author fuxinshuang
+	 * @version 2018-02-26
+	 */
+	@ResponseBody
+	@RequestMapping(value="/saveDrugs", method = RequestMethod.POST)
+	public CcmRestResult saveDrugs(String userId,HttpServletRequest req, CcmHouseDrugs ccmHouseDrugs, Model model, RedirectAttributes redirectAttributes) {
+		CcmRestResult result = new CcmRestResult();
+		if (!beanValidator(model, ccmHouseDrugs)) {//参数id不对
+			result.setCode(CcmRestType.ERROR_PARAM);
+			return result;
+		}
+		
+		User sessionUser = (User) req.getSession().getAttribute("user");
+		if (sessionUser== null) {
+			result.setCode(CcmRestType.ERROR_USER_NOT_EXIST);
+			return result;
+		}
+		String sessionUserId = sessionUser.getId();
+		if (userId== null || "".equals(userId) ||!userId.equals(sessionUserId)) {
+			result.setCode(CcmRestType.ERROR_USER_NOT_EXIST);
+			return result;
+		}
+		if (ccmHouseDrugs.getId() != null && !"".equals(ccmHouseDrugs.getId())) {
+			CcmHouseDrugs ccmHouseDrugsDB = ccmHouseDrugsService.get(ccmHouseDrugs.getId());
+			if (ccmHouseDrugsDB == null) {//从数据库中没有取到对应数据
+				result.setCode(CcmRestType.ERROR_DB_NOT_EXIST);
+				return result;
+			} 
+		}
+		if (ccmHouseDrugs.getCreateBy()== null) {
+			ccmHouseDrugs.setCreateBy(new User(userId));
+		}
+		ccmHouseDrugs.setUpdateBy(new User(userId));
+		
+		ccmHouseDrugsService.save(ccmHouseDrugs);
+		// 更新 当前人 是 吸毒人员
+		CcmPeople ccmPop = ccmPeopleService.get(ccmHouseDrugs.getPeopleId());
+		ccmPop.setIsDrugs(1);
+		ccmPop.setUpdateBy(new User(userId));
+		ccmPeopleService.save(ccmPop);
+		addMessage(redirectAttributes, "保存吸毒人员成功");
+		result.setCode(CcmRestType.OK);
+		result.setResult(ccmHouseDrugs);
+		
+		return result;
+	}
+	/**
+	 * @see  查询吸毒人员信息
+	 * @param pageNo 页码
+	 * @param pageSize 分页大小
+	 * @return 
+	 * @author fuxinshuang
+	 * @version 2018-03-09
+	 */
+	@ResponseBody
+	@RequestMapping(value="/queryDrugs", method = RequestMethod.GET)
+	public CcmRestResult queryDrugs(String userId,CcmHouseDrugs ccmHouseDrugs, HttpServletRequest req, HttpServletResponse resp) throws IOException {
+		CcmRestResult result = new CcmRestResult();
+		User sessionUser = (User) req.getSession().getAttribute("user");
+		if (sessionUser== null) {
+			result.setCode(CcmRestType.ERROR_USER_NOT_EXIST);
+			return result;
+		}
+		String sessionUserId = sessionUser.getId();
+		if (userId== null || "".equals(userId) ||!userId.equals(sessionUserId)) {
+			result.setCode(CcmRestType.ERROR_USER_NOT_EXIST);
+			return result;
+		}
+
+		ccmHouseDrugs.setCheckUser(sessionUser);
+		Page<CcmHouseDrugs> page = ccmHouseDrugsService.findPage(new Page<CcmHouseDrugs>(req, resp), ccmHouseDrugs);
+	
+		result.setCode(CcmRestType.OK);
+		result.setResult(page);
+		
+		return result;
+	}
+	/**
+	 * @see  获取吸毒人员信息 getDrugs
+	 * @param 
+	 * @author fuxinshuang
+	 * @version 2018-02-26
+	 */
+	@ResponseBody
+	@RequestMapping(value="/getDrugs", method = RequestMethod.GET)
+	public CcmRestResult getDrugs(String userId,HttpServletRequest req, HttpServletResponse resp, @RequestParam(value = "id", required = false) String id,
+			@RequestParam(value = "peopleId", required = false) String peopleId) throws IOException {
+		CcmRestResult result = new CcmRestResult();
+		User sessionUser = (User) req.getSession().getAttribute("user");
+		if (sessionUser== null) {
+			result.setCode(CcmRestType.ERROR_USER_NOT_EXIST);
+			return result;
+		}
+		String sessionUserId = sessionUser.getId();
+		if (userId== null || "".equals(userId) ||!userId.equals(sessionUserId)) {
+			result.setCode(CcmRestType.ERROR_USER_NOT_EXIST);
+			return result;
+		}
+		
+		CcmHouseDrugs entity = null;
+		if (StringUtils.isNotBlank(id)) {
+			entity = ccmHouseDrugsService.get(id);
+		} else if (StringUtils.isNotBlank(peopleId)) {
+			entity = ccmHouseDrugsService.getPeopleALL(peopleId);
+		}else{
+			result.setCode(CcmRestType.ERROR_PARAM);
+			return result;
+		}
+		if (entity == null) {
+			entity = new CcmHouseDrugs();
+			// 如果 peopleId 不为空 则 添加该ID
+			if (StringUtils.isNotBlank(peopleId)) {
+				entity.setPeopleId(peopleId);
+			}
+		}
+		
+		result.setCode(CcmRestType.OK);
+		result.setResult(entity);
+		
+		return result;
+	}
+
+	/**
+	 * @see  保存艾滋人员信息 saveAids
+	 * @param 
+	 * @author fuxinshuang
+	 * @version 2018-02-26
+	 */
+	@ResponseBody
+	@RequestMapping(value="/saveAids", method = RequestMethod.POST)
+	public CcmRestResult saveAids(String userId,HttpServletRequest req,CcmHouseAids ccmHouseAids, Model model, RedirectAttributes redirectAttributes) {
+		CcmRestResult result = new CcmRestResult();
+		if (!beanValidator(model, ccmHouseAids)) {//参数id不对
+			result.setCode(CcmRestType.ERROR_PARAM);
+			return result;
+		}
+		
+		User sessionUser = (User) req.getSession().getAttribute("user");
+		if (sessionUser== null) {
+			result.setCode(CcmRestType.ERROR_USER_NOT_EXIST);
+			return result;
+		}
+		String sessionUserId = sessionUser.getId();
+		if (userId== null || "".equals(userId) ||!userId.equals(sessionUserId)) {
+			result.setCode(CcmRestType.ERROR_USER_NOT_EXIST);
+			return result;
+		}
+		if (ccmHouseAids.getId() != null && !"".equals(ccmHouseAids.getId())) {
+			CcmHouseAids ccmHouseAidsDB = ccmHouseAidsService.get(ccmHouseAids.getId());
+			if (ccmHouseAidsDB == null) {//从数据库中没有取到对应数据
+				result.setCode(CcmRestType.ERROR_DB_NOT_EXIST);
+				return result;
+			} 
+		}
+		if (ccmHouseAids.getCreateBy()== null) {
+			ccmHouseAids.setCreateBy(new User(userId));
+		}
+		ccmHouseAids.setUpdateBy(new User(userId));
+		ccmHouseAidsService.save(ccmHouseAids);
+		// 更新 当前人 是 艾滋人员
+		CcmPeople ccmPop = ccmPeopleService.get(ccmHouseAids.getPeopleId());
+		ccmPop.setIsAids(1);
+		ccmPop.setUpdateBy(new User(userId));
+		ccmPeopleService.save(ccmPop);
+		addMessage(redirectAttributes, "保存艾滋人员成功");
+		result.setCode(CcmRestType.OK);
+		result.setResult(ccmHouseAids);
+		
+		return result;
+	}
+	/**
+	 * @see  查询艾滋人员信息
+	 * @param pageNo 页码
+	 * @param pageSize 分页大小
+	 * @return 
+	 * @author fuxinshuang
+	 * @version 2018-03-09
+	 */
+	@ResponseBody
+	@RequestMapping(value="/queryAids", method = RequestMethod.GET)
+	public CcmRestResult queryAids(String userId,CcmHouseAids ccmHouseAids, HttpServletRequest req, HttpServletResponse resp) throws IOException {
+		CcmRestResult result = new CcmRestResult();
+		User sessionUser = (User) req.getSession().getAttribute("user");
+		if (sessionUser== null) {
+			result.setCode(CcmRestType.ERROR_USER_NOT_EXIST);
+			return result;
+		}
+		String sessionUserId = sessionUser.getId();
+		if (userId== null || "".equals(userId) ||!userId.equals(sessionUserId)) {
+			result.setCode(CcmRestType.ERROR_USER_NOT_EXIST);
+			return result;
+		}
+		ccmHouseAids.setCheckUser(sessionUser);
+		Page<CcmHouseAids> page = ccmHouseAidsService.findPage(new Page<CcmHouseAids>(req, resp), ccmHouseAids);
+	
+		result.setCode(CcmRestType.OK);
+		result.setResult(page);
+		
+		return result;
+	}
+	/**
+	 * @see  获取艾滋人员信息 getAids
+	 * @param 
+	 * @author fuxinshuang
+	 * @version 2018-02-26
+	 */
+	@ResponseBody
+	@RequestMapping(value="/getAids", method = RequestMethod.GET)
+	public CcmRestResult getAids(String userId,HttpServletRequest req, HttpServletResponse resp, @RequestParam(value = "id", required = false) String id,
+			@RequestParam(value = "peopleId", required = false) String peopleId) throws IOException {
+		CcmRestResult result = new CcmRestResult();
+		User sessionUser = (User) req.getSession().getAttribute("user");
+		if (sessionUser== null) {
+			result.setCode(CcmRestType.ERROR_USER_NOT_EXIST);
+			return result;
+		}
+		String sessionUserId = sessionUser.getId();
+		if (userId== null || "".equals(userId) ||!userId.equals(sessionUserId)) {
+			result.setCode(CcmRestType.ERROR_USER_NOT_EXIST);
+			return result;
+		}
+		
+		CcmHouseAids entity = null;
+		if (StringUtils.isNotBlank(id)) {
+			entity = ccmHouseAidsService.get(id);
+		} else if (StringUtils.isNotBlank(peopleId)) {
+			entity = ccmHouseAidsService.getPeopleALL(peopleId);
+		}else{
+			result.setCode(CcmRestType.ERROR_PARAM);
+			return result;
+		}
+		if (entity == null) {
+			entity = new CcmHouseAids();
+			// 如果 peopleId 不为空 则 添加该ID
+			if (StringUtils.isNotBlank(peopleId)) {
+				entity.setPeopleId(peopleId);
+			}
+		}
+		
+		result.setCode(CcmRestType.OK);
+		result.setResult(entity);
+		
+		return result;
+	}
+
+	/**
+	 * @see  保存重点青少年人员信息 saveKym
+	 * @param 
+	 * @author fuxinshuang
+	 * @version 2018-02-26
+	 */
+	@ResponseBody
+	@RequestMapping(value="/saveKym", method = RequestMethod.POST)
+	public CcmRestResult saveKym(String userId,HttpServletRequest req,CcmHouseKym ccmHouseKym, Model model, RedirectAttributes redirectAttributes) {
+		CcmRestResult result = new CcmRestResult();
+		if (!beanValidator(model, ccmHouseKym)) {//参数id不对
+			result.setCode(CcmRestType.ERROR_PARAM);
+			return result;
+		}
+		User sessionUser = (User) req.getSession().getAttribute("user");
+		if (sessionUser== null) {
+			result.setCode(CcmRestType.ERROR_USER_NOT_EXIST);
+			return result;
+		}
+		String sessionUserId = sessionUser.getId();
+		if (userId== null || "".equals(userId) ||!userId.equals(sessionUserId)) {
+			result.setCode(CcmRestType.ERROR_USER_NOT_EXIST);
+			return result;
+		}
+		if (ccmHouseKym.getId() != null && !"".equals(ccmHouseKym.getId())) {
+			CcmHouseKym ccmHouseKymDB = ccmHouseKymService.get(ccmHouseKym.getId());
+			if (ccmHouseKymDB == null) {//从数据库中没有取到对应数据
+				result.setCode(CcmRestType.ERROR_DB_NOT_EXIST);
+				return result;
+			} 
+		}
+		if (ccmHouseKym.getCreateBy()== null) {
+			ccmHouseKym.setCreateBy(new User(userId));
+		}
+		ccmHouseKym.setUpdateBy(new User(userId));
+		ccmHouseKymService.save(ccmHouseKym);
+		// 更新 当前人 是 重点青少年人员
+		CcmPeople ccmPop = ccmPeopleService.get(ccmHouseKym.getPeopleId());
+		ccmPop.setIsKym(1);
+		ccmPop.setUpdateBy(new User(userId));
+		ccmPeopleService.save(ccmPop);
+		addMessage(redirectAttributes, "重点青少年人员成功");
+		result.setCode(CcmRestType.OK);
+		result.setResult(ccmHouseKym);
+		
+		return result;
+	}
+	/**
+	 * @see  查询重点青少年人员信息
+	 * @param pageNo 页码
+	 * @param pageSize 分页大小
+	 * @return 
+	 * @author fuxinshuang
+	 * @version 2018-03-09
+	 */
+	@ResponseBody
+	@RequestMapping(value="/queryKym", method = RequestMethod.GET)
+	public CcmRestResult queryKym(String userId,CcmHouseKym ccmHouseKym, HttpServletRequest req, HttpServletResponse resp) throws IOException {
+		CcmRestResult result = new CcmRestResult();
+		User sessionUser = (User) req.getSession().getAttribute("user");
+		if (sessionUser== null) {
+			result.setCode(CcmRestType.ERROR_USER_NOT_EXIST);
+			return result;
+		}
+		String sessionUserId = sessionUser.getId();
+		if (userId== null || "".equals(userId) ||!userId.equals(sessionUserId)) {
+			result.setCode(CcmRestType.ERROR_USER_NOT_EXIST);
+			return result;
+		}
+
+		ccmHouseKym.setCheckUser(sessionUser);
+		Page<CcmHouseKym> page = ccmHouseKymService.findPage(new Page<CcmHouseKym>(req, resp), ccmHouseKym);
+	
+		result.setCode(CcmRestType.OK);
+		result.setResult(page);
+		
+		return result;
+	}
+	/**
+	 * @see  获取重点青少年人员信息 getKym
+	 * @param 
+	 * @author fuxinshuang
+	 * @version 2018-02-26
+	 */
+	@ResponseBody
+	@RequestMapping(value="/getKym", method = RequestMethod.GET)
+	public CcmRestResult getKym(String userId,HttpServletRequest req, HttpServletResponse resp, @RequestParam(value = "id", required = false) String id,
+			@RequestParam(value = "peopleId", required = false) String peopleId) throws IOException {
+		CcmRestResult result = new CcmRestResult();
+		User sessionUser = (User) req.getSession().getAttribute("user");
+		if (sessionUser== null) {
+			result.setCode(CcmRestType.ERROR_USER_NOT_EXIST);
+			return result;
+		}
+		String sessionUserId = sessionUser.getId();
+		if (userId== null || "".equals(userId) ||!userId.equals(sessionUserId)) {
+			result.setCode(CcmRestType.ERROR_USER_NOT_EXIST);
+			return result;
+		}
+		
+		CcmHouseKym entity = null;
+		if (StringUtils.isNotBlank(id)) {
+			entity = ccmHouseKymService.get(id);
+		} else if (StringUtils.isNotBlank(peopleId)) {
+			entity = ccmHouseKymService.getPeopleALL(peopleId);
+		}else{
+			result.setCode(CcmRestType.ERROR_PARAM);
+			return result;
+		}
+		if (entity == null) {
+			entity = new CcmHouseKym();
+			// 如果 peopleId 不为空 则 添加该ID
+			if (StringUtils.isNotBlank(peopleId)) {
+				entity.setPeopleId(peopleId);
+			}
+		}
+		
+		result.setCode(CcmRestType.OK);
+		result.setResult(entity);
+		
+		return result;
+	}
+	/**
+	 * @see  保存涉教人员信息 saveHeresy
+	 * @param 
+	 * @author fuxinshuang
+	 * @version 2018-03-07
+	 */
+	@ResponseBody
+	@RequestMapping(value="/saveHeresy", method = RequestMethod.POST)
+	public CcmRestResult saveHeresy(String userId,HttpServletRequest req,CcmHouseHeresy ccmHouseHeresy, Model model, RedirectAttributes redirectAttributes) {
+		CcmRestResult result = new CcmRestResult();
+		if (!beanValidator(model, ccmHouseHeresy)) {//参数id不对
+			result.setCode(CcmRestType.ERROR_PARAM);
+			return result;
+		}
+		User sessionUser = (User) req.getSession().getAttribute("user");
+		if (sessionUser== null) {
+			result.setCode(CcmRestType.ERROR_USER_NOT_EXIST);
+			return result;
+		}
+		String sessionUserId = sessionUser.getId();
+		if (userId== null || "".equals(userId) ||!userId.equals(sessionUserId)) {
+			result.setCode(CcmRestType.ERROR_USER_NOT_EXIST);
+			return result;
+		}
+		if (ccmHouseHeresy.getId() != null && !"".equals(ccmHouseHeresy.getId())) {
+			CcmHouseHeresy ccmHouseHeresyDB = ccmHouseHeresyService.get(ccmHouseHeresy.getId());
+			if (ccmHouseHeresyDB == null) {//从数据库中没有取到对应数据
+				result.setCode(CcmRestType.ERROR_DB_NOT_EXIST);
+				return result;
+			} 
+		}
+		if (ccmHouseHeresy.getCreateBy()== null) {
+			ccmHouseHeresy.setCreateBy(new User(userId));
+		}
+		ccmHouseHeresy.setUpdateBy(new User(userId));
+		ccmHouseHeresyService.save(ccmHouseHeresy);
+		// 更新 当前人 是涉教人员
+		CcmPeople ccmPop = ccmPeopleService.get(ccmHouseHeresy.getPeopleId());
+		ccmPop.setIsHeresy(1);
+		ccmPop.setUpdateBy(new User(userId));
+		ccmPeopleService.save(ccmPop);
+		addMessage(redirectAttributes, "保存涉教人员成功");
+		result.setCode(CcmRestType.OK);
+		result.setResult(ccmHouseHeresy);
+		
+		return result;
+	}
+	/**
+	 * @see  查询涉教人员信息
+	 * @param pageNo 页码
+	 * @param pageSize 分页大小
+	 * @return 
+	 * @author fuxinshuang
+	 * @version 2018-03-09
+	 */
+	@ResponseBody
+	@RequestMapping(value="/queryHeresy", method = RequestMethod.GET)
+	public CcmRestResult queryHeresy(String userId,CcmHouseHeresy ccmHouseHeresy, HttpServletRequest req, HttpServletResponse resp) throws IOException {
+		CcmRestResult result = new CcmRestResult();
+		User sessionUser = (User) req.getSession().getAttribute("user");
+		if (sessionUser== null) {
+			result.setCode(CcmRestType.ERROR_USER_NOT_EXIST);
+			return result;
+		}
+		String sessionUserId = sessionUser.getId();
+		if (userId== null || "".equals(userId) ||!userId.equals(sessionUserId)) {
+			result.setCode(CcmRestType.ERROR_USER_NOT_EXIST);
+			return result;
+		}
+
+		ccmHouseHeresy.setCheckUser(sessionUser);
+		Page<CcmHouseHeresy> page = ccmHouseHeresyService.findPage(new Page<CcmHouseHeresy>(req, resp), ccmHouseHeresy);
+	
+		result.setCode(CcmRestType.OK);
+		result.setResult(page);
+		
+		return result;
+	}
+	/**
+	 * @see  获取涉教人员信息 getHeresy
+	 * @param 
+	 * @author fuxinshuang
+	 * @version 2018-02-26
+	 */
+	@ResponseBody
+	@RequestMapping(value="/getHeresy", method = RequestMethod.GET)
+	public CcmRestResult getHeresy(String userId,HttpServletRequest req, HttpServletResponse resp, @RequestParam(value = "id", required = false) String id,
+			@RequestParam(value = "peopleId", required = false) String peopleId) throws IOException {
+		CcmRestResult result = new CcmRestResult();
+		User sessionUser = (User) req.getSession().getAttribute("user");
+		if (sessionUser== null) {
+			result.setCode(CcmRestType.ERROR_USER_NOT_EXIST);
+			return result;
+		}
+		String sessionUserId = sessionUser.getId();
+		if (userId== null || "".equals(userId) ||!userId.equals(sessionUserId)) {
+			result.setCode(CcmRestType.ERROR_USER_NOT_EXIST);
+			return result;
+		}
+		
+		CcmHouseHeresy entity = null;
+		if (StringUtils.isNotBlank(id)) {
+			entity = ccmHouseHeresyService.get(id);
+		} else if (StringUtils.isNotBlank(peopleId)) {
+			entity = ccmHouseHeresyService.getPeopleALL(peopleId);
+		}else{
+			result.setCode(CcmRestType.ERROR_PARAM);
+			return result;
+		}
+		if (entity == null) {
+			entity = new CcmHouseHeresy();
+			// 如果 peopleId 不为空 则 添加该ID
+			if (StringUtils.isNotBlank(peopleId)) {
+				entity.setPeopleId(peopleId);
+			}
+		}
+		
+		result.setCode(CcmRestType.OK);
+		result.setResult(entity);
+		
+		return result;
+	}
+	/**
+	 * @see  保存危险品从业人员信息 saveDangerous
+	 * @param 
+	 * @author fuxinshuang
+	 * @version 2018-03-07
+	 */
+	@ResponseBody
+	@RequestMapping(value="/saveDangerous", method = RequestMethod.POST)
+	public CcmRestResult saveDangerous(String userId,HttpServletRequest req,CcmHouseDangerous ccmHouseDangerous, Model model, RedirectAttributes redirectAttributes) {
+		CcmRestResult result = new CcmRestResult();
+		if (!beanValidator(model, ccmHouseDangerous)) {//参数id不对
+			result.setCode(CcmRestType.ERROR_PARAM);
+			return result;
+		}
+		User sessionUser = (User) req.getSession().getAttribute("user");
+		if (sessionUser== null) {
+			result.setCode(CcmRestType.ERROR_USER_NOT_EXIST);
+			return result;
+		}
+		String sessionUserId = sessionUser.getId();
+		if (userId== null || "".equals(userId) ||!userId.equals(sessionUserId)) {
+			result.setCode(CcmRestType.ERROR_USER_NOT_EXIST);
+			return result;
+		}
+		if (ccmHouseDangerous.getId() != null && !"".equals(ccmHouseDangerous.getId())) {
+			CcmHouseDangerous ccmHouseDangerousDB = ccmHouseDangerousService.get(ccmHouseDangerous.getId());
+			if (ccmHouseDangerousDB == null) {//从数据库中没有取到对应数据
+				result.setCode(CcmRestType.ERROR_DB_NOT_EXIST);
+				return result;
+			} 
+		}
+		if (ccmHouseDangerous.getCreateBy()== null) {
+			ccmHouseDangerous.setCreateBy(new User(userId));
+		}
+		ccmHouseDangerous.setUpdateBy(new User(userId));
+		ccmHouseDangerousService.save(ccmHouseDangerous);
+		// 更新 当前人 是危险品从业人员
+		CcmPeople ccmPop = ccmPeopleService.get(ccmHouseDangerous.getPeopleId());
+		ccmPop.setIsDangerous(1);
+		ccmPop.setUpdateBy(new User(userId));
+		ccmPeopleService.save(ccmPop);
+		addMessage(redirectAttributes, "保存危险品从业人员成功");
+		result.setCode(CcmRestType.OK);
+		result.setResult(ccmHouseDangerous);
+		
+		return result;
+	}
+	/**
+	 * @see  查询危险品从业人员信息
+	 * @param pageNo 页码
+	 * @param pageSize 分页大小
+	 * @return 
+	 * @author fuxinshuang
+	 * @version 2018-03-09
+	 */
+	@ResponseBody
+	@RequestMapping(value="/queryDangerous", method = RequestMethod.GET)
+	public CcmRestResult queryDangerous(String userId,CcmHouseDangerous ccmHouseDangerous, HttpServletRequest req, HttpServletResponse resp) throws IOException {
+		CcmRestResult result = new CcmRestResult();
+		User sessionUser = (User) req.getSession().getAttribute("user");
+		if (sessionUser== null) {
+			result.setCode(CcmRestType.ERROR_USER_NOT_EXIST);
+			return result;
+		}
+		String sessionUserId = sessionUser.getId();
+		if (userId== null || "".equals(userId) ||!userId.equals(sessionUserId)) {
+			result.setCode(CcmRestType.ERROR_USER_NOT_EXIST);
+			return result;
+		}
+
+		ccmHouseDangerous.setCheckUser(sessionUser);
+		Page<CcmHouseDangerous> page = ccmHouseDangerousService.findPage(new Page<CcmHouseDangerous>(req, resp), ccmHouseDangerous);
+	
+		result.setCode(CcmRestType.OK);
+		result.setResult(page);
+		
+		return result;
+	}
+	/**
+	 * @see  获取危险品从业人员信息 getDangerous
+	 * @param 
+	 * @author fuxinshuang
+	 * @version 2018-03-07
+	 */
+	@ResponseBody
+	@RequestMapping(value="/getDangerous", method = RequestMethod.GET)
+	public CcmRestResult getDangerous(String userId,HttpServletRequest req, HttpServletResponse resp, @RequestParam(value = "id", required = false) String id,
+			@RequestParam(value = "peopleId", required = false) String peopleId) throws IOException {
+		CcmRestResult result = new CcmRestResult();
+		User sessionUser = (User) req.getSession().getAttribute("user");
+		if (sessionUser== null) {
+			result.setCode(CcmRestType.ERROR_USER_NOT_EXIST);
+			return result;
+		}
+		String sessionUserId = sessionUser.getId();
+		if (userId== null || "".equals(userId) ||!userId.equals(sessionUserId)) {
+			result.setCode(CcmRestType.ERROR_USER_NOT_EXIST);
+			return result;
+		}
+		
+		CcmHouseDangerous entity = null;
+		if (StringUtils.isNotBlank(id)) {
+			entity = ccmHouseDangerousService.get(id);
+		} else if (StringUtils.isNotBlank(peopleId)) {
+			entity = ccmHouseDangerousService.getPeopleALL(peopleId);
+		}else{
+			result.setCode(CcmRestType.ERROR_PARAM);
+			return result;
+		}
+		if (entity == null) {
+			entity = new CcmHouseDangerous();
+			// 如果 peopleId 不为空 则 添加该ID
+			if (StringUtils.isNotBlank(peopleId)) {
+				entity.setPeopleId(peopleId);
+			}
+		}
+		
+		result.setCode(CcmRestType.OK);
+		result.setResult(entity);
+		
+		return result;
+	}
+	/**
+	 * @see  保存重点上访人员信息 savePetition
+	 * @param 
+	 * @author fuxinshuang
+	 * @version 2018-03-07
+	 */
+	@ResponseBody
+	@RequestMapping(value="/savePetition", method = RequestMethod.POST)
+	public CcmRestResult savePetition(String userId,HttpServletRequest req,CcmHousePetition ccmHousePetition, Model model, RedirectAttributes redirectAttributes) {
+		CcmRestResult result = new CcmRestResult();
+		if (!beanValidator(model, ccmHousePetition)) {//参数id不对
+			result.setCode(CcmRestType.ERROR_PARAM);
+			return result;
+		}
+		User sessionUser = (User) req.getSession().getAttribute("user");
+		if (sessionUser== null) {
+			result.setCode(CcmRestType.ERROR_USER_NOT_EXIST);
+			return result;
+		}
+		String sessionUserId = sessionUser.getId();
+		if (userId== null || "".equals(userId) ||!userId.equals(sessionUserId)) {
+			result.setCode(CcmRestType.ERROR_USER_NOT_EXIST);
+			return result;
+		}
+		if (ccmHousePetition.getId() != null && !"".equals(ccmHousePetition.getId())) {
+			CcmHousePetition ccmHousePetitionDB = ccmHousePetitionService.get(ccmHousePetition.getId());
+			if (ccmHousePetitionDB == null) {//从数据库中没有取到对应数据
+				result.setCode(CcmRestType.ERROR_DB_NOT_EXIST);
+				return result;
+			} 
+		}
+		if (ccmHousePetition.getCreateBy()== null) {
+			ccmHousePetition.setCreateBy(new User(userId));
+		}
+		ccmHousePetition.setUpdateBy(new User(userId));
+		ccmHousePetitionService.save(ccmHousePetition);
+		// 更新 当前人 是重点上访人员
+		System.out.println(ccmHousePetition.getPeopleId());
+		CcmPeople ccmPop = ccmPeopleService.get(ccmHousePetition.getPeopleId());
+		ccmPop.setIsVisit(1);
+		ccmPop.setUpdateBy(new User(userId));
+		ccmPeopleService.save(ccmPop);
+		addMessage(redirectAttributes, "保存重点上访人员成功");
+		result.setCode(CcmRestType.OK);
+		result.setResult(ccmHousePetition);
+		
+		return result;
+	}
+	/**
+	 * @see  查询重点上访人员信息
+	 * @param pageNo 页码
+	 * @param pageSize 分页大小
+	 * @return 
+	 * @author fuxinshuang
+	 * @version 2018-03-09
+	 */
+	@ResponseBody
+	@RequestMapping(value="/queryPetition", method = RequestMethod.GET)
+	public CcmRestResult queryPetition(String userId,CcmHousePetition ccmHousePetition, HttpServletRequest req, HttpServletResponse resp) throws IOException {
+		CcmRestResult result = new CcmRestResult();
+		User sessionUser = (User) req.getSession().getAttribute("user");
+		if (sessionUser== null) {
+			result.setCode(CcmRestType.ERROR_USER_NOT_EXIST);
+			return result;
+		}
+		String sessionUserId = sessionUser.getId();
+		if (userId== null || "".equals(userId) ||!userId.equals(sessionUserId)) {
+			result.setCode(CcmRestType.ERROR_USER_NOT_EXIST);
+			return result;
+		}
+
+		ccmHousePetition.setCheckUser(sessionUser);
+		Page<CcmHousePetition> page = ccmHousePetitionService.findPage(new Page<CcmHousePetition>(req, resp), ccmHousePetition);
+	
+		result.setCode(CcmRestType.OK);
+		result.setResult(page);
+		
+		return result;
+	}
+	/**
+	 * @see  获取重点上访人员信息 getPetition
+	 * @param 
+	 * @author fuxinshuang
+	 * @version 2018-03-07
+	 */
+	@ResponseBody
+	@RequestMapping(value="/getPetition", method = RequestMethod.GET)
+	public CcmRestResult getPetition(String userId,HttpServletRequest req, HttpServletResponse resp, @RequestParam(value = "id", required = false) String id,
+			@RequestParam(value = "peopleId", required = false) String peopleId) throws IOException {
+		CcmRestResult result = new CcmRestResult();
+		User sessionUser = (User) req.getSession().getAttribute("user");
+		if (sessionUser== null) {
+			result.setCode(CcmRestType.ERROR_USER_NOT_EXIST);
+			return result;
+		}
+		String sessionUserId = sessionUser.getId();
+		if (userId== null || "".equals(userId) ||!userId.equals(sessionUserId)) {
+			result.setCode(CcmRestType.ERROR_USER_NOT_EXIST);
+			return result;
+		}
+		
+		CcmHousePetition entity = null;
+		if (StringUtils.isNotBlank(id)) {
+			entity = ccmHousePetitionService.get(id);
+		} else if (StringUtils.isNotBlank(peopleId)) {
+			entity = ccmHousePetitionService.getPeopleALL(peopleId);
+		}else{
+			result.setCode(CcmRestType.ERROR_PARAM);
+			return result;
+		}
+		if (entity == null) {
+			entity = new CcmHousePetition();
+			// 如果 peopleId 不为空 则 添加该ID
+			if (StringUtils.isNotBlank(peopleId)) {
+				entity.setPeopleId(peopleId);
+			}
+		}
+		
+		result.setCode(CcmRestType.OK);
+		result.setResult(entity);
+		
+		return result;
+	}
+	/**
+	 * @see  保存留守人员信息 saveBehind
+	 * @param 
+	 * @author fuxinshuang
+	 * @version 2018-03-07
+	 */
+	@ResponseBody
+	@RequestMapping(value="/saveBehind", method = RequestMethod.POST)
+	public CcmRestResult saveBehind(String userId,HttpServletRequest req,CcmPopBehind ccmPopBehind, Model model, RedirectAttributes redirectAttributes) {
+		CcmRestResult result = new CcmRestResult();
+		if (!beanValidator(model, ccmPopBehind)) {//参数id不对
+			result.setCode(CcmRestType.ERROR_PARAM);
+			return result;
+		}
+		User sessionUser = (User) req.getSession().getAttribute("user");
+		if (sessionUser== null) {
+			result.setCode(CcmRestType.ERROR_USER_NOT_EXIST);
+			return result;
+		}
+		String sessionUserId = sessionUser.getId();
+		if (userId== null || "".equals(userId) ||!userId.equals(sessionUserId)) {
+			result.setCode(CcmRestType.ERROR_USER_NOT_EXIST);
+			return result;
+		}
+		if (ccmPopBehind.getId() != null && !"".equals(ccmPopBehind.getId())) {
+			CcmPopBehind ccmPopBehindDB = ccmPopBehindService.get(ccmPopBehind.getId());
+			if (ccmPopBehindDB == null) {//从数据库中没有取到对应数据
+				result.setCode(CcmRestType.ERROR_DB_NOT_EXIST);
+				return result;
+			} 
+		}
+		if (ccmPopBehind.getCreateBy()== null) {
+			ccmPopBehind.setCreateBy(new User(userId));
+		}
+		ccmPopBehind.setUpdateBy(new User(userId));
+		ccmPopBehindService.save(ccmPopBehind);
+		// 更新 当前人 是留守人员
+		CcmPeople ccmPop = ccmPeopleService.get(ccmPopBehind.getPeopleId());
+		ccmPop.setIsBehind(1);
+		ccmPop.setUpdateBy(new User(userId));
+		ccmPeopleService.save(ccmPop);
+		addMessage(redirectAttributes, "保存留守人员成功");
+		result.setCode(CcmRestType.OK);
+		result.setResult(ccmPopBehind);
+		
+		return result;
+	}
+	/**
+	 * @see  查询留守人员信息
+	 * @param pageNo 页码
+	 * @param pageSize 分页大小
+	 * @return 
+	 * @author fuxinshuang
+	 * @version 2018-03-09
+	 */
+	@ResponseBody
+	@RequestMapping(value="/queryBehind", method = RequestMethod.GET)
+	public CcmRestResult queryBehind(String userId,CcmPopBehind ccmPopBehind, HttpServletRequest req, HttpServletResponse resp) throws IOException {
+		CcmRestResult result = new CcmRestResult();
+		User sessionUser = (User) req.getSession().getAttribute("user");
+		if (sessionUser== null) {
+			result.setCode(CcmRestType.ERROR_USER_NOT_EXIST);
+			return result;
+		}
+		String sessionUserId = sessionUser.getId();
+		if (userId== null || "".equals(userId) ||!userId.equals(sessionUserId)) {
+			result.setCode(CcmRestType.ERROR_USER_NOT_EXIST);
+			return result;
+		}
+
+		ccmPopBehind.setCheckUser(sessionUser);
+		Page<CcmPopBehind> page = ccmPopBehindService.findPage(new Page<CcmPopBehind>(req, resp), ccmPopBehind);
+	
+		result.setCode(CcmRestType.OK);
+		result.setResult(page);
+		
+		return result;
+	}
+	/**
+	 * @see  获取留守人员信息 getBehind
+	 * @param 
+	 * @author fuxinshuang
+	 * @version 2018-03-07
+	 */
+	@ResponseBody
+	@RequestMapping(value="/getBehind", method = RequestMethod.GET)
+	public CcmRestResult getBehind(String userId,HttpServletRequest req, HttpServletResponse resp, @RequestParam(value = "id", required = false) String id,
+			@RequestParam(value = "peopleId", required = false) String peopleId) throws IOException {
+		CcmRestResult result = new CcmRestResult();
+		User sessionUser = (User) req.getSession().getAttribute("user");
+		if (sessionUser== null) {
+			result.setCode(CcmRestType.ERROR_USER_NOT_EXIST);
+			return result;
+		}
+		String sessionUserId = sessionUser.getId();
+		if (userId== null || "".equals(userId) ||!userId.equals(sessionUserId)) {
+			result.setCode(CcmRestType.ERROR_USER_NOT_EXIST);
+			return result;
+		}
+		
+		CcmPopBehind entity = null;
+		if (StringUtils.isNotBlank(id)) {
+			entity = ccmPopBehindService.get(id);
+		} else if (StringUtils.isNotBlank(peopleId)) {
+			entity = ccmPopBehindService.getPeopleALL(peopleId);
+		}else{
+			result.setCode(CcmRestType.ERROR_PARAM);
+			return result;
+		}
+		if (entity == null) {
+			entity = new CcmPopBehind();
+			// 如果 peopleId 不为空 则 添加该ID
+			if (StringUtils.isNotBlank(peopleId)) {
+				entity.setPeopleId(peopleId);
+			}
+		}
+		
+		result.setCode(CcmRestType.OK);
+		result.setResult(entity);
+		
+		return result;
+	}
+	/**
+	 * @see  查询特殊关怀人员信息
+	 * @param pageNo 页码
+	 * @param pageSize 分页大小
+	 * @return 
+	 * @author fuxinshuang
+	 * @version 2018-03-24
+	 */
+	@ResponseBody
+	@RequestMapping(value="/queryCare", method = RequestMethod.GET)
+	public CcmRestResult queryCare(String userId,CcmPeople ccmPeople, HttpServletRequest req, HttpServletResponse resp) throws IOException {
+		CcmRestResult result = new CcmRestResult();
+		User sessionUser = (User) req.getSession().getAttribute("user");
+		if (sessionUser== null) {
+			result.setCode(CcmRestType.ERROR_USER_NOT_EXIST);
+			return result;
+		}
+		String sessionUserId = sessionUser.getId();
+		if (userId== null || "".equals(userId) ||!userId.equals(sessionUserId)) {
+			result.setCode(CcmRestType.ERROR_USER_NOT_EXIST);
+			return result;
+		}
+		String specialCareTypeStr = "";
+		if (ccmPeople.getSpecialCareType() != null && !"".equals(ccmPeople.getSpecialCareType())) {
+			String[] specialCareTypes = ccmPeople.getSpecialCareType().split(",");
+			for (int i = 0; i < specialCareTypes.length; i++) {// 去掉空字符串和null字符串
+				if (specialCareTypes[i] != null && !"".equals(specialCareTypes[i])
+						&& !"null".equals(specialCareTypes[i])) {
+					specialCareTypeStr = specialCareTypeStr + specialCareTypes[i] + ",";
+				}
+			}
+			ccmPeople.setSpecialCareTypes(specialCareTypeStr.split(","));
+		}
+		if ("".equals(specialCareTypeStr)) {// 传过来值中没有有效的内容，则查询全部
+			Dict dict = new Dict();
+			dict.setType("pop_special_care_type");
+			List<Dict> dictList = dictService.findList(dict);
+			String[] specialCareTypes = new String[dictList.size()];
+			for (int i = 0; i < specialCareTypes.length; i++) {
+				specialCareTypes[i] = dictList.get(i).getValue();
+			}
+			ccmPeople.setSpecialCareTypes(specialCareTypes);
+		}
+		ccmPeople.setCheckUser(sessionUser);
+		Page<CcmPeople> page = ccmPeopleService.findPage(new Page<CcmPeople>(req, resp), ccmPeople);
+		
+		
+		//
+		
+		List<CcmPeople> list = page.getList();
+		//
+		CcmPeople ccmPeople2 = new CcmPeople();
+		String[] listLimite = new String[list.size()];
+		if(list.size()>0){
+			for(int i=0;i<list.size();i++){
+				listLimite[i]=list.get(i).getId();
+			}
+			ccmPeople2.setListLimite(listLimite);
+			List<CcmPeople> list2 = ccmPeopleService.findListLimite(ccmPeople2);//数组查询id
+			page.setList(list2);
+		}
+		
+		
+		
+		result.setCode(CcmRestType.OK);
+		result.setResult(page);
+		
+		return result;
+	}
+	/**
+	 * @see  查询老年人信息
+	 * @param 
+	 * @param pageNo 页码
+	 * @param pageSize 分页大小
+	 * @return 
+	 * @author pengjianqiang
+	 * @version 2018-02-22
+	 */
+	@ResponseBody
+	@RequestMapping(value="/queryOlder", method = RequestMethod.GET)
+	public CcmRestResult queryOlder(String userId,CcmPeople ccmPeople, HttpServletRequest req, HttpServletResponse resp) throws IOException {
+		long a = System.currentTimeMillis();
+		CcmRestResult result = new CcmRestResult();
+		User sessionUser = (User) req.getSession().getAttribute("user");
+		if (sessionUser== null) {
+			result.setCode(CcmRestType.ERROR_USER_NOT_EXIST);
+			return result;
+		}
+		String sessionUserId = sessionUser.getId();
+		if (userId== null || "".equals(userId) ||!userId.equals(sessionUserId)) {
+			result.setCode(CcmRestType.ERROR_USER_NOT_EXIST);
+			return result;
+		}
+		ccmPeople.setCheckUser(sessionUser);
+		Calendar calendar = Calendar.getInstance();
+		calendar.setTime(new Date());
+		calendar.add(Calendar.YEAR, 0-PlmTypes.OLD_AGE);
+		ccmPeople.setBirthday(calendar.getTime());
+		Page<CcmPeople> page = ccmPeopleService.findOlderPage(new Page<CcmPeople>(req, resp), ccmPeople);
+		System.out.println("第一个使用了" + (System.currentTimeMillis() - a) + "ms");
+	
+		List<CcmPeople> list = page.getList();
+		CcmPeople ccmPeople2 = new CcmPeople();
+		String[] listLimite = new String[list.size()];
+		if(list.size()>0){
+			for(int i=0;i<list.size();i++){
+				listLimite[i]=list.get(i).getId();
+			}
+			ccmPeople2.setListLimite(listLimite);
+			List<CcmPeople> list2 = ccmPeopleService.findListLimite(ccmPeople2);//数组查询id
+			page.setList(list2);
+		}
+		result.setCode(CcmRestType.OK);
+		result.setResult(page);
+		System.out.println("第二个使用了" + (System.currentTimeMillis() - a) + "ms");
+		return result;
+	}
+	/**
+	 * @see  查询党员信息
+	 * @param 
+	 * @param pageNo 页码
+	 * @param pageSize 分页大小
+	 * @return 
+	 * @author pengjianqiang
+	 * @version 2018-02-22
+	 */
+	@ResponseBody
+	@RequestMapping(value="/queryCommunist", method = RequestMethod.GET)
+	public CcmRestResult queryCommunist(String userId,CcmPeople ccmPeople, HttpServletRequest req, HttpServletResponse resp) throws IOException {
+		CcmRestResult result = new CcmRestResult();
+		User sessionUser = (User) req.getSession().getAttribute("user");
+		if (sessionUser== null) {
+			result.setCode(CcmRestType.ERROR_USER_NOT_EXIST);
+			return result;
+		}
+		String sessionUserId = sessionUser.getId();
+		if (userId== null || "".equals(userId) ||!userId.equals(sessionUserId)) {
+			result.setCode(CcmRestType.ERROR_USER_NOT_EXIST);
+			return result;
+		}
+
+		ccmPeople.setCheckUser(sessionUser);
+		Page<CcmPeople> page = ccmPeopleService.findCommunistPage(new Page<CcmPeople>(req, resp), ccmPeople);
+	
+		//
+		List<CcmPeople> list = page.getList();
+		//
+		CcmPeople ccmPeople2 = new CcmPeople();
+		String[] listLimite = new String[list.size()];
+		if(list.size()>0){
+			for(int i=0;i<list.size();i++){
+				listLimite[i]=list.get(i).getId();
+			}
+			ccmPeople2.setListLimite(listLimite);
+			List<CcmPeople> list2 = ccmPeopleService.findListLimite(ccmPeople2);//数组查询id
+			page.setList(list2);
+		}
+		
+		
+		
+		result.setCode(CcmRestType.OK);
+		result.setResult(page);
+		
+		return result;
+	}
+	
+	/**********           以下是上下级平台数据同步用                  ***************/
+
+	/**
+	 * @see  保存人口信息（支持新增和编辑,数据同步用）
+	 * @author pengjianqiang
+	 * @version 2018-05-17
+	 */
+	@ResponseBody
+	@RequestMapping(value="/savePeopleSyn", method = RequestMethod.POST)
+	public CcmRestResult savePeopleSyn(String userId,CcmPeople ccmPeople,HttpServletRequest req, HttpServletResponse resp) throws IOException {
+		CcmRestResult result = new CcmRestResult();
+		if (userId == null || "".equals(userId)) {
+			userId = "1";
+		}
+		User user = new User(userId);
+		ccmPeople.setCreateBy(user);
+		ccmPeople.setUpdateBy(user);
+		
+		ccmPeopleService.save(ccmPeople);
+		result.setCode(CcmRestType.OK);
+		result.setResult("成功");
+		return result;
+		
+	}
+	/**
+	 * @see  删除人口信息（数据同步用）
+	 * @author pengjianqiang
+	 * @version 2018-05-17
+	 */
+	@ResponseBody
+	@RequestMapping(value="/deletePeopleSyn", method = RequestMethod.POST)
+	public CcmRestResult deletePeopleSyn(String userId,CcmPeople ccmPeople,HttpServletRequest req, HttpServletResponse resp) throws IOException {
+		CcmRestResult result = new CcmRestResult();
+		ccmPeopleService.delete(ccmPeople);
+		result.setCode(CcmRestType.OK);
+		result.setResult("成功");
+		return result;
+		
+	}
+	
+	
+	/**
+	 * @see  保存留守人员信息（支持新增和编辑,数据同步用）
+	 * @author liangwanmin
+	 * @version 2018-05-22
+	 */
+	@ResponseBody
+	@RequestMapping(value="/saveBehindSyn", method = RequestMethod.POST)
+	public CcmRestResult saveBehindSyn(String userId,CcmPopBehind ccmPopBehind,HttpServletRequest req, HttpServletResponse resp) throws IOException {
+		CcmRestResult result = new CcmRestResult();
+		if (userId == null || "".equals(userId)) {
+			userId = "1";
+		}
+		User user = new User(userId);
+		ccmPopBehind.setCreateBy(user);
+		ccmPopBehind.setUpdateBy(user);
+		
+		ccmPopBehindService.save(ccmPopBehind);
+		result.setCode(CcmRestType.OK);
+		result.setResult("成功");
+		return result;
+		
+	}
+	/**
+	 * @see  删除留守人员信息（数据同步用）
+	 * @author liangwanmin
+	 * @version 2018-05-22
+	 */
+	@ResponseBody
+	@RequestMapping(value="/deleteBehindSyn", method = RequestMethod.POST)
+	public CcmRestResult deleteBehindSyn(String userId,CcmPopBehind ccmPopBehind,HttpServletRequest req, HttpServletResponse resp) throws IOException {
+		CcmRestResult result = new CcmRestResult();
+		ccmPopBehindService.delete(ccmPopBehind);
+		result.setCode(CcmRestType.OK);
+		result.setResult("成功");
+		return result;
+		
+	}
+	
+	
+	/**
+	 * @see  保存安置帮教人员信息（支持新增和编辑,数据同步用）
+	 * @author liangwanmin
+	 * @version 2018-05-23
+	 */
+	@ResponseBody
+	@RequestMapping(value="/saveReleaseSyn", method = RequestMethod.POST)
+	public CcmRestResult saveReleaseSyn(String userId,CcmHouseRelease ccmHouseRelease,HttpServletRequest req, HttpServletResponse resp) throws IOException {
+		CcmRestResult result = new CcmRestResult();
+		if (userId == null || "".equals(userId)) {
+			userId = "1";
+		}
+		User user = new User(userId);
+		ccmHouseRelease.setCreateBy(user);
+		ccmHouseRelease.setUpdateBy(user);
+		
+		ccmHouseReleaseService.save(ccmHouseRelease);
+		result.setCode(CcmRestType.OK);
+		result.setResult("成功");
+		return result;
+		
+	}
+	/**
+	 * @see  删除安置帮教人员信息（数据同步用）
+	 * @author liangwanmin
+	 * @version 2018-05-23
+	 */
+	@ResponseBody
+	@RequestMapping(value="/deleteReleaseSyn", method = RequestMethod.POST)
+	public CcmRestResult deleteReleaseSyn(String userId,CcmHouseRelease ccmHouseRelease,HttpServletRequest req, HttpServletResponse resp) throws IOException {
+		CcmRestResult result = new CcmRestResult();
+		ccmHouseReleaseService.delete(ccmHouseRelease);
+		result.setCode(CcmRestType.OK);
+		result.setResult("成功");
+		return result;
+		
+	}
+
+	
+	
+	/**
+	 * @see  保存社区矫正人员信息（支持新增和编辑,数据同步用）
+	 * @author liangwanmin
+	 * @version 2018-05-23
+	 */
+	@ResponseBody
+	@RequestMapping(value="/saveRectificationSyn", method = RequestMethod.POST)
+	public CcmRestResult saveReleaseSyn(String userId,CcmHouseRectification ccmHouseRectification,HttpServletRequest req, HttpServletResponse resp) throws IOException {
+		CcmRestResult result = new CcmRestResult();
+		if (userId == null || "".equals(userId)) {
+			userId = "1";
+		}
+		User user = new User(userId);
+		ccmHouseRectification.setCreateBy(user);
+		ccmHouseRectification.setUpdateBy(user);
+		
+		ccmHouseRectificationService.save(ccmHouseRectification);
+		result.setCode(CcmRestType.OK);
+		result.setResult("成功");
+		return result;
+		
+	}
+	/**
+	 * @see  删除社区矫正人员信息（数据同步用）
+	 * @author liangwanmin
+	 * @version 2018-05-23
+	 */
+	@ResponseBody
+	@RequestMapping(value="/deleteRectificationSyn", method = RequestMethod.POST)
+	public CcmRestResult deleteReleaseSyn(String userId,CcmHouseRectification ccmHouseRectification,HttpServletRequest req, HttpServletResponse resp) throws IOException {
+		CcmRestResult result = new CcmRestResult();
+		ccmHouseRectificationService.delete(ccmHouseRectification);
+		result.setCode(CcmRestType.OK);
+		result.setResult("成功");
+		return result;
+		
+	}
+
+	
+	
+	/**
+	 * @see  保存肇事肇祸等严重精神障碍患者人口信息（支持新增和编辑,数据同步用）
+	 * @author liangwanmin
+	 * @version 2018-05-23
+	 */
+	@ResponseBody
+	@RequestMapping(value="/savePsychogenySyn", method = RequestMethod.POST)
+	public CcmRestResult savePsychogenySyn(String userId,CcmHousePsychogeny ccmHousePsychogeny,HttpServletRequest req, HttpServletResponse resp) throws IOException {
+		CcmRestResult result = new CcmRestResult();
+		if (userId == null || "".equals(userId)) {
+			userId = "1";
+		}
+		User user = new User(userId);
+		ccmHousePsychogeny.setCreateBy(user);
+		ccmHousePsychogeny.setUpdateBy(user);
+		
+		ccmHousePsychogenyService.save(ccmHousePsychogeny);
+		result.setCode(CcmRestType.OK);
+		result.setResult("成功");
+		return result;
+		
+	}
+	/**
+	 * @see  删除肇事肇祸等严重精神障碍患者人口信息（数据同步用）
+	 * @author liangwanmin
+	 * @version 2018-05-23
+	 */
+	@ResponseBody
+	@RequestMapping(value="/deletePsychogenySyn", method = RequestMethod.POST)
+	public CcmRestResult deletePsychogenySyn(String userId,CcmHousePsychogeny ccmHousePsychogeny,HttpServletRequest req, HttpServletResponse resp) throws IOException {
+		CcmRestResult result = new CcmRestResult();
+		ccmHousePsychogenyService.delete(ccmHousePsychogeny);
+		result.setCode(CcmRestType.OK);
+		result.setResult("成功");
+		return result;
+		
+	}
+
+	
+	
+	/**
+	 * @see  保存吸毒人员信息（支持新增和编辑,数据同步用）
+	 * @author liangwanmin
+	 * @version 2018-05-23
+	 */
+	@ResponseBody
+	@RequestMapping(value="/saveDrugsSyn", method = RequestMethod.POST)
+	public CcmRestResult saveDrugsSyn(String userId,CcmHouseDrugs ccmHouseDrugs,HttpServletRequest req, HttpServletResponse resp) throws IOException {
+		CcmRestResult result = new CcmRestResult();
+		if (userId == null || "".equals(userId)) {
+			userId = "1";
+		}
+		User user = new User(userId);
+		ccmHouseDrugs.setCreateBy(user);
+		ccmHouseDrugs.setUpdateBy(user);
+		
+		ccmHouseDrugsService.save(ccmHouseDrugs);
+		result.setCode(CcmRestType.OK);
+		result.setResult("成功");
+		return result;
+		
+	}
+	/**
+	 * @see  删除吸毒人员信息（数据同步用）
+	 * @author liangwanmin
+	 * @version 2018-05-23
+	 */
+	@ResponseBody
+	@RequestMapping(value="/deleteDrugsSyn", method = RequestMethod.POST)
+	public CcmRestResult deleteDrugsSyn(String userId,CcmHouseDrugs ccmHouseDrugs,HttpServletRequest req, HttpServletResponse resp) throws IOException {
+		CcmRestResult result = new CcmRestResult();
+		ccmHouseDrugsService.delete(ccmHouseDrugs);
+		result.setCode(CcmRestType.OK);
+		result.setResult("成功");
+		return result;
+		
+	}
+
+	
+	
+	/**
+	 * @see  保存艾滋病患者信息（支持新增和编辑,数据同步用）
+	 * @author liangwanmin
+	 * @version 2018-05-28
+	 */
+	@ResponseBody
+	@RequestMapping(value="/saveAidsSyn", method = RequestMethod.POST)
+	public CcmRestResult saveAidsSyn(String userId,CcmHouseAids ccmHouseAids,HttpServletRequest req, HttpServletResponse resp) throws IOException {
+		CcmRestResult result = new CcmRestResult();
+		if (userId == null || "".equals(userId)) {
+			userId = "1";
+		}
+		User user = new User(userId);
+		ccmHouseAids.setCreateBy(user);
+		ccmHouseAids.setUpdateBy(user);
+		
+		ccmHouseAidsService.save(ccmHouseAids);
+		result.setCode(CcmRestType.OK);
+		result.setResult("成功");
+		return result;
+		
+	}
+	/**
+	 * @see  删除艾滋病患者信息（数据同步用）
+	 * @author liangwanmin
+	 * @version 2018-05-28
+	 */
+	@ResponseBody
+	@RequestMapping(value="/deleteAidsSyn", method = RequestMethod.POST)
+	public CcmRestResult deleteAidsSyn(String userId,CcmHouseAids ccmHouseAids,HttpServletRequest req, HttpServletResponse resp) throws IOException {
+		CcmRestResult result = new CcmRestResult();
+		ccmHouseAidsService.delete(ccmHouseAids);
+		result.setCode(CcmRestType.OK);
+		result.setResult("成功");
+		return result;
+		
+	}
+
+	
+	
+	/**
+	 * @see  保存重点上访人员信息（支持新增和编辑,数据同步用）
+	 * @author liangwanmin
+	 * @version 2018-05-28
+	 */
+	@ResponseBody
+	@RequestMapping(value="/savePetitionSyn", method = RequestMethod.POST)
+	public CcmRestResult savePetitionSyn(String userId,CcmHousePetition ccmHousePetition,HttpServletRequest req, HttpServletResponse resp) throws IOException {
+		CcmRestResult result = new CcmRestResult();
+		if (userId == null || "".equals(userId)) {
+			userId = "1";
+		}
+		User user = new User(userId);
+		ccmHousePetition.setCreateBy(user);
+		ccmHousePetition.setUpdateBy(user);
+		
+		ccmHousePetitionService.save(ccmHousePetition);
+		result.setCode(CcmRestType.OK);
+		result.setResult("成功");
+		return result;
+		
+	}
+	/**
+	 * @see  删除重点上访人员信息（数据同步用）
+	 * @author liangwanmin
+	 * @version 2018-05-28
+	 */
+	@ResponseBody
+	@RequestMapping(value="/deletePetitionSyn", method = RequestMethod.POST)
+	public CcmRestResult deletePetitionSyn(String userId,CcmHousePetition ccmHousePetition,HttpServletRequest req, HttpServletResponse resp) throws IOException {
+		CcmRestResult result = new CcmRestResult();
+		ccmHousePetitionService.delete(ccmHousePetition);
+		result.setCode(CcmRestType.OK);
+		result.setResult("成功");
+		return result;
+		
+	}
+
+	
+	
+	/**
+	 * @see  保存涉教人员信息（支持新增和编辑,数据同步用）
+	 * @author liangwanmin
+	 * @version 2018-05-28
+	 */
+	@ResponseBody
+	@RequestMapping(value="/saveHeresySyn", method = RequestMethod.POST)
+	public CcmRestResult saveHeresySyn(String userId,CcmHouseHeresy ccmHouseHeresy,HttpServletRequest req, HttpServletResponse resp) throws IOException {
+		CcmRestResult result = new CcmRestResult();
+		if (userId == null || "".equals(userId)) {
+			userId = "1";
+		}
+		User user = new User(userId);
+		ccmHouseHeresy.setCreateBy(user);
+		ccmHouseHeresy.setUpdateBy(user);
+		
+		ccmHouseHeresyService.save(ccmHouseHeresy);
+		result.setCode(CcmRestType.OK);
+		result.setResult("成功");
+		return result;
+		
+	}
+	/**
+	 * @see  删除涉教人员信息（数据同步用）
+	 * @author liangwanmin
+	 * @version 2018-05-28
+	 */
+	@ResponseBody
+	@RequestMapping(value="/deleteHeresySyn", method = RequestMethod.POST)
+	public CcmRestResult deleteHeresySyn(String userId,CcmHouseHeresy ccmHouseHeresy,HttpServletRequest req, HttpServletResponse resp) throws IOException {
+		CcmRestResult result = new CcmRestResult();
+		ccmHouseHeresyService.delete(ccmHouseHeresy);
+		result.setCode(CcmRestType.OK);
+		result.setResult("成功");
+		return result;
+		
+	}
+
+	
+	
+	/**
+	 * @see  保存危险品从业人员信息（支持新增和编辑,数据同步用）
+	 * @author liangwanmin
+	 * @version 2018-05-28
+	 */
+	@ResponseBody
+	@RequestMapping(value="/saveDangerousSyn", method = RequestMethod.POST)
+	public CcmRestResult saveDangerousSyn(String userId,CcmHouseDangerous ccmHouseDangerous,HttpServletRequest req, HttpServletResponse resp) throws IOException {
+		CcmRestResult result = new CcmRestResult();
+		if (userId == null || "".equals(userId)) {
+			userId = "1";
+		}
+		User user = new User(userId);
+		ccmHouseDangerous.setCreateBy(user);
+		ccmHouseDangerous.setUpdateBy(user);
+		
+		ccmHouseDangerousService.save(ccmHouseDangerous);
+		result.setCode(CcmRestType.OK);
+		result.setResult("成功");
+		return result;
+		
+	}
+	/**
+	 * @see  删除危险品从业人员信息（数据同步用）
+	 * @author liangwanmin
+	 * @version 2018-05-28
+	 */
+	@ResponseBody
+	@RequestMapping(value="/deleteDangerousSyn", method = RequestMethod.POST)
+	public CcmRestResult deleteDangerousSyn(String userId,CcmHouseDangerous ccmHouseDangerous,HttpServletRequest req, HttpServletResponse resp) throws IOException {
+		CcmRestResult result = new CcmRestResult();
+		ccmHouseDangerousService.delete(ccmHouseDangerous);
+		result.setCode(CcmRestType.OK);
+		result.setResult("成功");
+		return result;
+		
+	}
+
+	
+	
+	/**
+	 * @see  保存重点青少年信息（支持新增和编辑,数据同步用）
+	 * @author liangwanmin
+	 * @version 2018-05-28
+	 */
+	@ResponseBody
+	@RequestMapping(value="/saveKymSyn", method = RequestMethod.POST)
+	public CcmRestResult saveKymSyn(String userId,CcmHouseKym ccmHouseKym,HttpServletRequest req, HttpServletResponse resp) throws IOException {
+		CcmRestResult result = new CcmRestResult();
+		if (userId == null || "".equals(userId)) {
+			userId = "1";
+		}
+		User user = new User(userId);
+		ccmHouseKym.setCreateBy(user);
+		ccmHouseKym.setUpdateBy(user);
+		
+		ccmHouseKymService.save(ccmHouseKym);
+		result.setCode(CcmRestType.OK);
+		result.setResult("成功");
+		return result;
+		
+	}
+	/**
+	 * @see  删除重点青少年信息（数据同步用）
+	 * @author liangwanmin
+	 * @version 2018-05-28
+	 */
+	@ResponseBody
+	@RequestMapping(value="/deleteKymSyn", method = RequestMethod.POST)
+	public CcmRestResult deleteKymSyn(String userId,CcmHouseKym ccmHouseKym,HttpServletRequest req, HttpServletResponse resp) throws IOException {
+		CcmRestResult result = new CcmRestResult();
+		ccmHouseKymService.delete(ccmHouseKym);
+		result.setCode(CcmRestType.OK);
+		result.setResult("成功");
+		return result;
+		
+	}
+	
+	
+	
+	
+	
+	
+	
+}

@@ -1,0 +1,236 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.arjjs.ccm.modules.ccm.house.dao.CcmHouseDangerousDao">
+    
+	<sql id="ccmHouseDangerousColumns">
+		a.id AS "id",
+		a.people_id AS "peopleId",
+		a.work_unit AS "workUnit",
+		a.work_phone AS "workPhone",
+		a.work_place AS "workPlace",
+		a.atte_type AS "atteType",
+		a.goods_type AS "goodsType",
+		a.work_type AS "workType",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag"
+	</sql>
+	
+	<sql id="ccmHouseDangerousAllColumns">
+		a.id AS "id",
+		a.people_id AS "peopleId",
+		a.work_unit AS "workUnit",
+		a.work_phone AS "workPhone",
+		a.work_place AS "workPlace",
+		a.atte_type AS "atteType",
+		a.goods_type AS "goodsType",
+		a.work_type AS "workType",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag",
+		b.ident AS "ident",
+		b. NAME AS "name",
+		b.sex AS "sex",
+		b.telephone AS
+		"telephone",
+		b.type AS "type",
+		b.censu AS "censu",
+		b.domiciledetail AS
+		"domiciledetail",
+		b.residencedetail AS
+		"residencedetail",
+		b.images AS
+		"images",
+		b.birthday AS "birthday",
+		a20.name AS "comName",
+        (case a.atte_type when 01 then '高' when 02 then '中' when 03 then '低' else '' end) "atteTypeLable"
+	</sql>
+	
+	
+	
+	<sql id="ccmHouseDangerousJoins">
+	</sql>
+    	<!--区域 没有对应的表-->
+	<sql id="ccmPopComJoins">
+		LEFT JOIN sys_area a20 ON a20.id = b.area_com_id
+	</sql>
+	<sql id="ccmPopGridJoins">
+		LEFT JOIN sys_area a21 ON a21.id = b.area_grid_id
+	</sql>
+	<select id="get" resultType="CcmHouseDangerous">
+		SELECT 
+			<include refid="ccmHouseDangerousAllColumns"/>
+		FROM ccm_house_dangerous a LEFT JOIN ccm_people b ON a.people_id =
+		b.id
+		<include refid="ccmHouseDangerousJoins"/>
+		<include refid="ccmPopComJoins"/>
+		<include refid="ccmPopGridJoins"/>
+
+		WHERE 
+			a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="CcmHouseDangerous">
+		SELECT 
+			<include refid="ccmHouseDangerousAllColumns"/>
+		FROM ccm_house_dangerous a LEFT JOIN ccm_people b ON a.people_id =
+		b.id
+		<include refid="ccmHouseDangerousJoins"/>
+		<include refid="ccmPopComJoins"/>
+		<include refid="ccmPopGridJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="peopleId != null and peopleId != ''">
+				AND a.people_id = #{peopleId}
+			</if>
+			<if test="name != null and name != ''">
+				AND b.name LIKE
+				<if test="dbName == 'oracle'">'%'||#{name}||'%'</if>
+				<if test="dbName == 'mssql'">'%'+#{name}+'%'</if>
+				<if test="dbName == 'mysql'">concat('%',#{name},'%')</if>
+			</if>
+
+			<if test="ident != null and ident != ''">
+				AND b.ident LIKE
+				<if test="dbName == 'oracle'">'%'||#{ident}||'%'</if>
+				<if test="dbName == 'mssql'">'%'+#{ident}+'%'</if>
+				<if test="dbName == 'mysql'">concat('%',#{ident},'%')</if>
+			</if>
+			<if test="censu != null and censu != ''">
+				AND b.censu LIKE
+				<if test="dbName == 'oracle'">'%'||#{censu}||'%'</if>
+				<if test="dbName == 'mssql'">'%'+#{censu}+'%'</if>
+				<if test="dbName == 'mysql'">concat('%',#{censu},'%')</if>
+			</if>
+			<if test="telephone != null and telephone != ''">
+				AND b.telephone LIKE
+				<if test="dbName == 'oracle'">'%'||#{telephone}||'%'</if>
+				<if test="dbName == 'mssql'">'%'+#{telephone}+'%'</if>
+				<if test="dbName == 'mysql'">concat('%',#{telephone},'%')</if>
+			</if>
+			<if test="sex != null and sex != ''">
+				AND b.sex = #{sex}
+			</if>
+			<if test="atteType != null and atteType != ''">
+				AND a.atte_type = #{atteType}
+			</if>
+			<if test="goodsType != null and goodsType != ''">
+				AND a.goods_type = #{goodsType}
+			</if>
+			<if test="workType != null and workType != ''">
+				AND a.work_type = #{workType}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<!-- 人员标记处 -->
+	<select id="getItemByPeopleId" resultType="CcmHouseDangerous">
+		SELECT
+		<include refid="ccmHouseDangerousAllColumns" />
+		FROM
+		ccm_house_dangerous a LEFT JOIN ccm_people b ON a.people_id =
+		b.id
+		<include refid="ccmHouseDangerousJoins"/>
+		<include refid="ccmPopComJoins"/>
+		<include refid="ccmPopGridJoins"/>
+		<where>
+			a.people_id = #{id}
+			and
+			a.del_flag = '0'
+		</where>
+	</select>
+	
+	
+	
+	
+	<select id="findAllList" resultType="CcmHouseDangerous">
+		SELECT 
+			<include refid="ccmHouseDangerousColumns"/>
+		FROM ccm_house_dangerous a LEFT JOIN ccm_people b ON a.people_id =
+		b.id
+		<include refid="ccmHouseDangerousJoins"/>
+		<include refid="ccmPopComJoins"/>
+		<include refid="ccmPopGridJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO ccm_house_dangerous(
+			id,
+			people_id,
+			work_unit,
+			work_phone,
+			work_place,
+			atte_type,
+			goods_type,
+			work_type,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag
+		) VALUES (
+			#{id},
+			#{peopleId},
+			#{workUnit},
+			#{workPhone},
+			#{workPlace},
+			#{atteType},
+			#{goodsType},
+			#{workType},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE ccm_house_dangerous SET 	
+			people_id = #{peopleId},
+			work_unit = #{workUnit},
+			work_phone = #{workPhone},
+			work_place = #{workPlace},
+			atte_type = #{atteType},
+			goods_type = #{goodsType},
+			work_type = #{workType},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE ccm_house_dangerous SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

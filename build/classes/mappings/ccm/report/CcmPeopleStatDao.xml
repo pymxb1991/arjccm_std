@@ -1,0 +1,446 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.arjjs.ccm.modules.ccm.report.dao.CcmPeopleStatDao">
+
+	<sql id="ccmPeopleStatColumns">
+		a.id AS "id",
+		a.area_id AS "area.id",
+		a.stat_date AS
+		"statDate",
+		a.person_new AS "personNew",
+		a.oversea_new AS "overseaNew",
+		a.float_new AS "floatNew",
+		a.unsettle_new AS "unsettleNew",
+		a.aids_new AS "aidsNew",
+		a.psychogeny_new AS
+		"psychogenyNew",
+		a.rectification_new AS "rectificationNew",
+		a.release_new AS "releaseNew",
+		a.drugs_new AS "drugsNew",
+		a.escape_new AS "escapeNew",
+		a.behind_new
+		AS "behindNew",
+		a.kym_new AS "kymNew",
+		a.care_new AS "careNew",
+		a.older_new AS "olderNew",
+		a.dispute_new As "disputeNew",
+		a.communist_new AS "communistNew",
+		a.visit_new AS "visitNew",
+		a.heresy_new AS "heresyNew",
+		a.dangerous_new AS "dangerousNew",
+		a.harmNational_new AS "harmNationalNew",
+		a.deliberatelyIllegal_new AS "deliberatelyIllegalNew",
+		a.more1 AS "more1",
+		a.more2 AS
+		"more2",
+		a.more3 AS "more3",
+		a.create_by AS "createBy.id",
+		a.create_date
+		AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS
+		"updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag",
+		a2.name AS
+		"area.name"
+	</sql>
+
+	<sql id="ccmPeopleStatJoins">
+		LEFT JOIN sys_area a2 ON a2.id = a.area_id
+	</sql>
+<!-- 实有人口总数、新增 -->
+	<select id="getOnLineRate" resultType="com.arjjs.ccm.tool.EchartType">
+		SELECT
+		 	(SUM(s.person_new)+SUM(s.oversea_new)+SUM(s.float_new)+SUM(s.unsettle_new)) AS "value"
+        FROM
+        		ccm_people_stat s
+		        LEFT JOIN sys_config c ON c.id = 'system_level'
+		        where
+		        s.del_flag=0
+		        AND c.param_str=s.system_level
+		        AND(s.stat_date &gt; date_format(
+							DATE_SUB(curdate()
+							, INTERVAL 0
+							MONTH), '%Y-%m')
+							AND
+							s.stat_date &lt;
+							date_format( DATE_SUB(curdate(),
+							INTERVAL - 1
+							MONTH), '%Y-%m'))
+	</select>
+	<!-- 本月人口信息 -->
+	<select id="getnumPopFollowPop" resultType="com.arjjs.ccm.tool.SearchTabMore">
+		SELECT
+		 	SUM(s.person_new) AS "value1",
+			SUM(s.unsettle_new) AS "value", 
+			SUM(s.permanent_new) AS "value17",  
+			SUM(s.float_new) AS "value2",  
+			SUM(s.oversea_new) AS "value3",
+			SUM(s.behind_new) AS "value4",
+			SUM(s.rectification_new) AS "value5",
+			SUM(s.psychogeny_new) AS "value6",   
+			SUM(s.drugs_new) AS "value7",   
+			SUM(s.release_new) AS "value8",   
+			SUM(s.aids_new) AS "value9",
+			SUM(s.kym_new) AS "value10",
+			SUM(s.visit_new) AS "value11",
+			SUM(s.heresy_new) AS "value12",
+			SUM(s.dangerous_new) AS "value13",
+			SUM(s.care_new) AS "value14",
+			SUM(s.older_new) AS "value15",
+			SUM(s.communist_new) AS "value16", 
+			SUM(s.escape_new) AS "value20",
+			SUM(s.harmNational_new) AS "value21",
+			
+			SUM(s.deliberatelyIllegal_new) AS "value23",
+			SUM(s.dispute_new) AS "value24"
+		        FROM
+		        ccm_people_stat s
+		        LEFT JOIN sys_config c ON c.id = 'system_level'
+		        where
+		        s.del_flag=0
+				AND c.param_str=s.system_level
+		        AND(s.stat_date &gt; date_format(
+							DATE_SUB(curdate()
+							, INTERVAL 0
+							MONTH), '%Y-%m')
+							AND
+							s.stat_date &lt;
+							date_format( DATE_SUB(curdate(),
+							INTERVAL - 1
+							MONTH), '%Y-%m'))
+	</select>
+
+	<!-- 首页社区弹框：本月新增人口 -->
+	<select id="findMonthAreaStat" resultType="CcmPeopleStat">
+		SELECT
+		<include refid="ccmPeopleStatColumns" />
+		FROM ccm_people_stat a
+		<include refid="ccmPeopleStatJoins" />
+		WHERE a.del_flag=0
+				AND a.area_id = #{area.id}
+		        AND(a.stat_date &gt; date_format(
+							DATE_SUB(curdate()
+							, INTERVAL 0
+							MONTH), '%Y-%m')
+							AND
+							a.stat_date &lt;
+							date_format( DATE_SUB(curdate(),
+							INTERVAL - 1
+							MONTH), '%Y-%m'))
+	</select>
+
+	<!-- 流入流出分析 -->
+	<select id="findFloatOutInArea" resultType="com.arjjs.ccm.tool.SearchTab">
+		SELECT
+			concat(
+				YEAR (stat_date),
+				"-",
+				MONTH (stat_date)
+			) AS "type",
+			(case when a.float_new IS NULL then 0 else a.float_new end) AS "value1",
+			(case when a.float_out_new IS NULL then 0 else a.float_out_new end) AS "value2"
+		FROM
+			ccm_people_stat a
+		WHERE
+			a.del_flag = '0'
+		<if test="area != null and area.id != null and area.id != ''">
+			AND a.area_id = #{area.id}
+		</if>
+		AND (
+			a.stat_date &gt; date_format(
+				DATE_SUB(curdate(), INTERVAL 11 MONTH),
+				'%Y-%m'
+			)
+			AND a.stat_date &lt; date_format(
+				DATE_SUB(curdate(), INTERVAL - 1 MONTH),
+				'%Y-%m'
+			)
+		)
+		GROUP BY
+			concat(
+				YEAR (stat_date),
+				MONTH (stat_date)
+			)
+		ORDER BY
+			concat(
+				YEAR (stat_date),
+		
+			IF (
+				MONTH (stat_date) &gt; 9,
+				MONTH (stat_date),
+				concat("0", MONTH(stat_date))
+			)
+			) ASC
+		LIMIT 12
+	</select>
+
+
+	<!-- 户籍人口迁入迁出情况 -->
+	<select id="getPopInOut" resultType="com.arjjs.ccm.tool.SearchTab">
+		SELECT
+				concat(
+					YEAR (stat_date),
+					"-",
+					MONTH (stat_date)
+				) AS "type",
+				(case when SUM(a.person_new) IS not NULL then SUM(a.person_new) else 0 end)value1,
+				(case when SUM(a.person_out) IS not NULL then SUM(a.person_out) else 0 end)value2
+			FROM
+				ccm_people_stat a
+			WHERE
+				a.del_flag = 0
+				AND a.system_level = 1
+			AND (
+				a.stat_date &gt; date_format(
+					DATE_SUB(curdate(), INTERVAL 11 MONTH),
+					'%Y-%m'
+				)
+				AND a.stat_date &lt; date_format(
+					DATE_SUB(curdate(), INTERVAL - 1 MONTH),
+					'%Y-%m'
+				)
+			)
+			GROUP BY
+				concat(
+					YEAR (stat_date),
+					MONTH (stat_date)
+				)
+			ORDER BY
+				concat(
+					YEAR (stat_date),
+			
+				IF (
+					MONTH (stat_date) &gt; 9,
+					MONTH (stat_date),
+					concat("0", MONTH(stat_date))
+				)
+				) ASC
+			LIMIT 12
+
+	</select>
+
+
+
+
+
+
+<!--  -->
+	<select id="get" resultType="CcmPeopleStat">
+		SELECT
+		<include refid="ccmPeopleStatColumns" />
+		FROM ccm_people_stat a
+		<include refid="ccmPeopleStatJoins" />
+		WHERE a.id = #{id}
+	</select>
+
+	<select id="findList" resultType="CcmPeopleStat">
+		SELECT
+		<include refid="ccmPeopleStatColumns" />
+		FROM ccm_people_stat a
+		<include refid="ccmPeopleStatJoins" />
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="area != null and area.id != null and area.id != ''">
+				AND a.area_id = #{area.id}
+			</if>
+			<if
+				test="beginStatDate != null and endStatDate != null and beginStatDate != '' and endStatDate != ''">
+				AND a.stat_date BETWEEN #{beginStatDate} AND #{endStatDate}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+
+	<select id="findAllList" resultType="CcmPeopleStat">
+		SELECT
+		<include refid="ccmPeopleStatColumns" />
+		FROM ccm_people_stat a
+		<include refid="ccmPeopleStatJoins" />
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+
+	<insert id="insert">
+		INSERT INTO ccm_people_stat(
+		id,
+		area_id,
+		stat_date,
+		person_new,
+		oversea_new,
+		float_new,
+		unsettle_new,
+		aids_new,
+		psychogeny_new,
+		rectification_new,
+		release_new,
+		drugs_new,
+		escape_new,
+		dispute_new,
+		behind_new,
+		kym_new,
+		care_new,
+		older_new,
+		communist_new,
+		visit_new,
+		heresy_new,
+		dangerous_new,
+		harmNational_new ,
+		deliberatelyIllegal_new,
+		more1,
+		more2,
+		more3,
+		create_by,
+		create_date,
+		update_by,
+		update_date,
+		remarks,
+		del_flag
+		) VALUES (
+		#{id},
+		#{area.id},
+		#{statDate},
+		#{personNew},
+		#{overseaNew},
+		#{floatNew},
+		#{unsettleNew},
+		#{aidsNew},
+		#{psychogenyNew},
+		#{rectificationNew},
+		#{releaseNew},
+		#{drugsNew},
+		#{escapeNew},
+		#{disputeNew},
+		#{behindNew},
+		#{kymNew},
+		#{careNew},
+		#{olderNew},
+		#{communistNew},
+		#{visitNew},
+		#{heresyNew},
+		#{dangerousNew},
+	   #{harmNationalNew},
+	     #{deliberatelyIllegalNew},
+		#{more1},
+		#{more2},
+		#{more3},
+		#{createBy.id},
+		#{createDate},
+		#{updateBy.id},
+		#{updateDate},
+		#{remarks},
+		#{delFlag}
+		)
+	</insert>
+
+	<update id="update">
+		UPDATE ccm_people_stat SET
+		area_id = #{area.id},
+		stat_date = #{statDate},
+		person_new = #{personNew},
+		oversea_new =
+		#{overseaNew},
+		float_new = #{floatNew},
+		unsettle_new = #{unsettleNew},
+		aids_new = #{aidsNew},
+		psychogeny_new = #{psychogenyNew},
+		rectification_new =
+		#{rectificationNew},
+		release_new = #{releaseNew},
+		drugs_new =
+		#{drugsNew},
+		escape_new = #{escapeNew},
+		dispute_new = #{disputeNew},
+		behind_new = #{behindNew},
+		kym_new = #{kymNew},
+		care_new = #{careNew},
+		older_new = #{olderNew},
+		communist_new = #{communistNew},
+		visit_new = #{visitNew},
+		heresy_new = #{heresyNew},
+		dangerous_new = #{dangerousNew},
+		harmNational_new = #{harmNationalNew},
+		deliberatelyIllegal_new=#{deliberatelyIllegalNew},
+		more1 =
+		#{more1},
+		more2 = #{more2},
+		more3 = #{more3},
+		update_by = #{updateBy.id},
+		update_date = #{updateDate},
+		remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+
+	<update id="delete">
+		UPDATE ccm_people_stat SET
+		del_flag =
+		#{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+
+
+	<select id="findListBySum" resultType="com.arjjs.ccm.tool.EchartType">
+		SELECT
+			concat(
+			YEAR (stat_date),
+			"-",
+			MONTH (stat_date)
+			) as "type",
+			sum(${column}) as "value"
+		FROM
+			ccm_people_stat a
+		LEFT JOIN sys_config c ON c.param_str=a.system_level
+		WHERE
+			a.del_flag = '0'
+			AND c.id = 'system_level' 
+		GROUP BY
+			a.stat_date
+		ORDER BY
+			a.stat_date
+	</select>
+
+	<select id="findListByMon" resultType="com.arjjs.ccm.tool.EchartType">
+		SELECT
+		sum(a.${column}) AS
+		"value",
+		a2. NAME AS "type"
+		FROM
+		ccm_people_stat a
+		LEFT JOIN sys_area a2
+		ON a2.id = a.area_id
+		LEFT JOIN sys_config c ON c.param_str=a.system_level
+		WHERE
+		a.del_flag = 0
+		AND c.id = 'system_level' 
+		and
+		(a.stat_date &gt;
+		date_format(DATE_SUB(curdate(), INTERVAL 0
+		MONTH),'%Y-%m')
+		AND
+		a.stat_date &lt; date_format(DATE_SUB(curdate(),
+		INTERVAL -1
+		MONTH),'%Y-%m'))
+		GROUP BY a.area_id
+		ORDER BY
+		a2.`code` DESC
+	</select>
+
+
+</mapper>

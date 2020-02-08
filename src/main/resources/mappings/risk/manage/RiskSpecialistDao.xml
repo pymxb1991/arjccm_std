@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.arjjs.ccm.modules.risk.manage.dao.RiskSpecialistDao">
+    
+	<sql id="riskSpecialistColumns">
+		a.id AS "id",
+		a.name AS "name",
+		a.sex AS "sex",
+		a.birthday AS "birthday",
+		a.speciality AS "speciality",
+		a.type AS "type",
+		a.profession AS "profession",
+		a.domain AS "domain",
+		a.tel AS "tel",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag"
+	</sql>
+	
+	<sql id="riskSpecialistJoins">
+	</sql>
+    
+	<select id="get" resultType="RiskSpecialist">
+		SELECT 
+			<include refid="riskSpecialistColumns"/>
+		FROM risk_specialist a
+		<include refid="riskSpecialistJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="RiskSpecialist">
+		SELECT 
+			<include refid="riskSpecialistColumns"/>
+		FROM risk_specialist a
+		<include refid="riskSpecialistJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="name != null and name != ''">
+				AND a.name LIKE 
+					<if test="dbName == 'oracle'">'%'||#{name}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{name}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{name},'%')</if>
+			</if>
+			<if test="sex != null and sex != ''">
+				AND a.sex = #{sex}
+			</if>
+			<if test="type != null and type != ''">
+				AND a.type = #{type}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="RiskSpecialist">
+		SELECT 
+			<include refid="riskSpecialistColumns"/>
+		FROM risk_specialist a
+		<include refid="riskSpecialistJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO risk_specialist(
+			id,
+			name,
+			sex,
+			birthday,
+			speciality,
+			type,
+			profession,
+			domain,
+			tel,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag
+		) VALUES (
+			#{id},
+			#{name},
+			#{sex},
+			#{birthday},
+			#{speciality},
+			#{type},
+			#{profession},
+			#{domain},
+			#{tel},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE risk_specialist SET 	
+			name = #{name},
+			sex = #{sex},
+			birthday = #{birthday},
+			speciality = #{speciality},
+			type = #{type},
+			profession = #{profession},
+			domain = #{domain},
+			tel = #{tel},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE risk_specialist SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

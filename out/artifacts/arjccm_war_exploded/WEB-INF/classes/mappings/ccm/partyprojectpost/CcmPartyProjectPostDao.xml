@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.arjjs.ccm.modules.ccm.partyprojectpost.dao.CcmPartyProjectPostDao">
+    
+	<sql id="ccmPartyProjectPostColumns">
+		a.id AS "id",
+		a.type AS "type",
+		a.pro_post AS "proPost",
+		a.org_party AS "orgParty",
+		a.more1 AS "more1",
+		a.more2 AS "more2",
+		a.more3 AS "more3"
+	</sql>
+	
+	<sql id="ccmPartyProjectPostJoins">
+	</sql>
+    
+	<select id="get" resultType="CcmPartyProjectPost">
+		SELECT 
+			<include refid="ccmPartyProjectPostColumns"/>
+		FROM ccm_party_project_post a
+		<include refid="ccmPartyProjectPostJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="CcmPartyProjectPost">
+		SELECT 
+			<include refid="ccmPartyProjectPostColumns"/>
+		FROM ccm_party_project_post a
+		<include refid="ccmPartyProjectPostJoins"/>
+		<where>
+			
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="CcmPartyProjectPost">
+		SELECT 
+			<include refid="ccmPartyProjectPostColumns"/>
+		FROM ccm_party_project_post a
+		<include refid="ccmPartyProjectPostJoins"/>
+		<where>
+			
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO ccm_party_project_post(
+			id,
+			type,
+			pro_post,
+			org_party,
+			more1,
+			more2,
+			more3
+		) VALUES (
+			#{id},
+			#{type},
+			#{proPost},
+			#{orgParty},
+			#{more1},
+			#{more2},
+			#{more3}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE ccm_party_project_post SET 	
+			type = #{type},
+			pro_post = #{proPost},
+			org_party = #{orgParty},
+			more1 = #{more1},
+			more2 = #{more2},
+			more3 = #{more3}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		DELETE FROM ccm_party_project_post
+		WHERE id = #{id}
+	</update>
+	<select id="countProPostNum" resultType="Integer">
+		SELECT	count(1)	FROM	ccm_party_project_post t 	WHERE 		t.pro_post = #{proPost}
+	</select>
+
+	<insert id="batchSave" parameterType="List">
+		INSERT INTO ccm_party_project_post(
+			id,
+			type,
+			pro_post,
+			org_party,
+			more1,
+			more2,
+			more3
+		) VALUES
+		<foreach collection="list" item="ccmPartyProjectPost" separator=",">
+			(
+			(SELECT REPLACE(UUID(), '-', '') AS id),
+			#{ccmPartyProjectPost.type},
+			#{ccmPartyProjectPost.proPost},
+			#{ccmPartyProjectPost.orgParty},
+			#{ccmPartyProjectPost.more1},
+			#{ccmPartyProjectPost.more2},
+			#{ccmPartyProjectPost.more3}
+			)
+		</foreach>
+
+	</insert>
+</mapper>

@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.arjjs.ccm.modules.ccm.patrol.dao.CcmPatrolUnitDao">
+    
+	<sql id="ccmPatrolUnitColumns">
+		a.id AS "id",
+		a.user_id AS "user.id",
+		a.patrol_vehicles AS "patrolVehicles",
+		a.vehicle_equipment AS "vehicleEquipment",
+		a.individual_equipment AS "individualEquipment",
+		a.departure_time AS "departureTime",
+		a.status AS "status",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag",
+		a.missions_id as "missions.id",
+		u3.patrol_content as "missions.patrolContent",
+		u4.name as "user.name",
+		u4.office_id as "user.office.id"
+	</sql>
+	
+	<sql id="ccmPatrolUnitJoins">
+		LEFT JOIN ccm_patrol_missions u3 ON u3.id = a.missions_id
+		LEFT JOIN sys_user u4 ON u4.id = a.user_id
+	</sql>
+
+	<select id="get" resultType="CcmPatrolUnit">
+		SELECT 
+			<include refid="ccmPatrolUnitColumns"/>
+		FROM ccm_patrol_unit a
+		<include refid="ccmPatrolUnitJoins"/>
+		WHERE a.id = #{id}
+	</select>
+
+
+    <!-- 绩效统计接口 -->
+    <select id="getByCount" resultType="com.arjjs.ccm.modules.flat.analyst.entity.Count">
+        SELECT
+        count(*) as counts,
+        user_id as userId
+        FROM
+        ccm_patrol_unit
+        WHERE
+        DATE_SUB( CURDATE( ), INTERVAL 1 MONTH ) &lt;= date( create_date )
+        AND
+        del_flag = 0 GROUP BY user_id
+    </select>
+
+	<select id="findList" resultType="CcmPatrolUnit">
+		SELECT 
+			<include refid="ccmPatrolUnitColumns"/>
+		FROM ccm_patrol_unit a
+		<include refid="ccmPatrolUnitJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="departureTime != null and departureTime != ''">
+				AND a.departure_time &gt; #{departureTime}
+			</if>
+			<if test="missions != null and missions.id != ''and missions.id != null">
+				AND a.missions_id = #{missions.id}
+			</if>
+			<if test="user !=null and user.id != null and user.id != '' ">
+				AND a.user_id = #{user.id}
+			</if>
+			<if test="missionsIds !=null and missionsIds != ''">
+				AND a.missions_id in
+				<foreach collection="missionsIds" item="item" index="index" open="(" separator="," close=")">
+					#{item}
+				</foreach>
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="CcmPatrolUnit">
+		SELECT 
+			<include refid="ccmPatrolUnitColumns"/>
+		FROM ccm_patrol_unit a
+		<include refid="ccmPatrolUnitJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO ccm_patrol_unit(
+			id,
+			user_id,
+			patrol_vehicles,
+			vehicle_equipment,
+			individual_equipment,
+			departure_time,
+			status,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag,
+			missions_id
+		) VALUES (
+			#{id},
+			#{user.id},
+			#{patrolVehicles},
+			#{vehicleEquipment},
+			#{individualEquipment},
+			#{departureTime},
+			#{status},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag},
+			#{missions.id}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE ccm_patrol_unit SET 	
+			user_id = #{user.id},
+			patrol_vehicles = #{patrolVehicles},
+			vehicle_equipment = #{vehicleEquipment},
+			individual_equipment = #{individualEquipment},
+			departure_time = #{departureTime},
+			status = #{status},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks},
+			missions_id = #{missions.id}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE ccm_patrol_unit SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+
+</mapper>

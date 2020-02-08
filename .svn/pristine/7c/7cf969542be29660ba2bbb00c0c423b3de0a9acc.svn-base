@@ -1,0 +1,347 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.arjjs.ccm.modules.plm.storage.dao.PlmMinusandAddDetailDao">
+    
+	<sql id="plmMinusandAddDetailColumns">
+		a.id AS "id",
+		a.parent_id AS "parent",
+		a.sto_id AS "storage.id",
+		s.name AS "storage.name",
+		a.equipment_code AS "equipmentCode",
+		a.name AS "name",
+		a.spec AS "spec",
+		a.type_id AS "typeId",
+		a.type_child AS "typeChild",
+		a.category as "category",
+		a.erial_number AS "erialNumber",
+		a.price AS "price",
+		a.img_url AS "imgUrl",
+		a.production_batch AS "productionBatch",
+		a.production_date AS "productionDate",
+		a.guarantee_period AS "guaranteePeriod",
+		a.expiration_date AS "expirationDate",
+		a.unit AS "unit",
+		a.durable_years AS "durableYears",
+		a.equ_id AS "equId",
+		a.deadline_date AS "deadlineDate",
+		a.back_date AS "backDate",
+		a.give_back AS "giveBack",
+		a.flag AS "flag",
+		a.extend1 AS "extend1",
+		a.extend2 AS "extend2",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag"
+	</sql>
+	
+	<sql id="plmMinusandAddDetailJoins">
+		LEFT JOIN plm_storage s ON s.id = a.sto_id
+	</sql>
+    
+	<select id="get" resultType="PlmMinusandAddDetail">
+		SELECT 
+			<include refid="plmMinusandAddDetailColumns"/>
+		FROM plm_minusand_add_detail a
+		<include refid="plmMinusandAddDetailJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	<select id="findIndexList" resultType="PlmMinusandAddDetail">
+		SELECT DISTINCT
+
+	a.equipment_code AS "equipmentCode",
+	a.NAME AS "name",
+	a.spec AS "spec",
+	a.type_id AS "typeId",
+	a.type_child AS "typeChild",
+	a.erial_number AS "erialNumber",
+	a.price AS "price",
+	a.img_url AS "imgUrl",
+	a.give_back AS "giveBack",
+	a.production_batch AS "productionBatch",
+	a.production_date AS "productionDate",
+	a.guarantee_period AS "guaranteePeriod",
+	a.expiration_date AS "expirationDate",
+	a.unit AS "unit",
+	a.flag AS "flag",
+	a.del_flag AS "delFlag",
+	n.apply_user AS "user.id",
+	n.type AS "type"
+FROM
+	plm_minusand_add_detail a
+	LEFT JOIN plm_incoming_entry n ON n.id=a.parent_id
+	LEFT JOIN sys_user u20 ON u20.id = n.apply_user 
+<where>
+		a.del_flag = 0 
+	AND a.equipment_code IS NOT NULL 
+	AND n.apply_user = #{currentUser.id}
+	AND n.type="5" 
+</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<!-- 借用超期装备 -->
+  <select id="findDeadLineCount" resultType="java.util.HashMap">	
+		SELECT DISTINCT
+			a.NAME AS name,
+			a.deadline_date deadLineDate,
+		    count(*) count	,
+	        DATEDIFF(now(), a.deadline_date) AS durDay
+		FROM
+			plm_minusand_add_detail a
+			LEFT JOIN plm_storage s ON s.id = a.sto_id 
+			LEFT JOIN plm_equipment e ON a.equipment_code = e.code
+			
+		where
+			a.del_flag = 0 
+		AND a.equipment_code	IS NOT NULL 
+		AND  a.deadline_date IS NOT NULL 
+		AND  (ISNULL(give_back) OR give_back <![CDATA[<>]]> 1)
+		AND  a.deadline_date <![CDATA[<]]> now()
+		GROUP BY  a.NAME
+	</select>
+	
+	<select id="findGiveBack" resultType="PlmMinusandAddDetail">
+	SELECT DISTINCT
+	a.id AS "id",
+	a.parent_id AS "parent",
+	a.sto_id AS "storage.id",
+	a.equipment_code AS "equipmentCode",
+	a.NAME AS "name",
+	a.spec AS "spec",
+	a.type_id AS "typeId",
+	a.type_child AS "typeChild",
+	a.erial_number AS "erialNumber",
+	a.price AS "price",
+	a.img_url AS "imgUrl",
+	a.production_batch AS "productionBatch",
+	a.production_date AS "productionDate",
+	a.guarantee_period AS "guaranteePeriod",
+	a.expiration_date AS "expirationDate",
+	a.unit AS "unit",
+	a.give_back AS "giveBack",
+	a.durable_years AS "durableYears",
+	a.equ_id AS "equId",
+	a.flag AS "flag",
+	a.extend1 AS "extend1",
+	a.extend2 AS "extend2",
+	a.create_by AS "createBy.id",
+	a.create_date AS "createDate",
+	a.update_by AS "updateBy.id",
+	a.update_date AS "updateDate",
+	a.remarks AS "remarks",
+	a.del_flag AS "delFlag" 
+	FROM
+	plm_minusand_add_detail a
+	INNER JOIN plm_equipment equ ON equ.code  = a.equipment_code
+	AND equ.code = #{equipmentCode}
+	AND  equ.del_flag = '0'
+	INNER JOIN plm_incoming_entry income ON  income.id = a.parent_id
+	AND income.type = '5'
+  AND income.apply_user = equ.user_id 
+	AND  income.apply_job  = equ.user_job
+	AND  income.del_flag = '0' 
+	<where>
+	 a.del_flag = '0'
+	</where>
+	</select>
+	 
+
+	<select id="findList" resultType="PlmMinusandAddDetail">
+		SELECT 
+			<include refid="plmMinusandAddDetailColumns"/>
+		FROM plm_minusand_add_detail a
+		<include refid="plmMinusandAddDetailJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="parent != null and parent != ''">
+				AND a.parent_id = #{parent}
+			</if>
+			<if test="name != null and name != ''">
+				AND a.name LIKE 
+					<if test="dbName == 'oracle'">'%'||#{name}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{name}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{name},'%')</if>
+			</if>
+			<if test="spec != null and spec != ''">
+				AND a.spec LIKE 
+					<if test="dbName == 'oracle'">'%'||#{spec}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{spec}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{spec},'%')</if>
+			</if>
+			<if test="typeId != null and typeId != ''">
+				AND a.type_id = #{typeId}
+			</if>
+			<if test="typeChild != null and typeChild != ''">
+				AND a.type_child = #{typeChild}
+			</if>
+			<if test="isConditionFlag == 1">
+				AND a.flag = #{flag}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="PlmMinusandAddDetail">
+		SELECT 
+			<include refid="plmMinusandAddDetailColumns"/>
+		FROM plm_minusand_add_detail a
+		<include refid="plmMinusandAddDetailJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO plm_minusand_add_detail(
+			id,
+			parent_id,
+			sto_id,
+			equipment_code,
+			name,
+			spec,
+			type_id,
+			type_child,
+			category,
+			erial_number,
+			price,
+			img_url,
+			production_batch,
+			production_date,
+			guarantee_period,
+			expiration_date,
+			unit,
+			durable_years,
+			equ_id,
+			deadline_date,
+			back_date,
+			give_back,
+			flag,
+			extend1,
+			extend2,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag
+		) VALUES (
+			#{id},
+			#{parent},
+			#{storage.id},
+			#{equipmentCode},
+			#{name},
+			#{spec},
+			#{typeId},
+			#{typeChild},
+			#{category},
+			#{erialNumber},
+			#{price},
+			#{imgUrl},
+			#{productionBatch},
+			#{productionDate},
+			#{guaranteePeriod},
+			#{expirationDate},
+			#{unit},
+			#{durableYears},
+			#{equId},
+			#{deadlineDate},
+			#{backDate},
+			#{giveBack},
+			#{flag},
+			#{extend1},
+			#{extend2},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE plm_minusand_add_detail SET 	
+			parent_id = #{parent},
+			sto_id = #{storage.id},
+			name = #{name},
+			equipment_code = #{equipmentCode},
+			spec = #{spec},
+			type_id = #{typeId},
+			type_child = #{typeChild},
+			category = #{category},
+			erial_number = #{erialNumber},
+			price = #{price},
+			img_url = #{imgUrl},
+			production_batch = #{productionBatch},
+			production_date = #{productionDate},
+			guarantee_period = #{guaranteePeriod},
+			expiration_date = #{expirationDate},
+			unit = #{unit},
+			durable_years = #{durableYears},
+			equ_id = #{equId},
+			deadline_date = #{deadlineDate},
+			back_date = #{backDate},
+			give_back = #{giveBack},
+			flag = #{flag},
+			extend1 = #{extend1},
+			extend2 = #{extend2},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+	<update id="updateId">
+	UPDATE plm_minusand_add_detail a 
+	SET a.give_back = '1',
+	a.back_date = CURRENT_DATE 
+	WHERE
+	a.id = #{id}
+	</update>
+	<update id="delete">
+		UPDATE plm_minusand_add_detail SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="updateFlag">
+		UPDATE plm_minusand_add_detail SET
+			flag = '1'
+		WHERE id = #{id}
+	</update>
+	
+	<select id="countDetails" resultType="Integer">
+		select count(*) from plm_minusand_add_detail where del_flag = '0' and parent_id = #{pId}
+	</select>
+	
+	<update id="updateDeadlineDate">
+		UPDATE plm_minusand_add_detail SET 	
+		deadline_date = DATE_FORMAT(#{1},'%Y-%m-%d')
+		WHERE parent_id = #{0}
+	</update>
+	
+</mapper>

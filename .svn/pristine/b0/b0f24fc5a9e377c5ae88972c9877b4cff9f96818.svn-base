@@ -1,0 +1,481 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.arjjs.ccm.modules.ccm.house.dao.CcmHouseBuildmanageDao">
+
+	<sql id="ccmHouseBuildmanageColumns">
+		a.id AS "id",
+		a.name AS "name",
+		a.buildname AS "buildname",
+		a.floor_area AS "floorArea",
+		a.piles_num AS "pilesNum",
+		a.elem_num AS
+		"elemNum",
+		a.build_num AS "buildNum",
+		a.build_peo AS "buildPeo",
+		a.build_pname AS "buildPname",
+		a.sex AS "sex",
+		a.nation AS "nation",
+		a.content AS "content",
+		a.birthday AS "birthday",
+		a.education AS
+		"education",
+		a.tel AS "tel",
+		a.phone AS "phone",
+		a.residence AS
+		"residence",
+		a.residencedetail AS "residencedetail",
+		a.area_map AS
+		"areaMap",
+		a.area_point AS "areaPoint",
+		a.image AS "image",
+		a.images AS "images",
+		a.create_by
+		AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS
+		"updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag",
+		a17.name AS "area.name",
+		a.area_id AS "area.id"
+	</sql>
+
+	<sql id="ccmHouseBuildmanageJoins">
+		LEFT JOIN sys_area a17 ON a17.id = a.area_id
+	</sql>
+
+	<select id="get" resultType="CcmHouseBuildmanage">
+		SELECT
+		<include refid="ccmHouseBuildmanageColumns" />
+		FROM ccm_house_buildmanage a
+		<include refid="ccmHouseBuildmanageJoins" />
+		WHERE a.id = #{id}
+	</select>
+
+	<!-- 首页统计地址库数量 -->
+	<select id="findCountAddressLibrary" resultType="CcmHouseBuildmanage">
+		SELECT
+			count( a.id ) AS "count",
+			"buildmanage" AS "name" 
+		FROM
+			ccm_house_buildmanage a 
+		WHERE
+			a.del_flag = 0 UNION ALL
+		SELECT
+			count( a.id ) AS "count",
+			"address" AS "name" 
+		FROM
+			ccm_road_address a 
+		WHERE
+			a.del_flag = 0
+	</select>
+
+	<select id="findList" resultType="CcmHouseBuildmanage">
+		SELECT
+		<include refid="ccmHouseBuildmanageColumns" />
+		FROM ccm_house_buildmanage a
+		<include refid="ccmHouseBuildmanageJoins" />
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="name != null and name != ''">
+				AND a.name LIKE
+				<if test="dbName == 'oracle'">'%'||#{name}||'%'</if>
+				<if test="dbName == 'mssql'">'%'+#{name}+'%'</if>
+				<if test="dbName == 'mysql'">concat('%',#{name},'%')</if>
+			</if>
+			<if test="buildname != null and buildname != ''">
+				AND a.buildname LIKE
+				<if test="dbName == 'oracle'">'%'||#{buildname}||'%'</if>
+				<if test="dbName == 'mssql'">'%'+#{buildname}+'%'</if>
+				<if test="dbName == 'mysql'">concat('%',#{buildname},'%')</if>
+			</if>
+			<if test="area != null and area.id != null and area.id != ''">
+				AND a.area_id = #{area.id}
+			</if>
+			<if test="buildPname != null and buildPname != ''">
+				AND a.build_pname LIKE
+				<if test="dbName == 'oracle'">'%'||#{buildPname}||'%'</if>
+				<if test="dbName == 'mssql'">'%'+#{buildPname}+'%'</if>
+				<if test="dbName == 'mysql'">concat('%',#{buildPname},'%')</if>
+			</if>
+			 <if test="userArea != null and userArea.parentIds != null and userArea.parentIds != ''">
+             AND   (a17.parent_ids LIKE  CONCAT('%',#{userArea.id},'%')  or a.area_id = #{userArea.id})
+              </if>
+              <if test="more1 != null and more1 != ''">
+                AND  (${more1})
+            </if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+
+	<select id="findAllList" resultType="CcmHouseBuildmanage">
+		SELECT
+		<include refid="ccmHouseBuildmanageColumns" />
+		FROM ccm_house_buildmanage a
+		<include refid="ccmHouseBuildmanageJoins" />
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+
+	<insert id="insert">
+		INSERT INTO ccm_house_buildmanage(
+		id,
+		name,
+		buildname,
+		area_id,
+		floor_area,
+		piles_num,
+		elem_num,
+		build_num,
+		build_peo,
+		build_pname,
+		sex,
+		nation,
+		content,
+		birthday,
+		education,
+		tel,
+		phone,
+		residence,
+		residencedetail,
+		area_map,
+		area_point,
+		image,
+		images,
+		create_by,
+		create_date,
+		update_by,
+		update_date,
+		remarks,
+		del_flag
+		) VALUES (
+		#{id},
+		#{name},
+		#{buildname},
+		#{area.id},
+		#{floorArea},
+		#{pilesNum},
+		#{elemNum},
+		#{buildNum},
+		#{buildPeo},
+		#{buildPname},
+		#{sex},
+		#{nation},
+		#{content},
+		#{birthday},
+		#{education},
+		#{tel},
+		#{phone},
+		#{residence},
+		#{residencedetail},
+		#{areaMap},
+		#{areaPoint},
+		#{image},
+		#{images},
+		#{createBy.id},
+		#{createDate},
+		#{updateBy.id},
+		#{updateDate},
+		#{remarks},
+		#{delFlag}
+		)
+	</insert>
+
+	<update id="update">
+		UPDATE ccm_house_buildmanage SET
+		name = #{name},
+		buildname = #{buildname},
+		area_id = #{area.id},
+		floor_area =
+		#{floorArea},
+		piles_num = #{pilesNum},
+		elem_num = #{elemNum},
+		build_num =
+		#{buildNum},
+		build_peo = #{buildPeo},
+		build_pname = #{buildPname},
+		sex =
+		#{sex},
+		nation = #{nation},
+		content = #{content},
+		birthday = #{birthday},
+		education = #{education},
+		tel = #{tel},
+		phone = #{phone},
+		residence =
+		#{residence},
+		residencedetail = #{residencedetail},
+		area_map =
+		#{areaMap},
+		area_point = #{areaPoint},
+		image = #{image},
+		images = #{images},
+		update_by =
+		#{updateBy.id},
+		update_date = #{updateDate},
+		remarks = #{remarks}
+		WHERE
+		id = #{id}
+	</update>
+
+	<update id="delete">
+		UPDATE ccm_house_buildmanage SET
+		del_flag =
+		#{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+
+	<select id="findBuildListBySpecilPop" resultType="java.lang.String">
+		SELECT distinct(a.build_id)
+			from ccm_people a 
+		<where>
+			a.del_flag = 0
+			AND a.build_id is not null
+			AND a.build_id != ''
+			<if test="more1 != null and more1 != ''">
+				and (${more1})
+			</if>
+			<if test="more2 != null and more2 != ''">
+				${more2}
+			</if>
+		</where>
+		
+	</select>
+	
+	<!-- 默认全部的重点人员类型 -->
+	<select id="findBuildListBySpecilPopUNION" resultType="java.lang.String">
+		${more1}
+	</select>
+
+	<!--findBuildListByPrup -->
+	<select id="findBuildListByPrup" resultType="java.lang.String">
+		SELECT
+		distinct(a20.id)
+		FROM ccm_house_buildmanage a20
+		LEFT JOIN sys_area a17 ON a17.id = a20.area_id
+		LEFT JOIN ccm_pop_tenant a23 ON	a23.building_id = a20.id
+		<where>
+			( a20.del_flag = 0
+			AND a17.del_flag = 0
+			AND a23.del_flag = 0)
+			and
+			a23.house_type ="02"
+		</where>
+	</select>
+
+	<select id="findMap" resultType="CcmHouseBuildmanage">
+		SELECT
+		<include refid="ccmHouseBuildmanageColumns" />
+		FROM ccm_house_buildmanage a
+		<include refid="ccmHouseBuildmanageJoins" />
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="name != null and name != ''">
+				AND a.name LIKE
+				<if test="dbName == 'oracle'">'%'||#{name}||'%'</if>
+				<if test="dbName == 'mssql'">'%'+#{name}+'%'</if>
+				<if test="dbName == 'mysql'">concat('%',#{name},'%')</if>
+			</if>
+			<if test="buildname != null and buildname != ''">
+				AND a.buildname LIKE
+				<if test="dbName == 'oracle'">'%'||#{buildname}||'%'</if>
+				<if test="dbName == 'mssql'">'%'+#{buildname}+'%'</if>
+				<if test="dbName == 'mysql'">concat('%',#{buildname},'%')</if>
+			</if>
+			<if test="area != null and area.id != null and area.id != ''">
+				AND a.area_id = #{area.id}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	<update id="updateCoordinates">
+		UPDATE ccm_house_buildmanage SET
+		area_map =
+		#{areaMap},
+		area_point = #{areaPoint}
+		WHERE
+		id = #{id}
+	</update>
+
+	<select id="getBuildByImmigration" resultType="CcmHouseBuildmanage">
+		SELECT
+		p.more1 as 'more1',
+		p.id as 'id',
+		h.areaMap as 'areaMap',
+		h.areaPoint as 'areaPoint'
+		FROM
+		(
+				SELECT
+					count(a.id) as 'more1',
+					a.build_id as 'id'
+				FROM
+				ccm_people a
+				LEFT JOIN sys_area a2 ON a2.id = a.area_grid_id
+				WHERE
+					a.del_flag=0
+					  <if test="userArea != null and userArea.parentIds != null and userArea.parentIds != ''">
+					 AND   (a2.parent_ids LIKE  CONCAT('%',#{userArea.id},'%')  or a.area_grid_id = #{userArea.id})
+					</if>
+					AND (
+					<if test="value1 == 1 or value2 == 1 or value3 == 1 or value4 == 1 or value5 == 1 or value6 == 1 or value7 == 1 or value8 == 1 or value9 == 1 or value10 == 1">
+						1=0
+					</if>
+					<if test="value1 != 1 and value2 != 1 and value3 != 1 and value4 != 1 and value5 != 1 and value6 != 1 and value7 != 1 and value8 != 1 and value9 != 1 and value10 != 1">
+						1=1
+					</if>
+					<if test="value1 == 1">
+						or is_aids = 1
+					</if>
+					<if test="value2 == 1">
+						or is_psychogeny = 1
+					</if>
+					<if test="value3 == 1">
+						or is_kym = 1
+					</if>
+					<if test="value4 == 1">
+						or is_drugs = 1
+					</if>
+					<if test="value5 == 1">
+						or is_release = 1
+					</if>
+					<if test="value6 == 1">
+						or is_rectification = 1
+					</if>
+					<if test="value7 == 1">
+						or is_behind = 1
+					</if>
+					<if test="value8 == 1">
+						or is_visit = 1
+					</if>
+					<if test="value9 == 1">
+						or is_heresy = 1
+					</if>
+					<if test="value10 == 1">
+						or is_dangerous = 1
+					</if>
+					)
+				GROUP BY
+					a.build_id
+		) p
+		LEFT JOIN 
+		(
+			SELECT
+				b.id as 'id',
+				b.area_map as 'areaMap',
+				b.area_point as 'areaPoint'
+			FROM
+			
+			ccm_house_buildmanage b 
+			LEFT JOIN sys_area a17 ON a17.id = b.area_id
+			WHERE
+				b.del_flag=0
+		) h
+		ON
+		h.id = p.id
+		<!-- SELECT
+		count(b.id) as 'more1',
+		b.id as 'id ',
+		b.area_map as 'areaMap',
+		b.area_point as 'areaPoint'
+		FROM
+		ccm_house_buildmanage b
+		LEFT JOIN ccm_pop_tenant a10 ON a10.building_id = b.id
+		LEFT JOIN ccm_people a11 ON a11.room_id = a10.id
+		WHERE
+		a11.type = "20"
+		GROUP BY
+		b.id -->
+	</select>
+
+	<!-- 街道信息-大屏-滨海新区社会网格化管理信息平台 -->
+	<select id="findListAllData" resultType="com.arjjs.ccm.tool.SearchTab">
+		SELECT
+		<!--  <include refid="ccmHouseBuildmanageColumns" />-->
+		a.id AS "type",
+		a.buildname AS "value",
+		a.area_map AS "value1",
+		a.area_point AS "value2"
+		FROM ccm_house_buildmanage a
+		<include refid="ccmHouseBuildmanageJoins" />
+		LEFT JOIN sys_area community ON community.id = a17.parent_id
+		LEFT JOIN sys_area street ON street.id = community.parent_id
+		where
+			a.del_flag = '0'
+			AND a17.del_flag = '0'
+			AND community.del_flag = '0'
+			AND street.del_flag = '0'
+			<if test="area != null and area.id != null and area.id != ''">
+				AND street.id = #{area.id}
+			</if>
+	</select>
+	
+	<!-- 楼栋总数-->
+    <select id="findListNum" resultType="int">
+       	SELECT
+			COUNT(*)
+		FROM
+			ccm_house_buildmanage a
+		<if test="area != null and area.id != null and area.id != ''">
+			<include refid="ccmHouseBuildmanageJoins" />
+			LEFT JOIN sys_area community ON community.id = a17.parent_id
+			LEFT JOIN sys_area street ON street.id = community.parent_id
+		</if>
+		where
+			a.del_flag = '0'
+			<if test="area != null and area.id != null and area.id != ''">
+				AND a17.del_flag = '0'
+				AND community.del_flag = '0'
+				AND street.del_flag = '0'
+				AND street.id = #{area.id}
+			</if>
+    </select>
+    <!-- 单元总数-->
+    <select id="findListNumDanYuan" resultType="int">
+       	SELECT
+			SUM(a.elem_num)
+		FROM
+			ccm_house_buildmanage a
+		<if test="area != null and area.id != null and area.id != ''">
+			<include refid="ccmHouseBuildmanageJoins" />
+			LEFT JOIN sys_area community ON community.id = a17.parent_id
+			LEFT JOIN sys_area street ON street.id = community.parent_id
+		</if>
+		where
+			a.del_flag = '0'
+			<if test="area != null and area.id != null and area.id != ''">
+				AND a17.del_flag = '0'
+				AND community.del_flag = '0'
+				AND street.del_flag = '0'
+				AND street.id = #{area.id}
+			</if>
+    </select>
+	
+	
+	
+	
+
+</mapper>

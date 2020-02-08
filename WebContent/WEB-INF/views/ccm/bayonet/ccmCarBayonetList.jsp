@@ -1,0 +1,110 @@
+<%@ page contentType="text/html;charset=UTF-8"%>
+<%@ include file="/WEB-INF/views/include/taglib.jsp"%>
+<html>
+<head>
+<title>车辆卡口管理</title>
+<meta name="decorator" content="default" />
+<script type="text/javascript">
+	$(document).ready(function() {
+
+	});
+	function page(n, s) {
+		$("#pageNo").val(n);
+		$("#pageSize").val(s);
+		$("#searchForm").submit();
+		return false;
+	}
+</script>
+<script src="${ctxStatic}/ccm/event/js/ccmEventIncident.js"
+	type="text/javascript"></script>
+</head>
+<body>
+	<ul class="nav nav-tabs">
+		<li class="active"><a href="${ctx}/bayonet/ccmCarBayonet/">数据列表</a></li>
+	</ul>
+	<form:form id="searchForm" modelAttribute="ccmCarBayonet"
+		action="${ctx}/bayonet/ccmCarBayonet/" method="post"
+		class="breadcrumb form-search">
+		<input id="pageNo" name="pageNo" type="hidden" value="${page.pageNo}" />
+		<input id="pageSize" name="pageSize" type="hidden"
+			value="${page.pageSize}" />
+		<ul class="ul-form">
+			<li><label>卡口名称：</label> <form:input path="bayonetName"
+					htmlEscape="false" maxlength="64" class="input-medium" /></li>
+			<li><label>使用类别：</label> <form:select path="useType"
+					class="input-large">
+					<form:option value="" label="全部" />
+					<form:options items="${fns:getDictList('bayonet_use_type')}"
+						itemLabel="label" itemValue="value" htmlEscape="false"
+						maxlength="2" class="input-medium" />
+				</form:select></li>
+			<li><label>卡口类型：</label> <form:select path="bayonetType"
+					class="input-large">
+					<form:option value="" label="全部" />
+					<form:options items="${fns:getDictList('ccm_bayonet_type')}"
+						itemLabel="label" itemValue="value" htmlEscape="false"
+						maxlength="2" class="input-medium" />
+				</form:select></li>
+			<li><label>卡口模式：</label> <form:select path="bayonetPattern"
+					class="input-large">
+					<form:option value="" label="全部" />
+					<form:options items="${fns:getDictList('ccm_bayonet_pattern')}"
+						itemLabel="label" itemValue="value" htmlEscape="false"
+						maxlength="2" class="input-medium" />
+				</form:select></li>
+			<li class="btns"><a
+				onclick="parent.LayerDialog('${ctx}/bayonet/ccmCarBayonet/form', '添加', '1100px', '700px')"
+				class="btn btn-success"><i class="icon-plus"></i> 添加</a></li>
+			<li class="btns"><a href="javascript:;" id="btnSubmit"
+				class="btn btn-primary"> <i class="icon-search"></i> 查询
+			</a></li>
+			<li class="clearfix"></li>
+		</ul>
+	</form:form>
+	<sys:message content="${message}" />
+	<table id="contentTable"
+		class="table table-striped table-bordered table-condensed">
+		<thead>
+			<tr>
+				<th>卡口名称</th>
+				<th>使用类别</th>
+				<th>前端类型</th>
+				<th>卡口类型</th>
+				<th>卡口模式</th>
+				<th>是否一图多车</th>
+				<th>备注信息</th>
+				<th>更新时间</th>
+				<shiro:hasPermission name="bayonet:ccmCarBayonet:edit">
+					<th>操作</th>
+				</shiro:hasPermission>
+			</tr>
+		</thead>
+		<tbody>
+			<c:forEach items="${page.list}" var="ccmCarBayonet">
+				<tr>
+					<td><a class="btnList"
+						onclick="parent.LayerDialog('${ctx}/bayonet/ccmCarBayonet/form?id=${ccmCarBayonet.id}', '编辑', '1100px', '700px')">
+							${ccmCarBayonet.bayonetName}</a></td>
+					<td>${fns:getDictLabel(ccmCarBayonet.useType, 'bayonet_use_type', '无')}</td>
+					<td>${fns:getDictLabel(ccmCarBayonet.frontType, 'bayonet_front_type', '无')}</td>
+					<td>${fns:getDictLabel(ccmCarBayonet.bayonetType, 'ccm_bayonet_type', '无')}</td>
+					<td>${fns:getDictLabel(ccmCarBayonet.bayonetPattern, 'ccm_bayonet_pattern', '无')}</td>
+					<td>${fns:getDictLabel(ccmCarBayonet.isOneToMore, 'yes_no', '无')}</td>
+					<td class="tp">${ccmCarBayonet.remarks}</td>
+					<td><fmt:formatDate value="${ccmCarBayonet.updateDate}"
+							pattern="yyyy-MM-dd HH:mm:ss" /></td>
+					<shiro:hasPermission name="bayonet:ccmCarBayonet:edit">
+						<td><a class="btnList"
+							onclick="parent.LayerDialog('${ctx}/bayonet/ccmCarBayonet/form?id=${ccmCarBayonet.id}', '编辑', '1100px', '700px')"
+							title="修改"><i class="icon-pencil"></i></a> <a class="btnList"
+							href="${ctx}/bayonet/ccmCarBayonet/delete?id=${ccmCarBayonet.id}"
+							onclick="return confirmx('确认要删除该车辆卡口吗？', this.href)" title="删除"><i
+								class="icon-trash"></i></a></td>
+					</shiro:hasPermission>
+				</tr>
+			</c:forEach>
+		</tbody>
+	</table>
+	<div class="pagination">${page}</div>
+</body>
+</html>

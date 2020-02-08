@@ -1,0 +1,1396 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.arjjs.ccm.modules.ccm.pop.dao.CcmPeopleDao">
+
+	<sql id="ccmPeopleColumns">
+		a.id AS "id",
+		a.type AS "type",
+		a.name AS "name",
+		a.usedname
+		AS "usedname",
+		a.sex AS "sex",
+		a.birthday AS "birthday",
+		a.nation AS
+		"nation",
+		a.censu AS "censu",
+		a.marriage AS "marriage",
+		a.politics AS
+		"politics",
+		a.education AS "education",
+		a.belief AS "belief",
+		a.prof_type AS "profType",
+		a.profession AS "profession",
+		a.is_public_servants AS "isPublicServants",
+		a.office_name AS "officeName",
+		a.serv_place AS
+		"servPlace",
+		a.domicile AS "domicile",
+		a.domiciledetail AS
+		"domiciledetail",
+		a.residence AS "residence",
+		a.residencedetail AS
+		"residencedetail",
+		a.area_com_id AS "areaComId.id",
+		a.area_grid_id AS
+		"areaGridId.id",
+		a.build_id AS "buildId.id",
+		a.room_id AS "roomId.id",
+		a.is_behind AS "isBehind",
+		a.is_release AS "isRelease",
+		a.is_rectification AS "isRectification",
+		a.is_aids AS "isAids",
+		a.is_psychogeny AS "isPsychogeny",
+		a.is_kym AS
+		"isKym",
+		a.is_dispute AS "isDispute",
+		a.is_drugs AS
+		"isDrugs",
+		a.is_escape AS "isEscape",
+		a.is_harm_national AS "isHarmNational",			
+		a.is_deliberately_illegal AS "isDeliberatelyIllegal",	
+	    a.is_criminal_offense AS "isCriminalOffense",	
+		a.is_visit AS "isVisit",
+		a.is_heresy AS "isHeresy",
+		a.is_dangerous AS "isDangerous",
+		a.is_more1 AS
+		"isMore1",
+		a.is_more2
+		AS "isMore2",
+		a.type_spec AS "typeSpec",
+		a.images AS
+		"images",
+		a.ident AS
+		"ident",
+		a.telephone AS "telephone",
+		a.uniformlogo AS
+		"uniformlogo",
+		a.account AS "account",
+		a.accountidentity AS
+		"accountidentity",
+		a.accountname AS "accountname",
+		a.accountrelation AS
+		"accountrelation",
+		a.accounttelephone AS "accounttelephone",
+		a.person_type AS "personType",
+		a.person_time AS "personTime",
+		a.person_reason AS "personReason",
+		a.flow_rea AS "flowRea",
+		a.accr_type
+		AS "accrType",
+		a.cert_num AS "certNum",
+		a.special_care_type AS "specialCareType",
+		a.reco_date AS
+		"recoDate",
+		a.due_date AS "dueDate",
+		a.domi_type AS "domiType",
+		a.focu_pers AS
+		"focuPers",
+		a.time AS "time",
+		a.cause AS "cause",
+		a.explainelse AS
+		"explainelse",
+		a.esurname AS "esurname",
+		a.ename AS
+		"ename",
+		a.nationality AS "nationality",
+		a.iden_code AS "idenCode",
+		a.iden_num AS
+		"idenNum",
+		a.iden_date AS "idenDate",
+		a.purpose AS
+		"purpose",
+		a.arri_date
+		AS "arriDate",
+		a.depart_date AS "departDate",
+		a.more1 AS "more1",
+		a.more2 AS "more2",
+		a.more3 AS "more3",
+		a.more4 AS "more4",
+		a.more5 AS "more5",
+		a.is_permanent AS "isPermanent",
+		a.unsettle_reason AS "unsettleReason",
+		a.unsettle_date AS "unsettleDate",
+		a.unsettle_card_type AS "unsettleCardType",
+		a.unsettle_card_number AS "unsettleCardNumber",
+		TIMESTAMPDIFF(YEAR, a.birthday, CURDATE()) AS "age",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag",
+		a20.name AS "areaComId.name",
+		a21.name AS "areaGridId.name",
+		a22.house_build AS "roomId.houseBuild",
+		'' AS "roomId.buildingId.buildname",
+		a.room_id AS "roomIdString",
+		(case a.sex when 0 then '男' when 1 then '女' else '' end) "sexLable"
+		
+		
+	</sql>
+
+	<sql id="ccmPeopleColumns_simple">
+		a.id AS "id",
+		a.type AS "type",
+		a.name AS "name",
+		a.usedname AS "usedname",
+		a.sex AS "sex",
+		a.birthday AS "birthday",
+		a.nation AS "nation",
+		a.censu AS "censu",
+		a.marriage AS "marriage",
+		a.politics AS "politics",
+		a.education AS "education",
+		a.belief AS "belief",
+		a.prof_type AS "profType",
+		a.profession AS "profession",
+		a.is_public_servants AS "isPublicServants",
+		a.office_name AS "officeName",
+		a.serv_place AS "servPlace",
+		a.domicile AS "domicile",
+		a.domiciledetail AS "domiciledetail",
+		a.residence AS "residence",
+		a.residencedetail AS "residencedetail",
+		a.area_com_id AS "areaComId.id",
+		a.area_grid_id AS "areaGridId.id",
+		a.is_behind AS "isBehind",
+		a.is_release AS "isRelease",
+		a.is_rectification AS "isRectification",
+		a.is_aids AS "isAids",
+		a.is_psychogeny AS "isPsychogeny",
+		a.is_kym AS "isKym",
+		a.is_drugs AS "isDrugs",
+		a.is_harm_national AS "isHarmNational",
+		a.is_deliberately_illegal AS "isDeliberatelyIllegal",
+		 a.is_criminal_offense AS "isCriminalOffense",
+		a.is_escape AS "isEscape",
+		a.is_visit AS "isVisit",
+		a.is_heresy AS "isHeresy",
+		a.is_dangerous AS "isDangerous",
+		a.is_dispute AS "isDispute",
+		a.type_spec AS "typeSpec",
+		a.ident AS "ident",
+		a.telephone AS "telephone",
+		a.account AS "account",
+		a.images AS "images",
+		TIMESTAMPDIFF(YEAR, a.birthday, CURDATE()) AS "age",
+		a20.name AS "areaComId.name",
+		a21.name AS "areaGridId.name",
+		a.room_id AS "roomIdString",
+		(case a.sex when 0 then '男' when 1 then '女' else '' end) "sexLable",
+		a.build_id AS "buildId.id",
+		a23.buildname AS "buildId.buildname",
+		a23.area_point AS "buildId.areaPoint",
+		a23.area_map AS "buildId.areaMap"
+		
+		
+	</sql>
+	<sql id="ccmPeopleJoinsArea">
+		LEFT JOIN sys_area a20 ON a20.id = a.area_com_id
+	</sql>
+	<sql id="ccmPeopleJoinsNet">
+		LEFT JOIN sys_area a21 ON a21.id = a.area_grid_id
+	</sql>
+	<sql id="ccmPeopleJoinsRoom">
+		LEFT JOIN ccm_pop_tenant a22 ON a22.id = a.room_id
+	</sql>
+	<sql id="ccmPeopleJoinsBuild">
+		LEFT JOIN ccm_house_buildmanage a23 ON a23.id = a.build_id
+	</sql>
+
+	<select id="get" resultType="CcmPeople">
+		SELECT
+		<include refid="ccmPeopleColumns" />
+		FROM ccm_people a
+		<include refid="ccmPeopleJoinsArea" />
+		<include refid="ccmPeopleJoinsNet" />
+		<include refid="ccmPeopleJoinsRoom" />
+		WHERE a.id = #{id}
+	</select>
+
+	<!-- 首页统计实有人口信息按type统计 -->
+	<select id="findCountByType" resultType="CcmPeople">
+		SELECT 
+			 c.value AS "type",
+			 IFNULL(d.count,0) AS "count"
+		FROM
+		(SELECT d.value AS "value" from sys_dict d WHERE d.del_flag = 0 AND d.type = 'sys_ccm_people' ) c
+		LEFT JOIN 
+		(SELECT
+			count( a.id ) AS "count" ,a.type AS "type"
+		FROM
+			ccm_people a 
+		WHERE
+			a.del_flag = 0 
+		GROUP BY
+			a.type) d ON c.value = d.type
+	</select>
+
+	<!-- 首页统计实有人口信息按 uniformlogo统计-->
+	<select id="findCountByUniformlogo" resultType="CcmPeople">
+		SELECT 
+			 c.value AS "uniformlogo",
+			 IFNULL(d.count,0) AS "count"
+		FROM
+		(SELECT d.value AS "value" from sys_dict d WHERE d.del_flag = 0 AND d.type = 'ccm_huh_cst' ) c
+		LEFT JOIN 
+		(SELECT
+			count( a.id ) AS "count" ,a.uniformlogo AS "uniformlogo"
+		FROM
+			ccm_people a 
+		WHERE
+			a.del_flag = 0 
+		GROUP BY
+			a.uniformlogo) d ON c.value = d.uniformlogo
+	</select>
+
+	<!-- 人员信息弹框 -->
+	<select id="getHousePopForm" resultType="CcmPeople">
+		SELECT
+		<include refid="ccmPeopleColumns" />
+		FROM ccm_people a
+		<include refid="ccmPeopleJoinsArea" />
+		<include refid="ccmPeopleJoinsNet" />
+		<include refid="ccmPeopleJoinsRoom" />
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			AND a.id = #{id}
+		</where>
+	</select>
+	<!-- getNation -->
+	<select id="getNation" resultType="String">
+		SELECT
+		label AS label
+		FROM
+		sys_dict d
+		where
+		d.del_flag = #{DEL_FLAG_NORMAL}
+		AND d.value = #{nation}
+		AND d.description = "民族"
+
+	</select>
+	
+	<!-- 首页统计重点人员数量 -->
+	<select id="findCountPeopleForType" resultType="CcmPeople">
+		SELECT count( a.id ) AS "count" ,"kym" AS "name" FROM ccm_house_kym a LEFT JOIN ccm_people b ON a.people_id = b.id AND b.del_flag = 0 WHERE a.del_flag = 0
+			UNION ALL
+		SELECT count( a.id ) AS "count" ,"dangerous" AS "name" FROM ccm_house_dangerous a LEFT JOIN ccm_people b ON a.people_id = b.id  AND b.del_flag = 0  WHERE a.del_flag = 0 
+			UNION ALL
+		SELECT count( a.id ) AS "count" ,"illegal" AS "name"  FROM ccm_house_deliberately_illegal a LEFT JOIN ccm_people b ON a.people_id = b.id  AND b.del_flag = 0  WHERE a.del_flag = 0
+			UNION ALL
+		SELECT count( a.id ) AS "count" ,"dispute" AS "name"  FROM ccm_house_dispute a LEFT JOIN ccm_people b ON a.people_id = b.id  AND b.del_flag = 0  WHERE a.del_flag = 0
+			UNION ALL
+		SELECT count( a.id ) AS "count" ,"drugs" AS "name"  FROM ccm_house_drugs a LEFT JOIN ccm_people b ON a.people_id = b.id  AND b.del_flag = 0  WHERE a.del_flag = 0
+			UNION ALL
+		SELECT count( a.id ) AS "count" ,"escape" AS "name"  FROM ccm_house_escape a LEFT JOIN ccm_people b ON a.people_id = b.id  AND b.del_flag = 0  WHERE a.del_flag = 0
+			UNION ALL
+		SELECT count( a.id ) AS "count" ,"heresy" AS "name"  FROM ccm_house_heresy a LEFT JOIN ccm_people b ON a.people_id = b.id  AND b.del_flag = 0  WHERE a.del_flag = 0
+			UNION ALL
+		SELECT count( a.id ) AS "count" ,"petition" AS "name"  FROM ccm_house_petition a LEFT JOIN ccm_people b ON a.people_id = b.id  AND b.del_flag = 0  WHERE a.del_flag = 0
+			UNION ALL
+		SELECT count( a.id ) AS "count" ,"psychogeny" AS "name"  FROM ccm_house_psychogeny a LEFT JOIN ccm_people b ON a.people_id = b.id  AND b.del_flag = 0  WHERE a.del_flag = 0
+			UNION ALL
+		SELECT count( a.id ) AS "count" ,"rectification" AS "name"  FROM ccm_house_rectification a LEFT JOIN ccm_people b ON a.people_id = b.id  AND b.del_flag = 0  WHERE a.del_flag = 0
+			UNION ALL
+		SELECT count( a.id ) AS "count" ,"release" AS "name"  FROM ccm_house_release a LEFT JOIN ccm_people b ON a.people_id = b.id  AND b.del_flag = 0  WHERE a.del_flag = 0
+			UNION ALL
+		SELECT count( a.id ) AS "count" ,"aids" AS "name"  FROM ccm_house_aids a LEFT JOIN ccm_people b ON a.people_id = b.id  AND b.del_flag = 0  WHERE a.del_flag = 0
+		UNION ALL
+		SELECT count( a.id ) AS "count" ,"security" AS "name"  FROM ccm_harm_national_security a LEFT JOIN ccm_people b ON a.people_id = b.id  AND b.del_flag = 0  WHERE a.del_flag = 0
+	</select>
+	
+	<!-- getRelation -->
+	<select id="getRelation" resultType="String">
+		SELECT
+		label AS label
+		FROM
+		sys_dict d
+		where
+		d.del_flag = #{DEL_FLAG_NORMAL}
+		AND d.value =
+		#{accountrelation}
+		AND d.description = "家庭关系类型编码"
+
+	</select>
+	<!-- 楼栋-房屋-住户信息弹框 -->
+	<select id="getHousePopList" resultType="CcmPeople">
+		SELECT
+		<include refid="ccmPeopleColumns" />
+		FROM ccm_people a
+		<include refid="ccmPeopleJoinsArea" />
+		<include refid="ccmPeopleJoinsNet" />
+		<include refid="ccmPeopleJoinsRoom" />
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			AND a.room_id = #{roomId.id}
+		</where>
+		<choose>
+			<otherwise>
+				ORDER BY a.accountrelation
+			</otherwise>
+		</choose>
+	</select>
+	<!-- 校园周边重点人员列表 -->
+	<select id="findPagePop" resultType="CcmPeople">
+		SELECT
+			a.id AS "id"
+		FROM ccm_people a
+		<include refid="ccmPeopleJoinsNet" />
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="areaComId != null and areaComId.id != null and areaComId.id != ''">
+				AND a.area_com_id = #{areaComId.id}
+			</if>
+			AND (a.is_release = 1
+			OR a.is_rectification = 1
+			OR a.is_aids = 1
+			OR a.is_psychogeny = 1
+			OR a.is_drugs = 1 
+			OR a.is_harm_national = 1 
+			OR a.is_deliberately_illegal=1
+			OR a.is_criminal_offense=1
+			OR a.is_visit = 1 
+			OR a.is_dangerous = 1 
+			OR a.is_heresy = 1 
+			OR a.is_dispute =1)
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+
+	<!-- 户籍户号调用 -->
+	<select id="listAccount" resultType="CcmPeople">
+		SELECT
+		<include refid="ccmPeopleColumns" />
+		FROM ccm_people a
+		<include refid="ccmPeopleJoinsArea" />
+		<include refid="ccmPeopleJoinsNet" />
+		<include refid="ccmPeopleJoinsRoom" />
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			AND a.account = #{account}
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.accountrelation
+			</otherwise>
+		</choose>
+	</select>
+
+	<!-- 党员 -->
+	<select id="findCommunistList" resultType="CcmPeople">
+		SELECT
+		a.id AS "id"
+		FROM ccm_people a
+		<include refid="ccmPeopleJoinsNet" />
+		<where>
+			a.politics = '01'
+			<!-- AND a.del_flag = #{DEL_FLAG_NORMAL} -->
+			<if test="areaComId != null and areaComId.id != null and areaComId.id != ''">
+				AND a.area_com_id = #{areaComId.id}
+			</if>
+			<if test="name != null and name != ''">
+				AND a.name LIKE
+				<if test="dbName == 'oracle'">'%'||#{name}||'%'</if>
+				<if test="dbName == 'mssql'">'%'+#{name}+'%'</if>
+				<if test="dbName == 'mysql'">concat('%',#{name},'%')</if>
+			</if>
+			<if test="ident != null and ident != ''">
+				AND a.ident LIKE
+				<if test="dbName == 'oracle'">'%'||#{ident}||'%'</if>
+				<if test="dbName == 'mssql'">'%'+#{ident}+'%'</if>
+				<if test="dbName == 'mysql'">concat('%',#{ident},'%')</if>
+			</if>
+			<if test="isPermanent != null and isPermanent != ''">
+				AND a.is_permanent = #{isPermanent}
+			</if>
+			
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<!-- 老年人 -->
+	<select id="findOlderPage" resultType="CcmPeople">
+		SELECT
+			a.id AS "id"
+		FROM ccm_people a
+		<where>
+			a.birthday &lt; #{birthday}
+			<!-- AND a.del_flag = #{DEL_FLAG_NORMAL} -->
+			<if test="areaComId != null and areaComId.id != null and areaComId.id != ''">
+				AND a.area_com_id = #{areaComId.id}
+			</if>
+			<if test="name != null and name != ''">
+				AND a.name LIKE
+				<if test="dbName == 'oracle'">'%'||#{name}||'%'</if>
+				<if test="dbName == 'mssql'">'%'+#{name}+'%'</if>
+				<if test="dbName == 'mysql'">concat(#{name},'%')</if>
+			</if>
+			<if test="ident != null and ident != ''">
+				AND a.ident LIKE
+				<if test="dbName == 'oracle'">'%'||#{ident}||'%'</if>
+				<if test="dbName == 'mssql'">'%'+#{ident}+'%'</if>
+				<if test="dbName == 'mysql'">concat('%',#{ident},'%')</if>
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.birthday ASC
+			</otherwise>
+		</choose>
+	</select>
+	<!--特殊关怀First -->
+	<select id="findCareFirst" resultType="CcmPeople">
+		SELECT
+			a.id AS "id"
+		FROM ccm_people a
+		<include refid="ccmPeopleJoinsNet" />
+		<where>
+			(
+				a.special_care_type !=''
+				AND a.special_care_type IS not NULL
+				AND a.special_care_type !=',null,'
+			)
+			<!-- AND a.del_flag = #{DEL_FLAG_NORMAL} -->
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	<!--特殊关怀 -->
+	<select id="findCareList" resultType="CcmPeople">
+		SELECT
+			a.id AS "id"
+		FROM ccm_people a
+		<where>
+			<if test="specialCareTypes != null and specialCareTypes.length > 0">
+				(
+				<foreach collection="specialCareTypes" item="m"  separator=" OR " >
+					<if test="m != null and m != ''">
+		           	   a.special_care_type LIKE concat('%',#{m},'%')
+		           	</if>
+		        </foreach>
+		        )
+			</if>
+			<!-- AND a.del_flag = #{DEL_FLAG_NORMAL} -->
+			<if test="name != null and name != ''">
+				AND a.name LIKE
+				<if test="dbName == 'oracle'">'%'||#{name}||'%'</if>
+				<if test="dbName == 'mssql'">'%'+#{name}+'%'</if>
+				<if test="dbName == 'mysql'">concat('%',#{name},'%')</if>
+			</if>
+			<if test="sex != null and sex != ''">
+				AND a.sex = #{sex}
+			</if>
+			<if test="areaComId != null and areaComId.id != null and areaComId.id != ''">
+				AND a.area_com_id = #{areaComId.id}
+			</if>
+			
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	<!-- 特殊关怀人员数量 -->
+	<select id="findListNum" resultType="int">
+		SELECT
+		count(a.id)
+		FROM ccm_people a
+		<where>
+			1=1
+			<!--AND a.del_flag = #{DEL_FLAG_NORMAL} -->
+			<if test="specialCareTypes != null and specialCareTypes.length > 0">
+				AND (
+				<foreach collection="specialCareTypes" item="m"  separator=" OR " >
+					<if test="m != null and m != ''">
+		           	   a.special_care_type LIKE concat('%',#{m},'%')
+		           	</if>
+		        </foreach>
+		        )
+			</if>
+			<!-- 数据范围过滤 -->
+			${sqlMap.dsf}
+		</where>
+	</select>
+	<!-- 数组查询id -->
+	<select id="findListLimite" resultType="CcmPeople">
+		SELECT
+			<include refid="ccmPeopleColumns_simple" />
+		FROM ccm_people a
+		<include refid="ccmPeopleJoinsArea" />
+		<include refid="ccmPeopleJoinsNet" />
+		<include refid="ccmPeopleJoinsBuild" />
+		where
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="listLimite != null and listLimite.length > 0">
+				AND (
+				<foreach collection="listLimite" item="n"  separator=" OR " >
+					<if test="n != null and n != ''">
+		           	   a.id = #{n}
+		           	</if>
+		        </foreach>
+		        )
+			</if>
+	</select>
+	<!--常住人口 -->
+	<select id="findPermanentList" resultType="CcmPeople">
+		SELECT
+			a.id AS "id"
+		FROM ccm_people a
+		<include refid="ccmPeopleJoinsNet" />
+		<where>
+			<if test="isPermanent != null and isPermanent != ''">
+				a.is_permanent = #{isPermanent}
+			</if>
+			<!-- AND a.del_flag = #{DEL_FLAG_NORMAL} -->
+			<if test="type != null and type != ''">
+				AND a.type = #{type}
+			</if>
+			<if test="name != null and name != ''">
+				AND a.name LIKE
+				<if test="dbName == 'oracle'">'%'||#{name}||'%'</if>
+				<if test="dbName == 'mssql'">'%'+#{name}+'%'</if>
+				<if test="dbName == 'mysql'">concat('%',#{name},'%')</if>
+			</if>
+			<if test="sex != null and sex != ''">
+				AND a.sex = #{sex}
+			</if>
+			<if
+				test="beginBirthday != null and endBirthday != null and beginBirthday != '' and endBirthday != ''">
+				AND a.birthday BETWEEN #{beginBirthday} AND #{endBirthday}
+			</if>
+			<if
+				test="areaComId != null and areaComId.id != null and areaComId.id != ''">
+				AND a.area_com_id = #{areaComId.id}
+			</if>
+			<if
+				test="areaGridId != null and areaGridId.id != null and areaGridId.id != ''">
+				AND a.area_grid_id = #{areaGridId.id}
+			</if>
+			<if test="roomId != null and roomId.id != null and roomId.id != ''">
+				AND a.room_id = #{roomId.id}
+			</if>
+			<if test="isBehind != null and isBehind != ''">
+				AND a.is_behind = #{isBehind}
+			</if>
+			<if test="isRelease != null and isRelease != ''">
+				AND a.is_release = #{isRelease}
+			</if>
+			<if test="isRectification != null and isRectification != ''">
+				AND a.is_rectification = #{isRectification}
+			</if>
+			<if test="isAids != null and isAids != ''">
+				AND a.is_aids = #{isAids}
+			</if>
+			<if test="isPsychogeny != null and isPsychogeny != ''">
+				AND a.is_psychogeny = #{isPsychogeny}
+			</if>
+			<if test="isKym != null and isKym != ''">
+				AND a.is_kym = #{isKym}
+			</if>
+			<if test="isDrugs != null and isDrugs != ''">
+				AND a.is_drugs = #{isDrugs}
+			</if>
+			<if test="isEscape != null and isEscape != ''">
+				AND a.is_escape = #{isEscape}
+			</if>
+			<if test="isHarmNational != null and isHarmNational != ''">
+				AND a.is_harm_national = #{isHarmNational}
+			</if>
+			<if test="isDeliberatelyIllegal != null and isDeliberatelyIllegal != ''">
+				AND a.is_deliberately_illegal = #{isDeliberatelyIllegal}
+			</if>
+			<if test="isCriminalOffense != null and isCriminalOffense != ''">
+				AND a.is_criminal_offense = #{isCriminalOffense}
+			</if>
+			<if test="isDispute != null and isDispute != ''">
+				AND a.is_dispute = #{isDispute} 
+			</if>
+			<if test="ident != null and ident != ''">
+				AND a.ident LIKE
+				<if test="dbName == 'oracle'">'%'||#{ident}||'%'</if>
+				<if test="dbName == 'mssql'">'%'+#{ident}+'%'</if>
+				<if test="dbName == 'mysql'">concat('%',#{ident},'%')</if>
+			</if>
+			<if test="specialCareTypes != null and specialCareTypes.length > 0">
+				AND (
+				<foreach collection="specialCareTypes" item="m"  separator=" OR " >
+					<if test="m != null and m != ''">
+		           	   a.special_care_type LIKE concat('%',#{m},'%')
+		           	</if>
+		        </foreach>
+		        )
+			</if>
+			<if test="residencedetail != null and residencedetail != ''">
+				AND a.residencedetail LIKE
+				<if test="dbName == 'oracle'">'%'||#{residencedetail}||'%'</if>
+				<if test="dbName == 'mssql'">'%'+#{residencedetail}+'%'</if>
+				<if test="dbName == 'mysql'">concat('%',#{residencedetail},'%')</if>
+			</if>
+			<!-- 数据范围过滤 -->
+			${sqlMap.dsf}
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<!-- 
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+			 -->
+		</choose>
+	</select>
+	
+	
+	
+	
+	<!-- -->
+	<select id="findList" resultType="CcmPeople">
+		SELECT
+			a.id AS "id"
+		FROM ccm_people a
+		<include refid="ccmPeopleJoinsNet" />
+		<where>
+			1=1
+			<!-- AND a.del_flag = #{DEL_FLAG_NORMAL} -->
+			<if test="type != null and type != ''">
+				AND a.type = #{type}
+			</if>
+			<if test="name != null and name != ''">
+				AND a.name LIKE
+				<if test="dbName == 'oracle'">'%'||#{name}||'%'</if>
+				<if test="dbName == 'mssql'">'%'+#{name}+'%'</if>
+				<if test="dbName == 'mysql'">concat('%',#{name},'%')</if>
+			</if>
+			<if test="sex != null and sex != ''">
+				AND a.sex = #{sex}
+			</if>
+			<if
+				test="beginBirthday != null and endBirthday != null and beginBirthday != '' and endBirthday != ''">
+				AND a.birthday BETWEEN #{beginBirthday} AND #{endBirthday}
+			</if>
+			<if
+				test="areaComId != null and areaComId.id != null and areaComId.id != ''">
+				AND a.area_com_id = #{areaComId.id}
+			</if>
+			<if
+				test="areaGridId != null and areaGridId.id != null and areaGridId.id != ''">
+				AND a.area_grid_id = #{areaGridId.id}
+			</if>
+			<if test="roomId != null and roomId.id != null and roomId.id != ''">
+				AND a.room_id = #{roomId.id}
+			</if>
+			<if test="isBehind != null and isBehind != ''">
+				AND a.is_behind = #{isBehind}
+			</if>
+			<if test="isRelease != null and isRelease != ''">
+				AND a.is_release = #{isRelease}
+			</if>
+			<if test="isRectification != null and isRectification != ''">
+				AND a.is_rectification = #{isRectification}
+			</if>
+			<if test="isAids != null and isAids != ''">
+				AND a.is_aids = #{isAids}
+			</if>
+			<if test="isPsychogeny != null and isPsychogeny != ''">
+				AND a.is_psychogeny = #{isPsychogeny}
+			</if>
+			<if test="isKym != null and isKym != ''">
+				AND a.is_kym = #{isKym}
+			</if>
+			<if test="isDrugs != null and isDrugs != ''">
+				AND a.is_drugs = #{isDrugs}
+			</if>
+			<if test="isEscape != null and isEscape != ''">
+				AND a.is_escape = #{isEscape}
+			</if>
+			<if test="isHarmNational != null and isHarmNational != ''">
+				AND a.is_harm_national = #{isHarmNational}
+			</if>
+			<if test="isDeliberatelyIllegal != null and isDeliberatelyIllegal != ''">
+				AND a.is_deliberately_illegal = #{isDeliberatelyIllegal}
+			</if>
+			<if test="isCriminalOffense != null and isCriminalOffense != ''">
+				AND a.is_criminal_offense = #{isCriminalOffense}
+			</if>
+			<if test="isDispute != null and isDispute != ''">
+				AND a.is_dispute = #{isDispute} 
+			</if>
+			<if test="ident != null and ident != ''">
+				AND a.ident LIKE
+				<if test="dbName == 'oracle'">'%'||#{ident}||'%'</if>
+				<if test="dbName == 'mssql'">'%'+#{ident}+'%'</if>
+				<if test="dbName == 'mysql'">concat('%',#{ident},'%')</if>
+			</if>
+			<if test="specialCareTypes != null and specialCareTypes.length > 0">
+				AND (
+				<foreach collection="specialCareTypes" item="m"  separator=" OR " >
+					<if test="m != null and m != ''">
+		           	   a.special_care_type LIKE concat('%',#{m},'%')
+		           	</if>
+		        </foreach>
+		        )
+			</if>
+			<if test="isPermanent != null and isPermanent != ''">
+				AND a.is_permanent = #{isPermanent}
+			</if>
+			<if test="residencedetail != null and residencedetail != ''">
+				AND a.residencedetail LIKE
+				<if test="dbName == 'oracle'">'%'||#{residencedetail}||'%'</if>
+				<if test="dbName == 'mssql'">'%'+#{residencedetail}+'%'</if>
+				<if test="dbName == 'mysql'">concat('%',#{residencedetail},'%')</if>
+			</if>
+			<!-- 数据范围过滤 -->
+			${sqlMap.dsf}
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+
+	<select id="findAllList" resultType="CcmPeople">
+		SELECT
+		<include refid="ccmPeopleColumns_simple" />
+		FROM ccm_people a
+		<include refid="ccmPeopleJoinsArea" />
+		<include refid="ccmPeopleJoinsNet" />
+		<include refid="ccmPeopleJoinsBuild" />
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+
+	<insert id="insert">
+		INSERT INTO ccm_people(
+		id,
+		type,
+		name,
+		usedname,
+		sex,
+		birthday,
+		nation,
+		censu,
+		marriage,
+		politics,
+		education,
+		belief,
+		prof_type,
+		profession,
+		is_public_servants,
+		office_name,
+		serv_place,
+		domicile,
+		domiciledetail,
+		residence,
+		residencedetail,
+		area_com_id,
+		area_grid_id,
+		build_id,
+		room_id,
+		is_behind,
+		is_release,
+		is_rectification,
+		is_aids,
+		is_psychogeny,
+		is_kym,
+		is_drugs,
+		is_escape,
+		is_harm_national,
+		is_deliberately_illegal,
+		is_criminal_offense,
+		is_visit,
+		is_heresy,
+		is_dispute,
+		is_dangerous,
+		is_more1,
+		is_more2,
+		type_spec,
+		images,
+		ident,
+		telephone,
+		uniformlogo,
+		account,
+		accountidentity,
+		accountname,
+		accountrelation,
+		accounttelephone,
+		person_type,
+		person_time,
+		person_reason,
+		flow_rea,
+		accr_type,
+		cert_num,
+		special_care_type,
+		reco_date,
+		due_date,
+		domi_type,
+		focu_pers,
+		time,
+		cause,
+		explainelse,
+		esurname,
+		ename,
+		nationality,
+		iden_code,
+		iden_num,
+		iden_date,
+		purpose,
+		arri_date,
+		depart_date,
+		more1,
+		more2,
+		more3,
+		more4,
+		more5,
+		is_permanent,
+		unsettle_reason,
+		unsettle_date,
+		unsettle_card_type,
+		unsettle_card_number,
+		create_by,
+		create_date,
+		update_by,
+		update_date,
+		remarks,
+		del_flag
+		)
+		VALUES (
+		#{id},
+		#{type},
+		#{name},
+		#{usedname},
+		#{sex},
+		#{birthday},
+		#{nation},
+		#{censu},
+		#{marriage},
+		#{politics},
+		#{education},
+		#{belief},
+		#{profType},
+		#{profession},
+		#{isPublicServants},
+		#{officeName},
+		#{servPlace},
+		#{domicile},
+		#{domiciledetail},
+		#{residence},
+		#{residencedetail},
+		#{areaComId.id},
+		#{areaGridId.id},
+		#{buildId.id},
+		#{roomId.id},
+		#{isBehind},
+		#{isRelease},
+		#{isRectification},
+		#{isAids},
+		#{isPsychogeny},
+		#{isKym},
+		#{isDrugs},
+		#{isEscape},
+		#{isDispute},
+		#{isHarmNational},
+		#{isDeliberatelyIllegal},
+		#{isCriminalOffense},
+		#{isVisit},
+		#{isHeresy},
+		#{isDangerous},
+		#{isMore1},
+		#{isMore2},
+		#{typeSpec},
+		#{images},
+		#{ident},
+		#{telephone},
+		#{uniformlogo},
+		#{account},
+		#{accountidentity},
+		#{accountname},
+		#{accountrelation},
+		#{accounttelephone},
+		#{personType},
+		#{personTime},
+		#{personReason},
+		#{flowRea},
+		#{accrType},
+		#{certNum},
+		#{specialCareType},
+		#{recoDate},
+		#{dueDate},
+		#{domiType},
+		#{focuPers},
+		#{time},
+		#{cause},
+		#{explainelse},
+		#{esurname},
+		#{ename},
+		#{nationality},
+		#{idenCode},
+		#{idenNum},
+		#{idenDate},
+		#{purpose},
+		#{arriDate},
+		#{departDate},
+		#{more1},
+		#{more2},
+		#{more3},
+		#{more4},
+		#{more5},
+		#{isPermanent},
+		#{unsettleReason},
+		#{unsettleDate},
+		#{unsettleCardType},
+		#{unsettleCardNumber},
+		#{createBy.id},
+		#{createDate},
+		#{updateBy.id},
+		#{updateDate},
+		#{remarks},
+		#{delFlag}
+		)
+	</insert>
+
+	<update id="update">
+		UPDATE ccm_people SET
+		type = #{type},
+		name = #{name},
+		usedname = #{usedname},
+		sex = #{sex},
+		birthday = #{birthday},
+		nation =
+		#{nation},
+		censu = #{censu},
+		marriage = #{marriage},
+		politics =
+		#{politics},
+		education = #{education},
+		belief = #{belief},
+		prof_type =
+		#{profType},
+		profession = #{profession},
+		is_public_servants = #{isPublicServants},
+		office_name = #{officeName},
+		serv_place = #{servPlace},
+		domicile = #{domicile},
+		domiciledetail = #{domiciledetail},
+		residence =
+		#{residence},
+		residencedetail = #{residencedetail},
+		area_com_id =
+		#{areaComId.id},
+		area_grid_id = #{areaGridId.id},
+		build_id = #{buildId.id},
+		room_id =
+		#{roomId.id},
+		is_behind =
+		#{isBehind},
+		is_release = #{isRelease},
+		is_rectification =
+		#{isRectification},
+		is_aids = #{isAids},
+		is_psychogeny =
+		#{isPsychogeny},
+		is_kym = #{isKym},
+		is_drugs =
+		#{isDrugs},
+		is_escape = 
+		#{isEscape},
+		is_dispute = #{isDispute},
+		is_harm_national = #{isHarmNational},
+		is_deliberately_illegal = #{isDeliberatelyIllegal},
+		is_criminal_offense=#{isCriminalOffense},
+		is_visit =
+		#{isVisit},
+		is_heresy =#{isHeresy},
+		is_dangerous =#{isDangerous},
+		is_more1 = #{isMore1},
+		is_more2 =
+		#{isMore2},
+		type_spec =
+		#{typeSpec},
+		images = #{images},
+		ident = #{ident},
+		telephone =
+		#{telephone},
+		uniformlogo = #{uniformlogo},
+		account =
+		#{account},
+		accountidentity = #{accountidentity},
+		accountname =
+		#{accountname},
+		accountrelation = #{accountrelation},
+		accounttelephone =
+		#{accounttelephone},
+		person_type = #{personType},
+		person_time =
+		#{personTime},
+		person_reason = #{personReason},
+		flow_rea = #{flowRea},
+		accr_type = #{accrType},
+		cert_num = #{certNum},
+		special_care_type = #{specialCareType},
+		reco_date = #{recoDate},
+		due_date = #{dueDate},
+		domi_type = #{domiType},
+		focu_pers = #{focuPers},
+		time = #{time},
+		cause =
+		#{cause},
+		explainelse = #{explainelse},
+		esurname =
+		#{esurname},
+		ename =
+		#{ename},
+		nationality = #{nationality},
+		iden_code =
+		#{idenCode},
+		iden_num = #{idenNum},
+		iden_date = #{idenDate},
+		purpose =
+		#{purpose},
+		arri_date = #{arriDate},
+		depart_date = #{departDate},
+		more1 =
+		#{more1},
+		more2 = #{more2},
+		more3 = #{more3},
+		more4 = #{more4},
+		more5 =
+		#{more5},
+		is_permanent = #{isPermanent},
+		unsettle_reason = #{unsettleReason},
+		unsettle_date = #{unsettleDate},
+		unsettle_card_type = #{unsettleCardType},
+		unsettle_card_number = #{unsettleCardNumber},
+		update_by = #{updateBy.id},
+		update_date = #{updateDate},
+		remarks =
+		#{remarks}
+		WHERE id = #{id}
+	</update>
+
+	<update id="delete">
+		UPDATE ccm_people SET
+		del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+
+	<select id="getListByMon" resultType="com.arjjs.ccm.tool.EchartType">
+		SELECT
+		DATE_FORMAT(a.create_date, "%Y-%c") AS "type",
+		COUNT(1) AS
+		"value"
+		FROM
+		ccm_people a
+		<where>
+			a.del_flag = #{ccmpeople.DEL_FLAG_NORMAL}
+			<if test="ccmpeople.type != null and ccmpeople.type != ''">
+				AND a.type = #{ccmpeople.type}
+			</if>
+			<if test="ccmpeople.name != null and ccmpeople.name != ''">
+				AND a.name LIKE
+				<if test="dbName == 'oracle'">'%'||#{ccmpeople.name}||'%'</if>
+				<if test="dbName == 'mssql'">'%'+#{ccmpeople.name}+'%'</if>
+				<if test="dbName == 'mysql'">concat('%',#{ccmpeople.name},'%')</if>
+			</if>
+			<if test="ccmpeople.sex != null and ccmpeople.sex != ''">
+				AND a.sex = #{ccmpeople.sex}
+			</if>
+			<if
+				test="ccmpeople.beginBirthday != null and ccmpeople.endBirthday != null and ccmpeople.beginBirthday != '' and ccmpeople.endBirthday != ''">
+				AND a.birthday BETWEEN #{ccmpeople.beginBirthday} AND
+				#{ccmpeople.endBirthday}
+			</if>
+			<if
+				test="ccmpeople.areaComId != null and ccmpeople.areaComId.id != null and ccmpeople.areaComId.id != ''">
+				AND a.area_com_id = #{ccmpeople.areaComId.id.id}
+			</if>
+			<if
+				test="ccmpeople.areaGridId != null and ccmpeople.areaGridId.id != null and ccmpeople.areaGridId.id != ''">
+				AND a.area_grid_id = #{ccmpeople.areaGridId.id}
+			</if>
+
+			<if
+				test="ccmpeople.roomId != null and ccmpeople.roomId.id != null and ccmpeople.roomId.id != ''">
+				AND a.room_id = #{ccmpeople.roomId.id}
+			</if>
+
+			<if test="ccmpeople.isBehind != null and ccmpeople.isBehind != ''">
+				AND a.is_behind = #{ccmpeople.isBehind}
+			</if>
+			<if test="ccmpeople.isRelease != null and ccmpeople.isRelease != ''">
+				AND a.is_release = #{ccmpeople.isRelease}
+			</if>
+			<if
+				test="ccmpeople.isRectification != null and ccmpeople.isRectification != ''">
+				AND a.is_rectification = #{ccmpeople.isRectification}
+			</if>
+			<if test="ccmpeople.isAids != null and ccmpeople.isAids != ''">
+				AND a.is_aids = #{ccmpeople.isAids}
+			</if>
+			<if test="ccmpeople.isPsychogeny != null and ccmpeople.isPsychogeny != ''">
+				AND a.is_psychogeny = #{ccmpeople.isPsychogeny}
+			</if>
+			<if test="ccmpeople.isKym != null and ccmpeople.isKym != ''">
+				AND a.is_kym = #{ccmpeople.isKym}
+			</if>
+			<if test="ccmpeople.isDrugs != null and ccmpeople.isDrugs != ''">
+				AND a.is_drugs = #{ccmpeople.isDrugs}
+			</if>
+			<if test="ccmpeople.isEscape != null and ccmpeople.isEscape != ''">
+				AND a.is_escape = #{ccmpeople.isEscape}
+			</if>
+			<if test="ccmpeople.isDispute != null and ccmpeople.isDispute != ''">
+				AND a.is_dispute = #{isDispute}
+			</if>
+			<if test="ccmpeople.isHarmNational != null and ccmpeople.isHarmNational != ''">
+				AND a.is_harm_national = #{isHarmNational}
+			</if>
+			<if test="ccmpeople.isDeliberatelyIllegal != null and ccmpeople.isDeliberatelyIllegal != ''">
+				AND a.is_deliberately_illegal = #{isDeliberatelyIllegal}
+			</if>
+			<if test="ccmpeople.isCriminalOffense != null and ccmpeople.isCriminalOffense != ''">
+				AND a.is_criminal_offense = #{isCriminalOffense}
+			</if>
+			<if test="ccmpeople.ident != null and ccmpeople.ident != ''">
+				AND a.ident LIKE
+				<if test="dbName == 'oracle'">'%'||#{ccmpeople.ident}||'%'</if>
+				<if test="dbName == 'mssql'">'%'+#{ccmpeople.ident}+'%'</if>
+				<if test="dbName == 'mysql'">concat('%',#{ccmpeople.ident},'%')</if>
+			</if>
+		</where>
+		GROUP BY
+		DATE_FORMAT(a.create_date, "%Y%c")
+	</select>
+
+
+	<select id="getListByDay" resultType="com.arjjs.ccm.tool.EchartType">
+		SELECT
+		DATE_FORMAT(a.create_date, "%Y-%c-%d") AS "type",
+		COUNT(1) AS
+		"value"
+		FROM
+		ccm_people a
+		<where>
+			a.del_flag = #{ccmpeople.DEL_FLAG_NORMAL}
+			<if test="ccmpeople.type != null and ccmpeople.type != ''">
+				AND a.type = #{ccmpeople.type}
+			</if>
+			<if test="ccmpeople.name != null and ccmpeople.name != ''">
+				AND a.name LIKE
+				<if test="dbName == 'oracle'">'%'||#{ccmpeople.name}||'%'</if>
+				<if test="dbName == 'mssql'">'%'+#{ccmpeople.name}+'%'</if>
+				<if test="dbName == 'mysql'">concat('%',#{ccmpeople.name},'%')</if>
+			</if>
+			<if test="ccmpeople.sex != null and ccmpeople.sex != ''">
+				AND a.sex = #{ccmpeople.sex}
+			</if>
+			<if
+				test="ccmpeople.beginBirthday != null and ccmpeople.endBirthday != null and ccmpeople.beginBirthday != '' and ccmpeople.endBirthday != ''">
+				AND a.birthday BETWEEN #{ccmpeople.beginBirthday} AND
+				#{ccmpeople.endBirthday}
+			</if>
+			<if
+				test="ccmpeople.areaComId != null and ccmpeople.areaComId.id != null and ccmpeople.areaComId.id != ''">
+				AND a.area_com_id = #{ccmpeople.areaComId.id.id}
+			</if>
+			<if
+				test="ccmpeople.areaGridId != null and ccmpeople.areaGridId.id != null and ccmpeople.areaGridId.id != ''">
+				AND a.area_grid_id = #{ccmpeople.areaGridId.id}
+			</if>
+			<if
+				test="ccmpeople.roomId != null and ccmpeople.roomId.id != null and ccmpeople.roomId.id != ''">
+				AND room_id = #{ccmpeople.roomId.id}
+			</if>
+			<if test="ccmpeople.isBehind != null and ccmpeople.isBehind != ''">
+				AND a.is_behind = #{ccmpeople.isBehind}
+			</if>
+			<if test="ccmpeople.isRelease != null and ccmpeople.isRelease != ''">
+				AND a.is_release = #{ccmpeople.isRelease}
+			</if>
+			<if
+				test="ccmpeople.isRectification != null and ccmpeople.isRectification != ''">
+				AND a.is_rectification = #{ccmpeople.isRectification}
+			</if>
+			<if test="ccmpeople.isAids != null and ccmpeople.isAids != ''">
+				AND a.is_aids = #{ccmpeople.isAids}
+			</if>
+			<if test="ccmpeople.isPsychogeny != null and ccmpeople.isPsychogeny != ''">
+				AND a.is_psychogeny = #{ccmpeople.isPsychogeny}
+			</if>
+			<if test="ccmpeople.isKym != null and ccmpeople.isKym != ''">
+				AND a.is_kym = #{ccmpeople.isKym}
+			</if>
+			<if test="ccmpeople.isDrugs != null and ccmpeople.isDrugs != ''">
+				AND a.is_drugs = #{ccmpeople.isDrugs}
+			</if>
+			<if test="ccmpeople.isEscape != null and ccmpeople.isEscape != ''">
+				AND a.is_escape = #{ccmpeople.isEscape}
+			</if>
+			<if test="ccmpeople.isDispute != null and ccmpeople.isDispute != ''">
+				AND a.is_dispute = #{isDispute}
+			</if>
+			<if test="ccmpeople.isHarmNational != null and ccmpeople.isHarmNational != ''">
+				AND a.is_harm_national = #{isHarmNational}
+			</if>
+			<if test="ccmpeople.isDeliberatelyIllegal != null and ccmpeople.isDeliberatelyIllegal != ''">
+				AND a.is_deliberately_illegal = #{isDeliberatelyIllegal}
+			</if>
+			<if test="ccmpeople.isCriminalOffense != null and ccmpeople.isCriminalOffense != ''">
+				AND a.is_criminal_offense = #{isCriminalOffense}
+			</if>
+			<if test="ccmpeople.ident != null and ccmpeople.ident != ''">
+				AND a.ident LIKE
+				<if test="dbName == 'oracle'">'%'||#{ccmpeople.ident}||'%'</if>
+				<if test="dbName == 'mssql'">'%'+#{ccmpeople.ident}+'%'</if>
+				<if test="dbName == 'mysql'">concat('%',#{ccmpeople.ident},'%')</if>
+			</if>
+		</where>
+		GROUP BY
+		DATE_FORMAT(a.create_date, "%Y-%c-%d")
+	</select>
+
+	<!-- 查询所有的重点人口 -->
+	<select id="findSpeList" resultType="CcmPeople">
+		SELECT
+		<include refid="ccmPeopleColumns_simple" />
+		FROM ccm_people a
+		<include refid="ccmPeopleJoinsArea" />
+		<include refid="ccmPeopleJoinsNet" />
+		<include refid="ccmPeopleJoinsBuild" />
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="type != null and type != ''">
+				AND a.type = #{type}
+			</if>
+			<if test="name != null and name != ''">
+				AND a.name LIKE
+				<if test="dbName == 'oracle'">'%'||#{name}||'%'</if>
+				<if test="dbName == 'mssql'">'%'+#{name}+'%'</if>
+				<if test="dbName == 'mysql'">concat('%',#{name},'%')</if>
+			</if>
+			<if test="sex != null and sex != ''">
+				AND a.sex = #{sex}
+			</if>
+			<if
+				test="beginBirthday != null and endBirthday != null and beginBirthday != '' and endBirthday != ''">
+				AND a.birthday BETWEEN #{beginBirthday} AND #{endBirthday}
+			</if>
+			<if
+				test="areaComId != null and areaComId.id != null and areaComId.id != ''">
+				AND a.area_com_id = #{areaComId.id}
+			</if>
+			<if
+				test="areaGridId != null and areaGridId.id != null and areaGridId.id != ''">
+				AND a.area_grid_id = #{areaGridId.id}
+			</if>
+			<if test="roomId != null and roomId.id != null and roomId.id != ''">
+				AND a.room_id = #{roomId.id}
+			</if>
+			<if test="ident != null and ident != ''">
+				AND a.ident LIKE
+				<if test="dbName == 'oracle'">'%'||#{ident}||'%'</if>
+				<if test="dbName == 'mssql'">'%'+#{ident}+'%'</if>
+				<if test="dbName == 'mysql'">concat('%',#{ident},'%')</if>
+			</if>
+			<if test="more1 != null and more1 != ''">
+				and ( ${more1})
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+
+	<select id="checkPeopleIden" resultType="int">
+		SELECT count(1)
+		FROM ccm_people a
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			and (a.ident =#{ident} or
+			a.iden_num = #{idenNum})
+		</where>
+	</select>
+	
+	<select id="countSelect" resultType="int">
+	SELECT
+		count(1)
+	FROM
+		ccm_people a
+	<where> 
+		a.del_flag=0
+		and (a.is_aids=1 or a.is_heresy=1 or a.is_release=1 or a.is_psychogeny=1 or a.is_rectification=1 or a.is_dispute=1 or a.is_harm_national=1 or a.is_criminal_offense=1 or a.is_deliberately_illegal=1 or a.is_drugs=1  or a.is_visit=1 or a.is_dangerous=1)
+		<if test="list != null and list.size() > 0">
+			and a.build_id in
+			<foreach collection="list" item="coordiante" open="(" separator="," close=")">
+			 #{coordiante}
+			</foreach>
+		</if>
+	</where>
+	</select>
+	
+	<select id="locatingSuspects" resultType="CcmPeople">
+	SELECT
+		*
+	FROM
+		ccm_people a
+	<where> 
+		a.del_flag=0
+		and (a.is_aids=1 or a.is_heresy=1 or a.is_release=1 or a.is_psychogeny=1 or a.is_dispute=1 or a.is_rectification=1 or a.is_harm_national=1 or a.is_criminal_offense=1   or a.is_deliberately_illegal=1 or a.is_drugs=1 or a.is_visit=1 or a.is_dangerous=1)
+		<if test="list != null and list.size() > 0">
+			and a.build_id in
+			<foreach collection="list" item="coordiante" open="(" separator="," close=")">
+			 #{coordiante}
+			</foreach>
+		</if>
+	</where>
+	</select>
+	
+</mapper>

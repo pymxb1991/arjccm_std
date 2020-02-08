@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.arjjs.ccm.modules.ccm.patrollog.dao.CcmPatrolCheckDao">
+    
+	<sql id="ccmPatrolCheckColumns">
+		a.id AS "id",
+		a.image AS "image",
+		a.patrol_content AS "patrolContent",
+		a.report_person AS "reportPerson",
+		a.create_date AS "createDate",
+		a.report_road AS "reportRoad",
+		a.check_person AS "checkPerson",
+		a.check_date AS "checkDate",
+		a.score AS "score",
+		a.evaluate AS "evaluate",
+		a.create_by AS "createBy.id",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag"
+	</sql>
+	
+	<sql id="ccmPatrolCheckJoins">
+	</sql>
+    
+	<select id="get" resultType="CcmPatrolCheck">
+		SELECT 
+			<include refid="ccmPatrolCheckColumns"/>
+		FROM ccm_patrol_log a
+		<include refid="ccmPatrolCheckJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="CcmPatrolCheck">
+		SELECT 
+			<include refid="ccmPatrolCheckColumns"/>
+		FROM ccm_patrol_log a
+		<include refid="ccmPatrolCheckJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="patrolContent != null and patrolContent != ''">
+				AND a.patrol_content LIKE 
+					<if test="dbName == 'oracle'">'%'||#{patrolContent}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{patrolContent}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{patrolContent},'%')</if>
+			</if>
+			<if test="beginCreateDate != null and endCreateDate != null and beginCreateDate != '' and endCreateDate != ''">
+				AND a.create_date BETWEEN #{beginCreateDate} AND #{endCreateDate}
+			</if>
+			<if test="checkPerson != null and checkPerson != ''">
+				AND a.check_person LIKE 
+					<if test="dbName == 'oracle'">'%'||#{checkPerson}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{checkPerson}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{checkPerson},'%')</if>
+			</if>
+			<if test="score != null and score != ''">
+				AND a.score = #{score}
+			</if>
+			<if test="createBy != null and createBy.id != null and createBy.id != ''">
+				AND a.create_by LIKE 
+					<if test="dbName == 'oracle'">'%'||#{createBy.id}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{createBy.id}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{createBy.id},'%')</if>
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="CcmPatrolCheck">
+		SELECT 
+			<include refid="ccmPatrolCheckColumns"/>
+		FROM ccm_patrol_log a
+		<include refid="ccmPatrolCheckJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO ccm_patrol_log(
+			id,
+			image,
+			patrol_content,
+			create_date,
+			report_road,
+			check_person,
+			check_date,
+			score,
+			evaluate,
+			create_by,
+			update_by,
+			update_date,
+			remarks,
+			del_flag
+		) VALUES (
+			#{id},
+			#{image},
+			#{patrolContent},
+			#{createDate},
+			#{reportRoad},
+			#{checkPerson},
+			#{checkDate},
+			#{score},
+			#{evaluate},
+			#{createBy.id},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE ccm_patrol_log SET 	
+			check_person = #{checkPerson},
+			check_date = #{checkDate},
+			score = #{score},
+			update_date = #{updateDate},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE ccm_patrol_log SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

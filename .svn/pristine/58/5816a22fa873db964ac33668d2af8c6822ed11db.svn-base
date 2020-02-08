@@ -1,0 +1,100 @@
+<%@ page contentType="text/html;charset=UTF-8"%>
+<%@ include file="/WEB-INF/views/include/taglib.jsp"%>
+<html>
+<head>
+<title>重点青少年管理</title>
+<meta name="decorator" content="default" />
+<script type="text/javascript" src="${ctxStatic}/ccm/house/js/ccmHouseKymInfo.js"></script>
+<script type="text/javascript" src="${ctxStatic}/ccm/pop/js/ccmCommon.js"></script>
+</head>
+<body>
+<div class="context" content="${ctx}"></div>
+	<form:form id="searchForm" modelAttribute="ccmHouseKym" action="${ctx}/house/ccmHouseKym/?tableType='ccmHouseKym'" method="post" class="breadcrumb form-search">
+		<input id="pageNo" name="pageNo" type="hidden" value="${page.pageNo}" />
+		<input id="pageSize" name="pageSize" type="hidden" value="${page.pageSize}" />
+		<ul class="ul-form">
+			<li><label>姓名：</label> <form:input path="name" htmlEscape="false" maxlength="50" class="input-medium" />
+			<li />
+			<li><label>性别：</label>
+				<form:select path="sex" class="input-medium">
+					<form:option value="" label="全部" />
+					<form:options items="${fns:getDictList('sex')}" itemLabel="label" itemValue="value" htmlEscape="false" />
+				</form:select>
+			</li>
+			<li><label >关注程度：</label> 
+				<form:select path="atteType" class="input-medium">
+					<form:option value="" label="" />
+					<form:options items="${fns:getDictList('ccm_conc_exte')}" itemLabel="label" itemValue="value" htmlEscape="false" />
+				</form:select></li>
+		
+			<li><label>家庭情况：</label> <form:select path="famiStat" class="input-medium">
+					<form:option value="" label="全部" />
+					<form:options items="${fns:getDictList('ccm_famy_stat')}" itemLabel="label" itemValue="value" htmlEscape="false" />
+				</form:select>
+			</li>
+			<li><label >是否违法犯罪：</label>
+				<form:select path="delinquency" class="input-medium">
+					<form:option value="" label="全部" />
+					<form:options items="${fns:getDictList('yes_no')}" itemLabel="label" itemValue="value" htmlEscape="false" />
+				</form:select>
+			</li>
+				<li class="btns">
+				<a href="javascript:;" id="btnSubmit" class="btn btn-primary"  >
+                <i class="icon-search"></i> 查询 </a>
+				</li>
+		</ul>
+	</form:form>
+	<sys:message content="${message}" />
+	<table id="contentTable" class="table table-striped table-bordered table-condensed">
+		<thead>
+			<tr>
+				<th>人员图片</th>
+				<th>姓名</th>
+				<th>公民身份号码</th>
+				<th>性别</th>
+				<th>联系方式</th>
+				<th>关注程度</th>
+				<th>人员类型</th>
+				<th>家庭情况</th>
+				<th>是否违法犯罪</th>
+				<shiro:hasPermission name="house:ccmHouseKym:edit">
+					<th>操作</th>
+				</shiro:hasPermission>
+			</tr>
+		</thead>
+		<tbody>
+			<c:forEach items="${page.list}" var="ccmHouseKym">
+				<tr>
+					<td width="100px"><img src="${ccmHouseKym.images}" style="height:50px;"/></td>
+					<td><a onclick="parent.parent.LayerDialog('${ctx}/house/ccmHouseKym/form?id=${ccmHouseKym.id}&hide1=true&hide2=false', '信息', '1200px', '800px')">${ccmHouseKym.name} </a></td>
+					<td>${ccmHouseKym.ident}</td>
+					<td>${fns:getDictLabel(ccmHouseKym.sex, 'sex', '')}</td>
+					<td>${ccmHouseKym.telephone}</td>
+					<c:if test="${ccmHouseKym.atteType eq '01'}">
+						<td style='color:red'>${fns:getDictLabel(ccmHouseKym.atteType, 'ccm_conc_exte', '')}&nbsp; &nbsp; <img src="${ctxStatic}/images/atteType_red.png" /> </td>
+					</c:if>
+					<c:if test="${ccmHouseKym.atteType eq '02'}">
+						<td style='color:orange'>${fns:getDictLabel(ccmHouseKym.atteType, 'ccm_conc_exte', '')}&nbsp; &nbsp; <img src="${ctxStatic}/images/atteType_orange.png" /> </td>
+					</c:if>
+					<c:if test="${ccmHouseKym.atteType eq '03'}">
+						<td>${fns:getDictLabel(ccmHouseKym.atteType, 'ccm_conc_exte', '')}&nbsp; &nbsp; <img src="${ctxStatic}/images/atteType_green.png" /> </td>
+					</c:if>
+					<c:if test="${ccmHouseKym.atteType eq '' or empty ccmHouseKym.atteType}">
+						<td>${fns:getDictLabel(ccmHouseKym.atteType, 'ccm_conc_exte', '')} </td>
+					</c:if>
+					<td><a href="${ctx}/house/ccmHouseKym/form?id=${ccmHouseKym.id}">${fns:getDictLabel(ccmHouseKym.manType, 'sys_ccm_delp_type', '')}</a></td>
+					<td>${fns:getDictLabel(ccmHouseKym.famiStat, 'sys_ccm_famy_stat', '')}</td>
+					<td>${fns:getDictLabel(ccmHouseKym.delinquency, 'yes_no', '')}</td>
+					<td><shiro:hasPermission name="house:ccmHouseKym:edit">
+						<a class="btnList" onclick="parent.parent.LayerDialog('${ctx}/house/ccmHouseKym/form?id=${ccmHouseKym.id}&hide1=true&hide2=false', '详情', '1200px', '800px')" title="详情"><i class="icon-list-alt"></i></a>
+						<a class="btnList" onclick="parent.parent.LayerDialog('${ctx}/house/ccmHouseKym/form?id=${ccmHouseKym.id}&hide1=false&hide2=true', '走访记录', '1200px', '500px')" title="走访记录"><i class="icon-list-ul"></i></a>
+						</shiro:hasPermission> <shiro:hasPermission name="log:ccmLogTail:edit">
+						<a class="btnList" onclick="parent.parent.LayerDialog('${ctx}/log/ccmLogTail/formPro?relevance_id=${ccmHouseKym.id}&relevance_table=ccm_house_kym', '添加记录', '800px', '660px')" title="添加记录"><i class="icon-plus"></i></a>
+						</shiro:hasPermission></td>
+				</tr>
+			</c:forEach>
+		</tbody>
+	</table>
+	<div class="pagination">${page}</div>
+</body>
+</html>

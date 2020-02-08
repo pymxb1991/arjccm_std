@@ -1,0 +1,96 @@
+<%@ page contentType="text/html;charset=UTF-8" %>
+<%@ page import="org.apache.shiro.web.filter.authc.FormAuthenticationFilter"%>
+<%@ include file="/WEB-INF/views/include/taglib.jsp"%>
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<title>${fns:getConfig('productName')}</title>
+ 	<meta name="decorator" content="blank"/>
+<link type="text/css" rel="stylesheet" href="${ctxStatic}/layim/layui/css/layui.css" />
+<script type="text/javascript" src="${ctxStatic}/layim/layui/layui.js"></script>
+<link href="${ctxStatic}/bootstrap/2.3.1/css_${not empty cookie.theme.value ? cookie.theme.value : 'cerulean'}/projectIndex.css" type="text/css" rel="stylesheet" />
+	<script type="text/javascript">
+		$(document).ready(
+				function() {
+					// 如果在框架或在对话框中，则弹出提示并跳转到首页
+					if (self.frameElement
+							&& self.frameElement.tagName == "IFRAME"
+							|| $('#left').length > 0 || $('.jbox').length > 0) {
+						alert('未登录或登录超时。请重新登录，谢谢！');
+						top.location = "${ctx}";
+					}
+				});
+	</script>
+
+</head>
+<body>
+	
+	<div class="bodyBg">
+		<div class="top">
+		<img id="topImg" src="${ctxStatic}/images/login_top.png" style="height:80px;"/>
+		<%-- <h1 class="form-signin-heading">${fns:getConfig('showName')}</h1> --%>
+		<h1 class="form-signin-heading">
+		<div id="header" class="navbar navbar-fixed-top">
+		<div class="navbar-inner">
+		<div class="navbarname">功能模块</div>
+		<div class="brand">
+					<a href="${ctx}/sys/map/statIndexCom" target=""><img class="logo" src="${ctxStatic}/images/logo.png" style="width:45px;height:45px;margin-right:6px;margin-top:-6px"/></i><span id="productName"
+						>${fns:getConfig('productName')}</span></a>
+		</div>
+		<ul id="userControl" class="nav pull-right">
+				
+					<li id="userInfo" class="dropdown"><a class="dropdown-toggle"
+						data-toggle="dropdown" href="#" title="个人信息">
+						<img style=" width: 40px; height: 40px; border-radius: 100%;" src="${fns:getUser().photo}"/>
+							${fns:getUser().name}&nbsp;<span id="notifyNum"
+							class="label label-info hide"></span><span class="caret" style="margin-top: 18px;"></span>
+					</a>
+						<ul class="dropdown-menu">
+							<li><a href="${ctx}/sys/user/info" target="mainFrame"><i
+									class="icon-user"></i>&nbsp; 个人信息</a></li>
+							<li><a href="${ctx}/sys/user/modifyPwd" target="mainFrame"><i
+									class="icon-lock"></i>&nbsp; 修改密码</a></li>
+							<li><a href="${ctx}/oa/oaNotify/self" target="mainFrame"><i
+									class="icon-bell"></i>&nbsp; 我的通知 <span id="notifyNum2"
+									class="label label-info hide"></span></a></li>
+							<li><a href="${ctx}/logout" title="退出登录"><i class="icon-signout"></i>&nbsp;退出登录</a></li>
+						</ul></li>
+					
+					<li>&nbsp;</li>
+				</ul>
+		</div>
+		</div>
+		</h1>
+	</div>
+	<div id="main">
+	<ul class="system-nav clearfix">
+	<c:forEach items="${fns:getMenuList()}" var="menu"
+							varStatus="idxStatus">
+							<c:if test="${menu.parent.id eq '1'&&menu.isShow eq '1'}">
+								<li
+									class="menu ${not empty firstMenu && firstMenu ? ' active' : ''}">
+									<c:if test="${empty menu.href}">
+										<a class="menu" href="${ctx}/index?pid=${menu.id}"
+											data-href="${ctx}/sys/menu/tree?parentId=${menu.id}" 	data-id="${menu.id}">
+											<i class="nav-icon iconfont  icon-${menu.icon}"></i>
+											<span>${menu.name}</span></a>
+									</c:if> 
+									<c:if test="${not empty menu.href}">
+										<a class="menu"
+											href="${fn:indexOf(menu.href, '://') eq -1 ? ctx : ''}${menu.href}" data-id="${menu.id}">
+											<i class="nav-icon iconfont  icon-${menu.icon} "></i>
+											<span class="nav-name">${menu.name}</span>
+											</a>
+									</c:if>
+								</li>
+							</c:if>
+						</c:forEach>
+			
+			</ul>
+	</div>
+	</div>
+	
+
+</body>
+</html>

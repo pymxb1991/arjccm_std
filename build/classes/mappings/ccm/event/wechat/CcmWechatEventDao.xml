@@ -1,0 +1,175 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.arjjs.ccm.modules.ccm.event.dao.wechat.CcmWechatEventDao">
+    
+	<sql id="ccmWechatEventColumns">
+		a.id AS "id",
+		a.wechat_user AS "wechatUser",
+		a.report_info AS "reportInfo",
+		a.report_time AS "reportTime",
+		a.state AS "state",
+		a.status AS "status",
+		a.user_tel AS "userTel",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag",
+		(case a.status 
+			when 01 then '未处理' 
+			when 02 then '处理中' 
+			when 03 then '已完成'
+			else '' end) "statusLable",
+		(case a.state 
+			when 01 then '未读' 
+			when 02 then '已读未回复' 
+			when 03 then '已回复'
+			when 03 then '完成'
+			else '' end) "stateLable"
+	</sql>
+	
+	<sql id="ccmWechatEventJoins">
+	</sql>
+    
+    <resultMap type="CcmWechatEvent" id="CcmWechatEventMap">
+    	<id column="id" property="id"/>
+    	<result column="wechat_user" property="wechatUser"/>
+    	<result column="report_info" property="reportInfo"/>
+    	<result column="report_time" property="reportTime"/>
+    	<result column="state" property="state"/>
+    	<result column="status" property="status"/>
+    	<result column="user_tel" property="userTel"/>
+    	<result column="create_by" property="createBy.id"/>
+    	<result column="create_date" property="createDate"/>
+    	<result column="update_by" property="updateBy.id"/>
+    	<result column="update_date" property="updateDate"/>
+    	<result column="remarks" property="remarks"/>
+    	<result column="del_flag" property="delFlag"/>
+    	<collection property="eventAttachmentList" ofType="CcmWechatEventAttachment" select="findAttaList" column="id"></collection>
+    </resultMap>
+    
+    
+    
+	<select id="get" resultMap="CcmWechatEventMap">
+		SELECT 
+			<include refid="ccmWechatEventColumns"/>
+		FROM ccm_wechat_event a
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findAttaList" resultType="CcmWechatEventAttachment">
+		SELECT 
+			b.*
+		FROM ccm_wechat_event_attachment b
+		WHERE b.event_id = #{id}
+			AND b.del_flag = '0'
+			
+		
+	</select>
+	
+	
+	<select id="findList" resultType="CcmWechatEvent">
+		SELECT 
+			<include refid="ccmWechatEventColumns"/>
+		FROM ccm_wechat_event a
+		<include refid="ccmWechatEventJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="reportInfo != null and reportInfo != ''">
+				AND a.report_info LIKE 
+					<if test="dbName == 'oracle'">'%'||#{reportInfo}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{reportInfo}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{reportInfo},'%')</if>
+			</if>
+			<if test="beginReportTime != null and endReportTime != null and beginReportTime != '' and endReportTime != ''">
+				AND a.report_time BETWEEN #{beginReportTime} AND #{endReportTime}
+			</if>
+			<if test="state != null and state != ''">
+				AND a.state = #{state}
+			</if>
+			<if test="status != null and status != ''">
+				AND a.status = #{status}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="CcmWechatEvent">
+		SELECT 
+			<include refid="ccmWechatEventColumns"/>
+		FROM ccm_wechat_event a
+		<include refid="ccmWechatEventJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO ccm_wechat_event(
+			id,
+			wechat_user,
+			report_info,
+			report_time,
+			state,
+			status,
+			user_tel,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag
+		) VALUES (
+			#{id},
+			#{wechatUser},
+			#{reportInfo},
+			#{reportTime},
+			#{state},
+			#{status},
+			#{userTel},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE ccm_wechat_event SET 	
+			wechat_user = #{wechatUser},
+			report_info = #{reportInfo},
+			report_time = #{reportTime},
+			state = #{state},
+			status = #{status},
+			user_tel = #{userTel},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE ccm_wechat_event SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

@@ -1,0 +1,32 @@
+.ratify{
+	float:right;
+	width:32px;
+	height: 32px;
+	background :url("../images/ratify.png");
+    margin-top: -9px;
+}
+.stick{
+	transform:rotate(-45deg);
+	width:32px;
+	height: 32px;
+	background :url("../images/stick.png");
+	float:left;
+    margin-left: -12px;
+    margin-top: -18px;
+}
+.urgent{
+	float:right;
+	width:48px;
+	height: 35px;
+    margin-top: -17px;
+    margin-right: -14px;
+	background :url("../images/urgent.png");
+}
+.historyLegacy{
+	float:right;
+	width:32px;
+	height: 32px;
+    margin-top: -9px;
+    margin-right: -2px;
+	background :url("../images/historyLegacy.png");
+}

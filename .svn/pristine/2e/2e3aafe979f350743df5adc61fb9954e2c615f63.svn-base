@@ -1,0 +1,139 @@
+/**
+ * Copyright &copy; 2012-2016 <a href="https://github.com/thinkgem/jeesite">JeeSite</a> All rights reserved.
+ */
+package com.arjjs.ccm.modules.ccm.sys.entity;
+
+import org.hibernate.validator.constraints.Length;
+import java.util.Date;
+import com.fasterxml.jackson.annotation.JsonFormat;
+
+import com.arjjs.ccm.common.persistence.DataEntity;
+
+/**
+ * 系统信息配置Entity
+ * @author liang
+ * @version 2018-05-10
+ */
+public class SysConfig extends DataEntity<SysConfig> {
+	
+	private static final long serialVersionUID = 1L;
+	private String paramStr;		// 信息
+	private int paramInt;		// 信息
+	private Date paramDate;		// 信息
+	private String tableName;		// 所在表
+	private String objId;		// 对象id
+	private Date beginParamDate;		// 开始 信息
+	private Date endParamDate;		// 结束 信息
+	
+	
+	
+	private String url;   			//url
+	private String username;  	 	//username
+	private String password;   		//password
+	
+	private SysMapConfig sysMapConfig;  //地图配置信息实体
+	
+	public static final String MAP_CONFIG_ID="map_info_config";//地图配置ID
+	
+	
+	public String getUrl() {
+		return url;
+	}
+
+	public void setUrl(String url) {
+		this.url = url;
+	}
+
+	public String getUsername() {
+		return username;
+	}
+
+	public void setUsername(String username) {
+		this.username = username;
+	}
+
+	public String getPassword() {
+		return password;
+	}
+
+	public void setPassword(String password) {
+		this.password = password;
+	}
+
+	public SysConfig() {
+		super();
+	}
+
+	public SysConfig(String id){
+		super(id);
+	}
+
+	@Length(min=0, max=128, message="信息长度必须介于 0 和 128 之间")
+	public String getParamStr() {
+		return paramStr;
+	}
+
+	public void setParamStr(String paramStr) {
+		this.paramStr = paramStr;
+	}
+	
+	public int getParamInt() {
+		return paramInt;
+	}
+
+	public void setParamInt(int paramInt) {
+		this.paramInt = paramInt;
+	}
+	
+	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+	public Date getParamDate() {
+		return paramDate;
+	}
+
+	public void setParamDate(Date paramDate) {
+		this.paramDate = paramDate;
+	}
+	
+	@Length(min=0, max=64, message="所在表长度必须介于 0 和 64 之间")
+	public String getTableName() {
+		return tableName;
+	}
+
+	public void setTableName(String tableName) {
+		this.tableName = tableName;
+	}
+	
+	@Length(min=0, max=64, message="对象id长度必须介于 0 和 64 之间")
+	public String getObjId() {
+		return objId;
+	}
+
+	public void setObjId(String objId) {
+		this.objId = objId;
+	}
+	
+	public Date getBeginParamDate() {
+		return beginParamDate;
+	}
+
+	public void setBeginParamDate(Date beginParamDate) {
+		this.beginParamDate = beginParamDate;
+	}
+	
+	public Date getEndParamDate() {
+		return endParamDate;
+	}
+
+	public void setEndParamDate(Date endParamDate) {
+		this.endParamDate = endParamDate;
+	}
+
+	public SysMapConfig getSysMapConfig() {
+		return sysMapConfig;
+	}
+
+	public void setSysMapConfig(SysMapConfig sysMapConfig) {
+		this.sysMapConfig = sysMapConfig;
+	}
+		
+}

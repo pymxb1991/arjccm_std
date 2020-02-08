@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.arjjs.ccm.modules.ccm.partyvolutterpost.dao.CcmPartyVolutterPostDao">
+    
+	<sql id="ccmPartyVolutterPostColumns">
+		a.id AS "id",
+		a.name AS "name",
+		a.type AS "type",
+		a.professional_requirements AS "professionalRequirements",
+		a.community AS "community.id",
+		a5.name AS "community.name",
+		a.claim_num AS "claimNum",
+		a.publish_time AS "publishTime",
+		a.rela AS "rela",
+		a.telphone AS "telphone",
+		a.job_description AS "jobDescription",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag"
+	</sql>
+	
+	<sql id="ccmPartyVolutterPostJoins">
+		LEFT JOIN sys_area a5 ON a5.id = a.community
+	</sql>
+    
+	<select id="get" resultType="CcmPartyVolutterPost">
+		SELECT 
+			<include refid="ccmPartyVolutterPostColumns"/>
+		FROM ccm_party_volutter_post a
+		<include refid="ccmPartyVolutterPostJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="CcmPartyVolutterPost">
+		SELECT 
+			<include refid="ccmPartyVolutterPostColumns"/>
+		FROM ccm_party_volutter_post a
+		<include refid="ccmPartyVolutterPostJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="name != null and name != ''">
+				AND a.name LIKE 
+					<if test="dbName == 'oracle'">'%'||#{name}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{name}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{name},'%')</if>
+			</if>
+			<if test="type != null and type != ''">
+				AND a.type = #{type}
+			</if>
+			<if test="community != null and community != ''">
+				AND a.community = #{community}
+			</if>
+			<if test="publishTime != null and publishTime != ''">
+				AND a.publish_time = #{publishTime}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="CcmPartyVolutterPost">
+		SELECT 
+			<include refid="ccmPartyVolutterPostColumns"/>
+		FROM ccm_party_volutter_post a
+		<include refid="ccmPartyVolutterPostJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO ccm_party_volutter_post(
+			id,
+			name,
+			type,
+			professional_requirements,
+			community,
+			claim_num,
+			publish_time,
+			rela,
+			telphone,
+			job_description,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag
+		) VALUES (
+			#{id},
+			#{name},
+			#{type},
+			#{professionalRequirements},
+			#{community.id},
+			#{claimNum},
+			#{publishTime},
+			#{rela},
+			#{telphone},
+			#{jobDescription},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE ccm_party_volutter_post SET 	
+			name = #{name},
+			type = #{type},
+			professional_requirements = #{professionalRequirements},
+			community = #{community.id},
+			claim_num = #{claimNum},
+			publish_time = #{publishTime},
+			rela = #{rela},
+			telphone = #{telphone},
+			job_description = #{jobDescription},
+			create_by = #{createBy.id},
+			create_date = #{createDate},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks},
+			del_flag = #{delFlag}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE ccm_party_volutter_post SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

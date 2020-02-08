@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.arjjs.ccm.modules.pbs.sys.dao.PbsGeneralDao">
+
+	<select id="checkExist" resultType="java.lang.Integer">
+		SELECT
+		count(1)
+		FROM
+		${Tabletype} a
+		WHERE
+		id &lt;&gt; #{id}
+		and a.${Columntype} = #{Key}
+		and a.del_flag = "0"
+	</select>
+	
+</mapper>

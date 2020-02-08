@@ -1,0 +1,404 @@
+/**
+ * Copyright &copy; 2012-2016 <a href="https://github.com/thinkgem/jeesite">JeeSite</a> All rights reserved.
+ */
+package com.arjjs.ccm.modules.ccm.event.entity;
+
+import java.util.Date;
+
+import javax.validation.constraints.Past;
+
+import org.hibernate.validator.constraints.Length;
+import org.hibernate.validator.constraints.NotEmpty;
+
+import com.arjjs.ccm.common.persistence.DataEntity;
+import com.arjjs.ccm.modules.ccm.line.entity.CcmLineProtect;
+import com.arjjs.ccm.modules.sys.entity.Area;
+import com.arjjs.ccm.modules.sys.entity.User;
+import com.fasterxml.jackson.annotation.JsonFormat;
+
+/**
+ * 案事件登记Entity
+ * @author arj
+ * @version 2018-01-10
+ */
+public class CcmEventIncident extends DataEntity<CcmEventIncident> {
+	
+	private static final long serialVersionUID = 1L;
+	
+	@NotEmpty(message = "案（事）件名称不能为空")
+	private String caseName;		// 案事件名称
+	@Past(message = "发生日期必须是一个过去事件")
+	private Date happenDate;		// 发生日期
+	private String casePlace; // 发案地
+	private Area area;  // 发案地
+    private String address;		// 发生地代码
+    private String happenPlace;		// 发生地详址
+	private String areaMap;		// 区域图
+	private String areaPoint;		// 中心点
+	private String image;		// 图标
+	@NotEmpty(message = "案（事）件种类不能为空")
+	private String eventKind;		// 案（事）件种类
+	private String otherId;		// 种类详细信息
+	private CcmLineProtect line;	// 种类详细信息类
+	@NotEmpty(message = "案（事）件分级不能为空")
+	private String eventScale;		// 案（事）件分级
+	@NotEmpty(message = "案（事）件类型不能为空")
+	private String eventType;		// 案（事）件类型
+	private String number;		// 案事件编号
+	@NotEmpty(message = "案（事）件性质不能为空")
+	private String property;		// 案事件性质
+	private String caseCondition;		// 案事件情况
+	private String culPapercode;		// 主犯（嫌疑人)证件代码
+	private String culPaperid;		// 主犯（嫌疑人)证件号码
+	private String culName;		// 主犯（嫌疑人）姓名
+	private Integer typeSolve;		// 是否破案
+	private Integer numCrime;		// 作案人数
+	private Integer numFlee;		// 在逃人数
+	private Integer numArrest;		// 抓捕人数
+	private Date caseOverDay;		// 侦查终结日期
+	private String caseSolve;		// 案事件侦破情况
+	private String file1;		// 附件1
+	private String file2;		// 附件2
+	private String file3;		// 附件3
+	private Date beginHappenDate;		// 开始 发生日期
+	private Date endHappenDate;		// 结束 发生日期
+	private String createName;
+	private String status;		// 处理状态
+	private String statusLable;	//用于app接口列表显示
+
+	private String peopleName;		// 重点人员姓名
+
+	private User checkUser;		// 拦截器中使用该用户进行权限拦截，App的rest接口使用
+    private Area userArea;  //登录用户所在区域
+	private String count;
+	
+	
+	
+
+	public String getCount() {
+		return count;
+	}
+
+	public void setCount(String count) {
+		this.count = count;
+	}
+
+	public Area getUserArea() {
+		return userArea;
+	}
+
+	public void setUserArea(Area userArea) {
+		this.userArea = userArea;
+	}
+	
+	
+	public User getCheckUser() {
+		return checkUser;
+	}
+	public void setCheckUser(User checkUser) {
+		this.checkUser = checkUser;
+	}
+
+	public CcmEventIncident() {
+		super();
+	}
+
+	public CcmEventIncident(String id){
+		super(id);
+	}
+
+	public String getPeopleName() {
+		return peopleName;
+	}
+	public void setPeopleName(String peopleName) {
+		this.peopleName = peopleName;
+	}
+	@Length(min=0, max=100, message="案事件名称长度必须介于 0 和 100 之间")
+	public String getCaseName() {
+		return caseName;
+	}
+
+	public void setCaseName(String caseName) {
+		this.caseName = caseName;
+	}
+	
+	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+	public Date getHappenDate() {
+		return happenDate;
+	}
+
+	public void setHappenDate(Date happenDate) {
+		this.happenDate = happenDate;
+	}
+	
+	
+	@Length(min=0, max=6, message="发案地长度必须介于 0 和 6 之间")
+	public String getCasePlace() {
+		return casePlace;
+	}
+
+	public void setCasePlace(String casePlace) {
+		this.casePlace = casePlace;
+	}
+	
+	@Length(min=0, max=200, message="发生地详址长度必须介于 0 和 200 之间")
+	public String getHappenPlace() {
+		return happenPlace;
+	}
+
+	public void setHappenPlace(String happenPlace) {
+		this.happenPlace = happenPlace;
+	}
+	
+	@Length(min=0, max=2000, message="区域图长度必须介于 0 和 2000 之间")
+	public String getAreaMap() {
+		return areaMap;
+	}
+
+	public void setAreaMap(String areaMap) {
+		this.areaMap = areaMap;
+	}
+	
+	@Length(min=0, max=40, message="中心点长度必须介于 0 和 40 之间")
+	public String getAreaPoint() {
+		return areaPoint;
+	}
+
+	public void setAreaPoint(String areaPoint) {
+		this.areaPoint = areaPoint;
+	}
+	
+	@Length(min=0, max=255, message="图标长度必须介于 0 和 255 之间")
+	public String getImage() {
+		return image;
+	}
+
+	public void setImage(String image) {
+		this.image = image;
+	}
+	
+	@Length(min=0, max=64, message="种类详细信息长度必须介于 0 和 64 之间")
+	public String getOtherId() {
+		return otherId;
+	}
+
+	public void setOtherId(String otherId) {
+		this.otherId = otherId;
+	}
+	
+	public CcmLineProtect getLine() {
+		return line;
+	}
+	public void setLine(CcmLineProtect line) {
+		this.line = line;
+	}
+	@Length(min=0, max=2, message="案（事）件种类长度必须介于 0 和 2 之间")
+	public String getEventKind() {
+		return eventKind;
+	}
+
+	public void setEventKind(String eventKind) {
+		this.eventKind = eventKind;
+	}
+	
+	@Length(min=0, max=2, message="案（事）件分级长度必须介于 0 和 2 之间")
+	public String getEventScale() {
+		return eventScale;
+	}
+
+	public void setEventScale(String eventScale) {
+		this.eventScale = eventScale;
+	}
+	
+	@Length(min=0, max=2, message="案（事）件类型长度必须介于 0 和 2 之间")
+	public String getEventType() {
+		return eventType;
+	}
+
+	public void setEventType(String eventType) {
+		this.eventType = eventType;
+	}
+	
+	@Length(min=0, max=100, message="案事件编号长度必须介于 0 和 100 之间")
+	public String getNumber() {
+		return number;
+	}
+
+	public void setNumber(String number) {
+		this.number = number;
+	}
+	
+	@Length(min=0, max=2, message="案事件性质长度必须介于 0 和 2 之间")
+	public String getProperty() {
+		return property;
+	}
+
+	public void setProperty(String property) {
+		this.property = property;
+	}
+	
+	public String getCaseCondition() {
+		return caseCondition;
+	}
+
+	public void setCaseCondition(String caseCondition) {
+		this.caseCondition = caseCondition;
+	}
+	
+	@Length(min=0, max=3, message="主犯（嫌疑人)证件代码长度必须介于 0 和 3 之间")
+	public String getCulPapercode() {
+		return culPapercode;
+	}
+
+	public void setCulPapercode(String culPapercode) {
+		this.culPapercode = culPapercode;
+	}
+	
+	@Length(min=0, max=50, message="主犯（嫌疑人)证件号码长度必须介于 0 和 50 之间")
+	public String getCulPaperid() {
+		return culPaperid;
+	}
+
+	public void setCulPaperid(String culPaperid) {
+		this.culPaperid = culPaperid;
+	}
+	
+	@Length(min=0, max=80, message="主犯（嫌疑人）姓名长度必须介于 0 和 80 之间")
+	public String getCulName() {
+		return culName;
+	}
+
+	public void setCulName(String culName) {
+		this.culName = culName;
+	}
+	
+	public Integer getTypeSolve() {
+		return typeSolve;
+	}
+
+	public void setTypeSolve(Integer typeSolve) {
+		this.typeSolve = typeSolve;
+	}
+	
+	public Integer getNumCrime() {
+		return numCrime;
+	}
+
+	public void setNumCrime(Integer numCrime) {
+		this.numCrime = numCrime;
+	}
+	
+	public Integer getNumFlee() {
+		return numFlee;
+	}
+
+	public void setNumFlee(Integer numFlee) {
+		this.numFlee = numFlee;
+	}
+	
+	public Integer getNumArrest() {
+		return numArrest;
+	}
+
+	public void setNumArrest(Integer numArrest) {
+		this.numArrest = numArrest;
+	}
+	
+	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+	public Date getCaseOverDay() {
+		return caseOverDay;
+	}
+
+	public void setCaseOverDay(Date caseOverDay) {
+		this.caseOverDay = caseOverDay;
+	}
+	
+	public String getCaseSolve() {
+		return caseSolve;
+	}
+
+	public void setCaseSolve(String caseSolve) {
+		this.caseSolve = caseSolve;
+	}
+	
+	public Date getBeginHappenDate() {
+		return beginHappenDate;
+	}
+
+	public void setBeginHappenDate(Date beginHappenDate) {
+		this.beginHappenDate = beginHappenDate;
+	}
+	
+	public Date getEndHappenDate() {
+		return endHappenDate;
+	}
+
+	public void setEndHappenDate(Date endHappenDate) {
+		this.endHappenDate = endHappenDate;
+	}
+
+	public String getCreateName() {
+		return createName;
+	}
+
+	public void setCreateName(String createName) {
+		this.createName = createName;
+	}
+	
+	public Area getArea() {
+        return area;
+    }
+
+    public void setArea(Area area) {
+        this.area = area;
+    }
+    @Length(min=0, max=256, message="附件1长度必须介于 0 和 256 之间")
+	public String getFile1() {
+		return file1;
+	}
+
+	public void setFile1(String file1) {
+		this.file1 = file1;
+	}
+	
+	@Length(min=0, max=256, message="附件2长度必须介于 0 和 256 之间")
+	public String getFile2() {
+		return file2;
+	}
+
+	public void setFile2(String file2) {
+		this.file2 = file2;
+	}
+	
+	@Length(min=0, max=256, message="附件3长度必须介于 0 和 256 之间")
+	public String getFile3() {
+		return file3;
+	}
+
+	public void setFile3(String file3) {
+		this.file3 = file3;
+	}	
+	@Length(min=0, max=2, message="处理状态必须介于 0 和 2 之间")
+	public String getStatus() {
+		return status;
+	}
+
+	public void setStatus(String status) {
+		this.status = status;
+	}
+	public String getStatusLable() {
+		return statusLable;
+	}
+	public void setStatusLable(String statusLable) {
+		this.statusLable = statusLable;
+	}
+
+	@Length(min=0, max=6, message="发案地代码长度必须介于 0 和 6 之间")
+	public String getAddress() {
+		return address;
+	}
+	public void setAddress(String address) {
+		this.address = address;
+	}
+	
+}

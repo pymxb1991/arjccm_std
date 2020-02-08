@@ -1,0 +1,225 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.arjjs.ccm.modules.pbs.activity.dao.PbsActivityevaluateDao">
+
+	<sql id="pbsActivityevaluateColumns">
+		a.id AS "id",
+		a.s_activityid AS "sActivityid.id",
+		rec.s_title AS "sActivityid.sTitle",
+		a.s_content AS "sContent",
+		a.s_partmember AS "sPartmember.id",
+		memP.s_name AS "sPartmember.sName",
+		a.s_value AS "sValue",
+		a.s_operator AS "sOperator.id",
+		u6.name AS
+		"sOperator.name",
+		a.s_bindmember AS "sBindmember.id",
+		mem.s_name AS
+		"sBindmember.sName",
+		mem.s_photo AS "sBindmember.sPhoto",
+		a.s_status AS
+		"sStatus",
+		a.s_spare01 AS
+		"sSpare01",
+		a.s_spare02 AS "sSpare02",
+		a.s_spare03 AS "sSpare03",
+		a.s_spare04 AS
+		"sSpare04",
+		a.create_by AS
+		"createBy.id",
+		a.create_date AS
+		"createDate",
+		a.update_by AS
+		"updateBy.id",
+		a.update_date AS
+		"updateDate",
+		a.remarks
+		AS "remarks",
+		a.del_flag AS "delFlag"
+	</sql>
+
+	<sql id="pbsActivityevaluateJoins">
+		LEFT JOIN sys_user u6 ON u6.id = a.s_operator
+		LEFT JOIN pbs_partymem mem ON a.s_bindmember = mem.id
+		LEFT JOIN pbs_partymem memP ON a.s_partmember = memP.id
+		LEFT JOIN pbs_activityrec rec ON rec.id =a.s_activityid
+	</sql>
+
+	<select id="get" resultType="PbsActivityevaluate">
+		SELECT
+		<include refid="pbsActivityevaluateColumns" />
+		FROM pbs_activityevaluate a
+		<include refid="pbsActivityevaluateJoins" />
+		WHERE a.id = #{id}
+	</select>
+
+	<select id="findList" resultType="PbsActivityevaluate">
+	SELECT
+	<include refid="pbsActivityevaluateColumns" />
+	FROM pbs_activityevaluate a
+	<include refid="pbsActivityevaluateJoins" />
+	<where>
+		a.del_flag = #{DEL_FLAG_NORMAL}
+		<!-- 查询 -->
+		<if test="sActivityid != null and sActivityid != '' and sActivityid.id != null and sActivityid.id != ''">
+			AND a.s_activityid = #{sActivityid.id}
+		</if>
+		<if test="sActivityid != null and sActivityid != '' and sActivityid.sTitle != null and sActivityid.sTitle != ''">
+            AND rec.s_title   like
+                    <if test="dbName == 'oracle'">'%'||#{sActivityid.sTitle}||'%'</if>
+                    <if test="dbName == 'mssql'">'%'+#{sActivityid.sTitle}+'%'</if>
+                    <if test="dbName == 'mysql'">concat('%',#{sActivityid.sTitle},'%')</if>
+        </if>
+		<if
+			test="sPartmember  != null and sPartmember != '' and sPartmember.id != null and sPartmember.id != ''">
+			AND a.s_partmember = #{sPartmember.id}
+		</if>
+		<if test="sValue != null and sValue != ''">
+			AND a.s_value = #{sValue}
+		</if>
+	</where>
+	<choose>
+		<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+			ORDER BY ${page.orderBy}
+		</when>
+		<otherwise>
+			ORDER BY a.update_date DESC
+		</otherwise>
+	</choose>
+</select>
+
+	<select id="findAllList" resultType="PbsActivityevaluate">
+		SELECT
+		<include refid="pbsActivityevaluateColumns" />
+		FROM pbs_activityevaluate a
+		<include refid="pbsActivityevaluateJoins" />
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+
+	<insert id="insert">
+		INSERT INTO pbs_activityevaluate(
+		id,
+		s_activityid,
+		s_content,
+		s_partmember,
+		s_value,
+		s_operator,
+		s_bindmember,
+		s_status,
+		s_spare01,
+		s_spare02,
+		s_spare03,
+		s_spare04,
+		create_by,
+		create_date,
+		update_by,
+		update_date,
+		remarks,
+		del_flag
+		) VALUES (
+		#{id},
+		#{sActivityid.id},
+		#{sContent},
+		#{sPartmember.id},
+		#{sValue},
+		#{sOperator.id},
+		#{sBindmember.id},
+		#{sStatus},
+		#{sSpare01},
+		#{sSpare02},
+		#{sSpare03},
+		#{sSpare04},
+		#{createBy.id},
+		#{createDate},
+		#{updateBy.id},
+		#{updateDate},
+		#{remarks},
+		#{delFlag}
+		)
+	</insert>
+
+	<update id="update">
+		UPDATE pbs_activityevaluate SET
+		s_activityid =
+		#{sActivityid.id},
+		s_content = #{sContent},
+		s_partmember =
+		#{sPartmember.id},
+		s_value = #{sValue},
+		s_operator = #{sOperator.id},
+		s_bindmember = #{sBindmember.id},
+		s_status = #{sStatus},
+		update_by =
+		#{updateBy.id},
+		update_date = #{updateDate},
+		remarks = #{remarks}
+		WHERE
+		id = #{id}
+	</update>
+
+	<insert id="insertAll">
+		INSERT INTO pbs_activityevaluate(
+		id,
+		s_activityid,
+		s_content,
+		s_partmember,
+		s_value,
+		s_operator,
+		s_bindmember,
+		s_status,
+		s_spare01,
+		s_spare02,
+		s_spare03,
+		s_spare04,
+		create_by,
+		create_date,
+		update_by,
+		update_date,
+		remarks,
+		del_flag
+		)
+		<if test="list.get(0).dbName == 'mssql' or list.get(0).dbName == 'mysql'">
+			VALUES
+			<foreach collection="list" item="e" open="" separator=","
+				close="">
+				(
+				#{e.id},
+				#{e.sActivityid.id},
+				#{e.sContent},
+				#{e.sPartmember.id},
+				#{e.sValue},
+				#{e.sOperator.id},
+				#{e.sBindmember.id},
+				#{e.sStatus},
+				#{e.sSpare01},
+				#{e.sSpare02},
+				#{e.sSpare03},
+				#{e.sSpare04},
+				#{e.createBy.id},
+				#{e.createDate},
+				#{e.updateBy.id},
+				#{e.updateDate},
+				#{e.remarks},
+				#{e.delFlag})
+			</foreach>
+		</if>
+	</insert>
+
+	<update id="delete">
+		UPDATE pbs_activityevaluate SET
+		del_flag =
+		#{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+
+</mapper>

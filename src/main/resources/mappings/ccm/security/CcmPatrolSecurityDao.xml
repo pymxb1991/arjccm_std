@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.arjjs.ccm.modules.ccm.security.dao.CcmPatrolSecurityDao">
+    
+	<sql id="ccmPatrolSecurityColumns">
+		a.id AS "id",
+		a.user_id AS "user.id",
+		a.security_time AS "securityTime",
+		a.office_id AS "office",
+		a.number_units AS "numberUnits",
+		a.guard_line AS "guardLine",
+		a.collection_time AS "collectionTime",
+		a.collection_place AS "collectionPlace",
+		a.status AS "status",
+		a.title AS "title",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.end_time AS "endTime",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag",
+		a.auditing_status AS "auditingStatus",
+		u2.name AS "user.name"
+	</sql>
+	
+	<sql id="ccmPatrolSecurityJoins">
+		LEFT JOIN sys_user u2 ON u2.id = a.user_id
+	</sql>
+    
+	<select id="get" resultType="CcmPatrolSecurity">
+		SELECT 
+			<include refid="ccmPatrolSecurityColumns"/>
+		FROM ccm_patrol_security a
+		<include refid="ccmPatrolSecurityJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="CcmPatrolSecurity">
+		SELECT 
+			<include refid="ccmPatrolSecurityColumns"/>
+		FROM ccm_patrol_security a
+		<include refid="ccmPatrolSecurityJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="user != null and user.id != null and user.id != ''">
+				AND a.user_id = #{user.id}
+			</if>
+			<if test="securityTime != null and securityTime != ''">
+				AND a.security_time &gt; #{securityTime}
+			</if>
+			<if test="endTime != null and endTime != ''">
+				AND a.end_time &lt; #{endTime}
+			</if>
+			<if test="office != null  and office != ''">
+				AND a.office_id like  concat('%',#{office},'%')
+			</if>
+			<if test="status != null and status != ''">
+				AND a.status = #{status}
+			</if>
+	  		<if test="auditingStatus != null and auditingStatus != ''">
+				AND a.auditing_status = #{auditingStatus}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="CcmPatrolSecurity">
+		SELECT 
+			<include refid="ccmPatrolSecurityColumns"/>
+		FROM ccm_patrol_security a
+		<include refid="ccmPatrolSecurityJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO ccm_patrol_security(
+			id,
+			user_id,
+			security_time,
+			office_id,
+			number_units,
+			guard_line,
+			collection_time,
+			collection_place,
+			status,
+			title,
+			create_by,
+			create_date,
+			update_by,
+			end_time,
+			update_date,
+			remarks,
+			auditing_status,
+			del_flag
+		) VALUES (
+			#{id},
+			#{user.id},
+			#{securityTime},
+			#{office},
+			#{numberUnits},
+			#{guardLine},
+			#{collectionTime},
+			#{collectionPlace},
+			#{status},
+			#{title},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{endTime},
+			#{updateDate},
+			#{remarks},
+			#{auditingStatus},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE ccm_patrol_security SET 	
+			user_id = #{user.id},
+			security_time = #{securityTime},
+			office_id = #{office},
+			number_units = #{numberUnits},
+			guard_line = #{guardLine},
+			collection_time = #{collectionTime},
+			collection_place = #{collectionPlace},
+			status = #{status},
+			title = #{title},
+			end_time = #{endTime},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			auditing_status = #{auditingStatus},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE ccm_patrol_security SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	<update id="updateStatus">
+		UPDATE ccm_patrol_security SET
+			status = #{param1}
+		WHERE id = #{param2}
+	</update>
+	
+</mapper>

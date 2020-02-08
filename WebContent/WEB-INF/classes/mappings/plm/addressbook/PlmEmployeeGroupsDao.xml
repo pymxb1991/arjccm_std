@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.arjjs.ccm.modules.plm.addressbook.dao.PlmEmployeeGroupsDao">
+    
+	<sql id="plmEmployeeGroupsColumns">
+		a.id AS "id",
+		a.parent_id AS "parent.id",
+		a.parent_ids AS "parentIds",
+		a.name AS "name",
+		a.sort AS "sort",
+		a.extend1 AS "extend1",
+		a.extend2 AS "extend2",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag"
+	</sql>
+	
+	<sql id="plmEmployeeGroupsJoins">
+	</sql>
+    
+	<select id="get" resultType="PlmEmployeeGroups">
+		SELECT 
+			<include refid="plmEmployeeGroupsColumns"/>
+		FROM plm_employee_groups a
+		<include refid="plmEmployeeGroupsJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="PlmEmployeeGroups">
+		SELECT 
+			<include refid="plmEmployeeGroupsColumns"/>
+		FROM plm_employee_groups a
+		<include refid="plmEmployeeGroupsJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="parent != null and parent.id != null and parent.id != ''">
+				AND a.parent_id = #{parent.id}
+			</if>
+			<if test="parentIds != null and parentIds != ''">
+				AND a.parent_ids LIKE 
+					<if test="dbName == 'oracle'">'%'||#{parentIds}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{parentIds}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{parentIds},'%')</if>
+			</if>
+			<if test="name != null and name != ''">
+				AND a.name LIKE 
+					<if test="dbName == 'oracle'">'%'||#{name}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{name}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{name},'%')</if>
+			</if>
+			<if test = "updateBy != null and updateBy != ''">
+			    AND a.update_by = #{updateBy.id}
+			</if>
+		</where>
+		ORDER BY a.sort ASC
+	</select>
+	
+	<select id="findAllList" resultType="PlmEmployeeGroups">
+		SELECT 
+			<include refid="plmEmployeeGroupsColumns"/>
+		FROM plm_employee_groups a
+		<include refid="plmEmployeeGroupsJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>
+		ORDER BY a.sort ASC
+	</select>
+	
+	<select id="findByParentIdsLike" resultType="PlmEmployeeGroups">
+		SELECT
+			a.id,
+			a.parent_id AS "parent.id",
+			a.parent_ids
+		FROM plm_employee_groups a
+		<include refid="plmEmployeeGroupsJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			AND a.parent_ids LIKE #{parentIds}
+		</where>
+		ORDER BY a.sort ASC
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO plm_employee_groups(
+			id,
+			parent_id,
+			parent_ids,
+			name,
+			sort,
+			extend1,
+			extend2,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag
+		) VALUES (
+			#{id},
+			#{parent.id},
+			#{parentIds},
+			#{name},
+			#{sort},
+			#{extend1},
+			#{extend2},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE plm_employee_groups SET 	
+			parent_id = #{parent.id},
+			parent_ids = #{parentIds},
+			name = #{name},
+			sort = #{sort},
+			extend1 = #{extend1},
+			extend2 = #{extend2},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="updateParentIds">
+		UPDATE plm_employee_groups SET 
+			parent_id = #{parent.id}, 
+			parent_ids = #{parentIds}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE plm_employee_groups SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id} OR parent_ids LIKE 
+			<if test="dbName == 'oracle'">'%,'||#{id}||',%'</if>
+			<if test="dbName == 'mssql'">'%,'+#{id}+',%'</if>
+			<if test="dbName == 'mysql'">CONCAT('%,', #{id}, ',%')</if>
+	</update>
+	
+</mapper>

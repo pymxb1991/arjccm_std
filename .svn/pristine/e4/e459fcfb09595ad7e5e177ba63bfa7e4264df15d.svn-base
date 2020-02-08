@@ -1,0 +1,202 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.arjjs.ccm.modules.pbs.wechat.dao.PbsWebchatsendmsgDao">
+
+	<sql id="pbsWebchatsendmsgColumns">
+		a.id AS "id",
+		a.s_account AS "sAccount",
+		a.s_token AS
+		"sToken",
+		a.s_msgtype AS "sMsgtype",
+		a.dt_sendtime AS "dtSendtime",
+		a.s_stat AS "sStat",
+		a.s_senddata AS "sSenddata",
+		a.s_resultcontent AS
+		"sResultcontent",
+		a.s_retcode AS "sRetcode",
+		a.s_retmsg AS "sRetmsg",
+		a.s_createmem AS "sCreatemem.id",
+		a.s_description AS "sDescription",
+		a.s_spare01 AS "sSpare01",
+		a.s_spare02 AS "sSpare02",
+		a.s_spare03 AS
+		"sSpare03",
+		a.i_sendnum AS "iSendnum",
+		a.i_limit AS "iLimit",
+		a.s_spare04 AS "sSpare04",
+		a.create_by AS "createBy.id",
+		a.create_date
+		AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS
+		"updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag",
+		partymem.s_name AS "sCreatemem.sName"
+	</sql>
+
+	<sql id="pbsWebchatsendmsgJoins">
+		LEFT JOIN pbs_partymem partymem ON partymem.id =
+		a.s_createmem
+	</sql>
+
+	<select id="get" resultType="PbsWebchatsendmsg">
+		SELECT
+		<include refid="pbsWebchatsendmsgColumns" />
+		FROM pbs_webchatsendmsg a
+		<include refid="pbsWebchatsendmsgJoins" />
+		WHERE a.id = #{id}
+	</select>
+
+	<select id="findList" resultType="PbsWebchatsendmsg">
+		SELECT
+		<include refid="pbsWebchatsendmsgColumns" />
+		FROM pbs_webchatsendmsg a
+		<include refid="pbsWebchatsendmsgJoins" />
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="sMsgtype != null and sMsgtype != ''">
+				AND a.s_msgtype = #{sMsgtype}
+			</if>
+			<if test="sSenddata != null and sSenddata != ''">
+				AND a.s_senddata like "%${sSenddata}%"
+			</if>
+			<if test="sRetcode != null and sRetcode != ''">
+				AND a.s_retcode = #{sRetcode}
+			</if>
+			<if
+				test="sCreatemem != null and sCreatemem != '' and sCreatemem.id != null and sCreatemem.id != ''">
+				AND a.s_createmem = #{sCreatemem.id}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+
+	<select id="findAllList" resultType="PbsWebchatsendmsg">
+		SELECT
+		<include refid="pbsWebchatsendmsgColumns" />
+		FROM pbs_webchatsendmsg a
+		<include refid="pbsWebchatsendmsgJoins" />
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+
+	<insert id="insert">
+		INSERT INTO pbs_webchatsendmsg(
+		id,
+		s_account,
+		s_token,
+		s_msgtype,
+		s_senddata,
+		s_resultcontent,
+		s_retcode,
+		s_retmsg,
+		s_createmem,
+		s_description,
+		i_sendnum,
+		i_limit,
+		s_spare01,
+		s_spare02,
+		s_spare03,
+		s_spare04,
+		create_by,
+		create_date,
+		update_by,
+		update_date,
+		remarks,
+		dt_sendtime,
+		s_stat,
+		del_flag
+		) VALUES (
+		#{id},
+		#{sAccount},
+		#{sToken},
+		#{sMsgtype},
+		#{sSenddata},
+		#{sResultcontent},
+		#{sRetcode},
+		#{sRetmsg},
+		#{sCreatemem.id},
+		#{sDescription},
+		#{iSendnum} ,
+		#{iLimit} ,
+		#{sSpare01},
+		#{sSpare02},
+		#{sSpare03},
+		#{sSpare04},
+		#{createBy.id},
+		#{createDate},
+		#{updateBy.id},
+		#{updateDate},
+		#{remarks},
+		#{dtSendtime},
+		#{sStat},
+		#{delFlag}
+		)
+	</insert>
+
+	<update id="update">
+		UPDATE pbs_webchatsendmsg SET
+		s_account = #{sAccount},
+		s_token = #{sToken},
+		s_msgtype = #{sMsgtype},
+		s_senddata = #{sSenddata},
+		s_resultcontent = #{sResultcontent},
+		s_retcode = #{sRetcode},
+		s_retmsg =
+		#{sRetmsg},
+		s_createmem = #{sCreatemem.id},
+		i_sendnum =#{iSendnum},
+		i_limit =#{iLimit},
+		s_description =
+		#{sDescription},
+		update_by =
+		#{updateBy.id},
+		update_date = #{updateDate},
+		remarks =
+		#{remarks},
+		dt_sendtime = #{dtSendtime},
+		s_stat = #{sStat}
+		WHERE id =
+		#{id}
+	</update>
+
+	<update id="delete">
+		UPDATE pbs_webchatsendmsg SET
+		del_flag =
+		#{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+
+
+	<select id="findSum" resultType="java.lang.Integer">
+		SELECT
+		count(1)
+		FROM
+		pbs_webchatsendmsg a
+		WHERE
+		DATE_FORMAT(a.dt_sendtime, '%Y%m') =
+		DATE_FORMAT(
+		CURDATE(),
+		'%Y%m')
+
+
+
+	</select>
+</mapper>

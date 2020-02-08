@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.arjjs.ccm.modules.cms.dao.CmsBbsCommentMultiDao">
+    
+	<sql id="cmsBbsCommentMultiColumns">
+		a.id AS "id",
+		a.comment_id AS "commentId",
+		a.comment_multi_content AS "commentMultiContent",
+		a.comment_multi_user_id AS "commentMultiUserId",
+		a.comment_multi_time AS "commentMultiTime",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag"
+	</sql>
+	
+	<sql id="cmsBbsCommentMultiJoins">
+	</sql>
+    
+	<select id="get" resultType="CmsBbsCommentMulti">
+		SELECT 
+			<include refid="cmsBbsCommentMultiColumns"/>
+		FROM cms_bbs_comment_multi a
+		<include refid="cmsBbsCommentMultiJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="CmsBbsCommentMulti">
+		SELECT 
+			<include refid="cmsBbsCommentMultiColumns"/>
+		FROM cms_bbs_comment_multi a
+		<include refid="cmsBbsCommentMultiJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="commentMultiContent != null and commentMultiContent != ''">
+				AND a.comment_multi_content = #{commentMultiContent}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="CmsBbsCommentMulti">
+		SELECT 
+			<include refid="cmsBbsCommentMultiColumns"/>
+		FROM cms_bbs_comment_multi a
+		<include refid="cmsBbsCommentMultiJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO cms_bbs_comment_multi(
+			id,
+			comment_id,
+			comment_multi_content,
+			comment_multi_user_id,
+			comment_multi_time,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag
+		) VALUES (
+			#{id},
+			#{commentId},
+			#{commentMultiContent},
+			#{commentMultiUserId},
+			#{commentMultiTime},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE cms_bbs_comment_multi SET 	
+			comment_id = #{commentId}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE cms_bbs_comment_multi SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

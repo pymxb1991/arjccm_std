@@ -1,0 +1,436 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper
+	namespace="com.arjjs.ccm.modules.iot.warning.dao.CcmEarlyWarningDao">
+
+	<sql id="ccmEarlyWarningColumns">
+		a.id AS "id",
+		a.name AS "name",
+		a.sex AS "sex",
+		a.age AS
+		"age",
+		a.id_card AS "idCard",
+		a.place AS "place",
+		a.people_type AS
+		"peopleType",
+		a.special_type AS "specialType",
+		a.alarm_facility AS
+		"alarmFacility",
+		a.address AS "address",
+		a.alarm_date AS "alarmDate",
+		a.is_check AS "isCheck",
+		a.type AS "type",
+		a.img AS "img",
+		a.people_emphasis AS "peopleEmphasis",
+		a.mac_address AS "macAddress",
+		a.rfid AS "rfid",
+		a.imei AS "imei",
+		a.phone AS "phone",
+		a.is_people AS
+		"isPeople",
+		a.car_id AS "carid",
+		a.alarm_Type AS "alarmType",
+		a.x AS "x",
+		a.y AS "y",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks
+		AS "remarks",
+		a.del_flag AS "delFlag"
+	</sql>
+
+	<sql id="ccmEarlyWarningJoins">
+	</sql>
+
+	<select id="get" resultType="CcmEarlyWarning">
+		SELECT
+		<include refid="ccmEarlyWarningColumns" />
+		FROM ccm_early_warning a
+		<include refid="ccmEarlyWarningJoins" />
+		WHERE a.id = #{id}
+	</select>
+
+	<select id="findList" resultType="CcmEarlyWarning">
+		SELECT
+		<include refid="ccmEarlyWarningColumns" />
+		FROM ccm_early_warning a
+		<include refid="ccmEarlyWarningJoins" />
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="name != null and name != ''">
+				AND a.name LIKE
+				<if test="dbName == 'oracle'">'%'||#{name}||'%'</if>
+				<if test="dbName == 'mssql'">'%'+#{name}+'%'</if>
+				<if test="dbName == 'mysql'">concat('%',#{name},'%')</if>
+			</if>
+			<if test="sex != null and sex != ''">
+				AND a.sex = #{sex}
+			</if>
+			<if test="age != null and age != ''">
+				AND a.age = #{age}
+			</if>
+			<if test="idCard != null and idCard != ''">
+				AND a.id_card LIKE
+				<if test="dbName == 'oracle'">'%'||#{idCard}||'%'</if>
+				<if test="dbName == 'mssql'">'%'+#{idCard}+'%'</if>
+				<if test="dbName == 'mysql'">concat('%',#{idCard},'%')</if>
+			</if>
+			<if test="type != null and type != ''">
+				AND a.type = #{type}
+			</if>
+			<if test="peopleType != null and peopleType != ''">
+				AND a.people_type = #{peopleType}
+			</if>
+			<if test="specialType != null and specialType != ''">
+				AND a.special_type = #{specialType}
+			</if>
+			<if test="alarmFacility != null and alarmFacility != ''">
+				AND a.alarm_facility LIKE
+				<if test="dbName == 'oracle'">'%'||#{alarmFacility}||'%'</if>
+				<if test="dbName == 'mssql'">'%'+#{alarmFacility}+'%'</if>
+				<if test="dbName == 'mysql'">concat('%',#{alarmFacility},'%')</if>
+			</if>
+			<if test="address != null and address != ''">
+				AND a.address = #{address}
+			</if>
+			<if test="alarmDate != null and alarmDate != ''">
+				AND a.alarm_date = #{alarmDate}
+			</if>
+			<if test="isCheck != null and isCheck != ''">
+				AND a.is_check = #{isCheck}
+			</if>
+			<if test="peopleEmphasis != null and peopleEmphasis != ''">
+				AND a.people_emphasis = #{peopleEmphasis}
+			</if>
+			<if test="macAddress != null and macAddress != ''">
+				AND a.mac_address = #{macAddress}
+			</if>
+			<if test="rfid != null and rfid != ''">
+				AND a.rfid = #{rfid}
+			</if>
+			<if test="imei != null and imei != ''">
+				AND a.imei = #{imei}
+			</if>
+			<if test="phone != null and phone != ''">
+				AND a.phone = #{phone}
+			</if>
+			<if test="carid != null and carid != ''">
+				AND a.car_id LIKE
+				<if test="dbName == 'oracle'">'%'||#{carid}||'%'</if>
+				<if test="dbName == 'mssql'">'%'+#{carid}+'%'</if>
+				<if test="dbName == 'mysql'">concat('%',#{carid},'%')</if>
+			</if>
+			<if test="isPeople != null and isPeople != ''">
+				AND a.is_people = #{isPeople}
+			</if>
+			<if test="place != null and place != ''">
+				AND a.place = #{place}
+			</if>
+			<if test="createDate != null and createDate != ''">
+				AND a.create_date = #{createDate}
+			</if>
+			<if
+				test="beginDate != null and endDate != null and beginDate != '' and endDate != ''">
+				AND a.alarm_date BETWEEN #{beginDate} AND #{endDate}
+			</if>
+		</where>
+		<choose>
+			<when
+				test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+
+	<select id="findAllList" resultType="CcmEarlyWarning">
+		SELECT
+		<include refid="ccmEarlyWarningColumns" />
+		FROM ccm_early_warning a
+		<include refid="ccmEarlyWarningJoins" />
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>
+		<choose>
+			<when
+				test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+
+	<insert id="insert">
+		INSERT INTO ccm_early_warning(
+		id,
+		name,
+		sex,
+		age,
+		id_card,
+		place,
+		people_type,
+		special_type,
+		alarm_facility,
+		address,
+		alarm_date,
+		is_check,
+		type,
+		img,
+		people_emphasis,
+		mac_address,
+		rfid,
+		imei,
+		phone,
+		is_people,
+		car_id,
+		alarm_Type,
+		create_by,
+		create_date,
+		update_by,
+		update_date,
+		remarks,
+		del_flag,
+		x,
+		y
+		) VALUES (
+		#{id},
+		#{name},
+		#{sex},
+		#{age},
+		#{idCard},
+		#{place},
+		#{peopleType},
+		#{specialType},
+		#{alarmFacility},
+		#{address},
+		#{alarmDate},
+		#{isCheck},
+		#{type},
+		#{img},
+		#{peopleEmphasis},
+		#{macAddress},
+		#{rfid},
+		#{imei},
+		#{phone},
+		#{isPeople},
+		#{carid},
+		#{alarmType},
+		#{createBy.id},
+		#{createDate},
+		#{updateBy.id},
+		#{updateDate},
+		#{remarks},
+		#{delFlag},
+		#{x},
+		#{y}
+		)
+	</insert>
+
+	<update id="update">
+		UPDATE ccm_early_warning SET
+		name = #{name},
+		sex =
+		#{sex},
+		age = #{age},
+		id_card = #{idCard},
+		people_type = #{peopleType},
+		special_type = #{specialType},
+		alarm_facility = #{alarmFacility},
+		address = #{address},
+		alarm_date = #{alarmDate},
+		is_check = #{isCheck},
+		img = #{img},
+		people_emphasis = #{peopleEmphasis},
+		mac_address =
+		#{macAddress},
+		rfid = #{rfid},
+		imei = #{imei},
+		phone = #{phone},
+		update_by = #{updateBy.id},
+		update_date = #{updateDate},
+		remarks =
+		#{remarks}
+		WHERE id = #{id}
+	</update>
+
+	<update id="delete">
+		UPDATE ccm_early_warning SET
+		del_flag =
+		#{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+
+	<select id="getSortCountToday" resultType="java.util.HashMap">
+		SELECT
+		alarm_type,COUNT(1) AS count
+		FROM ccm_early_warning
+		<where>
+			del_flag = #{DEL_FLAG_NORMAL}
+			AND
+			TO_DAYS(alarm_date)=TO_DAYS(NOW())
+		</where>
+		GROUP BY alarm_type
+	</select>
+
+	<select id="getDataByToday" resultType="CcmEarlyWarning">
+		select <include refid="ccmEarlyWarningColumns" /> from ccm_early_warning a where del_flag = 0 AND date(alarm_date) =
+		curdate() ORDER BY alarm_date ASC;
+	</select>
+
+	<select id="getSortCountWeek" resultType="java.util.HashMap">
+		SELECT
+		alarm_type,COUNT(1) AS count
+		FROM ccm_early_warning
+		<where>
+			del_flag = #{DEL_FLAG_NORMAL}
+			AND DATE_SUB(CURDATE(), INTERVAL 7
+			DAY) &lt;= alarm_date
+		</where>
+		GROUP BY alarm_type
+	</select>
+
+	<select id="findPagegroupby" resultType="CcmEarlyWarning">
+		SELECT
+		<include refid="ccmEarlyWarningColumns" />
+		FROM ccm_early_warning a
+		<include refid="ccmEarlyWarningJoins" />
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="name != null and name != ''">
+				AND a.name LIKE
+				<if test="dbName == 'oracle'">'%'||#{name}||'%'</if>
+				<if test="dbName == 'mssql'">'%'+#{name}+'%'</if>
+				<if test="dbName == 'mysql'">concat('%',#{name},'%')</if>
+			</if>
+			<if test="sex != null and sex != ''">
+				AND a.sex = #{sex}
+			</if>
+			<if test="age != null and age != ''">
+				AND a.age = #{age}
+			</if>
+			<if test="idCard != null and idCard != ''">
+				AND a.id_card LIKE
+				<if test="dbName == 'oracle'">'%'||#{idCard}||'%'</if>
+				<if test="dbName == 'mssql'">'%'+#{idCard}+'%'</if>
+				<if test="dbName == 'mysql'">concat('%',#{idCard},'%')</if>
+			</if>
+			<if test="type != null and type != ''">
+				AND a.type = #{type}
+			</if>
+			<if test="peopleType != null and peopleType != ''">
+				AND a.people_type = #{peopleType}
+			</if>
+			<if test="specialType != null and specialType != ''">
+				AND a.special_type = #{specialType}
+			</if>
+			<if test="alarmFacility != null and alarmFacility != ''">
+				AND a.alarm_facility LIKE
+				<if test="dbName == 'oracle'">'%'||#{alarmFacility}||'%'</if>
+				<if test="dbName == 'mssql'">'%'+#{alarmFacility}+'%'</if>
+				<if test="dbName == 'mysql'">concat('%',#{alarmFacility},'%')</if>
+			</if>
+			<if test="address != null and address != ''">
+				AND a.address = #{address}
+			</if>
+			<if test="alarmDate != null and alarmDate != ''">
+				AND a.alarm_date = #{alarmDate}
+			</if>
+			<if test="isCheck != null and isCheck != ''">
+				AND a.is_check = #{isCheck}
+			</if>
+			<if test="peopleEmphasis != null and peopleEmphasis != ''">
+				AND a.people_emphasis = #{peopleEmphasis}
+			</if>
+			<if test="macAddress != null and macAddress != ''">
+				AND a.mac_address = #{macAddress}
+			</if>
+			<if test="rfid != null and rfid != ''">
+				AND a.rfid = #{rfid}
+			</if>
+			<if test="imei != null and imei != ''">
+				AND a.imei = #{imei}
+			</if>
+			<if test="phone != null and phone != ''">
+				AND a.phone = #{phone}
+			</if>
+			<if test="carid != null and carid != ''">
+				AND a.car_id LIKE
+				<if test="dbName == 'oracle'">'%'||#{carid}||'%'</if>
+				<if test="dbName == 'mssql'">'%'+#{carid}+'%'</if>
+				<if test="dbName == 'mysql'">concat('%',#{carid},'%')</if>
+			</if>
+			<if test="isPeople != null and isPeople != ''">
+				AND a.is_people = #{isPeople}
+			</if>
+			<if test="place != null and place != ''">
+				AND a.place = #{place}
+			</if>
+			<if test="createDate != null and createDate != ''">
+				AND a.create_date = #{createDate}
+			</if>
+			<if
+				test="beginDate != null and endDate != null and beginDate != '' and endDate != ''">
+				AND a.alarm_date BETWEEN #{beginDate} AND #{endDate}
+			</if>
+		</where>
+		group by a.id_card
+		<choose>
+			<when
+				test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+
+	<select id="findListbyidcard" resultType="CcmEarlyWarning">
+		SELECT
+		<include refid="ccmEarlyWarningColumns" />
+		FROM ccm_early_warning a
+		<include refid="ccmEarlyWarningJoins" />
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="idCard != null and idCard != ''">
+				AND a.id_card = #{idCard}
+			</if>
+			<if test="address != null and address != ''">
+				AND a.address = #{address}
+			</if>
+			<if test="alarmDate != null and alarmDate != ''">
+				AND a.alarm_date = #{alarmDate}
+			</if>
+			<if test="macAddress != null and macAddress != ''">
+				AND a.mac_address = #{macAddress}
+			</if>
+			<if test="rfid != null and rfid != ''">
+				AND a.rfid = #{rfid}
+			</if>
+			<if test="imei != null and imei != ''">
+				AND a.imei = #{imei}
+			</if>
+			<if test="phone != null and phone != ''">
+				AND a.phone = #{phone}
+			</if>
+			<if test="isPeople != null and isPeople != ''">
+				AND a.is_people = #{isPeople}
+			</if>
+			<if test="place != null and place != ''">
+				AND a.place = #{place}
+			</if>
+			<if
+				test="beginDate != null and endDate != null and beginDate != '' and endDate != ''">
+				AND a.alarm_date BETWEEN #{beginDate} AND #{endDate}
+			</if>
+		</where>
+		ORDER BY a.update_date DESC
+	</select>
+
+</mapper>

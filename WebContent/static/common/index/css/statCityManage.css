@@ -1,0 +1,351 @@
+.header-logo{
+	width: 1560px;
+}
+.header h5 {
+    background: url(../images/headerLogo.png) no-repeat center;
+    background-size: 100% 100%;
+    line-height: 21px;
+    letter-spacing: 10px;
+    line-height: 40px;
+    letter-spacing: 1px;
+    font-size: 26px;
+}
+.header span {
+    background: url(../images/header-right.png) no-repeat center;
+    background-size: 100% 100%;
+}
+.header h5 b{
+	font-size: 20px;
+    font-weight: 545;
+}
+
+.common-header {
+    position: absolute;
+    top: -5px;
+    left: 32px;
+     padding: 5px 16px;
+}
+.shoulishijian {
+	font-size: 18px;
+	margin-left: 7px;
+}
+
+.shoulishijiannum {
+	color: #A53A52;
+	font-size: 32px;
+	margin-left: 7px;
+}
+
+.jianfont {
+	marfin-top: 5px;
+	font-size: 16px;
+	color: #A53A52;
+}
+
+.shijian-common {
+	margin-left: 7px;
+}
+
+.shijian-common-num {
+	margin-left: 7px;
+	color: #5AAFB2;
+	font-size: 28px;
+}
+
+.shijian-common-jian {
+	color: #fff;
+	font-size: 14px;
+}
+
+.shijian1 {
+	border: 1px solid #10559a;
+	width: 140px;
+	height: 75px;
+	line-height: 40px;
+	margin-left: 10px;
+	margin-top: 10px
+}
+
+.shijian2 {
+	border: 1px solid #10559a;
+	width: 120px;
+	height: 50px;
+	line-height: 24px;
+	position: absolute;
+	left: 171px;
+	top: 33px;
+}
+
+.shijian3 {
+	border: 1px solid #10559a;
+	width: 120px;
+	height: 50px;
+	line-height: 24px;
+	position: absolute;
+	left: 308px;
+	top: 33px;
+}
+
+.shijian4 {
+	border: 1px solid #10559a;
+	width: 120px;
+	height: 50px;
+	line-height: 24px;
+	position: absolute;
+	left: 30px;
+	top: 100px;
+}
+
+.shijian5 {
+	border: 1px solid #10559a;
+	width: 120px;
+	height: 50px;
+	line-height: 24px;
+	position: absolute;
+	left: 171px;
+	top: 100px;
+}
+
+.shijian6 {
+	border: 1px solid #10559a;
+	width: 120px;
+	height: 50px;
+	line-height: 24px;
+	position: absolute;
+	left: 308px;
+	top: 100px;
+}
+@media (min-width: 1601px) and (max-width:1680px)  {
+
+	.shijian1 {
+	width: 129px;
+}
+	.shijian2 {
+    width: 100px;
+    left: 160px;
+}
+	.shijian3 {
+    width: 100px;
+    left: 279px;
+}
+	.shijian4 {
+    width: 100px;
+    left: 38px;
+}
+	.shijian5 {
+    width: 100px;
+    left: 160px;
+}
+	.shijian6 {
+    width: 100px;
+    left: 279px;
+}	
+	.shijian-common-num {
+    font-size: 25px;
+}
+	.header-logo {
+    width: 1349px;
+}
+}
+@media (min-width: 1441px) and (max-width:1600px)   {
+	.shijian1 {
+	width: 114px;
+	margin-left: 7px;
+	height: 60px;
+    line-height: 30px;
+    margin-top: 5px;
+}
+	.shijian2 {
+    width: 100px;
+    left: 140px;
+    height: 43px;
+    line-height: 20px;
+    top: 22px;
+}
+	.shijian3 {
+    width: 100px;
+    left: 257px;
+    height: 43px;
+    line-height: 20px;
+    top: 22px;
+}
+	.shijian4 {
+    width: 100px;
+    left: 21px;
+    height: 43px;
+    line-height: 20px;
+    top: 76px;
+}
+	.shijian5 {
+    width: 100px;
+    left: 140px;
+    height: 43px;
+    line-height: 20px;
+    top: 76px;
+}
+	.shijian6 {
+    width: 100px;
+    left: 257px;
+    height: 43px;
+    line-height: 20px;
+    top: 76px;
+}
+	.shoulishijian {
+    font-size: 15px;
+}
+	.shoulishijiannum {
+    font-size: 28px;
+}	
+	.shijian-common-num {
+    font-size: 20px;
+}
+	.header h5.header-logo {
+   background: url(../images/headerLogo.png) no-repeat center;
+    background-size: 100% 100%;
+    line-height: 21px;
+    letter-spacing: 10px;
+    line-height: 34px;
+    letter-spacing: 1px;
+    font-size: 18px;
+    width: 100%;
+    height: 52px;
+}
+/*.header h5 b {
+    font-size: 16px;
+}*/
+	}
+@media (min-width: 1367px) and (max-width:1440px)  {
+.header h5.header-logo {
+    background: url(../images/headerLogo.png) no-repeat center;
+    background-size: 100% 100%;
+    line-height: 21px;
+    letter-spacing: 10px;
+    line-height: 34px;
+    letter-spacing: 0px;
+    font-size: 18px;
+    width: 100%;
+}
+/*.header h5 b {
+    font-size: 16px;
+}*/
+.shijian1 {
+	width: 108px;
+	margin-left: 7px;
+	height: 60px;
+    line-height: 30px;
+    margin-top: 5px;
+}
+	.shijian2 {
+    width: 90px;
+    left: 127px;
+    height: 43px;
+    line-height: 20px;
+    top: 22px;
+}
+	.shijian3 {
+    width: 90px;
+    left: 230px;
+    height: 43px;
+    line-height: 20px;
+    top: 22px;
+}
+	.shijian4 {
+    width: 90px;
+    left: 21px;
+    height: 43px;
+    line-height: 20px;
+    top: 76px;
+}
+	.shijian5 {
+    width: 90px;
+    left: 127px;
+    height: 43px;
+    line-height: 20px;
+    top: 76px;
+}
+	.shijian6 {
+    width: 90px;
+    left: 230px;
+    height: 43px;
+    line-height: 20px;
+    top: 76px;
+}
+	.shoulishijian {
+    font-size: 15px;
+}
+	.shoulishijiannum {
+    font-size: 25px;
+}	
+	.shijian-common-num {
+    font-size: 20px;
+}
+}
+@media  (max-width:1366px)  {
+.header h5.header-logo {
+       background: url(../images/headerLogo.png) no-repeat center;
+    background-size: 100% 100%;
+    line-height: 21px;
+    letter-spacing: 10px;
+    line-height: 28px;
+    letter-spacing: 0px;
+    font-size: 16px;
+    width: 100%;
+}
+/*.header h5 b {
+    font-size: 16px;
+}*/
+.shijian1 {
+	width: 100px;
+	margin-left: 7px;
+	height: 47px;
+    line-height: 22px;
+    margin-top: 0px;
+}
+	.shijian2 {
+    width: 85px;
+    left: 120px;
+    height: 39px;
+    line-height: 18px;
+    top: 8px;
+}
+	.shijian3 {
+    width: 85px;
+    left: 217px;
+    height: 39px;
+    line-height: 18px;
+    top: 8px;
+}
+	.shijian4 {
+    width: 85px;
+    left: 21px;
+    height: 39px;
+    line-height: 18px;
+    top: 52px;
+}
+	.shijian5 {
+    width: 85px;
+    left: 120px;
+    height: 39px;
+    line-height: 18px;
+    top: 52px;
+}
+	.shijian6 {
+    width: 85px;
+    left: 217px;
+    height: 39px;
+    line-height: 18px;
+    top: 52px;
+}
+	.shoulishijian {
+    font-size: 14px;
+}
+	.shoulishijiannum {
+    font-size: 23px;
+}	
+	.shijian-common-num {
+    font-size: 16px;
+}
+	.shijian-common-jian {
+    font-size: 7px;
+}
+}

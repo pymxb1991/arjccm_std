@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.arjjs.ccm.modules.ccm.know.dao.CcmKnowPunishDao">
+    
+	<sql id="ccmKnowPunishColumns">
+		a.id AS "id",
+		a.name AS "name",
+		a.inspect_data AS "inspectData",
+		a.type AS "type",
+		a.num AS "num",
+		a.file AS "file",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag"
+	</sql>
+	
+	<sql id="ccmKnowPunishJoins">
+	</sql>
+    
+	<select id="get" resultType="CcmKnowPunish">
+		SELECT 
+			<include refid="ccmKnowPunishColumns"/>
+		FROM ccm_know_punish a
+		<include refid="ccmKnowPunishJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	<!-- 行政处罚 -->
+	<select id="getType" resultType="int">
+		SELECT
+			COUNT(a.id)
+		FROM
+			ccm_know_punish a
+		where
+			a.del_flag='0'
+			<if test="type != null and type != ''">
+				AND a.type = #{type}
+			</if>
+		GROUP BY 
+			CONCAT(DATE_FORMAT(a.inspect_data,'%y'),FLOOR((DATE_FORMAT(a.inspect_data,'%m')+2)/3))
+	</select>
+	
+	
+	
+	
+	<!--  -->
+	<select id="findList" resultType="CcmKnowPunish">
+		SELECT 
+			<include refid="ccmKnowPunishColumns"/>
+		FROM ccm_know_punish a
+		<include refid="ccmKnowPunishJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="name != null and name != ''">
+				AND a.name LIKE 
+					<if test="dbName == 'oracle'">'%'||#{name}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{name}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{name},'%')</if>
+			</if>
+			<if test="beginInspectData != null and endInspectData != null and beginInspectData != '' and endInspectData != ''">
+				AND a.inspect_data BETWEEN #{beginInspectData} AND #{endInspectData}
+			</if>
+			<if test="type != null and type != ''">
+				AND a.type = #{type}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="CcmKnowPunish">
+		SELECT 
+			<include refid="ccmKnowPunishColumns"/>
+		FROM ccm_know_punish a
+		<include refid="ccmKnowPunishJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO ccm_know_punish(
+			id,
+			name,
+			inspect_data,
+			type,
+			num,
+			file,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag
+		) VALUES (
+			#{id},
+			#{name},
+			#{inspectData},
+			#{type},
+			#{num},
+			#{file},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE ccm_know_punish SET 	
+			name = #{name},
+			inspect_data = #{inspectData},
+			type = #{type},
+			num = #{num},
+			file = #{file},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE ccm_know_punish SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

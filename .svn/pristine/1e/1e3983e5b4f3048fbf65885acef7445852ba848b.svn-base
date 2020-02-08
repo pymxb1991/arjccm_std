@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.arjjs.ccm.modules.pbs.flow.dao.PbsFlowtypeDao">
+    
+	<sql id="pbsFlowtypeColumns">
+		a.id AS "id",
+		a.s_name AS "sName",
+		a.s_description AS "sDescription",
+		a.s_spare01 AS "sSpare01",
+		a.s_spare02 AS "sSpare02",
+		a.s_spare03 AS "sSpare03",
+		a.s_spare04 AS "sSpare04",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag"
+	</sql>
+	
+	<sql id="pbsFlowtypeJoins">
+	</sql>
+    
+	<select id="get" resultType="PbsFlowtype">
+		SELECT 
+			<include refid="pbsFlowtypeColumns"/>
+		FROM pbs_flowtype a
+		<include refid="pbsFlowtypeJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="PbsFlowtype">
+		SELECT 
+			<include refid="pbsFlowtypeColumns"/>
+		FROM pbs_flowtype a
+		<include refid="pbsFlowtypeJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="sName != null and sName != ''">
+				AND a.s_name LIKE 
+					<if test="dbName == 'oracle'">'%'||#{sName}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{sName}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{sName},'%')</if>
+			</if>
+		</where>
+		GROUP BY  a.id
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="PbsFlowtype">
+		SELECT 
+			<include refid="pbsFlowtypeColumns"/>
+		FROM pbs_flowtype a
+		<include refid="pbsFlowtypeJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO pbs_flowtype(
+			id,
+			s_name,
+			s_description,
+			s_spare01,
+			s_spare02,
+			s_spare03,
+			s_spare04,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag
+		) VALUES (
+			#{id},
+			#{sName},
+			#{sDescription},
+			#{sSpare01},
+			#{sSpare02},
+			#{sSpare03},
+			#{sSpare04},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE pbs_flowtype SET 	
+			s_name = #{sName},
+			s_description = #{sDescription},
+			create_by = #{createBy.id},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE pbs_flowtype SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

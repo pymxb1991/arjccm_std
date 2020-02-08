@@ -1,0 +1,180 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.arjjs.ccm.modules.plm.storage.dao.PlmStorageDao">
+    
+	<sql id="plmStorageColumns">
+		a.id AS "id",
+		a.parent_id AS "parent.id",
+		a.parent_ids AS "parentIds",
+		a.emp_id AS "user.id",
+		a.code AS "code",
+		a.name AS "name",
+		a.simple_name AS "simpleName",
+		a.type AS "type",
+		a.sort AS "sort",
+		a.sto_address AS "stoAddress",
+		a.long_itude AS "longItude",
+		a.lat_itude AS "latItude",
+		a.extend1 AS "extend1",
+		a.extend2 AS "extend2",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag",
+		u4.name AS "user.name"
+	</sql>
+	
+	<sql id="plmStorageJoins">
+		LEFT JOIN sys_user u4 ON u4.id = a.emp_id
+	</sql>
+    
+	<select id="get" resultType="PlmStorage">
+		SELECT 
+			<include refid="plmStorageColumns"/>
+		FROM plm_storage a
+		<include refid="plmStorageJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="PlmStorage">
+		SELECT 
+			<include refid="plmStorageColumns"/>
+		FROM plm_storage a
+		<include refid="plmStorageJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="parent != null and parent.id != null and parent.id != ''">
+				AND a.parent_id = #{parent.id}
+			</if>
+			<if test="parentIds != null and parentIds != ''">
+				AND a.parent_ids = #{parentIds}
+			</if>
+		</where>
+		ORDER BY a.sort ASC
+	</select>
+	
+	<select id="findAllList" resultType="PlmStorage">
+		SELECT 
+			<include refid="plmStorageColumns"/>
+		FROM plm_storage a
+		<include refid="plmStorageJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>
+		ORDER BY a.sort ASC
+	</select>
+	
+	<select id="findByParentIdsLike" resultType="PlmStorage">
+		SELECT
+			a.id,
+			a.parent_id AS "parent.id",
+			a.parent_ids
+		FROM plm_storage a
+		<include refid="plmStorageJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			AND a.parent_ids LIKE
+				<if test="dbName == 'oracle'">'%'||#{parentIds}||'%'</if>
+				<if test="dbName == 'mssql'">'%'+#{parentIds}+'%'</if>
+				<if test="dbName == 'mysql'">concat('%',#{parentIds},'%')</if>
+		</where>
+		ORDER BY a.sort ASC
+	</select>
+	<select id="countStorageList"  resultType="PlmStorage">
+	SELECT 
+	     a.name AS name
+		 FROM plm_storage a
+        <where>
+              a.del_flag = "0"
+           and a.id not IN(SELECT z.parent_id
+		      FROM plm_storage z
+              WHERE z.del_flag = "0")
+	</where>		
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO plm_storage(
+			id,
+			parent_id,
+			parent_ids,
+			emp_id,
+			code,
+			name,
+			simple_name,
+			type,
+			sort,
+			sto_address,
+			long_itude,
+			lat_itude,
+			extend1,
+			extend2,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag
+		) VALUES (
+			#{id},
+			#{parent.id},
+			#{parentIds},
+			#{user.id},
+			#{code},
+			#{name},
+			#{simpleName},
+			#{type},
+			#{sort},
+			#{stoAddress},
+			#{longItude},
+			#{latItude},
+			#{extend1},
+			#{extend2},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE plm_storage SET 	
+			parent_id = #{parent.id},
+			parent_ids = #{parentIds},
+			emp_id = #{user.id},
+			code = #{code},
+			name = #{name},
+			simple_name = #{simpleName},
+			type = #{type},
+			sort = #{sort},
+			sto_address = #{stoAddress},
+			long_itude = #{longItude},
+			lat_itude = #{latItude},
+			extend1 = #{extend1},
+			extend2 = #{extend2},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="updateParentIds">
+		UPDATE plm_storage SET 
+			parent_id = #{parent.id}, 
+			parent_ids = #{parentIds}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE plm_storage SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id} OR parent_ids LIKE
+			<if test="dbName == 'oracle'">'%,'||#{id}||',%'</if>
+			<if test="dbName == 'mssql'">'%,'+#{id}+',%'</if>
+			<if test="dbName == 'mysql'">CONCAT('%,', #{id}, ',%')</if>
+	</update>
+	
+</mapper>

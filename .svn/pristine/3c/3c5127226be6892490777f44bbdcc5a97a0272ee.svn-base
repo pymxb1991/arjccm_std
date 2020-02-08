@@ -1,0 +1,443 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.arjjs.ccm.modules.ccm.event.dao.CcmEventAmbiDao">
+    
+	<sql id="ccmEventAmbiColumns">
+		a.id AS "id",
+		a.name AS "name",
+		a.send_date AS "sendDate",
+		a.area_id AS "area.id",
+		a.send_add AS "sendAdd",
+		a.event_scale AS "eventScale",
+		a.event_type AS "eventType",
+		a.invo_num AS "invoNum",
+		a.event_sket AS "eventSket",
+		a.involve_com AS "involveCom",
+		a.part_code AS "partCode",
+		a.part_num AS "partNum",
+		a.part_name AS "partName",
+		a.part_sex AS "partSex",
+		a.part_nat AS "partNat",
+		a.part_edu_bg AS "partEduBg",
+		a.part_type AS "partType",
+		a.part_add AS "partAdd",
+		a.solve AS "solve",
+		a.solve_type AS "solveType",
+		a.solve_comp AS "solveComp",
+		a.solve_name AS "solveName",
+		a.solve_tl AS "solveTl",
+		a.solve_succ AS "solveSucc",
+		a.solve_case AS "solveCase",
+		a.evaluate_date AS "evaluateDate",
+		a.evaluate_adv AS "evaluateAdv",
+		a.area_map AS "areaMap",
+		a.area_point AS "areaPoint",
+		a.icon AS "icon",
+		a.status AS "status",
+		a.file AS "file",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag",
+		a17.name AS "area.name",
+		(case a.status 
+			when 01 then '未处理' 
+			when 02 then '处理中' 
+			when 03 then '已完成'
+			else '' end) "statusLable"
+	</sql>
+	
+	<sql id="ccmEventAmbiJoins">
+		LEFT JOIN sys_area a17 ON a17.id = a.area_id
+	</sql>
+    
+	<select id="get" resultType="CcmEventAmbi">
+		SELECT 
+			<include refid="ccmEventAmbiColumns"/>
+		FROM ccm_event_ambi a
+		<include refid="ccmEventAmbiJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<!-- 化解是否成功统计 -->
+	<select id="findSuccessMap" resultType="com.arjjs.ccm.tool.EchartType">
+		SELECT
+			a.solve_succ AS "typeO",
+			b.label AS "type",
+			COUNT(*) AS "value"
+		FROM
+			ccm_event_ambi a
+		LEFT JOIN sys_dict b ON b.type = "yes_no" AND a.solve_succ = b.value
+		LEFT JOIN sys_area cm ON cm.id = a.area_id
+		LEFT JOIN sys_config c ON c.id = 'system_level'
+		WHERE
+		a.del_flag = '0'
+		AND a.solve_succ is not null
+		<if test="area != null and area.id != null and area.id != ''">
+		AND  
+			(
+				CASE c.param_str
+				WHEN '1' THEN cm.id = #{area.id}
+				WHEN '2' THEN cm.parent_id = #{area.id}
+				ELSE cm.parent_id = #{area.id}
+				END
+			)
+		</if>
+		<if test="beginSendDate != null and endSendDate != null and beginSendDate != '' and endSendDate != ''">
+			AND a.send_date BETWEEN #{beginSendDate} AND
+			#{endSendDate}
+		</if>
+		GROUP BY typeO
+	</select>
+	<!-- 矛盾纠纷规模统计 -->
+	<select id="findScaleMap" resultType="com.arjjs.ccm.tool.EchartType">
+		SELECT
+			a.event_scale AS "typeO",
+			b.label AS "type",
+			COUNT(*) AS "value"
+		FROM
+			ccm_event_ambi a
+		LEFT JOIN sys_dict b ON b.type = "ccm_event_scale" AND a.event_scale = b.value
+		LEFT JOIN sys_area cm ON cm.id = a.area_id
+		LEFT JOIN sys_config c ON c.id = 'system_level'
+		WHERE
+		a.del_flag = #{DEL_FLAG_NORMAL}
+		AND a.event_scale is not null
+		AND a.event_scale !=""
+		<if test="area != null and area.id != null and area.id != ''">
+		AND  
+			(
+				CASE c.param_str
+				WHEN '1' THEN cm.id = #{area.id}
+				WHEN '2' THEN cm.parent_id = #{area.id}
+				ELSE cm.parent_id = #{area.id}
+				END
+			)
+		</if>
+		<if test="beginSendDate != null and endSendDate != null and beginSendDate != '' and endSendDate != ''">
+			AND a.send_date BETWEEN #{beginSendDate} AND
+			#{endSendDate}
+		</if>
+		GROUP BY typeO
+	</select>
+	<!-- 处理状态统计 -->
+	<select id="findStatusMap" resultType="com.arjjs.ccm.tool.EchartType">
+		SELECT
+			a.status AS "typeO",
+			b.label AS "type",
+			COUNT(*) AS "value"
+		FROM
+			ccm_event_ambi a
+		LEFT JOIN sys_dict b ON b.type = "ccm_event_status" AND a.status = b.value
+		LEFT JOIN sys_area cm ON cm.id = a.area_id
+		LEFT JOIN sys_config c ON c.id = 'system_level'
+		WHERE
+		a.del_flag = #{DEL_FLAG_NORMAL}
+		AND a.status is not null
+		AND a.status !=""
+		<if test="area != null and area.id != null and area.id != ''">
+		AND  
+			(
+				CASE c.param_str
+				WHEN '1' THEN cm.id = #{area.id}
+				WHEN '2' THEN cm.parent_id = #{area.id}
+				ELSE cm.parent_id = #{area.id}
+				END
+			)
+		</if>
+		<if test="beginSendDate != null and endSendDate != null and beginSendDate != '' and endSendDate != ''">
+			AND a.send_date BETWEEN #{beginSendDate} AND
+			#{endSendDate}
+		</if>
+		GROUP BY typeO
+	</select>
+	<!-- 总数统计 -->
+	<select id="findLineMap" resultType="com.arjjs.ccm.tool.EchartType">
+		SELECT
+			CONCAT(
+				YEAR (send_date),
+				'_',
+				DATE_FORMAT(send_date, '%m')
+			) AS "type",
+			COUNT(*) AS "value"
+		FROM
+			ccm_event_ambi a
+		LEFT JOIN sys_area cm ON cm.id = a.area_id
+		LEFT JOIN sys_config c ON c.id = 'system_level'
+		WHERE
+		a.send_date is not null	
+		AND a.send_date is not null
+		<if test="area != null and area.id != null and area.id != ''">
+		AND  
+			(
+				CASE c.param_str
+				WHEN '1' THEN cm.id = #{area.id}
+				WHEN '2' THEN cm.parent_id = #{area.id}
+				ELSE cm.parent_id = #{area.id}
+				END
+			)
+		</if>
+		AND (
+			a.send_date &gt; date_format(
+				DATE_SUB(curdate(), INTERVAL 5 MONTH),
+				'%Y-%m'
+			)
+			AND a.send_date &lt; date_format(
+				DATE_SUB(curdate(), INTERVAL - 1 MONTH),
+				'%Y-%m'
+			)
+		)
+		GROUP BY
+			concat(
+				YEAR (send_date),
+				MONTH (send_date)
+			)
+		ORDER BY
+			concat(
+				YEAR (send_date),
+		
+			IF (
+				MONTH (send_date) &gt; 9,
+				MONTH (send_date),
+				concat("0", MONTH(send_date))
+			)
+			) ASC
+		LIMIT 6
+	</select>
+	<!-- 累计受理纠纷总数-->
+    <select id="findListNum" resultType="int">
+       	SELECT
+			COUNT(*)
+		FROM
+			ccm_event_ambi a
+		WHERE
+			a.del_flag = "0"
+    </select>
+	
+	<select id="stateEventOneYear" resultType="com.arjjs.ccm.tool.EchartType">
+		SELECT
+			t_month.m AS type,
+			count( * ) value 
+		FROM
+			( SELECT CONCAT(YEAR(a.solve),'-',MONTH( a.solve )) AS m 
+			FROM ccm_event_ambi a 
+			WHERE a.`status` = 03 
+			AND a.solve BETWEEN #{beginSendDate} AND #{endSendDate}) t_month 
+		GROUP BY
+			t_month.m 
+		ORDER BY
+			t_month.m
+	</select>
+	
+	<!-- 矛盾纠纷统计数量 -->
+	<select id="findCountByStatus" resultType="CcmEventAmbi">
+		SELECT
+			COUNT( a.id ) AS "count",
+			a.status
+		FROM
+			ccm_event_ambi a 
+		WHERE
+			a.del_flag = 0 
+			GROUP BY a.status
+	</select>
+	
+	<!-- 综治机构统计数量 -->
+	<select id="findOfficeCount" resultType="CcmEventAmbi">
+		SELECT count(a.id) AS "count" FROM `sys_office` a WHERE a.del_flag = 0
+	</select>
+	
+	<!--  -->
+	<select id="findList" resultType="CcmEventAmbi">
+		SELECT 
+			<include refid="ccmEventAmbiColumns"/>
+		FROM ccm_event_ambi a
+		<include refid="ccmEventAmbiJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="beginSendDate != null and endSendDate != null and beginSendDate != '' and endSendDate != ''">
+				AND a.send_date BETWEEN #{beginSendDate} AND
+				#{endSendDate}
+			</if>
+			<if test="name != null and name != ''">
+				AND a.name LIKE 
+					<if test="dbName == 'oracle'">'%'||#{name}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{name}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{name},'%')</if>
+			</if>
+			<if test="eventScale != null and eventScale != ''">
+				AND a.event_scale LIKE 
+					<if test="dbName == 'oracle'">'%'||#{eventScale}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{eventScale}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{eventScale},'%')</if>
+			</if>
+			<if test="eventType != null and eventType != ''">
+				AND a.event_type LIKE 
+					<if test="dbName == 'oracle'">'%'||#{eventType}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{eventType}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{eventType},'%')</if>
+			</if>
+			<if test="status != null and status != ''">
+				AND a.status = #{status}
+			</if>
+			<if test="area != null and area.id != null and area.id != ''">
+				AND a.area_id = #{area.id}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="CcmEventAmbi">
+		SELECT 
+			<include refid="ccmEventAmbiColumns"/>
+		FROM ccm_event_ambi a
+		<include refid="ccmEventAmbiJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO ccm_event_ambi(
+			id,
+			name,
+			send_date,
+		    area_id,
+			send_add,
+			event_scale,
+			event_type,
+			invo_num,
+			event_sket,
+			involve_com,
+			part_code,
+			part_num,
+			part_name,
+			part_sex,
+			part_nat,
+			part_edu_bg,
+			part_type,
+			part_add,
+			solve,
+			solve_type,
+			solve_comp,
+			solve_name,
+			solve_tl,
+			solve_succ,
+			solve_case,
+			evaluate_date,
+			evaluate_adv,
+			area_map,
+			area_point,
+			icon,
+			status,
+			file,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag
+		) VALUES (
+			#{id},
+			#{name},
+			#{sendDate},
+		    #{area.id},
+			#{sendAdd},
+			#{eventScale},
+			#{eventType},
+			#{invoNum},
+			#{eventSket},
+			#{involveCom},
+			#{partCode},
+			#{partNum},
+			#{partName},
+			#{partSex},
+			#{partNat},
+			#{partEduBg},
+			#{partType},
+			#{partAdd},
+			#{solve},
+			#{solveType},
+			#{solveComp},
+			#{solveName},
+			#{solveTl},
+			#{solveSucc},
+			#{solveCase},
+			#{evaluateDate},
+			#{evaluateAdv},
+			#{areaMap},
+			#{areaPoint},
+			#{icon},
+			#{status},
+			#{file},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE ccm_event_ambi SET 	
+			name = #{name},
+			send_date = #{sendDate},
+		    area_id = #{area.id},
+			send_add = #{sendAdd},
+			event_scale = #{eventScale},
+			event_type = #{eventType},
+			invo_num = #{invoNum},
+			event_sket = #{eventSket},
+			involve_com = #{involveCom},
+			part_code = #{partCode},
+			part_num = #{partNum},
+			part_name = #{partName},
+			part_sex = #{partSex},
+			part_nat = #{partNat},
+			part_edu_bg = #{partEduBg},
+			part_type = #{partType},
+			part_add = #{partAdd},
+			solve = #{solve},
+			solve_type = #{solveType},
+			solve_comp = #{solveComp},
+			solve_name = #{solveName},
+			solve_tl = #{solveTl},
+			solve_succ = #{solveSucc},
+			solve_case = #{solveCase},
+			evaluate_date = #{evaluateDate},
+			evaluate_adv = #{evaluateAdv},
+			area_map = #{areaMap},
+			area_point = #{areaPoint},
+			icon = #{icon},
+			status = #{status},
+			file = #{file},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE ccm_event_ambi SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

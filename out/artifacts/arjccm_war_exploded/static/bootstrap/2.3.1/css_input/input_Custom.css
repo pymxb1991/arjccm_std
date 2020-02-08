@@ -1,0 +1,82 @@
+
+html{overflow-x:auto !important;}
+/*去除虚线*/
+.control-group  {
+    border-bottom: 0px dotted #dddddd !important;
+}
+/*table去除虚线*/
+td{border: 0px solid #dddddd !important;}
+/*.first_table td{border: 1px solid #00cccc !important;}*/
+/* Table布局 页面顶部间距修改 */
+.form-horizontal{
+    padding-top: 21px !important;
+
+}
+/*必填信息label 可见*/
+#show1 label,#show2 label{
+    display: inline-block !important;
+}
+
+/*DIV布局 页面顶部间距修改 第一个DIV上加class*/
+.head_Space{
+    padding-top: 8px ;
+}
+
+/*下拉文本框样式修改*/
+.select2-container .select2-choice{
+    width: 274px ;
+}
+
+/*所属区域和使用者等弹出选择文本框修改*/
+input[type="text"],input[type="password"],  .uneditable-input {width: 270px !important;}
+/*文本域样式修改*/
+textarea.input-xlarge{
+    width: 282px !important;
+}
+/*文本域样式修改*/
+textarea.input-xxlarge{
+    width: 282px !important;
+}
+/*链接或标示标记等长文本框修改*/
+input.input-xxlarge{
+    width: 270px ;
+}
+/*目标或排序 小文本框样式修改*/
+.input-small {
+    width: 270px ;
+}
+
+
+
+
+
+@media screen  and (max-width: 1166px) {
+
+    /*下拉文本框样式修改*/
+    .select2-container .select2-choice{
+        width: 210px ;
+    }
+    .input-xlarge {width: 206px ;}
+    /*所属区域和使用者等弹出选择文本框修改*/
+    input[type="text"],input[type="password"], .uneditable-input {width: 206px !important;}
+    /*文本域样式修改*/
+    textarea.input-xlarge{
+        width: 218px !important;
+    }
+    /*文本域样式修改*/
+    textarea.input-xxlarge{
+        width: 218px !important;
+    }
+    /*链接或标示标记等长文本框修改*/
+    input.input-xxlarge{
+        width: 206px ;
+    }
+    /*目标或排序 小文本框样式修改*/
+    .input-small {
+        width: 206px ;
+    }
+    /*日期选择文本框修改*/
+    .input-medium .Wdate {
+        width: 206px;
+    }
+}

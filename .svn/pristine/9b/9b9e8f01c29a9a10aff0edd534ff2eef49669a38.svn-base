@@ -1,0 +1,244 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.arjjs.ccm.modules.ccm.service.dao.CcmServiceOnlineDao">
+    
+	<sql id="ccmServiceOnlineColumns">
+		a.id AS "id",
+		a.type AS "type",
+		a.applicant AS "applicant",
+		a.ident AS "ident",
+		a.telephone AS "telephone",
+		a.relevant_person AS "relevantPerson",
+		a.description AS "description",
+		a.file AS "file",
+		a.status AS "status",
+		a.reviewer AS "reviewer",
+		a.content AS "content",
+		a.reply_file AS "replyFile",
+		a.extend1 AS "extend1",
+		a.extend2 AS "extend2",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag",
+		(case a.type 
+			when 01 then '上访申请' 
+			when 02 then '司法调解申请' 
+			when 03 then '在线问题投诉'
+			else '' end) "typeLable",
+		(case a.status 
+			when 01 then '待审核' 
+			when 02 then '未通过' 
+			when 03 then '已通过'
+			else '' end) "statusLable"
+	</sql>
+	
+	<sql id="ccmServiceOnlineJoins">
+	 LEFT JOIN  sys_user u on u.id=a.create_by
+	  LEFT JOIN  sys_office o on o.id=u.office_id
+	</sql>
+    
+	<select id="get" resultType="CcmServiceOnline">
+		SELECT 
+			<include refid="ccmServiceOnlineColumns"/>
+		FROM ccm_service_online a
+		<include refid="ccmServiceOnlineJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="CcmServiceOnline">
+		SELECT 
+			<include refid="ccmServiceOnlineColumns"/>
+		FROM ccm_service_online a
+		<include refid="ccmServiceOnlineJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="areaId != null and areaId != ''">
+				AND o.area_id = #{areaId}
+			</if>		
+			<if test="type != null and type != ''">
+				AND a.type = #{type}
+			</if>
+			<if test="status != null and status != ''">
+				AND a.status = #{status}
+			</if>
+			<if test="applicant != null and applicant != ''">
+				AND a.applicant LIKE 
+					<if test="dbName == 'oracle'">'%'||#{applicant}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{applicant}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{applicant},'%')</if>
+			</if>
+			<if test="ident != null and ident != ''">
+				AND a.ident = #{ident}
+			</if>
+			<if test="beginTime != null and endTime != null and beginTime != '' and endTime != ''">
+				AND a.create_date BETWEEN #{beginTime} AND #{endTime}
+			</if>
+			<if test="beginTime != null and endTime != null and beginTime != '' and endTime != ''">
+				AND a.create_date BETWEEN #{beginTime} AND #{endTime}
+			</if>
+			<!-- 我的通知 -->
+			<if test="isSelf">
+				AND a.create_by = #{currentUser.id}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="CcmServiceOnline">
+		SELECT 
+			<include refid="ccmServiceOnlineColumns"/>
+		FROM ccm_service_online a
+		<include refid="ccmServiceOnlineJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO ccm_service_online(
+			id,
+			type,
+			applicant,
+			ident,
+			telephone,
+			relevant_person,
+			description,
+			file,
+			status,
+			reviewer,
+			content,
+			reply_file,
+			extend1,
+			extend2,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag
+		) VALUES (
+			#{id},
+			#{type},
+			#{applicant},
+			#{ident},
+			#{telephone},
+			#{relevantPerson},
+			#{description},
+			#{file},
+			#{status},
+			#{reviewer},
+			#{content},
+			#{replyFile},
+			#{extend1},
+			#{extend2},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE ccm_service_online SET 	
+			type = #{type},
+			applicant = #{applicant},
+			ident = #{ident},
+			telephone = #{telephone},
+			relevant_person = #{relevantPerson},
+			description = #{description},
+			file = #{file},
+			status = #{status},
+			reviewer = #{reviewer},
+			content = #{content},
+			reply_file = #{replyFile},
+			extend1 = #{extend1},
+			extend2 = #{extend2},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE ccm_service_online SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+	<!-- 在线办事事项分类分析 -->
+	<select id="getServiceType" resultType="com.arjjs.ccm.tool.EchartType">
+		SELECT
+			a.type AS "typeO",
+			b.label AS "type",
+			COUNT(*) AS "value"
+		FROM
+			ccm_service_online a
+		LEFT JOIN sys_dict b ON b.type = "ccm_service_online_type" AND a.type = b.VALUE
+		WHERE
+			a.del_flag = '0'
+		AND a.type IS NOT NULL
+		AND a.type != ""
+		AND (
+			a.create_date &gt; date_format(
+				DATE_SUB(curdate(), INTERVAL 0 MONTH),
+				'%Y-%m'
+			)
+			AND a.create_date &lt; date_format(
+				DATE_SUB(curdate(), INTERVAL - 1 MONTH),
+				'%Y-%m'
+			)
+		)
+		GROUP BY
+			typeO
+	
+	</select>
+	<!-- 在线办事-处理进度 -->
+	<select id="getServiceStatus" resultType="com.arjjs.ccm.tool.EchartType">
+		SELECT
+			a.status AS "typeO",
+			b.label AS "type",
+			COUNT(*) AS "value"
+		FROM
+			ccm_service_online a
+		LEFT JOIN sys_dict b ON b.type = "ccm_service_online_handle" AND a.status = b.VALUE
+		WHERE
+			a.del_flag = '0'
+		AND a.status IS NOT NULL
+		AND a.status != ""
+		AND (
+			a.create_date &gt; date_format(
+				DATE_SUB(curdate(), INTERVAL 0 MONTH),
+				'%Y-%m'
+			)
+			AND a.create_date &lt; date_format(
+				DATE_SUB(curdate(), INTERVAL - 1 MONTH),
+				'%Y-%m'
+			)
+		)
+		GROUP BY
+			typeO
+	
+	</select>
+	
+	
+</mapper>

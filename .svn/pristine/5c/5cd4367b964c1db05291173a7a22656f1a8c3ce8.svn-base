@@ -1,0 +1,58 @@
+/**
+ * Copyright &copy; 2012-2016 <a href="https://github.com/thinkgem/jeesite">JeeSite</a> All rights reserved.
+ */
+package com.arjjs.ccm.modules.ccm.org.service;
+
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.arjjs.ccm.common.persistence.Page;
+import com.arjjs.ccm.common.service.CrudService;
+import com.arjjs.ccm.modules.ccm.org.entity.CcmOrgComPop;
+import com.arjjs.ccm.modules.ccm.report.dao.CcmPeopleAmountDao;
+import com.arjjs.ccm.modules.ccm.org.dao.CcmOrgComPopDao;
+
+/**
+ * 公共机构人员Service
+ * @author liang
+ * @version 2018-05-11
+ */
+@Service
+@Transactional(readOnly = true)
+public class CcmOrgComPopService extends CrudService<CcmOrgComPopDao, CcmOrgComPop> {
+
+	@Autowired
+	private CcmOrgComPopDao ccmOrgComPopDao;
+	
+	
+	public CcmOrgComPop get(String id) {
+		return super.get(id);
+	}
+	
+	public List<CcmOrgComPop> findList(CcmOrgComPop ccmOrgComPop) {
+		return super.findList(ccmOrgComPop);
+	}
+	
+	public Page<CcmOrgComPop> findPage(Page<CcmOrgComPop> page, CcmOrgComPop ccmOrgComPop) {
+		return super.findPage(page, ccmOrgComPop);
+	}
+	
+	@Transactional(readOnly = false)
+	public void save(CcmOrgComPop ccmOrgComPop) {
+		super.save(ccmOrgComPop);
+	}
+	
+	@Transactional(readOnly = false)
+	public void delete(CcmOrgComPop ccmOrgComPop) {
+		super.delete(ccmOrgComPop);
+	}
+
+	//社区民警/辅警
+	public int findPop() {
+		return ccmOrgComPopDao.findPop();
+	}
+	
+}

@@ -1,0 +1,454 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.arjjs.ccm.modules.ccm.partyperson.dao.CcmPartyPersonDao">
+    
+	<sql id="ccmPartyPersonColumns">
+		a.id AS "id",
+		a.type AS "type",
+		a.name AS "name",
+		a.status AS "status",
+		a.community AS "community.id",
+		a5.name AS "community.name",
+		a.belone_org AS "beloneOrg",
+		p9.name AS "beloneOrgName",
+		a.part_membership AS "partMembership",
+		a.super_part_org AS "superPartOrg",
+		p10.name AS "superPartOrgName",
+		a.join_part_time AS "joinPartTime",
+		a.belone_branch AS "beloneBranch",
+		a.inner_part_position AS "innerPartPosition",
+		a.chargeman_flag AS "chargemanFlag",
+		a.old_part_flag AS "oldPartFlag",
+		a.difficult_part_flag AS "difficultPartFlag",
+		a.difficult_info AS "difficultInfo",
+		a.subsidy_info AS "subsidyInfo",
+		a.flow_part_flag AS "flowPartFlag",
+		a.flow_out_add AS "flowOutAdd",
+		a.flow_in_add AS "flowInAdd",
+		a.now_work_and_position AS "nowWorkAndPosition",
+		a.now_be_attach_part AS "nowBeAttachPart",
+		a.reporting_time AS "reportingTime",
+		a.act_as_leader_flag AS "actAsLeaderFlag",
+		a.condition_info AS "conditionInfo",
+		a.leader_project AS "leaderProject",
+		a.dept_level AS "deptLevel",
+		a.admission_time AS "admissionTime",
+		a.graduation_time AS "graduationTime",
+		a.family_origin AS "familyOrigin",
+		a.democratic_party AS "democraticParty",
+		a.individual_status AS "individualStatus",
+		a.migrant_worker_flag AS "migrantWorkerFlag",
+		a.first_line_situation AS "firstLineSituation",
+		a.new_order AS "newOrder",
+		a.educational_background AS "educationalBackground",
+		a.academic_degree AS "academicDegree",
+		a.profession AS "profession",
+		a.graduate_institutions AS "graduateInstitutions",
+		a.technical_position AS "technicalPosition",
+		a.position_level AS "positionLevel",
+		a.contact_info AS "contactInfo",
+		a.join_other_part_time AS "joinOtherPartTime",
+		a.retirement_time AS "retirementTime",
+		a.departure_time AS "departureTime",
+		a.belone_part_group AS "belonePartGroup",
+		a.join_part_reference AS "joinPartReference",
+		a.correction_time AS "correctionTime",
+		a.develop_type AS "developType",
+		a.base_part_fees AS "basePartFees",
+		a.july_join_part_flag AS "julyJoinPartFlag",
+		a.work_start_time AS "workStartTime",
+		a.work_end_time AS "workEndTime",
+		a.work_time AS "workTime",
+		a.part_position_caption AS "partPositionCaption",
+		a.office_org_coding AS "officeOrgCoding",
+		a.office_org_which AS "officeOrgWhich",
+		a.class_member_flag AS "classMemberFlag",
+		a.mode_of_service AS "modeOfService",
+		a.service_time AS "serviceTime",
+		a.service_years AS "serviceYears",
+		a.villa_comm_memb_flag AS "villaCommMembFlag",
+		a.dire_comm_memb_flag AS "direCommMembFlag",
+		a.ranking_of_team_posts AS "rankingOfTeamPosts",
+		a.admin_postion_name AS "adminPostionName",
+		a.serving_uint AS "servingUint",
+		a.personal_job_ranking AS "personalJobRanking",
+		a.admin_service_time AS "adminServiceTime",
+		a.admin_depart_time AS "adminDepartTime",
+		a.education_category AS "educationCategory",
+		a.degree_award_time AS "degreeAwardTime",
+		a.engage_start_time AS "engageStartTime",
+		a.engage_end_time AS "engageEndTime",
+		a.prof_tech_position AS "profTechPosition",
+		a.prof_tech_title AS "profTechTitle",
+		a.eligibility_time AS "eligibilityTime",
+		a.part_rela_villa_flag AS "partRelaVillaFlag",
+		a.relation_name AS "relationName",
+		a.part_rela_farmer_flag AS "partRelaFarmerFlag",
+		a.farmer_num AS "farmerNum",
+		a.villa_work_group_flag AS "villaWorkGroupFlag",
+		a.resident_village_name AS "residentVillageName",
+		a.add_time AS "addTime",
+		a.part_add AS "partAdd",
+		a.dept_attr AS "deptAttr",
+		a.dept_industry AS "deptIndustry",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag"
+	</sql>
+	
+	<sql id="ccmPartyPersonJoins">
+		LEFT JOIN sys_area a5 ON a5.id = a.community
+		LEFT JOIN sys_office o6 ON o6.id = a.belone_org
+		LEFT JOIN sys_office o8 ON o8.id = a.super_part_org
+		LEFT JOIN ccm_party_organization p9 ON p9.id = a.belone_org
+		LEFT JOIN ccm_party_organization p10 ON p10.id = a.super_part_org
+	</sql>
+    
+	<select id="get" resultType="CcmPartyPerson">
+		SELECT 
+			<include refid="ccmPartyPersonColumns"/>
+		FROM ccm_party_person a
+		<include refid="ccmPartyPersonJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="CcmPartyPerson">
+		SELECT 
+			<include refid="ccmPartyPersonColumns"/>
+		FROM ccm_party_person a
+		<include refid="ccmPartyPersonJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="name != null and name != ''">
+				AND a.name LIKE 
+					<if test="dbName == 'oracle'">'%'||#{name}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{name}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{name},'%')</if>
+			</if>
+			<if test="beloneOrg != null and beloneOrg != ''">
+				AND a.belone_org = #{beloneOrg}
+			</if>
+			<if test="type != null and type != ''">
+				AND a.type = #{type}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="CcmPartyPerson">
+		SELECT 
+			<include refid="ccmPartyPersonColumns"/>
+		FROM ccm_party_person a
+		<include refid="ccmPartyPersonJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="type != null and type != ''">
+				AND a.type = #{type}
+			</if>
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO ccm_party_person(
+			id,
+			type,
+			name,
+			status,
+			community,
+			belone_org,
+			part_membership,
+			super_part_org,
+			join_part_time,
+			belone_branch,
+			inner_part_position,
+			chargeman_flag,
+			old_part_flag,
+			difficult_part_flag,
+			difficult_info,
+			subsidy_info,
+			flow_part_flag,
+			flow_out_add,
+			flow_in_add,
+			now_work_and_position,
+			now_be_attach_part,
+			reporting_time,
+			act_as_leader_flag,
+			condition_info,
+			leader_project,
+			dept_level,
+			admission_time,
+			graduation_time,
+			family_origin,
+			democratic_party,
+			individual_status,
+			migrant_worker_flag,
+			first_line_situation,
+			new_order,
+			educational_background,
+			academic_degree,
+			profession,
+			graduate_institutions,
+			technical_position,
+			position_level,
+			contact_info,
+			join_other_part_time,
+			retirement_time,
+			departure_time,
+			belone_part_group,
+			join_part_reference,
+			correction_time,
+			develop_type,
+			base_part_fees,
+			july_join_part_flag,
+			work_start_time,
+			work_end_time,
+			work_time,
+			part_position_caption,
+			office_org_coding,
+			office_org_which,
+			class_member_flag,
+			mode_of_service,
+			service_time,
+			service_years,
+			villa_comm_memb_flag,
+			dire_comm_memb_flag,
+			ranking_of_team_posts,
+			admin_postion_name,
+			serving_uint,
+			personal_job_ranking,
+			admin_service_time,
+			admin_depart_time,
+			education_category,
+			degree_award_time,
+			engage_start_time,
+			engage_end_time,
+			prof_tech_position,
+			prof_tech_title,
+			eligibility_time,
+			part_rela_villa_flag,
+			relation_name,
+			part_rela_farmer_flag,
+			farmer_num,
+			villa_work_group_flag,
+			resident_village_name,
+			add_time,
+			part_add,
+			dept_attr,
+			dept_industry,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag
+		) VALUES (
+			#{id},
+			#{type},
+			#{name},
+			#{status},
+			#{community.id},
+			#{beloneOrg},
+			#{partMembership},
+			#{superPartOrg},
+			#{joinPartTime},
+			#{beloneBranch},
+			#{innerPartPosition},
+			#{chargemanFlag},
+			#{oldPartFlag},
+			#{difficultPartFlag},
+			#{difficultInfo},
+			#{subsidyInfo},
+			#{flowPartFlag},
+			#{flowOutAdd},
+			#{flowInAdd},
+			#{nowWorkAndPosition},
+			#{nowBeAttachPart},
+			#{reportingTime},
+			#{actAsLeaderFlag},
+			#{conditionInfo},
+			#{leaderProject},
+			#{deptLevel},
+			#{admissionTime},
+			#{graduationTime},
+			#{familyOrigin},
+			#{democraticParty},
+			#{individualStatus},
+			#{migrantWorkerFlag},
+			#{firstLineSituation},
+			#{newOrder},
+			#{educationalBackground},
+			#{academicDegree},
+			#{profession},
+			#{graduateInstitutions},
+			#{technicalPosition},
+			#{positionLevel},
+			#{contactInfo},
+			#{joinOtherPartTime},
+			#{retirementTime},
+			#{departureTime},
+			#{belonePartGroup},
+			#{joinPartReference},
+			#{correctionTime},
+			#{developType},
+			#{basePartFees},
+			#{julyJoinPartFlag},
+			#{workStartTime},
+			#{workEndTime},
+			#{workTime},
+			#{partPositionCaption},
+			#{officeOrgCoding},
+			#{officeOrgWhich},
+			#{classMemberFlag},
+			#{modeOfService},
+			#{serviceTime},
+			#{serviceYears},
+			#{villaCommMembFlag},
+			#{direCommMembFlag},
+			#{rankingOfTeamPosts},
+			#{adminPostionName},
+			#{servingUint},
+			#{personalJobRanking},
+			#{adminServiceTime},
+			#{adminDepartTime},
+			#{educationCategory},
+			#{degreeAwardTime},
+			#{engageStartTime},
+			#{engageEndTime},
+			#{profTechPosition},
+			#{profTechTitle},
+			#{eligibilityTime},
+			#{partRelaVillaFlag},
+			#{relationName},
+			#{partRelaFarmerFlag},
+			#{farmerNum},
+			#{villaWorkGroupFlag},
+			#{residentVillageName},
+			#{addTime},
+			#{partAdd},
+			#{deptAttr},
+			#{deptIndustry},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE ccm_party_person SET 	
+			name = #{name},
+			status = #{status},
+			community = #{community.id},
+			belone_org = #{beloneOrg},
+			part_membership = #{partMembership},
+			super_part_org = #{superPartOrg},
+			join_part_time = #{joinPartTime},
+			belone_branch = #{beloneBranch},
+			inner_part_position = #{innerPartPosition},
+			chargeman_flag = #{chargemanFlag},
+			old_part_flag = #{oldPartFlag},
+			difficult_part_flag = #{difficultPartFlag},
+			difficult_info = #{difficultInfo},
+			subsidy_info = #{subsidyInfo},
+			flow_part_flag = #{flowPartFlag},
+			flow_out_add = #{flowOutAdd},
+			flow_in_add = #{flowInAdd},
+			now_work_and_position = #{nowWorkAndPosition},
+			now_be_attach_part = #{nowBeAttachPart},
+			reporting_time = #{reportingTime},
+			act_as_leader_flag = #{actAsLeaderFlag},
+			condition_info = #{conditionInfo},
+			leader_project = #{leaderProject},
+			dept_level = #{deptLevel},
+			admission_time = #{admissionTime},
+			graduation_time = #{graduationTime},
+			family_origin = #{familyOrigin},
+			democratic_party = #{democraticParty},
+			individual_status = #{individualStatus},
+			migrant_worker_flag = #{migrantWorkerFlag},
+			first_line_situation = #{firstLineSituation},
+			new_order = #{newOrder},
+			educational_background = #{educationalBackground},
+			academic_degree = #{academicDegree},
+			profession = #{profession},
+			graduate_institutions = #{graduateInstitutions},
+			technical_position = #{technicalPosition},
+			position_level = #{positionLevel},
+			contact_info = #{contactInfo},
+			join_other_part_time = #{joinOtherPartTime},
+			retirement_time = #{retirementTime},
+			departure_time = #{departureTime},
+			belone_part_group = #{belonePartGroup},
+			join_part_reference = #{joinPartReference},
+			correction_time = #{correctionTime},
+			develop_type = #{developType},
+			base_part_fees = #{basePartFees},
+			july_join_part_flag = #{julyJoinPartFlag},
+			work_start_time = #{workStartTime},
+			work_end_time = #{workEndTime},
+			work_time = #{workTime},
+			part_position_caption = #{partPositionCaption},
+			office_org_coding = #{officeOrgCoding},
+			office_org_which = #{officeOrgWhich},
+			class_member_flag = #{classMemberFlag},
+			mode_of_service = #{modeOfService},
+			service_time = #{serviceTime},
+			service_years = #{serviceYears},
+			villa_comm_memb_flag = #{villaCommMembFlag},
+			dire_comm_memb_flag = #{direCommMembFlag},
+			ranking_of_team_posts = #{rankingOfTeamPosts},
+			admin_postion_name = #{adminPostionName},
+			serving_uint = #{servingUint},
+			personal_job_ranking = #{personalJobRanking},
+			admin_service_time = #{adminServiceTime},
+			admin_depart_time = #{adminDepartTime},
+			education_category = #{educationCategory},
+			degree_award_time = #{degreeAwardTime},
+			engage_start_time = #{engageStartTime},
+			engage_end_time = #{engageEndTime},
+			prof_tech_position = #{profTechPosition},
+			prof_tech_title = #{profTechTitle},
+			eligibility_time = #{eligibilityTime},
+			part_rela_villa_flag = #{partRelaVillaFlag},
+			relation_name = #{relationName},
+			part_rela_farmer_flag = #{partRelaFarmerFlag},
+			farmer_num = #{farmerNum},
+			villa_work_group_flag = #{villaWorkGroupFlag},
+			resident_village_name = #{residentVillageName},
+			add_time = #{addTime},
+			part_add = #{partAdd},
+			dept_attr = #{deptAttr},
+			dept_industry = #{deptIndustry},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE ccm_party_person SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

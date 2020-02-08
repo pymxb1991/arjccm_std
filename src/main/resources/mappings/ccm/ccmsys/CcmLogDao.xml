@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.arjjs.ccm.modules.ccm.ccmsys.dao.CcmLogDao">
+    
+	<select id="getById" parameterType="String" resultType="CcmLog">
+		SELECT 
+			a.*,
+			u.id AS "createBy.id",
+			u.name AS "createBy.name",
+			c.name AS "createBy.company.name",
+			o.name AS "createBy.office.name"
+		FROM sys_log a
+		JOIN sys_user u ON u.id = a.create_by
+		JOIN sys_office c ON c.id = u.company_id
+		JOIN sys_office o ON o.id = u.office_id
+		WHERE a.id = #{id}
+	
+	</select>
+	
+</mapper>

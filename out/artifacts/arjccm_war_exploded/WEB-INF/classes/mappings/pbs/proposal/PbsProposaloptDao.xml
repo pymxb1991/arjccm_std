@@ -1,0 +1,186 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.arjjs.ccm.modules.pbs.proposal.dao.PbsProposaloptDao">
+
+	<sql id="pbsProposaloptColumns">
+		a.id AS "id",
+		a.s_areatype AS "sAreatype.id",
+		proarea.s_name
+		AS "sAreatype.sName",
+		a.s_areavesion AS "sAreavesion",
+		a.s_proposalid AS
+		"sProposalid.id",
+		prosal.s_title AS "sProposalid.sTitle",
+		a.s_opttype AS
+		"sOpttype",
+		a.s_opresult AS "sOpresult",
+		a.s_content AS "sContent",
+		a.s_showtype AS "sShowtype",
+		a.s_reporteruser AS "sReporteruser.id",
+		u9.name AS "sReporteruser.name",
+		a.s_reportermem AS "sReportermem.id",
+		mem.s_name AS "sReportermem.sName",
+		a.s_level AS "sLevel",
+		a.s_description AS "sDescription",
+		a.s_spare01 AS "sSpare01",
+		a.s_spare02 AS "sSpare02",
+		a.s_spare03 AS "sSpare03",
+		a.s_spare04 AS
+		"sSpare04",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks
+		AS "remarks",
+		a.del_flag AS "delFlag"
+	</sql>
+
+	<sql id="pbsProposaloptJoins">
+		LEFT JOIN pbs_proposalarea proarea ON proarea.id =
+		a.s_areatype
+		LEFT JOIN pbs_proposal prosal ON prosal.id =
+		a.s_proposalid
+		LEFT JOIN
+		sys_user u9 ON u9.id = a.s_reporteruser
+		LEFT
+		JOIN pbs_partymem mem ON
+		mem.id = a.s_reportermem
+	</sql>
+
+	<select id="get" resultType="PbsProposalopt">
+		SELECT
+		<include refid="pbsProposaloptColumns" />
+		FROM pbs_proposalopt a
+		<include refid="pbsProposaloptJoins" />
+		WHERE a.id = #{id}
+	</select>
+
+	<select id="findList" resultType="PbsProposalopt">
+		SELECT
+		<include refid="pbsProposaloptColumns" />
+		FROM pbs_proposalopt a
+		<include refid="pbsProposaloptJoins" />
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if
+				test="sProposalid != null and sProposalid != '' and sProposalid.id != null and sProposalid.id != ''">
+				AND a.s_proposalid = #{sProposalid.id}
+			</if>
+			<if
+                test="sOpttype != null and sOpttype != ''">
+                AND a.s_opttype = #{sOpttype}
+            </if>
+			<if test="sAreatype != null and sAreatype != '' and sAreatype.sName != null and sAreatype.sName != '' ">
+				AND proarea.s_name LIKE CONCAT('%',#{sAreatype.sName},'%')
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+
+	<select id="findAllList" resultType="PbsProposalopt">
+		SELECT
+		<include refid="pbsProposaloptColumns" />
+		FROM pbs_proposalopt a
+		<include refid="pbsProposaloptJoins" />
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+
+	<insert id="insert">
+		INSERT INTO pbs_proposalopt(
+		id,
+		s_areatype,
+		s_areavesion,
+		s_proposalid,
+		s_opttype,
+		s_opresult,
+		s_content,
+		s_showtype,
+		s_reporteruser,
+		s_reportermem,
+		s_level,
+		s_description,
+		s_spare01,
+		s_spare02,
+		s_spare03,
+		s_spare04,
+		create_by,
+		create_date,
+		update_by,
+		update_date,
+		remarks,
+		del_flag
+		) VALUES (
+		#{id},
+		#{sAreatype.id},
+		#{sAreavesion},
+		#{sProposalid.id},
+		#{sOpttype},
+		#{sOpresult},
+		#{sContent},
+		#{sShowtype},
+		#{sReporteruser.id},
+		#{sReportermem.id},
+		#{sLevel},
+		#{sDescription},
+		#{sSpare01},
+		#{sSpare02},
+		#{sSpare03},
+		#{sSpare04},
+		#{createBy.id},
+		#{createDate},
+		#{updateBy.id},
+		#{updateDate},
+		#{remarks},
+		#{delFlag}
+		)
+	</insert>
+
+	<update id="update">
+		UPDATE pbs_proposalopt SET
+		s_areatype =
+		#{sAreatype.id},
+		s_areavesion = #{sAreavesion},
+		s_proposalid =
+		#{sProposalid.id},
+		s_opttype = #{sOpttype},
+		s_opresult = #{sOpresult},
+		s_content = #{sContent},
+		s_showtype = #{sShowtype},
+		s_reporteruser =
+		#{sReporteruser.id},
+		s_reportermem = #{sReportermem.id},
+		s_level =
+		#{sLevel},
+		s_description = #{sDescription},
+		update_by = #{updateBy.id},
+		update_date = #{updateDate},
+		remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+
+	<update id="delete">
+		UPDATE pbs_proposalopt SET
+		del_flag =
+		#{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+
+</mapper>

@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.arjjs.ccm.modules.act.dao.ActUtConfigDao">
+    
+	<sql id="actUtConfigColumns">
+		a.id AS "id",
+		a.title AS "title",
+		a.process_type AS "processType",
+		a.process_id AS "processId",
+		a.process_name AS "processName",
+		a.table_name AS "table",
+		a.form_key_name AS "formKeyName",
+		a.title_config AS "titleConfig",
+		a.class_path AS "classPath",
+		a.extend1 AS "extend1",
+		a.extend2 AS "extend2",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag"
+	</sql>
+
+	<sql id="actUtConfigJoins">
+	</sql>
+    
+	<select id="get" resultType="ActUtConfig">
+		SELECT 
+			<include refid="actUtConfigColumns"/>
+		FROM act_ut_config a
+		<include refid="actUtConfigJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="ActUtConfig">
+		SELECT 
+			<include refid="actUtConfigColumns"/>
+		FROM act_ut_config a
+		<include refid="actUtConfigJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="title != null and title != ''">
+				AND a.title LIKE 
+					<if test="dbName == 'oracle'">'%'||#{title}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{title}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{title},'%')</if>
+			</if>
+			<if test="processType != null and processType != ''">
+				AND a.process_type = #{processType}
+			</if>
+			<if test="processName != null and processName != ''">
+				AND a.process_name LIKE 
+					<if test="dbName == 'oracle'">'%'||#{processName}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{processName}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{processName},'%')</if>
+			</if>
+			<if test="formKeyName != null and formKeyName != ''">
+				AND a.form_key_name LIKE 
+					<if test="dbName == 'oracle'">'%'||#{formKeyName}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{formKeyName}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{formKeyName},'%')</if>
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="ActUtConfig">
+		SELECT 
+			<include refid="actUtConfigColumns"/>
+		FROM act_ut_config a
+		<include refid="actUtConfigJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO act_ut_config(
+			id,
+			title,
+			process_type,
+			process_id,
+			process_name,
+			table_name,
+			form_key_name,
+			title_config,
+			class_path,
+			extend1,
+			extend2,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag
+		) VALUES (
+			#{id},
+			#{title},
+			#{processType},
+			#{processId},
+			#{processName},
+			#{table},
+			#{formKeyName},
+			#{titleConfig},
+			#{classPath},
+			#{extend1},
+			#{extend2},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE act_ut_config SET 	
+			title = #{title},
+			process_type = #{processType},
+			process_id = #{processId},
+			process_name = #{processName},
+			table_name = #{table},
+			form_key_name = #{formKeyName},
+			title_config = #{titleConfig},
+			class_path = #{classPath},
+			extend1 = #{extend1},
+			extend2 = #{extend2},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE act_ut_config SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

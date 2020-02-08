@@ -1,0 +1,121 @@
+/**
+ * Copyright &copy; 2012-2016 <a href="https://github.com/thinkgem/jeesite">JeeSite</a> All rights reserved.
+ */
+package com.arjjs.ccm.modules.ccm.service.web;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.apache.shiro.authz.annotation.RequiresPermissions;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
+import com.arjjs.ccm.common.config.Global;
+import com.arjjs.ccm.common.persistence.Page;
+import com.arjjs.ccm.common.web.BaseController;
+import com.arjjs.ccm.common.utils.StringUtils;
+import com.arjjs.ccm.modules.ccm.service.entity.CcmCommunityWork;
+import com.arjjs.ccm.modules.ccm.service.service.CcmCommunityWorkService;
+import com.arjjs.ccm.modules.ccm.sys.entity.SysDicts;
+import com.arjjs.ccm.modules.sys.entity.Dict;
+import com.arjjs.ccm.modules.sys.utils.DictUtils;
+
+/**
+ * 社区服务Controller
+ * 
+ * @author arj
+ * @version 2018-03-09
+ */
+@Controller
+@RequestMapping(value = "${adminPath}/service/ccmCommunityWork")
+public class CcmCommunityWorkController extends BaseController {
+
+	@Autowired
+	private CcmCommunityWorkService ccmCommunityWorkService;
+
+	@ModelAttribute
+	public CcmCommunityWork get(@RequestParam(required = false) String id) {
+		CcmCommunityWork entity = null;
+		if (StringUtils.isNotBlank(id)) {
+			entity = ccmCommunityWorkService.get(id);
+		}
+		if (entity == null) {
+			entity = new CcmCommunityWork();
+		}
+		return entity;
+	}
+
+	@RequiresPermissions("service:ccmCommunityWork:view")
+	@RequestMapping(value = { "list", "" })
+	public String list(CcmCommunityWork ccmCommunityWork, HttpServletRequest request, HttpServletResponse response,
+			Model model) {
+		/*
+		 * if(StringUtils.isEmpty(ccmCommunityWork.getType1())) {
+		 * if(StringUtils.isNotEmpty(ccmCommunityWork.getType2())) { List<Dict> dictlist
+		 * = DictUtils.getDictList("ccm_service_type"); for (Dict dict : dictlist) {
+		 * List<Dict> temp = DictUtils.getDictList(dict.getValue()); for (Dict dict2 :
+		 * temp) { if(dict2.getLabel().equals(ccmCommunityWork.getLabel2())) {
+		 * ccmCommunityWork.setType1(dict2.getType()); } } } } }
+		 */
+		Page<CcmCommunityWork> page = ccmCommunityWorkService.findPage(new Page<CcmCommunityWork>(request, response),
+				ccmCommunityWork);
+		model.addAttribute("page", page);
+		return "ccm/service/ccmCommunityWorkList";
+	}
+
+	@RequiresPermissions("service:ccmCommunityWork:edit")
+	@RequestMapping(value = "form")
+	public String form(CcmCommunityWork ccmCommunityWork, Model model) {
+		model.addAttribute("ccmCommunityWork", ccmCommunityWork);
+		return "ccm/service/ccmCommunityWorkForm";
+	}
+
+	@RequiresPermissions("service:ccmCommunityWork:edit")
+	@RequestMapping(value = "save")
+	public String save(CcmCommunityWork ccmCommunityWork, Model model, RedirectAttributes redirectAttributes) {
+		if (!beanValidator(model, ccmCommunityWork)) {
+			return form(ccmCommunityWork, model);
+		}
+		ccmCommunityWorkService.save(ccmCommunityWork);
+		addMessage(redirectAttributes, "保存社区服务成功");
+		return "redirect:" + Global.getAdminPath() + "/service/ccmCommunityWork/?repage";
+	}
+
+	@RequiresPermissions("service:ccmCommunityWork:edit")
+	@RequestMapping(value = "delete")
+	public String delete(CcmCommunityWork ccmCommunityWork, RedirectAttributes redirectAttributes) {
+		ccmCommunityWorkService.delete(ccmCommunityWork);
+		addMessage(redirectAttributes, "删除社区服务成功");
+		return "redirect:" + Global.getAdminPath() + "/service/ccmCommunityWork/?repage";
+	}
+
+	@RequestMapping(value = "selectType")
+	public String selectType(@RequestParam(required = false) String type, @RequestParam(required = false) String type2,
+			@RequestParam(required = false) String purposeType, Model model) {
+		if(StringUtils.isEmpty(type)) {
+			List<Dict> dictlist = DictUtils.getDictList("ccm_service_type");
+			List<Dict> result = new ArrayList<Dict>();
+			for (Dict dict : dictlist) {
+				List<Dict> temp = DictUtils.getDictList(dict.getValue());
+				for (Dict dict2 : temp) {
+					result.add(dict2);
+				}
+			}
+			model.addAttribute("type", result);
+		}else {
+			List<Dict> result = DictUtils.getDictList(type);
+			model.addAttribute("type", result);
+		}
+		model.addAttribute("type2", type2);
+		model.addAttribute("purposeType", purposeType);
+		return "/modules/mapping/service/serviceType";
+	}
+}

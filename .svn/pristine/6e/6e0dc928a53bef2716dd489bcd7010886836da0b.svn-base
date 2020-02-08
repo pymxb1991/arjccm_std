@@ -1,0 +1,168 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.arjjs.ccm.modules.ccm.org.dao.CcmOrgNpseEconomicDao">
+    
+	<sql id="ccmOrgNpseEconomicColumns">
+		a.id AS "id",
+		a.nasp_id AS "naspId",
+		a.years AS "years",
+		a.turnover AS "turnover",
+		a.net_margin AS "netMargin",
+		a.taxes AS "taxes",
+		a.fixed_assets AS "fixedAssets",
+		a.liabilities AS "liabilities",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag"
+	</sql>
+	
+	<sql id="ccmOrgNpseEconomicAllColumns">
+		a.id AS "id",
+		a.nasp_id AS "naspId",
+		a.years AS "years",
+		a.turnover AS "turnover",
+		a.net_margin AS "netMargin",
+		a.taxes AS "taxes",
+		a.fixed_assets AS "fixedAssets",
+		a.liabilities AS "liabilities",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag",
+		
+		b.comp_id AS "compId",
+		b.comp_name AS "compName"
+	</sql>
+	
+	<sql id="ccmOrgNpseEconomicJoins">
+		LEFT JOIN ccm_org_npse b ON a.nasp_id = b.id
+	</sql>
+    
+	<select id="get" resultType="CcmOrgNpseEconomic">
+		SELECT 
+			<include refid="ccmOrgNpseEconomicAllColumns"/>
+		FROM ccm_org_npse_economic a
+		<include refid="ccmOrgNpseEconomicJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="CcmOrgNpseEconomic">
+		SELECT 
+			<include refid="ccmOrgNpseEconomicAllColumns"/>
+		FROM ccm_org_npse_economic a
+		<include refid="ccmOrgNpseEconomicJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="naspId != null and naspId != ''">
+				AND a.nasp_id = #{naspId}
+			</if>
+
+			<if  test="beginYears != null and beginYears != ''">
+				AND a.years &gt;= #{beginYears}
+			</if>
+			<if  test="endYears != null and endYears != ''">
+				AND a.years &lt;= #{endYears}
+			</if>
+			<if test="compId != null and compId != ''">
+				AND b.comp_id LIKE
+				<if test="dbName == 'oracle'">'%'||#{compId}||'%'</if>
+				<if test="dbName == 'mssql'">'%'+#{compId}+'%'</if>
+				<if test="dbName == 'mysql'">concat('%',#{compId},'%')</if>
+			</if>
+			<if test="compName != null and compName != ''">
+				AND b.comp_name LIKE
+				<if test="dbName == 'oracle'">'%'||#{compName}||'%'</if>
+				<if test="dbName == 'mssql'">'%'+#{compName}+'%'</if>
+				<if test="dbName == 'mysql'">concat('%',#{compName},'%')</if>
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.years DESC,
+				a.nasp_id
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="CcmOrgNpseEconomic">
+		SELECT 
+			<include refid="ccmOrgNpseEconomicAllColumns"/>
+		FROM ccm_org_npse_economic a
+		<include refid="ccmOrgNpseEconomicJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO ccm_org_npse_economic(
+			id,
+			nasp_id,
+			years,
+			turnover,
+			net_margin,
+			taxes,
+			fixed_assets,
+			liabilities,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag
+		) VALUES (
+			#{id},
+			#{naspId},
+			#{years},
+			#{turnover},
+			#{netMargin},
+			#{taxes},
+			#{fixedAssets},
+			#{liabilities},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE ccm_org_npse_economic SET 	
+			nasp_id = #{naspId},
+			years = #{years},
+			turnover = #{turnover},
+			net_margin = #{netMargin},
+			taxes = #{taxes},
+			fixed_assets = #{fixedAssets},
+			liabilities = #{liabilities},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE ccm_org_npse_economic SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

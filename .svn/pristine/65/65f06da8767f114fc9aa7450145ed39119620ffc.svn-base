@@ -1,0 +1,178 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.arjjs.ccm.modules.ccm.know.dao.CcmKnowKeyMeetingDao">
+    
+	<sql id="ccmKnowKeyMeetingColumns">
+		a.id AS "id",
+		a.title AS "title",
+		a.time_start AS "timeStart",
+		a.time_long AS "timeLong",
+		a.address AS "address",
+		a.office_id AS "office.id",
+		a.compere AS "compere",
+		a.attendee AS "attendee",
+		a.absentee AS "absentee",
+		a.type AS "type",
+		a.content AS "content",
+		a.resolution AS "resolution",
+		a.handle AS "handle",
+		a.file AS "file",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag",
+		o6.name AS "office.name"
+	</sql>
+	
+	<sql id="ccmKnowKeyMeetingJoins">
+		LEFT JOIN sys_office o6 ON o6.id = a.office_id
+	</sql>
+    
+	<select id="get" resultType="CcmKnowKeyMeeting">
+		SELECT 
+			<include refid="ccmKnowKeyMeetingColumns"/>
+		FROM ccm_know_key_meeting a
+		<include refid="ccmKnowKeyMeetingJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="CcmKnowKeyMeeting">
+		SELECT 
+			<include refid="ccmKnowKeyMeetingColumns"/>
+		FROM ccm_know_key_meeting a
+		<include refid="ccmKnowKeyMeetingJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="title != null and title != ''">
+				AND a.title LIKE 
+					<if test="dbName == 'oracle'">'%'||#{title}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{title}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{title},'%')</if>
+			</if>
+
+			<if  test="beginTimeStart != null and beginTimeStart != ''">
+				AND a.time_start &gt;= #{beginTimeStart}
+			</if>
+			<if  test="endTimeStart != null and endTimeStart != ''">
+				AND a.time_start &lt;= #{endTimeStart}
+			</if>
+			<if test="address != null and address != ''">
+				AND a.address LIKE 
+					<if test="dbName == 'oracle'">'%'||#{address}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{address}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{address},'%')</if>
+			</if>
+			<if test="attendee != null and attendee != ''">
+				AND a.attendee LIKE 
+					<if test="dbName == 'oracle'">'%'||#{attendee}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{attendee}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{attendee},'%')</if>
+			</if>
+			<if test="type != null and type != ''">
+				AND a.type = #{type}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="CcmKnowKeyMeeting">
+		SELECT 
+			<include refid="ccmKnowKeyMeetingColumns"/>
+		FROM ccm_know_key_meeting a
+		<include refid="ccmKnowKeyMeetingJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO ccm_know_key_meeting(
+			id,
+			title,
+			time_start,
+			time_long,
+			address,
+			office_id,
+			compere,
+			attendee,
+			absentee,
+			type,
+			content,
+			resolution,
+			handle,
+			file,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag
+		) VALUES (
+			#{id},
+			#{title},
+			#{timeStart},
+			#{timeLong},
+			#{address},
+			#{office.id},
+			#{compere},
+			#{attendee},
+			#{absentee},
+			#{type},
+			#{content},
+			#{resolution},
+			#{handle},
+			#{file},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE ccm_know_key_meeting SET 	
+			title = #{title},
+			time_start = #{timeStart},
+			time_long = #{timeLong},
+			address = #{address},
+			office_id = #{office.id},
+			compere = #{compere},
+			attendee = #{attendee},
+			absentee = #{absentee},
+			type = #{type},
+			content = #{content},
+			resolution = #{resolution},
+			handle = #{handle},
+			file = #{file},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE ccm_know_key_meeting SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

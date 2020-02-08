@@ -1,0 +1,256 @@
+.header-logo{
+	width: 1560px;
+}
+.header h5 {
+    background: url(../images/headerLogo.png) no-repeat center;
+    background-size: 100% 100%;
+    line-height: 21px;
+    letter-spacing: 10px;
+    line-height: 40px;
+    letter-spacing: 1px;
+    font-size: 26px;
+}
+.header span {
+    background: url(../images/header-right.png) no-repeat center;
+    background-size: 100% 100%;
+}
+.header h5 b{
+	font-size: 20px;
+    font-weight: 545;
+}
+.fengxian-danwei{
+	width: 100%;
+	height: 100%;
+	position: relative;
+	
+}
+.fengxian-danwei li{
+	width: 46%;
+    height: 27%;
+    float: left;
+    margin: 2%;
+	border: 1px solid #10559a;
+	padding: 3px 5px
+}
+.fengxian-danwei li.maodn-li1{
+	position: absolute;
+	left:-3px;
+	top:24px;
+	width:50%;
+	height:30%;
+}
+.maodn-li2{
+	position: absolute;
+	left: 128px;
+    top: 31px;
+	
+}
+.maodn-li3{
+	position: absolute;
+	left:0px;
+	top:120px;
+
+	
+}
+.maodn-li4{
+	position: absolute;
+	left: 128px;
+    top: 120px;
+	
+}
+
+.fengxian-color1{
+	color:#800528;
+	font-size: 18px;
+	margin-bottom: 6px;
+}
+.fengxian-color2{
+	color:#a69025
+}
+.fengxian-color3{
+	color:#9fc325
+}
+.fengxian-color4{
+	color:#dae5e8
+}
+.fengxian-num{
+	color:#6f9fb3;
+	font-size: 28px
+}
+.common-header {
+    position: absolute;
+    top: -5px;
+    left: 32px;
+     padding: 5px 16px;
+}
+.table-info-table{
+	height: 100%; 
+	width: 90%
+}
+
+@media (min-width: 1601px) and (max-width:1680px)  {
+		.header-logo {
+    width: 1349px;
+}
+	.fengxian-danwei li {
+    font-size: 12px;
+}
+	.fengxian-color1 {
+    color: #800528;
+    font-size: 15px;
+    margin-bottom: 6px;
+}
+.maodn-li2 {
+    left: 111px;
+}
+.maodn-li4 {
+    left: 111px;
+}
+.table-info-table{
+	height: 100%; 
+	width: 92%
+}
+}
+@media (min-width: 1441px) and (max-width:1600px)  {
+		.header h5.header-logo {
+   background: url(../images/headerLogo.png) no-repeat center;
+    background-size: 100% 100%;
+    line-height: 21px;
+    letter-spacing: 10px;
+    line-height: 34px;
+    letter-spacing: 1px;
+    font-size: 18px;
+    width: 100%;
+    height: 52px;
+}
+.fengxian-danwei li {
+    font-size: 12px;
+   line-height: 20px;
+   width: 48%
+}
+	.fengxian-color1 {
+    color: #800528;
+    font-size: 14px;
+    margin-bottom: 6px;
+}
+.maodn-li2 {
+    left: 105px;
+}
+.maodn-li3 {
+    left: 2px;
+}
+.maodn-li4 {
+    left: 105px;
+}
+.table-info-table{
+	height: 100%; 
+	width: 92%
+}
+}
+@media (min-width: 1367px) and (max-width:1440px)  {
+	.header h5.header-logo {
+    background: url(../images/headerLogo.png) no-repeat center;
+    background-size: 100% 100%;
+    line-height: 21px;
+    letter-spacing: 10px;
+    line-height: 34px;
+    letter-spacing: 0px;
+    font-size: 18px;
+    width: 100%;
+}
+.fengxian-danwei li {
+    font-size: 12px;
+   line-height: 20px;
+   width: 48%;
+   
+}
+.fengxian-danwei li div{
+    width: 144px;
+    font-size: 20px;
+    -webkit-transform: scale(0.5);
+    -moz-transform: scale(0.5);
+    -o-transform: scale(0.5);
+    transform: scale(0.5);
+    margin-left: -37px;
+}
+	.fengxian-danwei li div.fengxian-color1 {
+    color: #800528;
+    font-size: 14px;
+    margin-bottom: 6px;
+     -webkit-transform: scale(1);
+    -moz-transform: scale(1);
+    -o-transform: scale(1);
+    transform: scale(1);
+    margin-left: 0px;
+}
+.maodn-li2 {
+    left: 93px;
+}
+.maodn-li3 {
+    left: 2px;
+}
+.maodn-li4 {
+    left: 93px;
+}
+.table-info-table{
+	height: 100%; 
+	width: 92%
+}
+}
+@media  (max-width:1366px)  {
+	.header h5.header-logo {
+       background: url(../images/headerLogo.png) no-repeat center;
+    background-size: 100% 100%;
+    line-height: 21px;
+    letter-spacing: 10px;
+    line-height: 28px;
+    letter-spacing: 0px;
+    font-size: 16px;
+    width: 100%;
+}
+.fengxian-danwei li {
+    font-size: 12px;
+   line-height: 20px;
+   width: 48%;
+   
+}
+.fengxian-danwei li div{
+    width: 144px;
+    font-size: 20px;
+    -webkit-transform: scale(0.5);
+    -moz-transform: scale(0.5);
+    -o-transform: scale(0.5);
+    transform: scale(0.5);
+    margin-left: -37px;
+}
+	.fengxian-danwei li div.fengxian-color1 {
+    color: #800528;
+    font-size: 12px;
+    margin-bottom: 5px;
+     -webkit-transform: scale(1);
+    -moz-transform: scale(1);
+    -o-transform: scale(1);
+    transform: scale(1);
+    margin-left: 0px;
+}
+.maodn-li2 {
+    left:88px;
+    top: 28px;
+}
+.maodn-li3 {
+    left: 0px;
+    top: 85px;
+}
+.maodn-li4 {
+    left:88px;
+    top: 85px;
+}
+.table-info-table{
+	height: 100%; 
+	width: 92%
+}
+.header h5 b {
+    font-size: 16px;
+    font-weight: 545;
+}
+}

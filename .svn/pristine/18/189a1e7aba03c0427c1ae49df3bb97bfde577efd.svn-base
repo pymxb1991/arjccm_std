@@ -1,0 +1,147 @@
+/**
+ * Copyright &copy; 2012-2016 <a href="https://github.com/thinkgem/jeesite">JeeSite</a> All rights reserved.
+ */
+package com.arjjs.ccm.modules.pbs.question.entity;
+
+import org.hibernate.validator.constraints.Length;
+
+import com.arjjs.ccm.common.persistence.DataEntity;
+
+/**
+ * 评分规则定义Entity
+ * @author lc
+ * @version 2018-06-06
+ */
+public class PbsQuestionRuleitem extends DataEntity<PbsQuestionRuleitem> {
+	
+	private static final long serialVersionUID = 1L;
+	private String sParentid;		// 评分规则名称
+	private String sType;		// 试题类型
+	private String sCompare;		// 对比方式
+	private String sCodetype;		// 判断代码语言
+	private String sCodecontent;		// 脚本内容
+	private String sJudgeval;		// 判断值
+	private String iVal;		// 赋分比例
+	private String sUrl;		// 展示的图片
+	private String sSpare01;		// 备用字段
+	private String sSpare02;		// 备用字段
+	private String sSpare03;		// 备用字段
+	private String sSpare04;		// 备用字段
+	
+	public PbsQuestionRuleitem() {
+		super();
+	}
+
+	public PbsQuestionRuleitem(String id){
+		super(id);
+	}
+
+	@Length(min=1, max=64, message="评分规则名称长度必须介于 1 和 64 之间")
+	public String getSParentid() {
+		return sParentid;
+	}
+
+	public void setSParentid(String sParentid) {
+		this.sParentid = sParentid;
+	}
+	
+	@Length(min=0, max=10, message="试题类型长度必须介于 0 和 10 之间")
+	public String getSType() {
+		return sType;
+	}
+
+	public void setSType(String sType) {
+		this.sType = sType;
+	}
+	
+	@Length(min=0, max=20, message="对比方式长度必须介于 0 和 20 之间")
+	public String getSCompare() {
+		return sCompare;
+	}
+
+	public void setSCompare(String sCompare) {
+		this.sCompare = sCompare;
+	}
+	
+	@Length(min=0, max=50, message="判断代码语言长度必须介于 0 和 50 之间")
+	public String getSCodetype() {
+		return sCodetype;
+	}
+
+	public void setSCodetype(String sCodetype) {
+		this.sCodetype = sCodetype;
+	}
+	
+	@Length(min=0, max=2000, message="脚本内容长度必须介于 0 和 2000 之间")
+	public String getSCodecontent() {
+		return sCodecontent;
+	}
+
+	public void setSCodecontent(String sCodecontent) {
+		this.sCodecontent = sCodecontent;
+	}
+	
+	@Length(min=0, max=200, message="判断值长度必须介于 0 和 200 之间")
+	public String getSJudgeval() {
+		return sJudgeval;
+	}
+
+	public void setSJudgeval(String sJudgeval) {
+		this.sJudgeval = sJudgeval;
+	}
+	
+	@Length(min=0, max=11, message="赋分比例长度必须介于 0 和 11 之间")
+	public String getIVal() {
+		return iVal;
+	}
+
+	public void setIVal(String iVal) {
+		this.iVal = iVal;
+	}
+	
+	@Length(min=0, max=500, message="展示的图片长度必须介于 0 和 500 之间")
+	public String getSUrl() {
+		return sUrl;
+	}
+
+	public void setSUrl(String sUrl) {
+		this.sUrl = sUrl;
+	}
+	
+	@Length(min=0, max=64, message="备用字段长度必须介于 0 和 64 之间")
+	public String getSSpare01() {
+		return sSpare01;
+	}
+
+	public void setSSpare01(String sSpare01) {
+		this.sSpare01 = sSpare01;
+	}
+	
+	@Length(min=0, max=64, message="备用字段长度必须介于 0 和 64 之间")
+	public String getSSpare02() {
+		return sSpare02;
+	}
+
+	public void setSSpare02(String sSpare02) {
+		this.sSpare02 = sSpare02;
+	}
+	
+	@Length(min=0, max=64, message="备用字段长度必须介于 0 和 64 之间")
+	public String getSSpare03() {
+		return sSpare03;
+	}
+
+	public void setSSpare03(String sSpare03) {
+		this.sSpare03 = sSpare03;
+	}
+	
+	@Length(min=0, max=64, message="备用字段长度必须介于 0 和 64 之间")
+	public String getSSpare04() {
+		return sSpare04;
+	}
+
+	public void setSSpare04(String sSpare04) {
+		this.sSpare04 = sSpare04;
+	}
+	
+}

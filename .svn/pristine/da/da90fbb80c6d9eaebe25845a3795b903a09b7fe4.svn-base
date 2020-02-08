@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.arjjs.ccm.modules.plm.home.dao.PlmPortalDetailDao">
+    
+	<sql id="plmPortalDetailColumns">
+		a.id AS "id",
+		a.parent_id AS "parent.id",
+		a.portal_dict_id AS "portalDictId",
+		a.title AS "title",
+		a.connect AS "connect",
+		c.content AS "content",
+		a.hight AS "hight",
+		a.long_itude AS "longItude",
+		a.lat_itude AS "latItude",
+		a.type AS "type",
+		a.sort AS "sort",
+		a.extend1 AS "extend1",
+		a.extend2 AS "extend2",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag",
+		b.name AS "parent.name"
+	</sql>
+	
+	<sql id="plmPortalDetailJoins">
+		LEFT JOIN plm_portal_plan b ON b.id = a.parent_id
+		LEFT JOIN plm_portal_dict c ON c.id = a.portal_dict_id
+	</sql>
+    
+	<select id="get" resultType="PlmPortalDetail">
+		SELECT 
+			<include refid="plmPortalDetailColumns"/>
+		FROM plm_portal_detail a
+		<include refid="plmPortalDetailJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="PlmPortalDetail">
+		SELECT 
+			<include refid="plmPortalDetailColumns"/>
+		FROM plm_portal_detail a
+			<include refid="plmPortalDetailJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="parent != null and parent.id != null and parent.id != ''">
+				AND a.parent_id = #{parent.id}
+			</if>
+			<if test="title != null and title != ''">
+				AND a.title LIKE 
+					<if test="dbName == 'oracle'">'%'||#{title}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{title}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{title},'%')</if>
+			</if>
+			<if test="type != null and type != ''">
+				AND a.type = #{type}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.create_date ASC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="PlmPortalDetail">
+		SELECT 
+			<include refid="plmPortalDetailColumns"/>
+		FROM plm_portal_detail a
+		<include refid="plmPortalDetailJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.create_date ASC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO plm_portal_detail(
+			id,
+			parent_id,
+			portal_dict_id,
+			title,
+			connect,
+			content,
+			hight,
+			long_itude,
+			lat_itude,
+			type,
+			sort,
+			extend1,
+			extend2,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag
+		) VALUES (
+			#{id},
+			#{parent.id},
+			#{portalDictId},
+			#{title},
+			#{connect},
+			#{content},
+			#{hight},
+			#{longItude},
+			#{latItude},
+			#{type},
+			#{sort},
+			#{extend1},
+			#{extend2},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE plm_portal_detail SET 	
+			parent_id = #{parent.id},
+			portal_dict_id = #{portalDictId},
+			title = #{title},
+			connect = #{connect},
+			content = #{content},
+			hight = #{hight},
+			long_itude = #{longItude},
+			lat_itude = #{latItude},
+			type = #{type},
+			sort = #{sort},
+			extend1 = #{extend1},
+			extend2 = #{extend2},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE plm_portal_detail SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		<choose>
+			<when test="id !=null and id != ''">
+				WHERE id = #{id}
+			</when>
+			<otherwise>
+				WHERE parent_id = #{parent.id}
+			</otherwise>
+		</choose>
+	</update>
+	
+</mapper>

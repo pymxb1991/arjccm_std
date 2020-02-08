@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.arjjs.ccm.modules.ccm.lane.dao.CcmLaneDao">
+    
+	<sql id="ccmLaneColumns">
+		a.id AS "id",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag",
+		a.lane_name AS "laneName",
+		a.lane_direction AS "laneDirection",
+		a.big_car_max_speed AS "bigCarMaxSpeed",
+		a.big_car_min_speed AS "bigCarMinSpeed",
+		a.small_car_max_speed AS "smallCarMaxSpeed",
+		a.small_car_min_speed AS "smallCarMinSpeed",
+		a.pass_direction AS "passDirection",
+		b.id AS "bayonetId",
+		b.bayonet_name AS "bayonetName"
+	</sql>
+	
+	<sql id="ccmLaneJoins">
+	LEFT JOIN ccm_car_bayonet b ON a.bayonet_id = b.id
+	</sql>
+    
+	<select id="get" resultType="CcmLane">
+		SELECT 
+			<include refid="ccmLaneColumns"/>
+		FROM ccm_lane a
+		<include refid="ccmLaneJoins"/>
+		WHERE a.id= #{id} 
+	</select>
+	
+	<select id="findList" resultType="CcmLane">
+		SELECT 
+			<include refid="ccmLaneColumns"/>
+		FROM ccm_lane a
+		<include refid="ccmLaneJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="laneName != null and laneName != ''">
+				AND a.lane_name LIKE 
+					<if test="dbName == 'oracle'">'%'||#{laneName}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{laneName}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{laneName},'%')</if>
+			</if>
+			<if test="laneDirection != null and laneDirection != ''">
+				AND a.lane_direction = #{laneDirection}
+			</if>
+			<if test="bayonetId != null and bayonetId != ''">
+				AND a.bayonet_id = #{bayonetId}
+			</if>
+			<if test="passDirection != null and passDirection != ''">
+				AND a.pass_direction = #{passDirection}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="CcmLane">
+		SELECT 
+			<include refid="ccmLaneColumns"/>
+		FROM ccm_lane a
+		<include refid="ccmLaneJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO ccm_lane(
+			id,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag,
+			lane_name,
+			lane_direction,
+			big_car_max_speed,
+			big_car_min_speed,
+			small_car_max_speed,
+			small_car_min_speed,
+			bayonet_id,
+			pass_direction
+		) VALUES (
+			#{id},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag},
+			#{laneName},
+			#{laneDirection},
+			#{bigCarMaxSpeed},
+			#{bigCarMinSpeed},
+			#{smallCarMaxSpeed},
+			#{smallCarMinSpeed},
+			#{bayonetId},
+			#{passDirection}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE ccm_lane SET 	
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks},
+			lane_name = #{laneName},
+			lane_direction = #{laneDirection},
+			big_car_max_speed = #{bigCarMaxSpeed},
+			big_car_min_speed = #{bigCarMinSpeed},
+			small_car_max_speed = #{smallCarMaxSpeed},
+			small_car_min_speed = #{smallCarMinSpeed},
+			bayonet_id = #{bayonetId},
+			pass_direction = #{passDirection}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE ccm_lane SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

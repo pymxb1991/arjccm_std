@@ -1,0 +1,19 @@
+@CHARSET "UTF-8";
+
+.pad {
+	min-width: 120px;
+	padding: 5px;
+	padding-left: 10px
+}
+
+li.spePop {
+	margin-left: 10px;
+}
+
+form#inputForm .tableName {
+	margin: 12px;
+}
+
+form#inputForm .tableNamefirst {
+	margin: -10px 10px 10px 10px
+}

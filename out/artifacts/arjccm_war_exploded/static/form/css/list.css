@@ -1,0 +1,12 @@
+@CHARSET "UTF-8";
+
+label.searchName {
+	min-width: 120px;
+	padding: 5px;
+	padding-left: 10px
+}
+
+.rightLabe {
+	min-width: 120px;
+	padding-left: 50px;
+}

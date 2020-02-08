@@ -1,0 +1,205 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.arjjs.ccm.modules.ccm.org.dao.CcmOrgGroppreventDao">
+    
+	<sql id="ccmOrgGroppreventColumns">
+		a.id AS "id",
+		a.orgprevent_id AS "orgpreventId.id",
+		a2.com_name AS "orgpreventId.comName",
+		a.name AS "name",
+		a.sex AS "sex",
+		a.nation AS "nation",
+		a.politics AS "politics",
+		a.iden_code AS "idenCode",
+		a.iden_num AS "idenNum",
+		a.birthday AS "birthday",
+		a.service AS "service",
+		a.prof_expertise AS "profExpertise",
+		a.education AS "education",
+		a.telephone AS "telephone",
+		a.fix_tel AS "fixTel",
+		a.images AS "images",
+		a.age AS "age",
+		a.health AS "health",
+		a.duty AS "duty",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag"
+	</sql>
+	
+	<sql id="ccmOrgGroppreventJoins">
+		LEFT JOIN ccm_org_orgprevent a2 ON a2.id = a.orgprevent_id
+	</sql>
+    
+	<select id="get" resultType="CcmOrgGropprevent">
+		SELECT 
+			<include refid="ccmOrgGroppreventColumns"/>
+		FROM ccm_org_gropprevent a
+		<include refid="ccmOrgGroppreventJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="CcmOrgGropprevent">
+		SELECT 
+			<include refid="ccmOrgGroppreventColumns"/>
+		FROM ccm_org_gropprevent a
+		<include refid="ccmOrgGroppreventJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="orgpreventId != null and orgpreventId.id != null and orgpreventId.id != ''">
+				AND a.orgprevent_id = #{orgpreventId.id}
+			</if>
+			<if test="name != null and name != ''">
+				AND a.name LIKE 
+					<if test="dbName == 'oracle'">'%'||#{name}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{name}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{name},'%')</if>
+			</if>
+			<if test="sex != null and sex != ''">
+				AND a.sex = #{sex}
+			</if>
+			<if test="idenNum != null and idenNum != ''">
+				AND a.iden_num LIKE 
+					<if test="dbName == 'oracle'">'%'||#{idenNum}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{idenNum}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{idenNum},'%')</if>
+			</if>
+			<if test="beginBirthday != null and endBirthday != null and beginBirthday != '' and endBirthday != ''">
+				AND a.birthday BETWEEN #{beginBirthday} AND #{endBirthday}
+			</if>
+			<if test="education != null and education != ''">
+				AND a.education = #{education}
+			</if>
+			<if test="telephone != null and telephone != ''">
+				AND a.telephone LIKE 
+					<if test="dbName == 'oracle'">'%'||#{telephone}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{telephone}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{telephone},'%')</if>
+			</if>
+			<if test="profExpertises != null and profExpertises.length > 0">
+				AND (
+				<foreach collection="profExpertises" item="m"  separator=" OR " >
+					<if test="m != null and m != ''">
+		           	   a.prof_expertise LIKE concat('%',#{m},'%')
+		           	</if>
+		        </foreach>
+		        )
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="CcmOrgGropprevent">
+		SELECT 
+			<include refid="ccmOrgGroppreventColumns"/>
+		FROM ccm_org_gropprevent a
+		<include refid="ccmOrgGroppreventJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO ccm_org_gropprevent(
+			id,
+			orgprevent_id,
+			name,
+			sex,
+			nation,
+			politics,
+			iden_code,
+			iden_num,
+			birthday,
+			service,
+			prof_expertise,
+			education,
+			telephone,
+			fix_tel,
+			images,
+			age,
+			health,
+			duty,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag
+		) VALUES (
+			#{id},
+			#{orgpreventId.id},
+			#{name},
+			#{sex},
+			#{nation},
+			#{politics},
+			#{idenCode},
+			#{idenNum},
+			#{birthday},
+			#{service},
+			#{profExpertise},
+			#{education},
+			#{telephone},
+			#{fixTel},
+			#{images},
+			#{age},
+			#{health},
+			#{duty},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE ccm_org_gropprevent SET 	
+			orgprevent_id = #{orgpreventId.id},
+			name = #{name},
+			sex = #{sex},
+			nation = #{nation},
+			politics = #{politics},
+			iden_code = #{idenCode},
+			iden_num = #{idenNum},
+			birthday = #{birthday},
+			service = #{service},
+			prof_expertise = #{profExpertise},
+			education = #{education},
+			telephone = #{telephone},
+			fix_tel = #{fixTel},
+			images = #{images},
+			age = #{age},
+			health = #{health},
+			duty = #{duty},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE ccm_org_gropprevent SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

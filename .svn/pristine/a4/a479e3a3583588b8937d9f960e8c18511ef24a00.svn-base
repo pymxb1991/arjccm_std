@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.arjjs.ccm.modules.ccm.know.dao.CcmKnowKeyJobDao">
+    
+	<sql id="ccmKnowKeyJobColumns">
+		a.id AS "id",
+		a.name AS "name",
+		a.time_start AS "timeStart",
+		a.time_end AS "timeEnd",
+		a.address AS "address",
+		a.office_id AS "office.id",
+		a.abstracts AS "abstracts",
+		a.plan AS "plan",
+		a.achievement AS "achievement",
+		a.summarize AS "summarize",
+		a.file AS "file",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag",
+		o6.name AS "office.name"
+	</sql>
+	
+	<sql id="ccmKnowKeyJobJoins">
+		LEFT JOIN sys_office o6 ON o6.id = a.office_id
+	</sql>
+    
+	<select id="get" resultType="CcmKnowKeyJob">
+		SELECT 
+			<include refid="ccmKnowKeyJobColumns"/>
+		FROM ccm_know_key_job a
+		<include refid="ccmKnowKeyJobJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="CcmKnowKeyJob">
+		SELECT 
+			<include refid="ccmKnowKeyJobColumns"/>
+		FROM ccm_know_key_job a
+		<include refid="ccmKnowKeyJobJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="name != null and name != ''">
+				AND a.name LIKE 
+					<if test="dbName == 'oracle'">'%'||#{name}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{name}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{name},'%')</if>
+			</if>
+			<if test="beginTimeStart != null and endTimeStart != null and beginTimeStart != '' and endTimeStart != ''">
+				AND a.time_start BETWEEN #{beginTimeStart} AND #{endTimeStart}
+			</if>
+			<if test="address != null and address != ''">
+				AND a.address LIKE 
+					<if test="dbName == 'oracle'">'%'||#{address}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{address}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{address},'%')</if>
+			</if>
+			<if test="abstracts != null and abstracts != ''">
+				AND a.abstracts LIKE 
+					<if test="dbName == 'oracle'">'%'||#{abstracts}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{abstracts}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{abstracts},'%')</if>
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="CcmKnowKeyJob">
+		SELECT 
+			<include refid="ccmKnowKeyJobColumns"/>
+		FROM ccm_know_key_job a
+		<include refid="ccmKnowKeyJobJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO ccm_know_key_job(
+			id,
+			name,
+			time_start,
+			time_end,
+			address,
+			office_id,
+			abstracts,
+			plan,
+			achievement,
+			summarize,
+			file,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag
+		) VALUES (
+			#{id},
+			#{name},
+			#{timeStart},
+			#{timeEnd},
+			#{address},
+			#{office.id},
+			#{abstracts},
+			#{plan},
+			#{achievement},
+			#{summarize},
+			#{file},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE ccm_know_key_job SET 	
+			name = #{name},
+			time_start = #{timeStart},
+			time_end = #{timeEnd},
+			address = #{address},
+			office_id = #{office.id},
+			abstracts = #{abstracts},
+			plan = #{plan},
+			achievement = #{achievement},
+			summarize = #{summarize},
+			file = #{file},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE ccm_know_key_job SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

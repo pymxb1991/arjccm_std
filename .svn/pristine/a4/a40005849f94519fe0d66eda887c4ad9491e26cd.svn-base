@@ -1,0 +1,333 @@
+/**
+ * Copyright &copy; 2012-2016 <a href="https://github.com/thinkgem/jeesite">JeeSite</a> All rights reserved.
+ */
+package com.arjjs.ccm.modules.ccm.house.web;
+
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.validation.ConstraintViolationException;
+
+import com.arjjs.ccm.tool.EntityTools;
+import org.apache.ibatis.annotations.Param;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
+import com.arjjs.ccm.common.beanvalidator.BeanValidators;
+import com.arjjs.ccm.common.config.Global;
+import com.arjjs.ccm.common.persistence.Page;
+import com.arjjs.ccm.common.web.BaseController;
+import com.arjjs.ccm.common.utils.DateUtils;
+import com.arjjs.ccm.common.utils.StringUtils;
+import com.arjjs.ccm.tool.ExportExcel;
+import com.arjjs.ccm.common.utils.excel.ImportExcel;
+import com.arjjs.ccm.modules.ccm.house.entity.CcmHarmNationalSecurity;
+import com.arjjs.ccm.modules.ccm.house.entity.CcmHouseDangerous;
+import com.arjjs.ccm.modules.ccm.house.service.CcmHarmNationalSecurityService;
+import com.arjjs.ccm.modules.ccm.house.service.CcmHouseDangerousService;
+import com.arjjs.ccm.modules.ccm.log.entity.CcmLogTail;
+import com.arjjs.ccm.modules.ccm.log.service.CcmLogTailService;
+import com.arjjs.ccm.modules.ccm.pop.entity.CcmPeople;
+import com.arjjs.ccm.modules.ccm.pop.service.CcmPeopleService;
+import com.arjjs.ccm.modules.sys.entity.User;
+import com.arjjs.ccm.modules.sys.utils.UserUtils;
+import com.arjjs.ccm.tool.CommUtil;
+
+import net.sf.json.JSONArray;
+import net.sf.json.JsonConfig;
+import net.sf.json.util.CycleDetectionStrategy;
+
+/**
+ * 危害国家安全人员Controller
+ * 
+ * @author liuxue
+ * @version 2018-09-26
+ */
+@Controller
+@RequestMapping(value = "${adminPath}/house/ccmHarmNationalSecurity")
+public class CcmHarmNationalSecurityController extends BaseController {
+
+	@Autowired
+	private CcmHarmNationalSecurityService ccmHarmNationalSecurityService;
+	@Autowired
+	private CcmPeopleService ccmPeopleService;
+	@Autowired
+	private CcmLogTailService ccmLogTailService;
+
+	@ModelAttribute
+	public CcmHarmNationalSecurity get(@RequestParam(value = "id", required = false) String id,
+			@RequestParam(value = "peopleId", required = false) String peopleId) {
+		CcmHarmNationalSecurity entity = null;
+		if (StringUtils.isNotBlank(id)) {
+			entity = ccmHarmNationalSecurityService.get(id);
+		} else if (StringUtils.isNotBlank(peopleId)) {
+			entity = ccmHarmNationalSecurityService.getPeopleALL(peopleId);
+		}
+		if (entity == null) {
+			entity = new CcmHarmNationalSecurity();
+			// 如果 peopleId 不为空 则 添加该ID
+			if (StringUtils.isNotBlank(peopleId)) {
+				entity.setPeopleId(peopleId);
+			}
+		}
+
+		return entity;
+	}
+
+	// 人员标记处
+	@RequiresPermissions("house:ccmHarmNationalSecurity:view")
+	@RequestMapping(value = "specialform")
+	public String specialform(CcmPeople ccmPeople, Model model) {
+		model.addAttribute("ccmPeople", ccmPeople);
+		CcmHarmNationalSecurity ccmHarmNationalSecurity = ccmHarmNationalSecurityService.getPeopleALL(ccmPeople.getId());
+		if (ccmHarmNationalSecurity == null) {
+			ccmHarmNationalSecurity = new CcmHarmNationalSecurity();
+		}
+		model.addAttribute("ccmHarmNationalSecurity", ccmHarmNationalSecurity);
+		return "/ccm/house/pop/ccmHarmNationalSecurityForm";
+	}
+
+	@RequiresPermissions("house:ccmHarmNationalSecurity:view")
+	@RequestMapping(value = { "list", "" })
+	public String list(CcmHarmNationalSecurity ccmHarmNationalSecurity, HttpServletRequest request,
+			HttpServletResponse response, Model model, @Param("tableType") String tableType) {
+		Page<CcmHarmNationalSecurity> page = new Page<CcmHarmNationalSecurity>();
+		String permissionKey = request.getParameter("permissionKey");
+		User user = UserUtils.getUser();
+		if (user != null && "1".equals(user.getHasPermission())) {// 有涉密权限
+			page = ccmHarmNationalSecurityService.findPage(new Page<CcmHarmNationalSecurity>(request, response),
+					ccmHarmNationalSecurity);
+		} else if (user != null && "0".equals(user.getHasPermission())) {// 无涉密权限
+			if (user.getPermissionKey() != null && user.getPermissionKey().equals(permissionKey)) {
+				page = ccmHarmNationalSecurityService.findPage(new Page<CcmHarmNationalSecurity>(request, response),
+						ccmHarmNationalSecurity);
+			} else {
+				model.addAttribute("message", "涉密权限不正确！");
+			}
+		}
+		model.addAttribute("page", page);
+		model.addAttribute("permissionKey", permissionKey);
+		if (StringUtils.isBlank(tableType)) {
+			return "ccm/house/ccmHarmNationalSecurityList";
+		} else {
+			return "ccm/house/emphasis/ccmHarmNationalSecurityList";
+		}
+	}
+
+	@RequiresPermissions("house:ccmHarmNationalSecurity:view")
+	@RequestMapping(value = "form")
+	public String form(CcmHarmNationalSecurity ccmHarmNationalSecurity, Model model) {
+		// 创建 查询对象 建立查询条件
+		CcmLogTail ccmLogTailDto = new CcmLogTail();
+		ccmLogTailDto.setRelevanceId(ccmHarmNationalSecurity.getId());
+		ccmLogTailDto.setRelevanceTable("ccm_harm_national_security");
+		List<CcmLogTail> ccmLogTailList = ccmLogTailService.findListByObject(ccmLogTailDto);
+		// 返回查询结果
+		JsonConfig config = new JsonConfig();
+		config.setExcludes(new String[] { "createBy", "updateBy", "currentUser", "dbName", "global", "page",
+				"createDate", "updateDate", "sqlMap" });
+		config.setIgnoreDefaultExcludes(false); // 设置默认忽略
+		config.setCycleDetectionStrategy(CycleDetectionStrategy.LENIENT);
+		String jsonDocumentList = JSONArray.fromObject(ccmLogTailList, config).toString();
+		model.addAttribute("documentList", jsonDocumentList);
+		model.addAttribute("documentNumber", ccmLogTailList.size());
+
+		model.addAttribute("ccmLogTailList", ccmLogTailList);
+		model.addAttribute("ccmHarmNationalSecurity", ccmHarmNationalSecurity);
+		return "ccm/house/ccmHarmNationalSecurityForm";
+	}
+
+	@RequiresPermissions("house:ccmHarmNationalSecurity:edit")
+	@RequestMapping(value = "savePop")
+	public String savePop(CcmHarmNationalSecurity ccmHarmNationalSecurity, Model model,
+			RedirectAttributes redirectAttributes) {
+		if (!beanValidator(model, ccmHarmNationalSecurity)) {
+			return form(ccmHarmNationalSecurity, model);
+		}
+		ccmHarmNationalSecurityService.save(ccmHarmNationalSecurity);
+		// 更新 当前人 是 危害国家安全人员
+		CcmPeople ccmPop = ccmPeopleService.get(ccmHarmNationalSecurity.getPeopleId());
+		if (ccmPop != null) {
+			ccmPop.setIsHarmNational(1);
+			ccmPeopleService.save(ccmPop);
+		}
+
+		addMessage(redirectAttributes, "保存吸毒人口成功");
+
+		return "redirect:" + Global.getAdminPath() + "/pop/ccmPeople/?repage";
+	}
+
+	@RequiresPermissions("house:ccmHarmNationalSecurity:edit")
+	@RequestMapping(value = "save")
+	public void save(HttpServletRequest request, HttpServletResponse response,
+			CcmHarmNationalSecurity ccmHarmNationalSecurity, Model model, RedirectAttributes redirectAttributes)
+			throws IOException {
+		if (!beanValidator(model, ccmHarmNationalSecurity)) {
+//			return form(ccmHarmNationalSecurity, model);
+		}
+		ccmHarmNationalSecurityService.save(ccmHarmNationalSecurity);
+		// 更新 当前人 是 危害国家安全人员
+		CcmPeople ccmPop = ccmPeopleService.get(ccmHarmNationalSecurity.getPeopleId());
+		if (ccmPop != null) {
+			ccmPop.setIsHarmNational(1);
+			ccmPeopleService.save(ccmPop);
+		}
+
+		addMessage(redirectAttributes, "保存危害国家安全人员成功");
+
+//		return "redirect:" + Global.getAdminPath() + "/house/ccmHarmNationalSecurity/?repage";
+
+		PrintWriter out = response.getWriter();
+		CommUtil.openWinExpDiv(out, "保存危害国家安全人员成功");
+
+	}
+
+	@RequiresPermissions("house:ccmHarmNationalSecurity:edit")
+	@RequestMapping(value = "delete")
+	public String delete(HttpServletRequest request, CcmHarmNationalSecurity ccmHarmNationalSecurity,
+			RedirectAttributes redirectAttributes) {
+		ccmHarmNationalSecurityService.delete(ccmHarmNationalSecurity);
+		addMessage(redirectAttributes, "删除危害国家安全人员成功");
+		String permissionKey = request.getParameter("permissionKey");
+		// 更新 当前人 不再是 危害国家安全人员
+		CcmPeople ccmPop = ccmPeopleService.get(ccmHarmNationalSecurity.getPeopleId());
+		if (ccmPop != null) {
+			ccmPop.setIsHarmNational(0);
+			ccmPeopleService.save(ccmPop);
+		}
+
+		return "redirect:" + Global.getAdminPath() + "/house/ccmHarmNationalSecurity/?repage&permissionKey="
+				+ permissionKey;
+	}
+
+	/**
+	 * 导出危害国家安全人员数据
+	 * 
+	 * @param user
+	 * @param request
+	 * @param response
+	 * @param redirectAttributes
+	 * @return
+	 */
+	@RequiresPermissions("house:ccmHarmNationalSecurity:view")
+	@RequestMapping(value = "export", method = RequestMethod.POST)
+	public String exportFile(CcmHarmNationalSecurity ccmHarmNationalSecurity, HttpServletRequest request,
+			HttpServletResponse response, RedirectAttributes redirectAttributes) {
+		String [] strArr={"姓名","联系方式","人口类型","现住门（楼）详址","公民身份号码","嫌疑类型","呈报单位","监管状态","危险程度","呈报时间","发现途径","有无犯罪史"};
+		try {
+			String fileName = "危害国家安全人员数据" + DateUtils.getDate("yyyyMMddHHmmss") + ".xlsx";
+
+			List<CcmHarmNationalSecurity> list = new ArrayList<CcmHarmNationalSecurity>();
+			String permissionKey = request.getParameter("permissionKey");
+			User user = UserUtils.getUser();
+			if (user != null && "1".equals(user.getHasPermission())) {// 有涉密权限
+				list = ccmHarmNationalSecurityService.findList(ccmHarmNationalSecurity);
+			} else if (user != null && "0".equals(user.getHasPermission())) {// 无涉密权限
+				if (user.getPermissionKey() != null && user.getPermissionKey().equals(permissionKey)) {
+					list = ccmHarmNationalSecurityService.findList(ccmHarmNationalSecurity);
+				}
+			}
+
+//			List<ccmHarmNationalSecurity> list = ccmHarmNationalSecurityService.findList(ccmHarmNationalSecurity);
+			new ExportExcel("危害国家安全人员数据", CcmHarmNationalSecurity.class,strArr).setDataList(list).write(response, fileName)
+					.dispose();
+			return null;
+		} catch (Exception e) {
+			addMessage(redirectAttributes, "导出危害国家安全人员失败！失败信息：" + e.getMessage());
+		}
+		return "redirect:" + adminPath + "/house/ccmHarmNationalSecurity/?repage";
+	}
+
+	/**
+	 * 导入危害国家安全人员数据
+	 * 
+	 * @param file
+	 * @param redirectAttributes
+	 * @return
+	 */
+	@RequiresPermissions("house:ccmHarmNationalSecurity:view")
+	@RequestMapping(value = "import", method = RequestMethod.POST)
+	public String importFile(MultipartFile file, RedirectAttributes redirectAttributes) {
+		if (Global.isDemoMode()) {
+			addMessage(redirectAttributes, "演示模式，不允许操作！");
+			return "redirect:" + adminPath + "/house/ccmHarmNationalSecurity/?repage";
+		}
+		try {
+			int successNum = 0;
+			int failureNum = 0;
+			StringBuilder failureMsg = new StringBuilder();
+			ImportExcel ei = new ImportExcel(file, 1, 0);
+			List<CcmHarmNationalSecurity> list = ei.getDataList(CcmHarmNationalSecurity.class);
+			for (CcmHarmNationalSecurity HarmNationalSecurity : list) {
+				try {
+
+					if(EntityTools.isEmpty(HarmNationalSecurity)){
+						continue;
+					}
+					if(StringUtils.isBlank(HarmNationalSecurity.getSuspicionType()) ||
+							EntityTools.isEmpty(HarmNationalSecurity.getReportOffice()) ||
+							StringUtils.isBlank(HarmNationalSecurity.getSuperviseStatus()) ||
+							StringUtils.isBlank(HarmNationalSecurity.getDangerLevel()) ||
+							HarmNationalSecurity.getReportDate()==null ||
+							StringUtils.isBlank(HarmNationalSecurity.getDiscoveryWay()) ||
+							StringUtils.isBlank(HarmNationalSecurity.getIsCrimeHistory())
+					){
+						failureMsg.append("<br/>危害国家安全人员名 " + HarmNationalSecurity.getName() + " 导入失败：必填项为空");
+						continue;
+					}
+					CcmPeople ccmPeople = new CcmPeople();
+					ccmPeople.setIdent(HarmNationalSecurity.getIdent());
+					List<CcmPeople> list1 = ccmPeopleService.findList(ccmPeople);
+					CcmHarmNationalSecurity HarmNationalSecurityFind;
+
+					if (list1.isEmpty()) {
+						failureMsg.append("<br/>危害国家安全人员名 " + HarmNationalSecurity.getName() + " 导入失败：实有人口表中无此人");
+						continue;
+					} else {
+						ccmPeople = list1.get(0);
+						ccmPeople.setIsHarmNational(1);
+						ccmPeopleService.save(ccmPeople);
+						HarmNationalSecurityFind = ccmHarmNationalSecurityService.getPeopleALL(list1.get(0).getId());
+						BeanValidators.validateWithException(validator, HarmNationalSecurity);
+						if (HarmNationalSecurityFind == null) {
+							HarmNationalSecurity.setPeopleId(list1.get(0).getId());
+							ccmHarmNationalSecurityService.save(HarmNationalSecurity);
+							successNum++;
+						} else {
+							failureMsg.append("<br/>危害国家安全人员名 " + HarmNationalSecurity.getName() + " 导入失败：记录已存在");
+						}
+					}
+				} catch (ConstraintViolationException ex) {
+					failureMsg.append("<br/>危害国家安全人员名 " + HarmNationalSecurity.getName() + " 导入失败：");
+					List<String> messageList = BeanValidators.extractPropertyAndMessageAsList(ex, ": ");
+					for (String message : messageList) {
+						failureMsg.append(message + "; ");
+						failureNum++;
+					}
+				} catch (Exception ex) {
+					failureMsg.append("<br/>登录名 " + HarmNationalSecurity.getName() + " 导入失败：" + ex.getMessage());
+				}
+			}
+			if (failureNum > 0) {
+				failureMsg.insert(0, "，失败 " + failureNum + " 条危害国家安全人员，导入信息如下：");
+			}
+			addMessage(redirectAttributes, "已成功导入 " + successNum + " 条危害国家安全人员" + failureMsg);
+		} catch (Exception e) {
+			addMessage(redirectAttributes, "导入危害国家安全人员失败！失败信息：" + e.getMessage());
+		}
+		return "redirect:" + adminPath + "/house/ccmHarmNationalSecurity/?repage";
+	}
+
+}

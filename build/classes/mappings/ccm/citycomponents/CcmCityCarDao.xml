@@ -1,0 +1,176 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.arjjs.ccm.modules.ccm.citycomponents.dao.CcmCityCarDao">
+    
+	<sql id="ccmCityCarColumns">
+		a.id AS "id",
+		a.number AS "number",
+		a.color_car AS "colorCar",
+		a.type AS "type",
+		a.color_car_plate AS "colorCarPlate",
+		a.transport_type AS "transportType",
+		a.car_company AS "carCompany",
+		a.principle AS "principle",
+		a.principle_tel AS "principleTel",
+		a.name AS "name",
+		a.sex AS "sex",
+		a.driving_licence AS "drivingLicence",
+		a.ident AS "ident",
+		a.tel AS "tel",
+		a.images AS "images",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag"
+	</sql>
+	
+	<sql id="ccmCityCarJoins">
+	</sql>
+    
+	<select id="get" resultType="CcmCityCar">
+		SELECT 
+			<include refid="ccmCityCarColumns"/>
+		FROM ccm_city_car a
+		<include refid="ccmCityCarJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="CcmCityCar">
+		SELECT 
+			<include refid="ccmCityCarColumns"/>
+		FROM ccm_city_car a
+		<include refid="ccmCityCarJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="number != null and number != ''">
+				AND a.number LIKE 
+					<if test="dbName == 'oracle'">'%'||#{number}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{number}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{number},'%')</if>
+			</if>
+			<if test="colorCar != null and colorCar != ''">
+				AND a.color_car = #{colorCar}
+			</if>
+			<if test="type != null and type != ''">
+				AND a.type = #{type}
+			</if>
+			<if test="colorCarPlate != null and colorCarPlate != ''">
+				AND a.color_car_plate = #{colorCarPlate}
+			</if>
+			<if test="transportType != null and transportType != ''">
+				AND a.transport_type = #{transportType}
+			</if>
+			<if test="name != null and name != ''">
+				AND a.name LIKE 
+					<if test="dbName == 'oracle'">'%'||#{name}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{name}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{name},'%')</if>
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="CcmCityCar">
+		SELECT 
+			<include refid="ccmCityCarColumns"/>
+		FROM ccm_city_car a
+		<include refid="ccmCityCarJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO ccm_city_car(
+			id,
+			number,
+			color_car,
+			type,
+			color_car_plate,
+			transport_type,
+			car_company,
+			principle,
+			principle_tel,
+			name,
+			sex,
+			driving_licence,
+			ident,
+			tel,
+			images,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag
+		) VALUES (
+			#{id},
+			#{number},
+			#{colorCar},
+			#{type},
+			#{colorCarPlate},
+			#{transportType},
+			#{carCompany},
+			#{principle},
+			#{principleTel},
+			#{name},
+			#{sex},
+			#{drivingLicence},
+			#{ident},
+			#{tel},
+			#{images},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE ccm_city_car SET 	
+			number = #{number},
+			color_car = #{colorCar},
+			type = #{type},
+			color_car_plate = #{colorCarPlate},
+			transport_type = #{transportType},
+			car_company = #{carCompany},
+			principle = #{principle},
+			principle_tel = #{principleTel},
+			name = #{name},
+			sex = #{sex},
+			driving_licence = #{drivingLicence},
+			ident = #{ident},
+			tel = #{tel},
+			images = #{images},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE ccm_city_car SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

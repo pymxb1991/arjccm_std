@@ -1,0 +1,429 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.arjjs.ccm.modules.plm.email.dao.PlmWorkEmailDao">
+
+	<sql id="plmWorkEmailColumns">
+		a.id AS "id",
+		a.type AS "type",
+		a.title AS "title",
+		a.content
+		AS "content",
+		a.files AS "files",
+		a.status AS "status",
+		a.create_by AS
+		"createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS
+		"updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks
+		AS "remarks",
+		a.del_flag AS "delFlag",
+		b.read_num,
+		b.un_read_num
+	</sql>
+
+	<sql id="plmWorkEmailColumnsforSelf">
+		a.id AS "id",
+		a.title AS "title",
+		a.content AS "content",
+		a.status AS "status",
+		a.create_by AS "createBy.id",
+		a.create_date AS
+		"createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS
+		"updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag"
+	</sql>
+	<sql id="plmWorkEmailJoinsUser">
+		LEFT JOIN sys_user sysU on a.create_by = sysU.id
+	</sql>
+	<sql id="plmWorkEmailJoins">
+		LEFT JOIN (
+		SELECT r.report_id,
+		sum(case when r.read_flag =
+		'1' then 1 else 0 end) read_num,
+		sum(case when r.read_flag != '1' then
+		1 else 0 end) un_read_num
+		FROM plm_work_email_read r GROUP BY
+		r.report_id
+		) b ON b.report_id = a.id
+	</sql>
+
+	<select id="get" resultType="PlmWorkEmail">
+		SELECT
+		<include refid="plmWorkEmailColumns" />
+		,sysU.`name` as "createBy.name"
+		,a.is_star as "isStar"
+		FROM
+		plm_work_email a
+		<include refid="plmWorkEmailJoinsUser" />
+		<include refid="plmWorkEmailJoins" />
+		WHERE a.id = #{id}
+	</select>
+
+
+
+
+
+
+	<!-- -->
+	<select id="findList" resultType="PlmWorkEmail">
+		SELECT
+		<include refid="plmWorkEmailColumns" />
+		,sysU.`name` as "createBy.name"
+		,sysU.`name` as "createName"
+		<if test="isSelf">,
+			r.read_flag as "readFlag",
+			r.status as "readStatus",
+			r.is_star as "isStar"
+		</if>
+		<if test="isSelf == null or !isSelf">,
+			a.is_star as "isStar"
+		</if>
+		FROM plm_work_email a
+		<include refid="plmWorkEmailJoinsUser" />
+		<include refid="plmWorkEmailJoins" />
+		<if test="isSelf">
+			JOIN (
+			SELECT * from plm_work_email_read GROUP BY report_id,user_id
+			) r ON r.report_id = a.id AND
+			r.user_id =
+			#{currentUser.id}
+		</if>
+		<where>
+			<if test="isSelf == null or !isSelf">
+				a.del_flag = #{DEL_FLAG_NORMAL}
+			</if>
+			<if test="beginDate != null and beginDate != ''">
+				AND a.create_date &gt;= #{beginDate}
+			</if>
+			<if test="endDate != null and endDate != ''">
+				AND a.create_date &lt;= #{endDate}
+			</if>
+			<if test="type != null and type != ''">
+				AND a.type = #{type}
+			</if>
+			<if test="title != null and title != ''">
+				AND a.title LIKE
+				<if test="dbName == 'oracle'">'%'||#{title}||'%'</if>
+				<if test="dbName == 'mssql'">'%'+#{title}+'%'</if>
+				<if test="dbName == 'mysql'">concat('%',#{title},'%')</if>
+			</if>
+			<if test="isSelf and readStatus !=null and readStatus != ''">
+				AND r.status = #{readStatus}
+			</if>
+			<if test="isSelf and isStar !=null and isStar != ''">
+				AND r.is_Star = #{isStar}
+			</if>
+			<if test="isSelf and readFlag !=null and readFlag != ''">
+				AND r.read_flag = #{readFlag}
+			</if>
+			<if test="status !=null and status != ''">
+				AND a.status = #{status}
+			</if>
+			<!-- a.create_by AS "createBy.id" -->
+			<if test="createBy !=null and createBy.id != ''">
+				AND a.create_by = #{createBy.id}
+			</if>
+
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.create_date DESC
+			</otherwise>
+		</choose>
+	</select>
+
+	<select id="findDefList" resultType="PlmWorkEmail">
+		SELECT * FROM
+		(
+		SELECT
+		<include refid="plmWorkEmailColumnsforSelf" />
+		,sysU.`name` as "createBy.name",
+		r.read_flag as "readFlag",
+		r.status as "readStatus",
+		r.is_star as "isStar"
+		FROM plm_work_email a
+		<include refid="plmWorkEmailJoinsUser" />
+		JOIN plm_work_email_read r ON r.report_id = a.id AND
+		r.user_id = #{currentUser.id}
+		<where>
+			<if test="beginDate != null and beginDate != ''">
+				AND a.create_date &gt;= #{beginDate}
+			</if>
+			<if test="endDate != null and endDate != ''">
+				AND a.create_date &lt;= #{endDate}
+			</if>
+			<if test="title != null and title != ''">
+				AND a.title LIKE
+				<if test="dbName == 'oracle'">'%'||#{title}||'%'</if>
+				<if test="dbName == 'mssql'">'%'+#{title}+'%'</if>
+				<if test="dbName == 'mysql'">concat('%',#{title},'%')</if>
+			</if>
+			<if test="status !=null and status != ''">
+				AND a.status = #{status}
+			</if>
+			<if test="readFlag !=null and readFlag != ''">
+				AND r.read_flag = #{readFlag}
+			</if>
+			AND r.status = #{readStatus}
+		</where>
+		UNION
+		SELECT
+		<include refid="plmWorkEmailColumnsforSelf" />
+		,sysU.`name` as "createBy.name",
+		'',
+		'',
+		a.is_star as "isStar"
+		FROM plm_work_email a
+		<include refid="plmWorkEmailJoinsUser" />
+		<where>
+			a.del_flag = #{DEL_FLAG_DELETE}
+			<if test="beginDate != null and beginDate != ''">
+				AND a.create_date &gt;= #{beginDate}
+			</if>
+			<if test="endDate != null and endDate != ''">
+				AND a.create_date &lt;= #{endDate}
+			</if>
+			<if test="title != null and title != ''">
+				AND a.title LIKE
+				<if test="dbName == 'oracle'">'%'||#{title}||'%'</if>
+				<if test="dbName == 'mssql'">'%'+#{title}+'%'</if>
+				<if test="dbName == 'mysql'">concat('%',#{title},'%')</if>
+			</if>
+
+			<if test="status !=null and status != ''">
+				AND a.status = #{status}
+			</if>
+			<if test="currentUser !=null and currentUser.id != ''">
+				AND a.create_by = #{currentUser.id}
+			</if>
+		</where>
+		) rr
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY rr.createDate DESC
+			</otherwise>
+		</choose>
+	</select>
+
+	<select id="findStarList" resultType="PlmWorkEmail">
+		SELECT * FROM
+		(
+		SELECT
+		<include refid="plmWorkEmailColumnsforSelf" />
+		,sysU.`name` as "createBy.name",
+		r.read_flag as "readFlag",
+		r.status as "readStatus",
+		r.is_star as "isStar"
+		FROM plm_work_email a
+		<include refid="plmWorkEmailJoinsUser" />
+		JOIN plm_work_email_read r ON r.report_id = a.id AND
+		r.user_id = #{currentUser.id}
+		<where>
+			<if test="beginDate != null and beginDate != ''">
+				AND a.create_date &gt;= #{beginDate}
+			</if>
+			<if test="endDate != null and endDate != ''">
+				AND a.create_date &lt;= #{endDate}
+			</if>
+			<if test="title != null and title != ''">
+				AND a.title LIKE
+				<if test="dbName == 'oracle'">'%'||#{title}||'%'</if>
+				<if test="dbName == 'mssql'">'%'+#{title}+'%'</if>
+				<if test="dbName == 'mysql'">concat('%',#{title},'%')</if>
+			</if>
+			<if test="status !=null and status != ''">
+				AND a.status = #{status}
+			</if>
+			<if test="readFlag !=null and readFlag != ''">
+				AND r.read_flag = #{readFlag}
+			</if>
+			AND r.status = #{readStatus}
+			AND r.is_star = #{isStar}
+		</where>
+		UNION
+		SELECT
+		<include refid="plmWorkEmailColumnsforSelf" />
+		,sysU.`name` as "createBy.name",
+		'',
+		'',
+		a.is_star as "isStar"
+		FROM plm_work_email a
+		<include refid="plmWorkEmailJoinsUser" />
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="beginDate != null and beginDate != ''">
+				AND a.create_date &gt;= #{beginDate}
+			</if>
+			<if test="endDate != null and endDate != ''">
+				AND a.create_date &lt;= #{endDate}
+			</if>
+			<if test="title != null and title != ''">
+				AND a.title LIKE
+				<if test="dbName == 'oracle'">'%'||#{title}||'%'</if>
+				<if test="dbName == 'mssql'">'%'+#{title}+'%'</if>
+				<if test="dbName == 'mysql'">concat('%',#{title},'%')</if>
+			</if>
+
+			<if test="status !=null and status != ''">
+				AND a.status = #{status}
+			</if>
+			<if test="currentUser !=null and currentUser.id != ''">
+				AND a.create_by = #{currentUser.id}
+			</if>
+			AND a.is_star = #{isStar}
+		</where>
+		) rr
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY rr.createDate DESC
+			</otherwise>
+		</choose>
+	</select>
+
+
+	<select id="findAllList" resultType="PlmWorkEmail">
+		SELECT
+		<include refid="plmWorkEmailColumns" />
+		FROM plm_work_email a
+		<include refid="plmWorkEmailJoins" />
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+
+	<select id="findReceiveCount" resultType="int">
+		SELECT
+		COUNT(1)
+		FROM
+		plm_work_email a
+		JOIN (
+			SELECT * from plm_work_email_read GROUP BY report_id,user_id
+			) r ON r.report_id = a.id
+		AND r.user_id =
+		#{currentUser.id}
+		WHERE
+		r. STATUS = '1'
+		UNION ALL
+		SELECT
+		COUNT(1)
+		FROM
+		plm_work_email a
+		JOIN (
+			SELECT * from plm_work_email_read GROUP BY report_id,user_id
+			) r ON r.report_id = a.id
+		AND r.user_id =
+		#{currentUser.id}
+		WHERE
+		r. STATUS = '1'
+		AND r.read_flag = '0'
+	</select>
+
+	<insert id="insert">
+		INSERT INTO plm_work_email(
+		id,
+		type,
+		title,
+		content,
+		files,
+		status,
+		is_star,
+		create_by,
+		create_date,
+		update_by,
+		update_date,
+		remarks,
+		del_flag
+		) VALUES (
+		#{id},
+		#{type},
+		#{title},
+		#{content},
+		#{files},
+		#{status},
+		#{isStar},
+		#{createBy.id},
+		#{createDate},
+		#{updateBy.id},
+		#{updateDate},
+		#{remarks},
+		#{delFlag}
+		)
+	</insert>
+
+	<update id="update">
+		UPDATE plm_work_email SET
+		type = #{type},
+		title =
+		#{title},
+		content =
+		#{content},
+		files = #{files},
+		status = #{status},
+		is_star = #{isStar},
+		update_by = #{updateBy.id},
+		update_date =
+		#{updateDate},
+		remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+
+	<update id="delete">
+		UPDATE plm_work_email SET
+		del_flag =
+		#{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+
+	<update id="delete2">
+		UPDATE plm_work_email SET
+		del_flag = #{delFlag}
+		WHERE
+		id = #{id}
+	</update>
+
+	<update id="star">
+		UPDATE plm_work_email SET
+		is_star = #{isStar}
+		WHERE id
+		= #{id}
+	</update>
+
+	<select id="findCount" resultType="Long">
+		SELECT
+		count(1)
+		FROM plm_work_email a
+		<if test="isSelf">
+			JOIN plm_work_email_read r ON r.report_id = a.id AND r.user_id =
+			#{currentUser.id}
+			<if test="readFlag != null and readFlag != ''">
+				AND r.read_flag = #{readFlag}
+			</if>
+		</if>
+		WHERE a.del_flag = #{DEL_FLAG_NORMAL}
+		<if test="isSelf">
+			AND a.STATUS = '1'
+		</if>
+	</select>
+</mapper>

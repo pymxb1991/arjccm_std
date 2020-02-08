@@ -1,0 +1,243 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.arjjs.ccm.modules.ccm.org.dao.CcmOrgSocialorgDao">
+    
+	<sql id="ccmOrgSocialorgColumns">
+		a.id AS "id",
+		a.credit_code AS "creditCode",
+		a.regi_num AS "regiNum",
+		a.org_name AS "orgName",
+		a.regi_place_num AS "regiPlaceNum",
+		a.legal_repr_name AS "legalReprName",
+		a.place AS "place",
+		a.appr_date AS "apprDate",
+		a.org_type AS "orgType",
+		a.type AS "type",
+		a.prin_code AS "prinCode",
+		a.prin_id AS "prinId",
+		a.prin_name AS "prinName",
+		a.prin_tel AS "prinTel",
+		a.work_add AS "workAdd",
+		a.secu_name AS "secuName",
+		a.secu_tel AS "secuTel",
+		a.concern_extent AS "concernExtent",
+		a.esta_org_cond AS "estaOrgCond",
+		a.esta_org AS "estaOrg",
+		a.party_mem AS "partyMem",
+		a.labor_union AS "laborUnion",
+		a.labor_union_num AS "laborUnionNum",
+		a.youth_leag_org AS "youthLeagOrg",
+		a.youth_leag_org_num AS "youthLeagOrgNum",
+		a.women_org AS "womenOrg",
+		a.women_num AS "womenNum",
+		a.capi_sour AS "capiSour",
+		a.over_back AS "overBack",
+		a.area_map AS "areaMap",
+		a.area_point AS "areaPoint",
+		a.icon AS "icon",
+		a.images AS "images",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag",
+		(case a.concern_extent when 01 then '高' when 02 then '中' when 03 then '低' else '' end) "concExteLable"
+	</sql>
+	
+	<sql id="ccmOrgSocialorgJoins">
+	</sql>
+    
+	<select id="get" resultType="CcmOrgSocialorg">
+		SELECT 
+			<include refid="ccmOrgSocialorgColumns"/>
+		FROM ccm_org_socialorg a
+		<include refid="ccmOrgSocialorgJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="CcmOrgSocialorg">
+		SELECT 
+			<include refid="ccmOrgSocialorgColumns"/>
+		FROM ccm_org_socialorg a
+		<include refid="ccmOrgSocialorgJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="orgName != null and orgName != ''">
+				AND a.org_name LIKE 
+					<if test="dbName == 'oracle'">'%'||#{orgName}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{orgName}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{orgName},'%')</if>
+			</if>
+			<if test="beginApprDate != null and endApprDate != null and beginApprDate != '' and endApprDate != ''">
+				AND a.appr_date BETWEEN #{beginApprDate} AND #{endApprDate}
+			</if>
+			<if test="orgType != null and orgType != ''">
+				AND a.org_type = #{orgType}
+			</if>
+			<if test="concernExtent != null and concernExtent != ''">
+				AND a.concern_extent = #{concernExtent}
+			</if>
+			<if test="regiNum != null and regiNum != ''">
+				AND a.regi_num = #{regiNum}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="CcmOrgSocialorg">
+		SELECT 
+			<include refid="ccmOrgSocialorgColumns"/>
+		FROM ccm_org_socialorg a
+		<include refid="ccmOrgSocialorgJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO ccm_org_socialorg(
+			id,
+			credit_code,
+			regi_num,
+			org_name,
+			regi_place_num,
+			legal_repr_name,
+			place,
+			appr_date,
+			org_type,
+			type,
+			prin_code,
+			prin_id,
+			prin_name,
+			prin_tel,
+			work_add,
+			secu_name,
+			secu_tel,
+			concern_extent,
+			esta_org_cond,
+			esta_org,
+			party_mem,
+			labor_union,
+			labor_union_num,
+			youth_leag_org,
+			youth_leag_org_num,
+			women_org,
+			women_num,
+			capi_sour,
+			over_back,
+			area_map,
+			area_point,
+			icon,
+			images,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag
+		) VALUES (
+			#{id},
+			#{creditCode},
+			#{regiNum},
+			#{orgName},
+			#{regiPlaceNum},
+			#{legalReprName},
+			#{place},
+			#{apprDate},
+			#{orgType},
+			#{type},
+			#{prinCode},
+			#{prinId},
+			#{prinName},
+			#{prinTel},
+			#{workAdd},
+			#{secuName},
+			#{secuTel},
+			#{concernExtent},
+			#{estaOrgCond},
+			#{estaOrg},
+			#{partyMem},
+			#{laborUnion},
+			#{laborUnionNum},
+			#{youthLeagOrg},
+			#{youthLeagOrgNum},
+			#{womenOrg},
+			#{womenNum},
+			#{capiSour},
+			#{overBack},
+			#{areaMap},
+			#{areaPoint},
+			#{icon},
+			#{images},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE ccm_org_socialorg SET 	
+			credit_code = #{creditCode},
+			regi_num = #{regiNum},
+			org_name = #{orgName},
+			regi_place_num = #{regiPlaceNum},
+			legal_repr_name = #{legalReprName},
+			place = #{place},
+			appr_date = #{apprDate},
+			org_type = #{orgType},
+			type = #{type},
+			prin_code = #{prinCode},
+			prin_id = #{prinId},
+			prin_name = #{prinName},
+			prin_tel = #{prinTel},
+			work_add = #{workAdd},
+			secu_name = #{secuName},
+			secu_tel = #{secuTel},
+			concern_extent = #{concernExtent},
+			esta_org_cond = #{estaOrgCond},
+			esta_org = #{estaOrg},
+			party_mem = #{partyMem},
+			labor_union = #{laborUnion},
+			labor_union_num = #{laborUnionNum},
+			youth_leag_org = #{youthLeagOrg},
+			youth_leag_org_num = #{youthLeagOrgNum},
+			women_org = #{womenOrg},
+			women_num = #{womenNum},
+			capi_sour = #{capiSour},
+			over_back = #{overBack},
+			area_map = #{areaMap},
+			area_point = #{areaPoint},
+			icon = #{icon},
+			images = #{images},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE ccm_org_socialorg SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

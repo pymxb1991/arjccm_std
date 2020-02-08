@@ -1,0 +1,220 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper
+	namespace="com.arjjs.ccm.modules.plm.equapply.dao.PlmEquApplyDao">
+
+	<sql id="plmEquApplyColumns">
+		a.id AS "id",
+		a.proc_ins_id AS "procInsId",
+		a.employee_id AS
+		"user.id",
+		a.equipment_id AS "equipmentId",
+		a.car_id AS "carId",
+		a.apply_date AS "applyDate",
+		a.apply_body AS "applyBody",
+		a.type AS
+		"type",
+		a.extend1 AS "extend1",
+		a.extend2 AS "extend2",
+		a.create_by AS
+		"createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS
+		"updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag",
+		a.submit_type AS "submitType",
+		<!-- a.spec_type AS
+		"specType", -->
+		a.is_give AS "isGive",
+		a.expectation_date AS "expectationDate",
+		u3.name AS "user.name",
+		a.e_id AS "eId",
+		e.name AS "equipment.name",
+		e.type_id AS "equipment.typeId",
+		e.type_child AS "equipment.typeChild",
+		e.spec AS "equipment.spec",
+		e.code AS "equipment.code", 
+		o.name AS "user.office.name",
+		e.production_date AS "equipment.productionDate"
+	</sql>
+
+	<sql id="plmEquApplyJoins">
+		LEFT JOIN sys_user u3 ON u3.id = a.employee_id
+		LEFT JOIN
+		plm_equipment e ON e.id = a.e_id
+		LEFT JOIN sys_office o ON o.id =
+		u3.office_id
+	</sql>
+
+	<select id="get" resultType="PlmEquApply">
+		SELECT
+		<include refid="plmEquApplyColumns" />
+		FROM plm_equ_apply a
+		<include refid="plmEquApplyJoins" />
+		WHERE a.id = #{id}
+	</select>
+
+	<update id="updateProcInsId">
+		UPDATE plm_equ_apply SET
+		proc_ins_id = #{procInsId},
+		update_by = #{updateBy.id},
+		update_date = #{updateDate}
+		WHERE id = #{id}
+	</update>
+
+	<select id="findList" resultType="PlmEquApply">
+		SELECT
+		<include refid="plmEquApplyColumns" />
+		FROM plm_equ_apply a
+		<include refid="plmEquApplyJoins" />
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="equipmentId != null and equipmentId != ''">
+				AND a.equipment_id LIKE
+				<if test="dbName == 'oracle'">'%'||#{equipmentId}||'%'</if>
+				<if test="dbName == 'mssql'">'%'+#{equipmentId}+'%'</if>
+				<if test="dbName == 'mysql'">concat('%',#{equipmentId},'%')</if>
+			</if>
+			<if test="applyDate != null and applyDate != ''">
+				AND a.apply_date Like
+				<if test="dbName == 'oracle'">'%'||#{applyDate}||'%'</if>
+				<if test="dbName == 'mssql'">'%'+#{applyDate}+'%'</if>
+				<if test="dbName == 'mysql'">concat('%',#{applyDate},'%')</if>
+			</if>
+			<if test="applyBody != null and applyBody != ''">
+				AND a.apply_body Like
+				<if test="dbName == 'oracle'">'%'||#{applyBody}||'%'</if>
+				<if test="dbName == 'mssql'">'%'+#{applyBody}+'%'</if>
+				<if test="dbName == 'mysql'">concat('%',#{applyBody},'%')</if>
+			</if>
+			<if test="type != null and type != ''">
+				AND a.type = #{type}
+			</if>
+			<if test="submitType != null and submitType != ''">
+				AND a.submit_type = #{submitType}
+			</if>
+			AND a.create_by = #{currentUser.id}
+		</where>
+		<choose>
+			<when
+				test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+
+	<select id="findAllList" resultType="PlmEquApply">
+		SELECT
+		<include refid="plmEquApplyColumns" />
+		FROM plm_equ_apply a
+		<include refid="plmEquApplyJoins" />
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>
+		<choose>
+			<when
+				test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+
+	<select id="selectNumEquApply"	resultType="com.arjjs.ccm.tool.EchartType">
+		SELECT
+		a.type,
+		COUNT( * ) AS "VALUE",o.name
+		FROM
+		plm_equ_apply a
+		<include refid="plmEquApplyJoins" />
+		<where>
+			a.del_flag = '0'
+			AND YEAR ( a.create_date ) = YEAR ( NOW( ) )
+		</where>
+		GROUP BY
+		a.type , o.name
+		ORDER BY
+		count( * ) DESC
+	</select>
+
+	<insert id="insert">
+		INSERT INTO plm_equ_apply(
+		id,
+		employee_id,
+		equipment_id,
+		apply_date,
+		apply_body,
+		type,
+		extend1,
+		extend2,
+		create_by,
+		create_date,
+		update_by,
+		update_date,
+		remarks,
+		del_flag,
+		submit_type,
+		number,
+		<!-- spec_type, -->
+		is_give,
+		expectation_date,
+		e_id
+		) VALUES (
+		#{id},
+		#{user.id},
+		#{equipmentId},
+		#{applyDate},
+		#{applyBody},
+		#{type},
+		#{extend1},
+		#{extend2},
+		#{createBy.id},
+		#{createDate},
+		#{updateBy.id},
+		#{updateDate},
+		#{remarks},
+		#{delFlag},
+		#{submitType},
+		#{number},
+		#{isGive},
+		#{expectationDate},
+		#{eId}
+		)
+	</insert>
+
+	<update id="update">
+		UPDATE plm_equ_apply SET
+		employee_id = #{user.id},
+		equipment_id = #{equipmentId},
+		apply_date = #{applyDate},
+		apply_body = #{applyBody},
+		type = #{type},
+		extend1 = #{extend1},
+		extend2 = #{extend2},
+		update_by = #{updateBy.id},
+		update_date = #{updateDate},
+		remarks = #{remarks},
+		submit_type = #{submitType},
+		number = #{number},
+		<!-- spec_type =
+		#{specType}, -->
+		is_give = #{isGive},
+		expectation_date = #{expectationDate},
+		e_id = #{eId}
+		WHERE id = #{id}
+	</update>
+
+	<update id="delete">
+		UPDATE plm_equ_apply SET
+		del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+
+</mapper>

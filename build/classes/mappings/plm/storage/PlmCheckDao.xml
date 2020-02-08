@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.arjjs.ccm.modules.plm.storage.dao.PlmCheckDao">
+    
+	<sql id="plmCheckColumns">
+		a.id AS "id",
+		a.code AS "code",
+		a.check_date_start AS "checkDateStart",
+		a.check_date_end AS "checkDateEnd",
+		a.title AS "title",
+		a.storage AS "storage.id",
+		a.content AS "content",
+		a.type AS "type",
+		a.status AS "status",
+		a.extend1 AS "extend1",
+		a.type_child AS "typeChild",
+		a.extend2 AS "extend2",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag",
+		s.name AS "storage.name"
+	</sql>
+	
+	<sql id="plmCheckJoins">
+		LEFT JOIN plm_storage s ON s.id = a.storage
+	</sql>
+    
+	<select id="get" resultType="PlmCheck">
+		SELECT 
+			<include refid="plmCheckColumns"/>
+		FROM plm_check a
+		<include refid="plmCheckJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="PlmCheck">
+		SELECT 
+			<include refid="plmCheckColumns"/>
+		FROM plm_check a
+		<include refid="plmCheckJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="checkDateStart != null and checkDateStart != ''">
+				AND a.check_date_start &gt;= #{checkDateStart}
+			</if>
+			<if test="checkDateEnd != null and checkDateEnd != ''">
+				AND a.check_date_end &lt;= #{checkDateEnd}
+			</if>
+			<if test="title != null and title != ''">
+				AND a.title LIKE 
+					<if test="dbName == 'oracle'">'%'||#{title}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{title}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{title},'%')</if>
+			</if>
+			<if test="status != null and status != ''">
+				AND a.status = #{status}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="PlmCheck">
+		SELECT 
+			<include refid="plmCheckColumns"/>
+		FROM plm_check a
+		<include refid="plmCheckJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO plm_check(
+			id,
+			code,
+			check_date_start,
+			check_date_end,
+			title,
+			storage,
+			content,
+			type,
+			status,
+			extend1,
+			type_child,
+			extend2,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag
+		) VALUES (
+			#{id},
+			#{code},
+			#{checkDateStart},
+			#{checkDateEnd},
+			#{title},
+			#{storage.id},
+			#{content},
+			#{type},
+			#{status},
+			#{extend1},
+			#{typeChild},
+			#{extend2},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE plm_check SET 	
+			code = #{code},
+			check_date_start = #{checkDateStart},
+			check_date_end = #{checkDateEnd},
+			title = #{title},
+			storage = #{storage.id},
+			content = #{content},
+			type = #{type},
+			status = #{status},
+			extend1 = #{extend1},
+			type_child = #{typeChild},
+			extend2 = #{extend2},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE plm_check SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.arjjs.ccm.modules.risk.report.dao.RiskMassesOpinionDao">
+    
+	<sql id="riskMassesOpinionColumns">
+		a.id AS "id",
+		a.event_id AS "riskEventGreat.id",
+		a.type AS "type",
+		a.file AS "file",
+		a.fileName AS "fileName",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag",
+		u7.name AS "updateBy.name",
+		g.name AS "riskEventGreat.name"
+	</sql>
+	
+	<sql id="riskMassesOpinionJoins">
+		LEFT JOIN sys_user u7 ON u7.id = a.update_by
+		LEFT JOIN risk_event_great g ON g.id = a.event_id
+	</sql>
+    
+	<select id="get" resultType="RiskMassesOpinion">
+		SELECT 
+			<include refid="riskMassesOpinionColumns"/>
+		FROM risk_masses_opinion a
+		<include refid="riskMassesOpinionJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="RiskMassesOpinion">
+		SELECT 
+			<include refid="riskMassesOpinionColumns"/>
+		FROM risk_masses_opinion a
+		<include refid="riskMassesOpinionJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="riskEventGreat != null and riskEventGreat.id != null and riskEventGreat.id != ''">
+				AND a.event_id = #{riskEventGreat.id}
+			</if>
+			<if test="type != null and type != ''">
+				AND a.type = #{type}
+			</if>
+			<if test="updateBy != null and updateBy.id != null and updateBy.id != ''">
+				AND a.update_by = #{updateBy.id}
+			</if>
+			<if test="beginUpdateDate != null and endUpdateDate != null and beginUpdateDate != '' and endUpdateDate != ''">
+				AND a.update_date BETWEEN #{beginUpdateDate} AND #{endUpdateDate}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="RiskMassesOpinion">
+		SELECT 
+			<include refid="riskMassesOpinionColumns"/>
+		FROM risk_masses_opinion a
+		<include refid="riskMassesOpinionJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO risk_masses_opinion(
+			id,
+			event_id,
+			type,
+			file,
+			fileName,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag
+		) VALUES (
+			#{id},
+			#{riskEventGreat.id},
+			#{type},
+			#{file},
+			#{fileName},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE risk_masses_opinion SET 	
+			event_id = #{riskEventGreat.id},
+			type = #{type},
+			file = #{file},
+			fileName = #{fileName},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE risk_masses_opinion SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

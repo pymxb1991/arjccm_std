@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper
+	namespace="com.arjjs.ccm.modules.ccm.car.dao.CcmCarControlDao">
+
+	<sql id="ccmCarControlColumns">
+		a.id AS "id",
+		a.create_by AS "createBy.id",
+		a.create_date AS
+		"createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS
+		"updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag",
+		a.plate_number AS "plateNumber",
+		a.control_type AS "controlType",
+		a.start_time AS "startTime",
+		a.end_time AS "endTime",
+		a.plate_color AS
+		"plateColor",
+		a.control_reason AS "controlReason",
+		a.contact_number AS
+		"contactNumber",
+		a.can_see AS "canSee",
+		a.can_dialogs AS "canDialogs",
+		a.can_voice AS "canVoice",
+		a.description AS "description"
+	</sql>
+
+	<sql id="ccmCarControlJoins">
+	</sql>
+
+	<select id="get" resultType="CcmCarControl">
+		SELECT
+		<include refid="ccmCarControlColumns" />
+		FROM ccm_car_control a
+		<include refid="ccmCarControlJoins" />
+		WHERE a.id = #{id}
+	</select>
+
+	<select id="findList" resultType="CcmCarControl">
+		SELECT
+		<include refid="ccmCarControlColumns" />
+		FROM ccm_car_control a
+		<include refid="ccmCarControlJoins" />
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="plateNumber != null and plateNumber != ''">
+				AND a.plate_number LIKE
+				<if test="dbName == 'oracle'">'%'||#{plateNumber}||'%'</if>
+				<if test="dbName == 'mssql'">'%'+#{plateNumber}+'%'</if>
+				<if test="dbName == 'mysql'">concat('%',#{plateNumber},'%')</if>
+			</if>
+			<if test="startTime != null and startTime != ''">
+				AND a.start_time = #{startTime}
+			</if>
+			<if test="endTime != null and endTime != ''">
+				AND a.end_time = #{endTime}
+			</if>
+			<if test="plateColor != null and plateColor != ''">
+				AND a.plate_color = #{plateColor}
+			</if>
+		</where>
+		<choose>
+			<when
+				test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+
+	<select id="findAllList" resultType="CcmCarControl">
+		SELECT
+		<include refid="ccmCarControlColumns" />
+		FROM ccm_car_control a
+		<include refid="ccmCarControlJoins" />
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>
+		<choose>
+			<when
+				test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+
+	<insert id="insert">
+		INSERT INTO ccm_car_control(
+		id,
+		create_by,
+		create_date,
+		update_by,
+		update_date,
+		remarks,
+		del_flag,
+		plate_number,
+		control_type,
+		start_time,
+		end_time,
+		plate_color,
+		control_reason,
+		contact_number,
+		can_see,
+		can_dialogs,
+		can_voice,
+		description
+		) VALUES (
+		#{id},
+		#{createBy.id},
+		#{createDate},
+		#{updateBy.id},
+		#{updateDate},
+		#{remarks},
+		#{delFlag},
+		#{plateNumber},
+		#{controlType},
+		#{startTime},
+		#{endTime},
+		#{plateColor},
+		#{controlReason},
+		#{contactNumber},
+		#{canSee},
+		#{canDialogs},
+		#{canVoice},
+		#{description}
+		)
+	</insert>
+
+	<update id="update">
+		UPDATE ccm_car_control SET
+		update_by = #{updateBy.id},
+		update_date = #{updateDate},
+		remarks = #{remarks},
+		plate_number = #{plateNumber},
+		control_type = #{controlType},
+		start_time = #{startTime},
+		end_time = #{endTime},
+		plate_color = #{plateColor},
+		control_reason = #{controlReason},
+		contact_number = #{contactNumber},
+		can_see = #{canSee},
+		can_dialogs = #{canDialogs},
+		can_voice = #{canVoice},
+		description = #{description}
+		WHERE id = #{id}
+	</update>
+
+	<update id="delete">
+		UPDATE ccm_car_control SET
+		del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+
+</mapper>

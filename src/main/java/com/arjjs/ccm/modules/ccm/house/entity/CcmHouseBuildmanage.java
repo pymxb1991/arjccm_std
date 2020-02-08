@@ -1,0 +1,329 @@
+/**
+ * Copyright &copy; 2012-2016 <a href="https://github.com/thinkgem/jeesite">JeeSite</a> All rights reserved.
+ */
+package com.arjjs.ccm.modules.ccm.house.entity;
+
+import com.arjjs.ccm.common.persistence.DataEntity;
+import com.arjjs.ccm.common.utils.excel.annotation.ExcelField;
+import com.arjjs.ccm.modules.sys.entity.Area;
+import com.arjjs.ccm.modules.sys.entity.User;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import org.hibernate.validator.constraints.Length;
+
+import javax.validation.constraints.NotNull;
+import java.util.Date;
+import java.util.List;
+
+/**
+ * 楼栋Entity
+ * @author wwh
+ * @version 2018-01-05
+ */
+public class CcmHouseBuildmanage extends DataEntity<CcmHouseBuildmanage> {
+	
+	private static final long serialVersionUID = 1L;
+	private String name;		// 小区（单位）名称
+	private String buildname;		// 楼栋名称
+	private Double floorArea;		// 建筑面积（平方米）
+	private Integer pilesNum;		// 层数
+	private Integer elemNum;		// 单元数
+	private Integer buildNum;		// 楼栋户数
+	private Integer buildPeo;		// 楼栋人数
+	private String buildPname;		// 楼栋长姓名
+	private String sex;		// 性别
+	private String nation;		// 民族
+	private String content;		// 政治面貌
+	private Date birthday;		// 出生日期
+	private String education;		// 学历
+	private String tel;		// 手机号码
+	private String phone;		// 固定电话
+	private String residence;		// 所在地
+	private String residencedetail;		// 所在地详址
+	private String areaMap;		// 区域图
+	private String areaPoint;		// 中心点
+	private String image;		// 图标
+	private Area area;		// 所属区域网格
+	private String images;		// 楼栋图片
+	private String more1; //sql
+	private String count;
+	private String code;//建筑物编号
+
+	private List<String> listLimite;
+
+	public List<String> getListLimite() {
+		return listLimite;
+	}
+
+	public void setListLimite(List<String> listLimite) {
+		this.listLimite = listLimite;
+	}
+
+	public String getCode() {
+		return code;
+	}
+
+	public void setCode(String code) {
+		this.code = code;
+	}
+
+	public String getCount() {
+		return count;
+	}
+
+	public void setCount(String count) {
+		this.count = count;
+	}
+
+	private Area userArea;  //登录用户所在区域
+	private User checkUser;		// 拦截器中使用该用户进行权限拦截，App的rest接口使用
+
+	public User getCheckUser() {
+		return checkUser;
+	}
+
+	public void setCheckUser(User checkUser) {
+		this.checkUser = checkUser;
+	}
+    
+	public Area getUserArea() {
+		return userArea;
+	}
+
+	public void setUserArea(Area userArea) {
+		this.userArea = userArea;
+	}
+
+	@ExcelField(title="所属区域网格", align=2, sort=19)
+	public Area getArea() {
+		return area;
+	}
+
+	public void setArea(Area area) {
+		this.area = area;
+	}
+
+	public CcmHouseBuildmanage() {
+		super();
+	}
+
+	public CcmHouseBuildmanage(String id){
+		super(id);
+	}
+
+	@ExcelField(title="小区（单位）名称", align=1)
+	@Length(min=0, max=512, message="小区（单位）名称长度必须介于 0 和 512 之间")
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+	
+	@ExcelField(title="楼栋名称", align=2, sort=2)
+	@Length(min=0, max=512, message="楼栋名称长度必须介于 0 和 512 之间")
+	public String getBuildname() {
+		return buildname;
+	}
+
+	public void setBuildname(String buildname) {
+		this.buildname = buildname;
+	}
+	
+	/* @NotNull(message="建筑面积（平方米）不能为空") */
+	@ExcelField(title="建筑面积", align=2, sort=3)
+	public Double getFloorArea() {
+		return floorArea;
+	}
+
+	public void setFloorArea(Double floorArea) {
+		this.floorArea = floorArea;
+	}
+	
+	@NotNull(message="层数不能为空")
+	@ExcelField(title="层数", align=2, sort=4)
+	public Integer getPilesNum() {
+		return pilesNum;
+	}
+
+	public void setPilesNum(Integer pilesNum) {
+		this.pilesNum = pilesNum;
+	}
+	
+	@NotNull(message="单元数不能为空")
+	@ExcelField(title="单元数", align=2, sort=5)
+	public Integer getElemNum() {
+		return elemNum;
+	}
+
+	public void setElemNum(Integer elemNum) {
+		this.elemNum = elemNum;
+	}
+	
+	/* @NotNull(message="楼栋户数不能为空") */
+	@ExcelField(title="楼栋户数", align=2, sort=6)
+	public Integer getBuildNum() {
+		return buildNum;
+	}
+
+	public void setBuildNum(Integer buildNum) {
+		this.buildNum = buildNum;
+	}
+	
+	/* @NotNull(message="楼栋人数不能为空") */
+	@ExcelField(title="楼栋人数", align=2, sort=7)
+	public Integer getBuildPeo() {
+		return buildPeo;
+	}
+
+	public void setBuildPeo(Integer buildPeo) {
+		this.buildPeo = buildPeo;
+	}
+	
+	@Length(min=0, max=64, message="楼栋长姓名长度必须介于 0 和 64 之间")
+	@ExcelField(title="楼栋长姓名", align=2, sort=8)
+	public String getBuildPname() {
+		return buildPname;
+	}
+
+	public void setBuildPname(String buildPname) {
+		this.buildPname = buildPname;
+	}
+	
+	@Length(min=0, max=1, message="性别长度必须介于 0 和 1 之间")
+	@ExcelField(title="性别", align=2, sort=9,dictType="sex")
+	public String getSex() {
+		return sex;
+	}
+
+	public void setSex(String sex) {
+		this.sex = sex;
+	}
+	
+	@Length(min=0, max=2, message="民族长度必须介于 0 和 2 之间")
+	@ExcelField(title="民族", align=2, sort=10,dictType="sys_volk")
+	public String getNation() {
+		return nation;
+	}
+
+	public void setNation(String nation) {
+		this.nation = nation;
+	}
+	
+	@Length(min=0, max=2, message="政治面貌长度必须介于 0 和 2 之间")
+	@ExcelField(title="政治面貌", align=2, sort=11,dictType="sys_ccm_poli_stat")
+	public String getContent() {
+		return content;
+	}
+
+	public void setContent(String content) {
+		this.content = content;
+	}
+	
+	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+	@ExcelField(title="出生日期", align=2, sort=12)
+	public Date getBirthday() {
+		return birthday;
+	}
+
+	public void setBirthday(Date birthday) {
+		this.birthday = birthday;
+	}
+	
+	@Length(min=0, max=2, message="学历长度必须介于 0 和 2 之间")
+	@ExcelField(title="学历", align=2, sort=13,dictType="sys_ccm_degree")
+	public String getEducation() {
+		return education;
+	}
+
+	public void setEducation(String education) {
+		this.education = education;
+	}
+	
+	@Length(min=0, max=11, message="手机号码长度必须介于 0 和 11 之间")
+	@ExcelField(title="手机号码", align=2, sort=14)
+	public String getTel() {
+		return tel;
+	}
+
+	public void setTel(String tel) {
+		this.tel = tel;
+	}
+	
+	@Length(min=0, max=12, message="固定电话长度必须介于 0 和 12 之间")
+	@ExcelField(title="固定电话", align=2, sort=16)
+	public String getPhone() {
+		return phone;
+	}
+
+	public void setPhone(String phone) {
+		this.phone = phone;
+	}
+	
+	@Length(min=0, max=6, message="所在地长度必须介于 0 和 6 之间")
+	@ExcelField(title="所在地", align=2, sort=17)
+	public String getResidence() {
+		return residence;
+	}
+
+	public void setResidence(String residence) {
+		this.residence = residence;
+	}
+	
+	@Length(min=0, max=64, message="所在地详址长度必须介于 0 和 64 之间")
+	@ExcelField(title="所在地详址", align=2, sort=18)
+	public String getResidencedetail() {
+		return residencedetail;
+	}
+
+	public void setResidencedetail(String residencedetail) {
+		this.residencedetail = residencedetail;
+	}
+	
+	@Length(min=0, max=2000, message="区域图长度必须介于 0 和 2000 之间")
+	@ExcelField(title="区域图", align=2, sort=14)
+	public String getAreaMap() {
+		return areaMap;
+	}
+
+	public void setAreaMap(String areaMap) {
+		this.areaMap = areaMap;
+	}
+	
+	@Length(min=0, max=40, message="中心点长度必须介于 0 和 40 之间")
+	@ExcelField(title="中心点", align=2, sort=15)
+	public String getAreaPoint() {
+		return areaPoint;
+	}
+
+	public void setAreaPoint(String areaPoint) {
+		this.areaPoint = areaPoint;
+	}
+	
+	@Length(min=0, max=255, message="图标长度必须介于 0 和 255 之间")
+	public String getImage() {
+		return image;
+	}
+
+	public void setImage(String image) {
+		this.image = image;
+	}
+
+	public String getMore1() {
+		return more1;
+	}
+
+	public void setMore1(String more1) {
+		this.more1 = more1;
+	}
+	
+	@Length(min=0, max=255, message="楼栋图片图片长度必须介于 0 和 255 之间")
+	public String getImages() {
+		return images;
+	}
+
+	public void setImages(String images) {
+		this.images = images;
+	}
+	
+}

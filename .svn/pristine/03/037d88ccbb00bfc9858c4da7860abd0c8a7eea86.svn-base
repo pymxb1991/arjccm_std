@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.arjjs.ccm.modules.ccm.worker.dao.CcmWorkerSignDao">
+    
+	<sql id="ccmWorkerSignColumns">
+		a.id AS "id",
+		a.user_id AS "user.id",
+		a.content AS "content",
+		a.type AS "type",
+		a.status AS "status",
+		a.sign_date AS "signDate",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag",
+		u2.name AS "user.name"
+	</sql>
+	
+	<sql id="ccmWorkerSignJoins">
+		LEFT JOIN sys_user u2 ON u2.id = a.user_id
+		LEFT JOIN sys_office o ON u2.office_id = o.id
+	</sql>
+    
+	<select id="get" resultType="CcmWorkerSign">
+		SELECT 
+			<include refid="ccmWorkerSignColumns"/>
+		FROM ccm_worker_sign a
+		<include refid="ccmWorkerSignJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="CcmWorkerSign">
+		SELECT 
+			<include refid="ccmWorkerSignColumns"/>
+		FROM ccm_worker_sign a
+		<include refid="ccmWorkerSignJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="user != null and user.id != null and user.id != ''">
+				AND a.user_id = #{user.id}
+			</if>
+			<if test="content != null and content != ''">
+				AND a.content LIKE 
+					<if test="dbName == 'oracle'">'%'||#{content}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{content}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{content},'%')</if>
+			</if>
+			<if test="type != null and type != ''">
+				AND a.type = #{type}
+			</if>
+			<if test="status != null and status != ''">
+				AND a.status = #{status}
+			</if>
+			<if test="beginSignDate != null and endSignDate != null and beginSignDate != '' and endSignDate != ''">
+				AND a.sign_date BETWEEN #{beginSignDate} AND #{endSignDate}
+			</if>
+			<!-- 数据范围过滤 -->
+			${sqlMap.dsf}
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="CcmWorkerSign">
+		SELECT 
+			<include refid="ccmWorkerSignColumns"/>
+		FROM ccm_worker_sign a
+		<include refid="ccmWorkerSignJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO ccm_worker_sign(
+			id,
+			user_id,
+			content,
+			type,
+			status,
+			sign_date,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag
+		) VALUES (
+			#{id},
+			#{user.id},
+			#{content},
+			#{type},
+			#{status},
+			#{signDate},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE ccm_worker_sign SET 	
+			user_id = #{user.id},
+			content = #{content},
+			type = #{type},
+			status = #{status},
+			sign_date = #{signDate},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE ccm_worker_sign SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

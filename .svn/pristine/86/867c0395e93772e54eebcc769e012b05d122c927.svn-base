@@ -1,0 +1,941 @@
+var Map,currPage=1,pageSize =10; //每页出现数量;
+var pTypeObj={},placeTypeObj={},placeImportantObj={};
+$(function(){
+	//加载地图
+	initMap();
+	//初始化人员类型，场所类型，重点类型
+	initType();
+    var todayDate=today();
+    $('#beginHappenDateEvent').val(todayDate+' 00:00:00');
+	$('#endHappenDateEvent').val(todayDate+' 23:59:59');
+	QueryEvents();
+    $('#btnSubmitEvent').click(function(){
+    	currPage=1;
+    	QueryEvents();
+    });
+    $('#btnSubmitBuild').click(function(){
+    	currPage=1;
+    	QueryBuilds();
+    });
+    $('#btnSubmitPlac').click(function(){
+    	currPage=1;
+    	QueryPlaces();
+    });
+    $('#btnSubmitPeople').click(function(){
+    	currPage=1;
+    	QueryPeople();
+    });
+    $('#btnSubmitPeople').click(function(){
+    	currPage=1;
+    	QueryPeople();
+    });
+    $('#btnSubmitVideo').click(function(){
+    	currPage=1;
+    	QueryVideos();
+    });
+    layui.use('element', function(){
+		  var element = layui.element; //Tab的切换功能，
+		  element.on('tab(allTab)', function(data){
+			  ClearData();
+			});
+		});
+ 
+    
+})
+function ClearData(){
+	//清除框选查询框
+	if(Map.draw){
+		map.removeInteraction(Map.draw);
+	}
+	Map.drawVector.getSource().clear();
+	currPage=1;
+	 if(Map.overlayGISDialog){
+			Map.overlayGISDialog.setPosition(undefined);
+		}
+		Map.clearOverlays();
+		 $('#pageNum').html('0');
+ 	 $('#datalist').html('');
+ 	 paged('0');
+ 	 $('.input-medium').val('');
+}
+function initType(){
+	//人员类型
+	$.getJSON(ctx+'/sys/dict/listData?type=sys_ccm_people',function(datas) {
+	for (var i = 0; i < datas.length; i++) {
+		$('#pType').append("<option value='" + datas[i].value + "'>"+ datas[i].label+ "</option>");
+		pTypeObj[datas[i].value]=datas[i].label;
+	}
+	})
+	//场所类型
+	
+	$.getJSON(ctx+'/sys/dict/listData?type=place_types',function(datas) {
+		for (var i = 0; i < datas.length; i++) {
+			placeTypeObj[datas[i].value]=datas[i].label;
+		}
+	})
+	//重点类型
+	$.getJSON(ctx+'/sys/dict/listData?type=ccm_place_important',function(datas) {
+		for (var i = 0; i < datas.length; i++) {
+			placeImportantObj[datas[i].value]=datas[i].label;
+		}
+	})
+}
+function initMap(){
+	// 地图默认数据设置
+	var defaultPrams = {
+		id : 'map',
+		centerCoordinate : centerCoordinate,
+		zoom : zoomIndex,
+		maxZoom : maxZoom,
+		minZoom : minZoom,
+		baseUrl : baseUrlT,
+		zoomShowOrHide : false,// 缩小放大
+		overviewMap : false,
+		selectPointerFlag : true
+	// 鹰眼图
+	}
+	Map = new ArjMap.Map(defaultPrams);
+	// 加载地图
+	Map.init();
+	map=Map.map;
+	// 框选查询初始化
+	Map.selectQueryInit();
+}
+function Tab(obj) {
+    $(obj).addClass("active").siblings().removeClass("active");
+    var index = $(obj).index(); //获取索引号
+    $(".tab-item").eq(index).addClass("active").siblings().removeClass("active");
+}
+//分页
+function paged(pageCount){
+	layui.use(['laypage', 'layer'], function(){
+        var laypage = layui.laypage, layer = layui.layer;
+        laypage.render({
+        	elem:'pageList' // 容器id
+            , count: pageCount //总页数
+            , curr: currPage
+            ,groups: 1 //只显示 3 个连续页码
+            ,layout: [ 'prev', 'page', 'next']
+            , jump: function (obj,first) {
+                currPage =obj.curr;  //这里是后台返回给前端的当前页数
+                if(!first){ //点击跳页触发函数自身，并传递当前页：obj.curr  ajax 再次请求
+                	$('#GIStab li').each(function(){
+                		if($(this).hasClass('layui-this')){
+                			var type=$(this).attr('type');
+                			if(type=='event'){
+                				QueryEvents()
+                			}else if(type=='build'){
+                				QueryBuilds()
+                			}else if(type=='place'){
+                				QueryPlaces()
+                			}else if(type=='people'){
+                				QueryPeople()
+                			}else if(type=='video'){
+                				QueryVideos()
+                			}
+                		}
+                	})
+                }
+            }
+        });
+    });
+}
+//事件
+function QueryEvents(){
+	var caseName=$('#caseName').val();
+	var beginHappenDateEvent=$('#beginHappenDateEvent').val();
+	var endHappenDateEvent=$('#endHappenDateEvent').val();
+	var areaEvent=$('#areaEventId').val();
+	if(Map.overlayGISDialog){
+		Map.overlayGISDialog.setPosition(undefined);
+	}
+	Map.clearOverlays();
+	$.getJSON(ctx+'/sys/map/queryEventIncidentMap?beginHappenDate='+beginHappenDateEvent+'&endHappenDate='+endHappenDateEvent+'&caseName='+caseName+'&area.id='+areaEvent+'&pageNo='+currPage+'&pageSize='+pageSize,function(data){
+	
+		if(data==null||data==""||data==undefined){
+        	 $.jBox.tip('暂无数据！');
+        	 $('#pageNum').html('0');
+        	 $('#datalist').html('');
+        	 paged('0');
+             return ;
+         }
+		var featuresData=data.features;
+		var count=data.count;
+		paged(count);
+		$('#pageNum').html(count);
+		var html='';
+		for(var i in featuresData){
+			var id=featuresData[i].id;
+			var x='',y='';
+			if(featuresData[i].geometry.coordinates){
+				 x=featuresData[i].geometry.coordinates[0];
+				 y=featuresData[i].geometry.coordinates[1];
+			}
+			var properties=featuresData[i].properties;
+			var icon=properties.icon;
+			if(icon==''||icon==null){
+				icon=ctxStatic+'/images/no.png'
+			}
+			html+='<li class="datalist-li" id="map_li'+id+'" data-id="'+id+'" onclick="goToDetail('+x+','+y+',\''+id+'\','+JSON.stringify(properties).replace(/"/g, '&quot;')+')">';
+			html+='<div class="map_list_data" data-id="'+id+'">';
+			html+='<div class="col-left" data-id="'+id+'"> <a class="map_markers" href="javascript:;" data-id="'+id+'">'+(Number(i)+1)+'</a></div>';
+			html+='<div class="col-right"><img src="'+icon+'" style="width:auto;height:58px;"></div>';
+			html+='<div class="col-center" style="margin-right: 50px;">';
+			html+='<div class="col-row" data-id="'+id+'"> <span class="n-blue" data-id="'+id+'">'+data.features[i].properties.info['事件名称']+'</span></div>';
+			if(x==''||y==''||featuresData[i].geometry.coordinates.length==0){
+				html+='<div class="col-row" data-id="'+id+'"><span style="color:red;font-size: 8px;margin-left: -7px;" data-id="'+id+'">〔坐标错误〕</span></div>';
+			}
+			html+='<div class="col-row" data-id="'+id+'">'+data.features[i].properties.info['事发地址']+'</div>';
+			html+='<div class="col-row" data-id="'+id+'">'+data.features[i].properties.info['事发时间']+'</div>';
+			html+='</div>';
+			html+='</div>';
+			html+='</li>';
+		}
+		$('#datalist').html(html);
+		paged(count);
+		onHoverLIst();
+		for (var i in data.features){
+			data.features[i].properties['nameNum']=''+(Number(i)+1)+'';
+		}
+		
+		Map.addGIS([ {
+			'type' : 'GIS',
+			'id' : 'GIS',
+			'data' : data,
+			'isShow' : true
+		} ])
+	})
+}
+//框选查询
+function selectQuery(type,content){
+	var map=Map.map;
+	if(!type){
+		return;
+	}
+	//selectedFeatures.clear();
+	if(Map.draw){
+		map.removeInteraction(Map.draw);
+	}
+	Map.drawVector.getSource().clear();
+	if(type=="Box"){
+		Map.draw = new ol.interaction.Draw({
+			source: Map.drawSource,
+			type:"Circle",
+			style:Map.drawStyle,
+			geometryFunction:ol.interaction.Draw.createBox()
+		});
+	}else{
+		Map.draw = new ol.interaction.Draw({
+			source: Map.drawSource,
+			type:type,
+			style:Map.drawStyle,
+		});
+	}
+	map.addInteraction(Map.draw);
+	Map.draw.on('drawend',function(evt){
+		// $(".selectFeature").removeClass("active");
+		// if(type=='Point'){
+		// 	var circleCenter = evt.feature.getGeometry().getCoordinates();
+		// 	layer.confirm('<input id="RangeMeter" type="number" min="1" value="1000" style="margin: 0; width: 168px; margin-right: 5px;"/>米', {
+		// 		btn: ['确定','取消'] //按钮
+		// 	}, function(index){
+		// 		var val=$('#RangeMeter').val();
+		// 		Map.showCircleFromPoint(circleCenter,val)
+		// 		layer.close(index);
+		// 		$('.pointSelect').removeClass('active')
+		// 	}, function(){
+		// 		$('.pointSelect').removeClass('active')
+		//
+		// 	});
+		// }else
+			if(type=='Circle'){
+
+			var polygon = evt.feature.getGeometry();
+			var center = polygon.getCenter(),radius = polygon.getRadius(),extent = polygon.getExtent();
+			$('.circleSelect').removeClass('active')
+			var centerX=center[0],centerY=center[1];
+			var val= radius/360*(2 * Math.PI * 6378137.0)//将纬度转换为米
+			var data={'radius':val,'centerX':centerX,'centerY':centerY}//实时监控
+			if(content == "event") {
+				QueryEventsBySelection(data,"circle");
+			}else if(content == "build"){
+				QueryBuildsBySelection(data,"circle");
+			}else if(content == "place"){
+				QueryPlacesBySelection(data,"circle");
+			}else if(content == "people"){
+				QueryPeoplesBySelection(data,"circle");
+			}else if(content == "video"){
+				QueryVideosBySelection(data,"circle");
+			}
+
+			/* setTimeout(function(){
+                 Map.getCircleSelect(polygon);
+             },300)  */            //如果不设置延迟，范围内要素选中后自动取消选中，具体原因不知道
+		}else if(type=='Polygon'||type=='Box'){
+			var polygon = evt.feature.getGeometry();
+			var coordinates=polygon.getCoordinates();
+			var len = coordinates[0].length;
+			var xSum = null, ySum = null, x = null, y = null;
+			var xList='',yList='',xyList='';
+			xyList=coordinates[0].join(';')
+			for (var i = 0; i < len; i++) {
+				xList+=coordinates[0][i][0]+',';
+				yList+=coordinates[0][i][1]+',';
+
+				xSum += Number(coordinates[0][i][0]);
+				ySum += Number(coordinates[0][i][1]);
+
+			}
+			xList=xList.substring(0,xList.length-1);
+			yList=yList.substring(0,yList.length-1);
+			//中心点
+			x = xSum / len;
+			y = ySum / len;
+			var areaPointDraw = x + ',' + y;
+			console.log(areaPointDraw)
+			var  geoStrDraw = coordinates[0].join(";");
+			console.log(geoStrDraw)
+			$('.polygonSelect').removeClass('active')
+			var data={'xList':xList,'yList':yList,'xyList':xyList};//实时监控
+			if(content == "event") {
+				QueryEventsBySelection(data,"polygon");
+			}else if(content == "build"){
+				QueryBuildsBySelection(data,"polygon");
+			}else if(content == "place"){
+				QueryPlacesBySelection(data,"polygon");
+			}else if(content == "people"){
+				QueryPeoplesBySelection(data,"polygon");
+			}else if(content == "video"){
+				QueryVideosBySelection(data,"polygon");
+			}
+			/*   setTimeout(function(){
+                   Map.getPolygonSelect(polygon);
+               },300)*/
+		}
+		map.removeInteraction(Map.draw);
+	})
+
+}
+//事件
+function QueryEventsBySelection(data,selectionMode){
+	var caseName=$('#caseName').val();
+	var beginHappenDateEvent=$('#beginHappenDateEvent').val();
+	var endHappenDateEvent=$('#endHappenDateEvent').val();
+	var areaEvent=$('#areaEventId').val();
+	if(Map.overlayGISDialog){
+		Map.overlayGISDialog.setPosition(undefined);
+	}
+	Map.clearOverlays();
+	var url ="";
+	if (selectionMode=="circle"){
+		url = ctx+'/sys/map/queryEventIncidentMapBySelection?beginHappenDate='+beginHappenDateEvent+'&endHappenDate='+endHappenDateEvent+'&caseName='+caseName+'&area.id='+areaEvent+'&radius='+data.radius+'&x='+data.centerX+'&y='+data.centerY+'&selectionMode='+selectionMode;
+	} else if(selectionMode=="polygon"){
+		url = ctx+'/sys/map/queryEventIncidentMapBySelection?beginHappenDate='+beginHappenDateEvent+'&endHappenDate='+endHappenDateEvent+'&caseName='+caseName+'&area.id='+areaEvent+'&pointsString='+data.xyList+'&selectionMode='+selectionMode;
+	}
+	$.getJSON(url,function(data){
+
+		if(data==null||data==""||data==undefined){
+			$.jBox.tip('暂无数据！');
+			$('#pageNum').html('0');
+			$('#datalist').html('');
+			paged('0');
+			return ;
+		}
+		var featuresData=data.features;
+		var count=featuresData.length;
+		paged('0');
+		$('#pageNum').html(count);
+		var html='';
+		for(var i in featuresData){
+			var id=featuresData[i].id;
+			var x='',y='';
+			if(featuresData[i].geometry.coordinates){
+				x=featuresData[i].geometry.coordinates[0];
+				y=featuresData[i].geometry.coordinates[1];
+			}
+			var properties=featuresData[i].properties;
+			var icon=properties.icon;
+			if(icon==''||icon==null){
+				icon=ctxStatic+'/images/no.png'
+			}
+			html+='<li class="datalist-li" id="map_li'+id+'" data-id="'+id+'" onclick="goToDetail('+x+','+y+',\''+id+'\','+JSON.stringify(properties).replace(/"/g, '&quot;')+')">';
+			html+='<div class="map_list_data" data-id="'+id+'">';
+			html+='<div class="col-left" data-id="'+id+'"> <a class="map_markers" href="javascript:;" data-id="'+id+'">'+(Number(i)+1)+'</a></div>';
+			html+='<div class="col-right"><img src="'+icon+'" style="width:auto;height:58px;"></div>';
+			html+='<div class="col-center" style="margin-right: 50px;">';
+			html+='<div class="col-row" data-id="'+id+'"> <span class="n-blue" data-id="'+id+'">'+data.features[i].properties.info['事件名称']+'</span></div>';
+			if(x==''||y==''||featuresData[i].geometry.coordinates.length==0){
+				html+='<div class="col-row" data-id="'+id+'"><span style="color:red;font-size: 8px;margin-left: -7px;" data-id="'+id+'">〔坐标错误〕</span></div>';
+			}
+			html+='<div class="col-row" data-id="'+id+'">'+data.features[i].properties.info['事发地址']+'</div>';
+			html+='<div class="col-row" data-id="'+id+'">'+data.features[i].properties.info['事发时间']+'</div>';
+			html+='</div>';
+			html+='</div>';
+			html+='</li>';
+		}
+		$('#datalist').html(html);
+		onHoverLIst();
+		for (var i in data.features){
+			data.features[i].properties['nameNum']=''+(Number(i)+1)+'';
+		}
+
+		Map.addGIS([ {
+			'type' : 'GIS',
+			'id' : 'GIS',
+			'data' : data,
+			'isShow' : true
+		} ])
+	})
+}
+//房屋-楼栋
+function QueryBuilds(){
+	var buildname=$('#buildname').val();
+	var buildPname=$('#buildPname').val();
+	var buildaddress=$('#buildaddress').val();
+	var areaBuild=$('#areaBuildId').val();
+	if(Map.overlayGISDialog){
+		Map.overlayGISDialog.setPosition(undefined);
+	}
+	Map.clearOverlays();
+	$.getJSON(ctx+'/sys/map/queryBuildMap?buildname='+buildname+'&buildPname='+buildPname+'&residencedetail='+buildaddress+'&area.id='+areaBuild+'&pageNo='+currPage+'&pageSize='+pageSize,function(data){
+		if(data==null||data==""||data==undefined){
+        	 $.jBox.tip('暂无数据！');
+        	 $('#pageNum').html('0');
+        	 $('#datalist').html('');
+             return ;
+         }
+		var featuresData=data.features;
+		var count=data.count;
+		$('#pageNum').html(count);
+		paged(count);
+		var html='';
+		for(var i in featuresData){
+			var id=featuresData[i].id;
+			var x='',y='';
+			if(featuresData[i].geometry.coordinates){
+				 x=featuresData[i].geometry.coordinates[0];
+				 y=featuresData[i].geometry.coordinates[1];
+			}
+			var properties=featuresData[i].properties;
+			var icon=properties.icon;
+			if(icon==''||icon==null){
+				icon=ctxStatic+'/images/no.png'
+			}
+			html+='<li class="datalist-li" id="map_li'+id+'" data-id="'+id+'" onclick="goToDetail('+x+','+y+',\''+id+'\','+JSON.stringify(properties).replace(/"/g, '&quot;')+')">';
+			html+='<div class="map_list_data" data-id="'+id+'">';
+			html+='<div class="col-left" data-id="'+id+'"> <a class="map_markers" href="javascript:;" data-id="'+id+'">'+(Number(i)+1)+'</a></div>';
+			html+='<div class="col-right"><img src="'+icon+'" style="width:auto;height:58px;"></div>';
+			html+='<div class="col-center" style="margin-right: 50px;">';
+			html+='<div class="col-row" data-id="'+id+'"> <span class="n-blue" data-id="'+id+'">'+data.features[i].properties.info['楼栋名称']+'</span></div>';
+			if(x==''||y==''||featuresData[i].geometry.coordinates.length==0){
+				html+='<div class="col-row" data-id="'+id+'"><span style="color:red;font-size: 8px;margin-left: -7px;" data-id="'+id+'">〔坐标错误〕</span></div>';
+			}
+			html+='<div class="col-row" data-id="'+id+'">'+data.features[i].properties.info['楼栋长']+'</div>';
+			html+='<div class="col-row" data-id="'+id+'">'+data.features[i].properties.info['所属小区']+'</div>';
+			html+='</div>';
+			html+='</div>';
+			html+='</li>';
+		}
+		$('#datalist').html(html);
+		onHoverLIst();
+		for (var i in data.features){
+			data.features[i].properties['nameNum']=''+(Number(i)+1)+'';
+		}
+		Map.addGIS([ {
+			'type' : 'GIS',
+			'id' : 'GIS',
+			'data' : data,
+			'isShow' : true
+		} ])
+	})
+}
+//房屋-楼栋(框选）
+function QueryBuildsBySelection(data,selectionMode){
+	var buildname=$('#buildname').val();
+	var buildPname=$('#buildPname').val();
+	var buildaddress=$('#buildaddress').val();
+	var areaBuild=$('#areaBuildId').val();
+	if(Map.overlayGISDialog){
+		Map.overlayGISDialog.setPosition(undefined);
+	}
+	Map.clearOverlays();
+	var url ="";
+	if (selectionMode=="circle"){
+		url = ctx+'/sys/map/queryBuildMapBySelection?buildname='+buildname+'&buildPname='+buildPname+'&residencedetail='+buildaddress+'&area.id='+areaBuild+'&radius='+data.radius+'&x='+data.centerX+'&y='+data.centerY+'&selectionMode='+selectionMode;
+	} else if(selectionMode=="polygon"){
+		url = ctx+'/sys/map/queryBuildMapBySelection?buildname='+buildname+'&buildPname='+buildPname+'&residencedetail='+buildaddress+'&area.id='+areaBuild+'&pointsString='+data.xyList+'&selectionMode='+selectionMode;
+	}
+	$.getJSON(url,function(data){
+		if(data==null||data==""||data==undefined){
+			$.jBox.tip('暂无数据！');
+			$('#pageNum').html('0');
+			$('#datalist').html('');
+			return ;
+		}
+		var featuresData=data.features;
+		var count=featuresData.length;
+		$('#pageNum').html(count);
+		paged('0');
+		var html='';
+		for(var i in featuresData){
+			var id=featuresData[i].id;
+			var x='',y='';
+			if(featuresData[i].geometry.coordinates){
+				x=featuresData[i].geometry.coordinates[0];
+				y=featuresData[i].geometry.coordinates[1];
+			}
+			var properties=featuresData[i].properties;
+			var icon=properties.icon;
+			if(icon==''||icon==null){
+				icon=ctxStatic+'/images/no.png'
+			}
+			html+='<li class="datalist-li" id="map_li'+id+'" data-id="'+id+'" onclick="goToDetail('+x+','+y+',\''+id+'\','+JSON.stringify(properties).replace(/"/g, '&quot;')+')">';
+			html+='<div class="map_list_data" data-id="'+id+'">';
+			html+='<div class="col-left" data-id="'+id+'"> <a class="map_markers" href="javascript:;" data-id="'+id+'">'+(Number(i)+1)+'</a></div>';
+			html+='<div class="col-right"><img src="'+icon+'" style="width:auto;height:58px;"></div>';
+			html+='<div class="col-center" style="margin-right: 50px;">';
+			html+='<div class="col-row" data-id="'+id+'"> <span class="n-blue" data-id="'+id+'">'+data.features[i].properties.info['楼栋名称']+'</span></div>';
+			if(x==''||y==''||featuresData[i].geometry.coordinates.length==0){
+				html+='<div class="col-row" data-id="'+id+'"><span style="color:red;font-size: 8px;margin-left: -7px;" data-id="'+id+'">〔坐标错误〕</span></div>';
+			}
+			html+='<div class="col-row" data-id="'+id+'">'+data.features[i].properties.info['楼栋长']+'</div>';
+			html+='<div class="col-row" data-id="'+id+'">'+data.features[i].properties.info['所属小区']+'</div>';
+			html+='</div>';
+			html+='</div>';
+			html+='</li>';
+		}
+		$('#datalist').html(html);
+		onHoverLIst();
+		for (var i in data.features){
+			data.features[i].properties['nameNum']=''+(Number(i)+1)+'';
+		}
+		Map.addGIS([ {
+			'type' : 'GIS',
+			'id' : 'GIS',
+			'data' : data,
+			'isShow' : true
+		} ])
+	})
+}
+//场所
+function QueryPlaces(){
+	var placeName=$('#placeName').val();
+	var keyPointList=$('#keyPointList').val();
+	var placeType=$('#placeType').val();
+	var areaPlace=$('#areaPlaceId').val();
+	if(Map.overlayGISDialog){
+		Map.overlayGISDialog.setPosition(undefined);
+	}
+	Map.clearOverlays();
+	$.getJSON(ctx+'/sys/map/queryPlaceMap?placeName='+placeName+'&area.id='+areaPlace+'&pageNo='+currPage+'&pageSize='+pageSize,function(data){
+		if(data==null||data==""||data==undefined){
+        	 $.jBox.tip('暂无数据！');
+        	 $('#pageNum').html('0');
+        	 $('#datalist').html('');
+        	 paged('0');
+             return ;
+         }
+		var featuresData=data.features;
+		var count=data.count;
+		$('#pageNum').html(count);
+		paged(count);
+		var html='';
+		for(var i in featuresData){
+			var id=featuresData[i].id;
+			var x='',y='';
+			if(featuresData[i].geometry.coordinates){
+				 x=featuresData[i].geometry.coordinates[0];
+				 y=featuresData[i].geometry.coordinates[1];
+			}
+			
+			var properties=featuresData[i].properties;
+			var icon=properties.icon;
+			if(icon==''||icon==null){
+				icon=ctxStatic+'/images/no.png'
+			}
+			html+='<li class="datalist-li" id="map_li'+id+'" data-id="'+id+'" onclick="goToDetail('+x+','+y+',\''+id+'\','+JSON.stringify(properties).replace(/"/g, '&quot;')+')">';
+			html+='<div class="map_list_data" data-id="'+id+'">';
+			html+='<div class="col-left" data-id="'+id+'"> <a class="map_markers" href="javascript:;" data-id="'+id+'">'+(Number(i)+1)+'</a></div>';
+			html+='<div class="col-right"><img src="'+icon+'" style="width:auto;height:58px;"></div>';
+			html+='<div class="col-center" style="margin-right: 50px;">';
+			html+='<div class="col-row" data-id="'+id+'"> <span class="n-blue" data-id="'+id+'">'+data.features[i].properties.info['场所名称']+'</span></div>';
+			if(x==''||y==''||featuresData[i].geometry.coordinates.length==0){
+				html+='<div class="col-row" data-id="'+id+'"><span style="color:red;font-size: 8px;margin-left: -7px;" data-id="'+id+'">〔坐标错误〕</span></div>';
+			}
+			html+='<div class="col-row" data-id="'+id+'">'+data.features[i].properties.info['地址']+'</div>';
+			html+='<div class="col-row" data-id="'+id+'">'+data.features[i].properties.info['负责人姓名']+'</div>';
+			html+='</div>';
+			html+='</div>';
+			html+='</li>';
+		}
+		$('#datalist').html(html);
+		onHoverLIst();
+		for (var i in data.features){
+			data.features[i].properties['nameNum']=''+(Number(i)+1)+'';
+		}
+		Map.addGIS([ {
+			'type' : 'GIS',
+			'id' : 'GIS',
+			'data' : data,
+			'isShow' : true
+		} ])
+	})
+}
+//场所（框选）
+function QueryPlacesBySelection(data,selectionMode){
+	var placeName=$('#placeName').val();
+	var keyPointList=$('#keyPointList').val();
+	var placeType=$('#placeType').val();
+	var areaPlace=$('#areaPlaceId').val();
+	if(Map.overlayGISDialog){
+		Map.overlayGISDialog.setPosition(undefined);
+	}
+	Map.clearOverlays();
+	var url ="";
+	if (selectionMode=="circle"){
+		url = ctx+'/sys/map/queryPlaceMapBySelection?placeName='+placeName+'&area.id='+areaPlace+'&radius='+data.radius+'&x='+data.centerX+'&y='+data.centerY+'&selectionMode='+selectionMode;
+	} else if(selectionMode=="polygon"){
+		url = ctx+'/sys/map/queryPlaceMapBySelection?placeName='+placeName+'&area.id='+areaPlace+'&pointsString='+data.xyList+'&selectionMode='+selectionMode;
+	}
+	$.getJSON(url,function(data){
+		if(data==null||data==""||data==undefined){
+			$.jBox.tip('暂无数据！');
+			$('#pageNum').html('0');
+			$('#datalist').html('');
+			paged('0');
+			return ;
+		}
+		var featuresData=data.features;
+		var count=featuresData.length;
+		$('#pageNum').html(count);
+		paged('0');
+		var html='';
+		for(var i in featuresData){
+			var id=featuresData[i].id;
+			var x='',y='';
+			if(featuresData[i].geometry.coordinates){
+				x=featuresData[i].geometry.coordinates[0];
+				y=featuresData[i].geometry.coordinates[1];
+			}
+
+			var properties=featuresData[i].properties;
+			var icon=properties.icon;
+			if(icon==''||icon==null){
+				icon=ctxStatic+'/images/no.png'
+			}
+			html+='<li class="datalist-li" id="map_li'+id+'" data-id="'+id+'" onclick="goToDetail('+x+','+y+',\''+id+'\','+JSON.stringify(properties).replace(/"/g, '&quot;')+')">';
+			html+='<div class="map_list_data" data-id="'+id+'">';
+			html+='<div class="col-left" data-id="'+id+'"> <a class="map_markers" href="javascript:;" data-id="'+id+'">'+(Number(i)+1)+'</a></div>';
+			html+='<div class="col-right"><img src="'+icon+'" style="width:auto;height:58px;"></div>';
+			html+='<div class="col-center" style="margin-right: 50px;">';
+			html+='<div class="col-row" data-id="'+id+'"> <span class="n-blue" data-id="'+id+'">'+data.features[i].properties.info['场所名称']+'</span></div>';
+			if(x==''||y==''||featuresData[i].geometry.coordinates.length==0){
+				html+='<div class="col-row" data-id="'+id+'"><span style="color:red;font-size: 8px;margin-left: -7px;" data-id="'+id+'">〔坐标错误〕</span></div>';
+			}
+			html+='<div class="col-row" data-id="'+id+'">'+data.features[i].properties.info['地址']+'</div>';
+			html+='<div class="col-row" data-id="'+id+'">'+data.features[i].properties.info['负责人姓名']+'</div>';
+			html+='</div>';
+			html+='</div>';
+			html+='</li>';
+		}
+		$('#datalist').html(html);
+		onHoverLIst();
+		for (var i in data.features){
+			data.features[i].properties['nameNum']=''+(Number(i)+1)+'';
+		}
+		Map.addGIS([ {
+			'type' : 'GIS',
+			'id' : 'GIS',
+			'data' : data,
+			'isShow' : true
+		} ])
+	})
+}
+//人员
+function QueryPeople(){
+	var pType=$('#pType').val();
+	var pIdent=$('#pIdent').val();
+	var pName=$('#pName').val();
+	var areaPeople=$('#areaPeopleId').val();
+	var pageNo=1;
+	if(Map.overlayGISDialog){
+		Map.overlayGISDialog.setPosition(undefined);
+	}
+	Map.clearOverlays();
+	$.getJSON(ctx+'/sys/map/queryPeopleMap?name='+pName+'&ident='+pIdent+'&type='+pType+'&areaGridId.id='+areaPeople+'&pageNo='+currPage+'&pageSize='+pageSize,function(data){
+		if(data==null||data==""||data==undefined){
+        	 $.jBox.tip('暂无数据！');
+        	 $('#pageNum').html('0');
+        	 $('#datalist').html('');
+        	 paged('0');
+             return ;
+         }
+		var featuresData=data.features;
+		var count=data.count;
+		$('#pageNum').html(count);
+		paged(count);
+		var html='';
+		for(var i in featuresData){
+			var id=featuresData[i].id;
+			var x='',y='';
+			if(featuresData[i].geometry.coordinates){
+				 x=featuresData[i].geometry.coordinates[0];
+				 y=featuresData[i].geometry.coordinates[1];
+			}
+			var properties=featuresData[i].properties;
+			var icon=properties.icon;
+			if(icon==''||icon==null){
+				icon=ctxStatic+'/images/no.png'
+			}
+			html+='<li class="datalist-li" id="map_li'+id+'" data-id="'+id+'" onclick="goToDetail('+x+','+y+',\''+id+'\','+JSON.stringify(properties).replace(/"/g, '&quot;')+')">';
+			html+='<div class="map_list_data" data-id="'+id+'">';
+			html+='<div class="col-left" data-id="'+id+'"> <a class="map_markers" href="javascript:;" data-id="'+id+'">'+(Number(i)+1)+'</a></div>';
+			html+='<div class="col-right"><img src="'+icon+'" style="width:auto;height:58px;"></div>';
+			html+='<div class="col-center" style="margin-right: 50px;">';
+			html+='<div class="col-row" data-id="'+id+'"> <span class="n-blue" data-id="'+id+'">'+data.features[i].properties.info['姓名']+'</span></div>';
+			if(x==''||y==''||featuresData[i].geometry.coordinates.length==0){
+				html+='<div class="col-row" data-id="'+id+'"><span style="color:red;font-size: 8px;margin-left: -7px;" data-id="'+id+'">〔坐标错误〕</span></div>';
+			}
+			html+='<div class="col-row" data-id="'+id+'">'+data.features[i].properties.info['身份号码']+'</div>';
+			html+='<div class="col-row" data-id="'+id+'">'+data.features[i].properties.info['户籍详址']+'</div>';
+			html+='</div>';
+			html+='</div>';
+			html+='</li>';
+		}
+		$('#datalist').html(html);
+		onHoverLIst();
+		for (var i in data.features){
+			data.features[i].properties['nameNum']=''+(Number(i)+1)+'';
+		}
+		Map.addGIS([ {
+			'type' : 'GIS',
+			'id' : 'GIS',
+			'data' : data,
+			'isShow' : true
+		} ])
+	})
+}
+//人员(框选）
+function QueryPeoplesBySelection(data,selectionMode){
+	var pType=$('#pType').val();
+	var pIdent=$('#pIdent').val();
+	var pName=$('#pName').val();
+	var areaPeople=$('#areaPeopleId').val();
+	var pageNo=1;
+	if(Map.overlayGISDialog){
+		Map.overlayGISDialog.setPosition(undefined);
+	}
+	Map.clearOverlays();
+	var url ="";
+	if (selectionMode=="circle"){
+		url = ctx+'/sys/map/queryPeopleMapBySelection?name='+pName+'&ident='+pIdent+'&type='+pType+'&areaGridId.id='+areaPeople+'&radius='+data.radius+'&x='+data.centerX+'&y='+data.centerY+'&selectionMode='+selectionMode;
+	} else if(selectionMode=="polygon"){
+		url = ctx+'/sys/map/queryPeopleMapBySelection?name='+pName+'&ident='+pIdent+'&type='+pType+'&areaGridId.id='+areaPeople+'&pointsString='+data.xyList+'&selectionMode='+selectionMode;
+	}
+	$.getJSON(url,function(data){
+		if(data==null||data==""||data==undefined){
+			$.jBox.tip('暂无数据！');
+			$('#pageNum').html('0');
+			$('#datalist').html('');
+			paged('0');
+			return ;
+		}
+		var featuresData=data.features;
+		var count=featuresData.length;
+		$('#pageNum').html(count);
+		paged('0');
+		var html='';
+		for(var i in featuresData){
+			var id=featuresData[i].id;
+			var x='',y='';
+			if(featuresData[i].geometry.coordinates){
+				x=featuresData[i].geometry.coordinates[0];
+				y=featuresData[i].geometry.coordinates[1];
+			}
+			var properties=featuresData[i].properties;
+			var icon=properties.icon;
+			if(icon==''||icon==null){
+				icon=ctxStatic+'/images/no.png'
+			}
+			html+='<li class="datalist-li" id="map_li'+id+'" data-id="'+id+'" onclick="goToDetail('+x+','+y+',\''+id+'\','+JSON.stringify(properties).replace(/"/g, '&quot;')+')">';
+			html+='<div class="map_list_data" data-id="'+id+'">';
+			html+='<div class="col-left" data-id="'+id+'"> <a class="map_markers" href="javascript:;" data-id="'+id+'">'+(Number(i)+1)+'</a></div>';
+			html+='<div class="col-right"><img src="'+icon+'" style="width:auto;height:58px;"></div>';
+			html+='<div class="col-center" style="margin-right: 50px;">';
+			html+='<div class="col-row" data-id="'+id+'"> <span class="n-blue" data-id="'+id+'">'+data.features[i].properties.info['姓名']+'</span></div>';
+			if(x==''||y==''||featuresData[i].geometry.coordinates.length==0){
+				html+='<div class="col-row" data-id="'+id+'"><span style="color:red;font-size: 8px;margin-left: -7px;" data-id="'+id+'">〔坐标错误〕</span></div>';
+			}
+			html+='<div class="col-row" data-id="'+id+'">'+data.features[i].properties.info['身份号码']+'</div>';
+			html+='<div class="col-row" data-id="'+id+'">'+data.features[i].properties.info['户籍详址']+'</div>';
+			html+='</div>';
+			html+='</div>';
+			html+='</li>';
+		}
+		$('#datalist').html(html);
+		onHoverLIst();
+		for (var i in data.features){
+			data.features[i].properties['nameNum']=''+(Number(i)+1)+'';
+		}
+		Map.addGIS([ {
+			'type' : 'GIS',
+			'id' : 'GIS',
+			'data' : data,
+			'isShow' : true
+		} ])
+	})
+}
+//监控
+function QueryVideos(){
+	var videoIP=$('#videoIP').val();
+	var videoName=$('#videoName').val();
+	var areaVideo=$('#areaVideoId').val();
+	if(Map.overlayGISDialog){
+		Map.overlayGISDialog.setPosition(undefined);
+	}
+	Map.clearOverlays();
+	$.getJSON(ctx+'/sys/map/queryDeviceMap?name='+videoName+'&ip='+videoIP+'&area.id='+areaVideo+'&pageNo='+currPage+'&pageSize='+pageSize,function(data){
+		if(data==null||data==""||data==undefined){
+        	 $.jBox.tip('暂无数据！');
+        	 $('#pageNum').html('0');
+        	 $('#datalist').html('');
+        	 paged('0');
+             return ;
+         }
+		var featuresData=data.features;
+		var count=data.count;
+		paged(count);
+		$('#pageNum').html(count);
+		var html='';
+		for(var i in featuresData){
+			var id=featuresData[i].id;
+			var x='',y='';
+			if(featuresData[i].geometry.coordinates){
+				 x=featuresData[i].geometry.coordinates[0];
+				 y=featuresData[i].geometry.coordinates[1];
+			}
+			var properties=featuresData[i].properties;
+			html+='<li class="datalist-li" id="map_li'+id+'" data-id="'+id+'" onclick="goToDetail('+x+','+y+',\''+id+'\','+JSON.stringify(properties).replace(/"/g, '&quot;')+')">';
+			html+='<div class="map_list_data" data-id="'+id+'">';
+			html+='<div class="col-left" data-id="'+id+'"> <a class="map_markers" href="javascript:;" data-id="'+id+'">'+(Number(i)+1)+'</a></div>';
+			html+='<div class="col-right"><img src="'+ctxStatic+'/images/gisVideo.png" style="width:auto;height:58px;"></div>';
+			html+='<div class="col-center" style="margin-right: 50px;">';
+			html+='<div class="col-row" data-id="'+id+'"> <span class="n-blue" data-id="'+id+'">'+data.features[i].properties.name+'</span></div>';
+			if(x==''||y==''||featuresData[i].geometry.coordinates.length==0){
+				html+='<div class="col-row" data-id="'+id+'"><span style="color:red;font-size: 8px;margin-left: -7px;" data-id="'+id+'">〔坐标错误〕</span></div>';
+			}
+			html+='<div class="col-row" data-id="'+id+'">'+data.features[i].properties.info['IP地址']+'</div>';
+			html+='<div class="col-row" data-id="'+id+'">'+data.features[i].properties.info['安装位置']+'</div>';
+			html+='</div>';
+			html+='</div>';
+			html+='</li>';
+		}
+		$('#datalist').html(html);
+		paged(count);
+		onHoverLIst();
+		for (var i in data.features){
+			data.features[i].properties['nameNum']=''+(Number(i)+1)+'';
+		}
+		
+		Map.addGIS([ {
+			'type' : 'GIS',
+			'id' : 'GIS',
+			'data' : data,
+			'isShow' : true
+		} ])
+	})
+}
+//监控(框选)
+function QueryVideosBySelection(data,selectionMode){
+	var videoIP=$('#videoIP').val();
+	var videoName=$('#videoName').val();
+	var areaVideo=$('#areaVideoId').val();
+	if(Map.overlayGISDialog){
+		Map.overlayGISDialog.setPosition(undefined);
+	}
+	Map.clearOverlays();
+	var url ="";
+	if (selectionMode=="circle"){
+		url = ctx+'/sys/map/queryDeviceMapBySelection?name='+videoName+'&ip='+videoIP+'&area.id='+areaVideo+'&radius='+data.radius+'&x='+data.centerX+'&y='+data.centerY+'&selectionMode='+selectionMode;
+	} else if(selectionMode=="polygon"){
+		url = ctx+'/sys/map/queryDeviceMapBySelection?name='+videoName+'&ip='+videoIP+'&area.id='+areaVideo+'&pointsString='+data.xyList+'&selectionMode='+selectionMode;
+	}
+	$.getJSON(url,function(data){
+		if(data==null||data==""||data==undefined){
+			$.jBox.tip('暂无数据！');
+			$('#pageNum').html('0');
+			$('#datalist').html('');
+			paged('0');
+			return ;
+		}
+		var featuresData=data.features;
+		var count=featuresData.length;
+		paged('0');
+		$('#pageNum').html(count);
+		var html='';
+		for(var i in featuresData){
+			var id=featuresData[i].id;
+			var x='',y='';
+			if(featuresData[i].geometry.coordinates){
+				x=featuresData[i].geometry.coordinates[0];
+				y=featuresData[i].geometry.coordinates[1];
+			}
+			var properties=featuresData[i].properties;
+			html+='<li class="datalist-li" id="map_li'+id+'" data-id="'+id+'" onclick="goToDetail('+x+','+y+',\''+id+'\','+JSON.stringify(properties).replace(/"/g, '&quot;')+')">';
+			html+='<div class="map_list_data" data-id="'+id+'">';
+			html+='<div class="col-left" data-id="'+id+'"> <a class="map_markers" href="javascript:;" data-id="'+id+'">'+(Number(i)+1)+'</a></div>';
+			html+='<div class="col-right"><img src="'+ctxStatic+'/images/gisVideo.png" style="width:auto;height:58px;"></div>';
+			html+='<div class="col-center" style="margin-right: 50px;">';
+			html+='<div class="col-row" data-id="'+id+'"> <span class="n-blue" data-id="'+id+'">'+data.features[i].properties.name+'</span></div>';
+			if(x==''||y==''||featuresData[i].geometry.coordinates.length==0){
+				html+='<div class="col-row" data-id="'+id+'"><span style="color:red;font-size: 8px;margin-left: -7px;" data-id="'+id+'">〔坐标错误〕</span></div>';
+			}
+			html+='<div class="col-row" data-id="'+id+'">'+data.features[i].properties.info['IP地址']+'</div>';
+			html+='<div class="col-row" data-id="'+id+'">'+data.features[i].properties.info['安装位置']+'</div>';
+			html+='</div>';
+			html+='</div>';
+			html+='</li>';
+		}
+		$('#datalist').html(html);
+		onHoverLIst();
+		for (var i in data.features){
+			data.features[i].properties['nameNum']=''+(Number(i)+1)+'';
+		}
+
+		Map.addGIS([ {
+			'type' : 'GIS',
+			'id' : 'GIS',
+			'data' : data,
+			'isShow' : true
+		} ])
+	})
+}
+//点击定位
+function goToDetail(x,y,id,info){
+	var coordinates=[x,y];
+	Map.map.getView().setZoom(18);
+	Map.goTo(coordinates);
+	Map.selectGISPointer(id,info,coordinates);
+	 $('.gis-marker').removeClass('activeMax');
+	 $('#overlay_'+id).addClass('activeMax');
+	 $('.gis-marker').parent().removeClass('activeMax');
+	 $('#overlay_'+id).parent().addClass('activeMax');
+}
+
+function onHoverLIst(){
+	var $document = $(document);
+	  $document.on("mouseenter mouseleave",".datalist-li",function(event){
+		  var id=event.target.getAttribute('data-id');
+	  　　if(event.type == "mouseenter"){
+		    $('.gis-marker').removeClass('active');
+			$('#overlay_'+id).addClass('active');
+			 $('.gis-marker').parent().removeClass('active');
+			 $('#overlay_'+id).parent().addClass('active');
+	  　　}else if(event.type == "mouseleave"){
+		  $('.gis-marker').removeClass('active');
+		  $('#overlay_'+id).parent().removeClass('active');
+	  　　};
+	  });
+}
+
+

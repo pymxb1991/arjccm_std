@@ -1,0 +1,378 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.arjjs.ccm.modules.ccm.ccmsys.dao.CcmDeviceDao">
+
+	<sql id="ccmDeviceColumns">
+		a.id AS "id",
+		a.code AS "code",
+		a.name AS "name",
+		a.ip AS
+		"ip",
+		a.mask AS "mask",
+		a.gateway AS "gateway",
+		a.proxy AS "proxy",
+		a.protocol AS "protocol",
+		a.port AS "port",
+		a.sdk_port AS "sdkPort",
+		a.channel_num AS "channelNum",
+		a.param AS "param",
+		a.account AS
+		"account",
+		a.password AS "password",
+		a.parent_id AS "parent.id",
+		a.type_id AS "typeId",
+		a.type_vidicon AS "typeVidicon",
+		a.area_id AS "area.id",
+		a.address AS "address",
+		a.status AS "status",
+		a.company_id AS "companyId",
+		a.version AS
+		"version",
+		a.image_path AS "imagePath",
+		a.description AS "description",
+		a.coordinate AS "coordinate",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.installation_range_type AS "rangeType",
+		a.del_flag AS
+		"delFlag",
+		a17.name AS "area.name"
+	</sql>
+
+	<sql id="ccmDeviceJoins">
+		LEFT JOIN sys_area a17 ON a17.id = a.area_id
+	</sql>
+
+	<select id="get" resultType="CcmDevice">
+		SELECT
+		<include refid="ccmDeviceColumns" />
+		FROM ccm_device a
+		<include refid="ccmDeviceJoins" />
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="getByCode" resultType="CcmDevice">
+		SELECT
+		<include refid="ccmDeviceColumns" />
+		FROM ccm_device a
+		<include refid="ccmDeviceJoins" />
+		WHERE a.del_flag = 0 AND a.code = #{code}
+	</select>
+
+	<select id="findList" resultType="CcmDevice">
+		SELECT
+		<include refid="ccmDeviceColumns" />
+		FROM ccm_device a
+		<include refid="ccmDeviceJoins" />
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="userArea != null and userArea.parentIds != null and userArea.parentIds != ''">
+				AND (a17.parent_ids LIKE CONCAT('%',#{userArea.id},'%') or
+				a.area_id
+				= #{userArea.id})
+			</if>
+			<if test="code != null and code != ''">
+				AND a.code LIKE
+				<if test="dbName == 'oracle'">'%'||#{code}||'%'</if>
+				<if test="dbName == 'mssql'">'%'+#{code}+'%'</if>
+				<if test="dbName == 'mysql'">concat('%',#{code},'%')</if>
+			</if>
+			<if test="name != null and name != ''">
+				AND a.name LIKE
+				<if test="dbName == 'oracle'">'%'||#{name}||'%'</if>
+				<if test="dbName == 'mssql'">'%'+#{name}+'%'</if>
+				<if test="dbName == 'mysql'">concat('%',#{name},'%')</if>
+			</if>
+			<if test="ip != null and ip != ''">
+				AND a.ip LIKE
+				<if test="dbName == 'oracle'">'%'||#{ip}||'%'</if>
+				<if test="dbName == 'mssql'">'%'+#{ip}+'%'</if>
+				<if test="dbName == 'mysql'">concat('%',#{ip},'%')</if>
+			</if>
+			<if test="typeId != null and typeId != ''">
+				AND a.type_id = #{typeId}
+			</if>
+			<if test="typeVidicon != null and typeVidicon != ''">
+				AND a.type_vidicon = #{typeVidicon}
+			</if>
+			<if test="area != null and area.id != null and area.id != ''">
+				AND a.area_id = #{area.id}
+			</if>
+			<if test="status != null and status != ''">
+				AND a.status = #{status}
+			</if>
+			<if test="coordinate != null and coordinate != ''">
+				AND a.coordinate = #{coordinate}
+			</if>
+			<if test="more1 != null and more1 != ''">
+                AND  (${more1})
+            </if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+
+	<select id="findAllList" resultType="CcmDevice">
+		SELECT
+		<include refid="ccmDeviceColumns" />
+		FROM ccm_device a
+		<include refid="ccmDeviceJoins" />
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="getByIp" resultType="CcmDevice">
+		SELECT
+		<include refid="ccmDeviceColumns" />
+		FROM ccm_device a
+		<include refid="ccmDeviceJoins" />
+		WHERE a.ip = #{ip}
+			  and
+			  a.del_flag = 0
+	</select>
+
+	<insert id="insert">
+		INSERT INTO ccm_device(
+		id,
+		code,
+		name,
+		ip,
+		mask,
+		gateway,
+		proxy,
+		protocol,
+		port,
+		sdk_port,
+		channel_num,
+		param,
+		account,
+		password,
+		parent_id,
+		type_id,
+		type_vidicon,
+		area_id,
+		address,
+		status,
+		company_id,
+		version,
+		image_path,
+		description,
+		coordinate,
+		create_by,
+		create_date,
+		update_by,
+		update_date,
+		remarks,
+		installation_range_type,
+		del_flag
+		) VALUES (
+		#{id},
+		#{code},
+		#{name},
+		#{ip},
+		#{mask},
+		#{gateway},
+		#{proxy},
+		#{protocol},
+		#{port},
+		#{sdkPort},
+		#{channelNum},
+		#{param},
+		#{account},
+		#{password},
+		#{parent.id},
+		#{typeId},
+		#{typeVidicon},
+		#{area.id},
+		#{address},
+		#{status},
+		#{companyId},
+		#{version},
+		#{imagePath},
+		#{description},
+		#{coordinate},
+		#{createBy.id},
+		#{createDate},
+		#{updateBy.id},
+		#{updateDate},
+		#{remarks},
+		#{rangeType},
+		#{delFlag}
+		)
+	</insert>
+
+	<update id="update">
+		UPDATE ccm_device SET
+		code = #{code},
+		name = #{name},
+		ip = #{ip},
+		mask = #{mask},
+		gateway = #{gateway},
+		proxy = #{proxy},
+		protocol = #{protocol},
+		port = #{port},
+		sdk_port = #{sdkPort},
+		channel_num = #{channelNum},
+		param = #{param},
+		account = #{account},
+		password = #{password},
+		parent_id = #{parent.id},
+		type_id = #{typeId},
+		type_vidicon = #{typeVidicon},
+		area_id = #{area.id},
+		address = #{address},
+		status = #{status},
+		company_id = #{companyId},
+		version = #{version},
+		image_path =
+		#{imagePath},
+		description = #{description},
+		coordinate = #{coordinate},
+		update_by = #{updateBy.id},
+		update_date = #{updateDate},
+		installation_range_type = #{rangeType},
+		remarks =
+		#{remarks}
+		WHERE id = #{id}
+	</update>
+
+	<update id="delete">
+		UPDATE ccm_device SET
+		del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+
+	<update id="updateCoordinates">
+		UPDATE ccm_device SET
+		coordinate = #{coordinate}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="updateDeviceArea">
+		UPDATE ccm_device SET
+		area_id = #{area.id}
+		WHERE id = #{id}
+	</update>
+	<!-- 视频安装范围分类 -->
+	<select id="selectByInstallType" resultType="com.arjjs.ccm.tool.EchartType">
+
+			SELECT
+		  (
+			  case
+					when t1.`value` = '01' then '党政机关'
+					when t1.`value` = '02' then '主干道'
+					when t1.`value` = '03' then '学校'
+					when t1.`value` = '04' then '小区'
+					when t1.`value` = '05' then '地铁口'
+					when t1.`value` = '06' then '商场'
+					when t1.`value` = '07' then '加油站'
+					when t1.`value` = '08' then '其它'
+					else '其它'
+				 end
+					)  AS "type",
+			count(t2.installation_range_type)  AS "value"
+		FROM
+			sys_dict t1
+		LEFT JOIN ccm_device t2 on  t1.`value` = IF(t2.installation_range_type IS NULL || t2.installation_range_type = '', '08', t2.installation_range_type) 
+		AND t1.del_flag = 0 AND t2.del_flag = 0
+		WHERE t1.type = 'installation_range_type'
+			GROUP BY	 t1.`value`
+	</select>
+	<!-- 视频每年布控趋势 -->
+	<select id="selectByCreateDate" resultType="com.arjjs.ccm.tool.EchartType">
+		SELECT
+			 date_format(t.create_date,'%Y') AS "type",
+			count(*)  AS "value"
+		FROM
+			ccm_device t
+		WHERE
+			t.del_flag = 0
+			GROUP BY	 date_format(t.create_date, '%Y');
+	</select>
+	<!-- 监控设备类型 -->
+	<select id="selectByType" resultType="com.arjjs.ccm.tool.EchartType">
+		SELECT
+				  (
+					  case
+							when t1.`value` = '001' then '普通监控'
+							when t1.`value` = '002' then '卡口监控'
+							when t1.`value` = '003' then '人脸监控'
+							else '普通监控'
+						 end
+					)  AS "type",
+			count(t2.type_id)  AS "value"
+		FROM
+			sys_dict t1
+		LEFT JOIN	ccm_device t2 on  t1.`value` = IF(t2.type_id IS NULL || t2.type_id = '', '001', t2.type_id)   
+		AND t1.del_flag = 0 AND t2.del_flag = 0
+		WHERE
+			 t1.type = 'ccm_device_type_id'
+			GROUP BY t1.`value`
+
+	</select>
+
+    <!-- 视频区域分布-->
+    <select id="selectDeviceByArea" resultType="com.arjjs.ccm.tool.EchartType" >
+        SELECT
+             t3.`name` AS "type",
+             count(*)  AS "value"
+        FROM
+        ccm_device AS t1
+        LEFT JOIN sys_area AS t2 ON t2.id = t1.area_id
+        LEFT JOIN sys_area AS t3 ON t3.id = t2.parent_id
+        WHERE
+            t1.del_flag = 0
+            GROUP BY t3.id
+	</select>
+	<!-- 视频区域分布 -->
+    <select id="selectDeviceByAreaYa" resultType="com.arjjs.ccm.tool.EchartType" >
+
+		SELECT
+			t4.`name` AS "type",
+             count(*)  AS "value"
+		FROM
+				sys_area t1
+		LEFT JOIN ccm_device AS t2 ON t1.id = t2.area_id
+		LEFT JOIN sys_area AS t3 ON t1.parent_id = t3.id
+		LEFT JOIN sys_area AS t4 ON t4.id = t3.parent_id
+			WHERE
+			t2.del_flag = 0
+			AND t1.type = 7
+			GROUP BY 	t4.id
+
+	</select>
+
+    <select id="selectByAreaGIdAndName" resultType="com.arjjs.ccm.modules.ccm.pop.entity.CcmAreaPoint" parameterType="com.arjjs.ccm.modules.ccm.sys.entity.CcmAreaPointVo">
+        SELECT
+        t1.id,
+        t1.coordinate as area_point
+        FROM
+        ccm_device t1
+        WHERE
+        t1.del_flag = 0 and t1.coordinate != ""
+        <if test="areaId != null and areaId !=''">
+            and t1.area_id = #{areaId}
+        </if>
+        <if test="name != null and name !=''">
+            and t1.name like  '%${name}%'
+        </if>
+    </select>
+</mapper>

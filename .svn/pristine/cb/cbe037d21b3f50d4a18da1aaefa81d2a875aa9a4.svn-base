@@ -1,0 +1,240 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.arjjs.ccm.modules.pbs.activity.dao.PbsActivitysigninDao">
+
+	<sql id="pbsActivitysigninColumns">
+		a.id AS "id",
+		a.s_activityid AS "sActivityid.id",
+		rec.s_title AS "sActivityid.sTitle",
+		a.s_type AS "sType.id",
+		type.s_name AS "sType.sName",
+		a.s_regflag AS "sRegflag",
+		a.s_signbindmember AS "sSignbindmember.id",
+		signmem.s_name AS
+		"sSignbindmember.sName",
+		a.s_familyflow AS "sFamilyflow",
+		a.s_operator
+		AS "sOperator.id",
+		u7.name AS "sOperator.name",
+		a.s_bindmember AS
+		"sBindmember.id",
+		mem.s_name AS "sBindmember.sName",
+		mem.s_photo AS "sBindmember.sPhoto",
+		a.s_spare01 AS
+		"sSpare01",
+		a.s_spare02 AS "sSpare02",
+		a.s_spare03 AS "sSpare03",
+		a.s_spare04 AS "sSpare04",
+		a.create_by AS "createBy.id",
+		a.create_date
+		AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS
+		"updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag"
+	</sql>
+
+	<sql id="pbsActivitysigninJoins">
+		LEFT JOIN sys_user u7 ON u7.id = a.s_operator
+		LEFT JOIN
+		pbs_partymem mem ON a.s_bindmember = mem.id
+		LEFT JOIN pbs_partymem
+		signmem ON a.s_signbindmember = signmem.id
+		LEFT JOIN pbs_activityrec
+		rec ON rec.id = a.s_activityid
+		LEFT JOIN pbs_activitytype type ON
+		type.id =a.s_type
+	</sql>
+
+	<select id="get" resultType="PbsActivitysignin">
+		SELECT
+		<include refid="pbsActivitysigninColumns" />
+		FROM pbs_activitysignin a
+		<include refid="pbsActivitysigninJoins" />
+		WHERE a.id = #{id}
+	</select>
+
+	<select id="findList" resultType="PbsActivitysignin">
+		SELECT
+		<include refid="pbsActivitysigninColumns" />
+		FROM pbs_activitysignin a
+		<include refid="pbsActivitysigninJoins" />
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if
+				test="sActivityid != null and sActivityid != '' and sActivityid.id != null and sActivityid.id != ''">
+				AND a.s_activityid = #{sActivityid.id}
+			</if>
+			<if
+				test="sType != null and sType != '' and sType.id != null and sType.id != ''">
+				AND a.s_type = #{sType.id}
+			</if>
+			<if
+				test="sOperator != null and sOperator != '' and sOperator.id != null and sOperator.id != ''">
+				AND a.s_operator = #{sOperator.id}
+			</if>
+			<if
+				test="sBindmember != null and sBindmember != '' and sBindmember.id != null and sBindmember.id != ''">
+				AND a.s_bindmember = #{sBindmember.id}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+
+	<select id="findAllList" resultType="PbsActivitysignin">
+		SELECT
+		<include refid="pbsActivitysigninColumns" />
+		FROM pbs_activitysignin a
+		<include refid="pbsActivitysigninJoins" />
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+
+	<insert id="insert">
+		INSERT INTO pbs_activitysignin(
+		id,
+		s_activityid,
+		s_type,
+		s_regflag,
+		s_signbindmember,
+		s_familyflow,
+		s_operator,
+		s_bindmember,
+		s_spare01,
+		s_spare02,
+		s_spare03,
+		s_spare04,
+		create_by,
+		create_date,
+		update_by,
+		update_date,
+		remarks,
+		del_flag
+		) VALUES (
+		#{id},
+		#{sActivityid.id},
+		#{sType.id},
+		#{sRegflag},
+		#{sSignbindmember.id},
+		#{sFamilyflow},
+		#{sOperator.id},
+		#{sBindmember.id},
+		#{sSpare01},
+		#{sSpare02},
+		#{sSpare03},
+		#{sSpare04},
+		#{createBy.id},
+		#{createDate},
+		#{updateBy.id},
+		#{updateDate},
+		#{remarks},
+		#{delFlag}
+		)
+	</insert>
+
+	<update id="update">
+		UPDATE pbs_activitysignin SET
+		s_activityid =
+		#{sActivityid.id},
+		s_type = #{sType.id},
+		s_regflag = #{sRegflag},
+		s_signbindmember = #{sSignbindmember.id},
+		s_familyflow =
+		#{sFamilyflow},
+		s_operator = #{sOperator.id},
+		s_bindmember =
+		#{sBindmember.id},
+		s_spare01 = #{sSpare01},
+		s_spare02 = #{sSpare02},
+		s_spare03 = #{sSpare03},
+		s_spare04 = #{sSpare04},
+		update_by =
+		#{updateBy.id},
+		update_date = #{updateDate},
+		remarks = #{remarks}
+		WHERE
+		id = #{id}
+	</update>
+
+	<select id="getMemSum" resultType="java.lang.Integer">
+		SELECT count(1) from
+		pbs_activitysignin a
+		where a.s_activityid = #{id} and
+		a.del_flage =
+		#{DEL_FLAG_NORMAL}
+	</select>
+	<update id="delete">
+		UPDATE pbs_activitysignin SET
+		del_flag =
+		#{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	<select id="getActivitySumByMemberId" resultType="java.lang.Integer">
+		SELECT count(1) from
+		pbs_activitysignin
+		where s_signbindmember = #{sSignbindmember}
+	</select>
+	<insert id="saveRecord" parameterType="List">
+		INSERT INTO pbs_activitysignin(
+		id,
+		s_activityid,
+		s_type,
+		s_regflag,
+		s_signbindmember,
+		s_familyflow,
+		s_operator,
+		s_bindmember,
+		s_spare01,
+		s_spare02,
+		s_spare03,
+		s_spare04,
+		create_by,
+		create_date,
+		update_by,
+		update_date,
+		remarks,
+		del_flag
+		)
+		<if test="list.get(0).dbName == 'mssql' or list.get(0).dbName == 'mysql'">
+			VALUES
+			<foreach collection="list" item="e" open="" separator=","
+				close="">
+				(#{e.id},
+				#{e.sActivityid.id},
+				#{e.sType.id},
+				#{e.sRegflag},
+				#{e.sSignbindmember.id},
+				#{e.sFamilyflow},
+				#{e.sOperator.id},
+				#{e.sBindmember.id},
+				#{e.sSpare01},
+				#{e.sSpare02},
+				#{e.sSpare03},
+				#{e.sSpare04},
+				#{e.createBy.id},
+				#{e.createDate},
+				#{e.updateBy.id},
+				#{e.updateDate},
+				#{e.remarks},
+				#{e.delFlag})
+			</foreach>
+		</if>
+	</insert>
+</mapper>

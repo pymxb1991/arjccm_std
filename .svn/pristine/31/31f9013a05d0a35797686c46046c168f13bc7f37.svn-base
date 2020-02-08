@@ -1,0 +1,413 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.arjjs.ccm.modules.ccm.org.dao.SysAreaDao">
+    
+	<sql id="sysAreaColumns">
+		a.id AS "id",
+		a.parent_id AS "parent.id",
+		a.parent_ids AS "parentIds",
+		a.name AS "name",
+		a.sort AS "sort",
+		a.code AS "code",
+		a.type AS "type",
+		b.id AS "idEx",
+		c.name AS "parent.name",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		b.remarks AS "remarks",
+		a.del_flag AS "delFlag"
+	</sql>
+	
+	<sql id="sysAreaJoins">
+	</sql>
+    
+	<select id="get" resultType="SysArea">
+		SELECT 
+			<include refid="sysAreaColumns"/>
+		FROM sys_area a
+		LEFT JOIN ccm_org_area b ON a.id = b.area_id
+		LEFT JOIN sys_area c ON c.id = a.parent_id
+		<include refid="sysAreaJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="SysArea">
+		SELECT 
+			<include refid="sysAreaColumns"/>
+		FROM sys_area a
+		LEFT JOIN ccm_org_area b ON a.id = b.area_id
+		LEFT JOIN sys_area c ON c.id = a.parent_id
+		<include refid="sysAreaJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="name != null and name != ''">
+				AND a.name LIKE 
+					<if test="dbName == 'oracle'">'%'||#{name}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{name}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{name},'%')</if>
+			</if>
+			<if test="code != null and code != ''">
+				AND a.code LIKE 
+					<if test="dbName == 'oracle'">'%'||#{code}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{code}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{code},'%')</if>
+			</if>
+			<if test="type != null and type != ''">
+				AND a.type = #{type}
+			</if>
+			<if test="parent != null and parent.id != ''">
+				AND a.parent_id = #{parent.id}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="SysArea">
+		SELECT 
+			<include refid="sysAreaColumns"/>
+		FROM sys_area a
+		<include refid="sysAreaJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="queryBuildCollectStat" resultType="SysArea">
+		SELECT
+			AA.id,
+			AA.name2 AS name,
+			sum(AA.cc) AS num,
+			AA.area_point,
+			AA.area_map
+		FROM
+			(
+				SELECT
+					A.*, B.*, orgarea.area_point,
+					orgarea.area_map
+				FROM
+					(
+						SELECT
+							count(build.area_id) AS cc,
+							build.area_id,
+							area1. NAME AS name1,
+							area1.parent_ids
+						FROM
+							ccm_house_buildmanage build,
+							sys_area area1
+						WHERE
+							build.area_id = area1.id
+							AND build.del_flag = #{delFlag}
+						GROUP BY
+							build.area_id
+					) A
+				RIGHT JOIN (
+					SELECT
+						area2.id,
+						area2. NAME AS name2
+					FROM
+						sys_area area2
+					WHERE 1=1
+						<if test="more1 != null and more1 != ''">
+			                and (${more1})
+			            </if>
+				) B ON 
+				<choose>
+				    <when test="type != null and type == '7'.toString()">
+				         A.area_id = B.id
+				    </when>
+				    <otherwise>
+				        A.parent_ids LIKE concat('%', B.id, '%')
+				    </otherwise>
+				</choose>
+				LEFT JOIN ccm_org_area orgarea ON B.id = orgarea.area_id
+			) AA
+		GROUP BY
+			AA.id
+	</select>
+	
+	<select id="queryRoomCollectStat" resultType="SysArea">
+		SELECT
+			AA.id,
+			AA.name2 AS name,
+			sum(AA.cc) AS num,
+			AA.area_point,
+			AA.area_map
+		FROM
+			(
+				SELECT
+					A.*, B.*, orgarea.area_point,
+					orgarea.area_map
+				FROM
+					(
+						SELECT
+							count(room.area_id) AS cc,
+							room.area_id,
+							area1. NAME AS name1,
+							area1.parent_ids
+						FROM
+							ccm_pop_tenant room,
+							sys_area area1
+						WHERE
+							room.area_id = area1.id
+							AND room.del_flag = #{delFlag}
+						GROUP BY
+							room.area_id
+					) A
+				RIGHT JOIN (
+					SELECT
+						area2.id,
+						area2. NAME AS name2
+					FROM
+						sys_area area2
+					WHERE 1=1
+						<if test="more1 != null and more1 != ''">
+			                and (${more1})
+			            </if>
+				) B ON 
+				<choose>
+				    <when test="type != null and type == '7'.toString()">
+				         A.area_id = B.id
+				    </when>
+				    <otherwise>
+				        A.parent_ids LIKE concat('%', B.id, '%')
+				    </otherwise>
+				</choose>
+				LEFT JOIN ccm_org_area orgarea ON B.id = orgarea.area_id
+			) AA
+		GROUP BY
+			AA.id
+	</select>
+	
+	<select id="queryNpseCollectStat" resultType="SysArea">
+		SELECT
+			AA.id,
+			AA.name2 AS name,
+			sum(AA.cc) AS num,
+			AA.area_point,
+			AA.area_map
+		FROM
+			(
+				SELECT
+					A.*, B.*, orgarea.area_point,
+					orgarea.area_map
+				FROM
+					(
+						SELECT
+							count(npse.area_id) AS cc,
+							npse.area_id,
+							area1. NAME AS name1,
+							area1.parent_ids
+						FROM
+							ccm_org_npse npse,
+							sys_area area1
+						WHERE
+							npse.area_id = area1.id
+							AND npse.del_flag = #{delFlag}
+						GROUP BY
+							npse.area_id
+					) A
+				RIGHT JOIN (
+					SELECT
+						area2.id,
+						area2. NAME AS name2
+					FROM
+						sys_area area2
+					WHERE 1=1
+						<if test="more1 != null and more1 != ''">
+			                and (${more1})
+			            </if>
+				) B ON 
+				<choose>
+				    <when test="type != null and type == '7'.toString()">
+				         A.area_id = B.id
+				    </when>
+				    <otherwise>
+				        A.parent_ids LIKE concat('%', B.id, '%')
+				    </otherwise>
+				</choose>
+				LEFT JOIN ccm_org_area orgarea ON B.id = orgarea.area_id
+			) AA
+		GROUP BY
+			AA.id
+	</select>
+	
+	<select id="queryPeopleCollectStat" resultType="SysArea">
+		SELECT
+			AA.id,
+			AA.name2 AS name,
+			sum(AA.cc) AS num,
+			AA.area_point,
+			AA.area_map
+		FROM
+			(
+				SELECT
+					A.*, B.*, orgarea.area_point,
+					orgarea.area_map
+				FROM
+					(
+						SELECT
+							COALESCE(sum(people.person_amount),0) + COALESCE(sum(people.oversea_amount),0) + COALESCE(sum(people.float_amount),0) + COALESCE(sum(people.unsettle_amount),0) AS cc,
+							people.area_id,
+							area1. NAME AS name1,
+							area1.parent_ids
+						FROM
+							ccm_people_amount people,
+							sys_area area1
+						WHERE
+							people.area_id = area1.id
+							AND people.del_flag = #{delFlag}
+							and DATE_FORMAT(people.amount_date, '%Y%m') = DATE_FORMAT(CURDATE() , '%Y%m')
+							<if test="type != null and type != ''">
+								AND area1.type = #{type}
+							</if>
+						GROUP BY
+							people.area_id
+					) A
+				RIGHT JOIN (
+					SELECT
+						area2.id,
+						area2. NAME AS name2
+					FROM
+						sys_area area2
+					WHERE 1=1
+						<if test="more1 != null and more1 != ''">
+			                and (${more1})
+			            </if>
+				) B ON A.area_id = B.id
+				LEFT JOIN ccm_org_area orgarea ON B.id = orgarea.area_id
+			) AA
+		GROUP BY
+			AA.id
+	</select>
+
+	<select id="queryPlaceCollectStat" resultType="SysArea">
+		SELECT
+		AA.id,
+		AA.name2 AS name,
+		sum(AA.cc) AS num,
+		AA.area_point,
+		AA.area_map
+		FROM
+		(
+		SELECT
+		A.*, B.*, orgarea.area_point,
+		orgarea.area_map
+		FROM
+		(
+		SELECT
+		count(place.administrative_division) AS cc,
+		place.administrative_division,
+		area1. NAME AS name1,
+		area1.parent_ids
+		FROM
+		ccm_base_place place,
+		sys_area area1
+		WHERE
+		place.administrative_division = area1.id
+		AND place.del_flag = #{delFlag}
+		GROUP BY
+		place.administrative_division
+		) A
+		RIGHT JOIN (
+		SELECT
+		area2.id,
+		area2. NAME AS name2
+		FROM
+		sys_area area2
+		WHERE 1=1
+		<if test="more1 != null and more1 != ''">
+			and (${more1})
+		</if>
+		) B ON
+		<choose>
+		<when test="type != null and type == '7'.toString()">
+			A.administrative_division = B.id
+		</when>
+		<otherwise>
+			A.parent_ids LIKE concat('%', B.id, '%')
+		</otherwise>
+		</choose>
+		LEFT JOIN ccm_org_area orgarea ON B.id = orgarea.area_id
+		) AA
+		GROUP BY
+		AA.id
+	</select>
+
+	<insert id="insert">
+		INSERT INTO sys_area(
+			id,
+			parent_id,
+			parent_ids,
+			name,
+			sort,
+			code,
+			type,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag
+		) VALUES (
+			#{id},
+			#{parent.id},
+			#{parentIds},
+			#{name},
+			#{sort},
+			#{code},
+			#{type},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE sys_area SET 	
+			parent_id = #{parent.id},
+			parent_ids = #{parentIds},
+			name = #{name},
+			sort = #{sort},
+			code = #{code},
+			type = #{type},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE sys_area SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	<select id="selectAreaByType" resultType="SysArea" parameterType="String">
+			SELECT
+				t.id,t.parent_id,t.parent_ids,t.`name`,t.sort,t.`code`,t.type,t.create_by,t.create_date,t.update_by,t.update_date,	t.remarks,	t.del_flag
+			FROM
+				sys_area t
+			WHERE
+			t.type = #{type}
+			and t.del_flag = 0
+	</select>
+</mapper>

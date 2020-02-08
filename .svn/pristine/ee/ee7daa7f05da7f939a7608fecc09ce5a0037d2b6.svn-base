@@ -1,0 +1,260 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.arjjs.ccm.modules.ccm.org.dao.CcmOrgCommonalityDao">
+
+	<sql id="ccmOrgCommonalityColumns">
+		a.id AS "id",
+		a.name AS "name",
+		a.org_code AS "orgCode",
+		a.type AS "type",
+		a.adds AS "adds",
+		a.principal_name AS "principalName",
+		a.principal_tel AS "principalTel",
+		a.institution_people_num AS "institutionPeopleNum",
+		a.key_resource_num AS "keyResourceNum",
+		a.org_tel AS "orgTel",
+		a.images AS
+		"images",
+		a.files AS "files",
+		a.area_id AS "area.id",
+		a.area_map AS
+		"areaMap",
+		a.area_point AS "areaPoint",
+		a.image AS "image",
+		a.more1 AS
+		"more1",
+		a.more2 AS "more2",
+		a.more3 AS "more3",
+		a.create_by AS
+		"createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS
+		"updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag",
+		a11.name AS "area.name",
+		(case a.type 
+			when 01 then '公安' 
+			when 02 then '医院（卫生院）' 
+			when 03 then '消防'
+			when 04 then '图书馆' 
+			when 05 then '体育场（馆）' 
+			when 06 then '博物馆'
+			when 07 then '供水' 
+			when 08 then '供电' 
+			else '' end) "typeLable"
+	</sql>
+
+	<sql id="ccmOrgCommonalityJoins">
+		LEFT JOIN sys_area a11 ON a11.id = a.area_id
+	</sql>
+
+	<select id="get" resultType="CcmOrgCommonality">
+		SELECT
+		<include refid="ccmOrgCommonalityColumns" />
+		FROM ccm_org_commonality a
+		<include refid="ccmOrgCommonalityJoins" />
+		WHERE a.id = #{id}
+	</select>
+
+	<select id="findList" resultType="CcmOrgCommonality">
+		SELECT
+		<include refid="ccmOrgCommonalityColumns" />
+		FROM ccm_org_commonality a
+		<include refid="ccmOrgCommonalityJoins" />
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="name != null and name != ''">
+				AND a.name LIKE
+				<if test="dbName == 'oracle'">'%'||#{name}||'%'</if>
+				<if test="dbName == 'mssql'">'%'+#{name}+'%'</if>
+				<if test="dbName == 'mysql'">concat('%',#{name},'%')</if>
+			</if>
+			<if test="orgCode != null and orgCode != ''">
+				AND a.org_code LIKE
+				<if test="dbName == 'oracle'">'%'||#{orgCode}||'%'</if>
+				<if test="dbName == 'mssql'">'%'+#{orgCode}+'%'</if>
+				<if test="dbName == 'mysql'">concat('%',#{orgCode},'%')</if>
+			</if>
+			<if test="type != null and type != ''">
+				AND a.type = #{type}
+			</if>
+			<if test="area != null and area.id != null and area.id != ''">
+				AND a.area_id = #{area.id}
+			</if>
+			<if test="more1 != null and more1 != ''">
+                AND  (${more1})
+            </if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	<!-- 生成公共机构地图信息-区域图 -->
+	<select id="findCommonalityList" resultType="CcmOrgCommonality">
+		SELECT
+		<include refid="ccmOrgCommonalityColumns" />
+		FROM ccm_org_commonality a
+		<include refid="ccmOrgCommonalityJoins" />
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="type != null and type != ''">
+				AND a.type in (${type})
+			</if>
+			<if test="more1 != null and more1 != ''">
+                AND  (${more1})
+            </if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+
+
+
+
+	<!-- -->
+	<select id="findAllList" resultType="CcmOrgCommonality">
+		SELECT
+		<include refid="ccmOrgCommonalityColumns" />
+		FROM ccm_org_commonality a
+		<include refid="ccmOrgCommonalityJoins" />
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="more1 != null and more1 != ''">
+                AND  (${more1})
+            </if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	
+	<!-- 总数、职工人数、资源数信息 -->
+	<select id="getCountInfo" resultType="com.arjjs.ccm.tool.SearchTabMore">
+		SELECT
+			count(id) AS "value",
+			SUM(a.institution_people_num) AS "value1",
+			SUM(a.key_resource_num) AS "value2"
+		FROM
+			ccm_org_commonality a
+		WHERE
+			a.del_flag = 0
+			<if test="type != null and type != ''">
+				AND a.type = #{type}
+			</if>
+	</select>
+	
+
+	<insert id="insert">
+		INSERT INTO ccm_org_commonality(
+		id,
+		name,
+		org_code,
+		type,
+		adds,
+		principal_name,
+		principal_tel,
+		institution_people_num,
+		key_resource_num,
+		org_tel,
+		images,
+		files,
+		area_id,
+		area_map,
+		area_point,
+		image,
+		more1,
+		more2,
+		more3,
+		create_by,
+		create_date,
+		update_by,
+		update_date,
+		remarks,
+		del_flag
+		) VALUES (
+		#{id},
+		#{name},
+		#{orgCode},
+		#{type},
+		#{adds},
+		#{principalName},
+		#{principalTel},
+		#{institutionPeopleNum},
+		#{keyResourceNum},
+		#{orgTel},
+		#{images},
+		#{files},
+		#{area.id},
+		#{areaMap},
+		#{areaPoint},
+		#{image},
+		#{more1},
+		#{more2},
+		#{more3},
+		#{createBy.id},
+		#{createDate},
+		#{updateBy.id},
+		#{updateDate},
+		#{remarks},
+		#{delFlag}
+		)
+	</insert>
+
+	<update id="update">
+		UPDATE ccm_org_commonality SET
+		name = #{name},
+		org_code = #{orgCode},
+		type = #{type},
+		adds = #{adds},
+		principal_name = #{principalName},
+		principal_tel = #{principalTel},
+		institution_people_num = #{institutionPeopleNum},
+		key_resource_num = #{keyResourceNum},
+		org_tel = #{orgTel},
+		images = #{images},
+		files = #{files},
+		area_id = #{area.id},
+		area_map = #{areaMap},
+		area_point = #{areaPoint},
+		image = #{image},
+		more1 = #{more1},
+		more2 = #{more2},
+		more3 = #{more3},
+		update_by = #{updateBy.id},
+		update_date = #{updateDate},
+		remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+
+	<update id="delete">
+		UPDATE ccm_org_commonality SET
+		del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+
+	<update id="updateCoordinates">
+		UPDATE ccm_org_commonality SET
+		area_map = #{areaMap},
+		area_point = #{areaPoint}
+		WHERE id = #{id}
+	</update>
+</mapper>

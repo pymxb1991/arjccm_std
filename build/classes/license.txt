@@ -1,0 +1,39 @@
+#============================#
+#===== 客户license注册信息文件 =====#
+#============================#
+#应用系统名称
+productName=社会网格化管理信息系统
+copyrightYear=2017
+version=V1.9.0
+#注册文件名称
+license.pathName=license.lic
+#软件发布日期
+license.issuedTime=2018-01-01
+#软件生效日期
+license.notBefore=2018-01-01
+#\软件有效日期
+license.notAfter=2018-12-31
+#客户类型
+license.consumerType=user
+#许可数量  
+license.consumerAmount=1
+#其它说明信息
+license.info=这是一些说明
+#用户名称
+license.CN=张三
+#机构名称
+license.OU=软件事业部
+#组织名称
+license.O=安瑞捷
+#城市
+license.L=天津
+#省/自治区/直辖市
+license.ST=天津
+#国家
+license.C=cn
+#CPUID CPU序列号 未注册软件在启动时，控制台会输出当前服务器CPUID
+license.CPUID=BFEBFBFF000806E9
+# MAC地址（eth0 ）  未注册软件在启动时，控制台会输出当前服务器MAC地址（eth0
+license.MACID=54-E1-AD-7D-41-58
+
+license.key=abc

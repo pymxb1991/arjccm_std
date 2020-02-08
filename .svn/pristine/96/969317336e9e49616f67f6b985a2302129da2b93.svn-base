@@ -1,0 +1,182 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.arjjs.ccm.modules.ccm.place.dao.CcmBasePlaceDao">
+    
+	<sql id="ccmBasePlaceColumns">
+		a.id AS "id",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag",
+		a.place_name AS "placeName",
+		a.relevance_org AS "relevanceOrg",
+		a.key_point AS "keyPoint",
+		a.place_area AS "placeArea",
+		a.place_use AS "placeUse",
+		a.worker_number AS "workerNumber",
+		a.leader_name AS "leaderName",
+		a.leader_id_card AS "leaderIdCard",
+		a.leader_contact AS "leaderContact",
+		a.create_time AS "createTime",
+		a.governing_body_name AS "governingBodyName",
+		a.address AS "address",
+		a.place_type AS "placeType",
+		a.place_picture AS "placePicture",
+		a.administrative_division AS "administrativeDivision",
+		a.child_type AS "childType",
+		a.junior_id AS "juniorId"
+	</sql>
+	
+	<sql id="ccmBasePlaceJoins">
+	</sql>
+    
+	<select id="get" resultType="CcmBasePlace">
+		SELECT 
+			<include refid="ccmBasePlaceColumns"/>
+		FROM ccm_base_place a
+		<include refid="ccmBasePlaceJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="CcmBasePlace">
+		SELECT 
+			<include refid="ccmBasePlaceColumns"/>
+		FROM ccm_base_place a
+		<include refid="ccmBasePlaceJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="placeName != null and placeName != ''">
+				AND a.place_name = #{placeName}
+			</if>
+			<if test="placeType != null and placeType != ''">
+				AND a.place_type = #{placeType}
+			</if>
+			<if test="relevanceOrg != null and relevanceOrg != ''">
+				AND a.relevance_org = #{relevanceOrg}
+			</if>
+			<if test="leaderName != null and leaderName != ''">
+				AND a.leader_name = #{leaderName}
+			</if>
+			<if test="leaderIdCard != null and leaderIdCard != ''">
+				AND a.leader_id_card = #{leaderIdCard}
+			</if>
+			<if test="keyPoint != null and keyPoint != ''">
+				AND a.key_point = #{keyPoint}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="CcmBasePlace">
+		SELECT 
+			<include refid="ccmBasePlaceColumns"/>
+		FROM ccm_base_place a
+		<include refid="ccmBasePlaceJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO ccm_base_place(
+			id,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag,
+			place_name,
+			relevance_org,
+			key_point,
+			place_area,
+			place_use,
+			worker_number,
+			leader_name,
+			leader_id_card,
+			leader_contact,
+			create_time,
+			governing_body_name,
+			address,
+			place_type,
+			place_picture,
+			administrative_division,
+			child_type,
+			junior_id
+		) VALUES (
+			#{id},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag},
+			#{placeName},
+			#{relevanceOrg},
+			#{keyPoint},
+			#{placeArea},
+			#{placeUse},
+			#{workerNumber},
+			#{leaderName},
+			#{leaderIdCard},
+			#{leaderContact},
+			#{createTime},
+			#{governingBodyName},
+			#{address},
+			#{placeType},
+			#{placePicture},
+			#{administrativeDivision},
+			#{childType},
+			#{juniorId}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE ccm_base_place SET 	
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks},
+			place_name = #{placeName},
+			relevance_org = #{relevanceOrg},
+			key_point = #{keyPoint},
+			place_area = #{placeArea},
+			place_use = #{placeUse},
+			worker_number = #{workerNumber},
+			leader_name = #{leaderName},
+			leader_id_card = #{leaderIdCard},
+			leader_contact = #{leaderContact},
+			create_time = #{createTime},
+			governing_body_name = #{governingBodyName},
+			address = #{address},
+			place_type = #{placeType},
+			place_picture = #{placePicture},
+			administrative_division = #{administrativeDivision},
+			child_type = #{childType},
+			junior_id = #{juniorId}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE ccm_base_place SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

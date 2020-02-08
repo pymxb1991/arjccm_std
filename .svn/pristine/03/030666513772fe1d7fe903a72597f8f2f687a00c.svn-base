@@ -1,0 +1,17 @@
+package com.arjjs.ccm.tool;
+
+import java.util.HashMap;
+import java.util.Map;
+
+public class pageStyle {
+
+	/**
+	 * 获取ProjectIndex 页面的style
+	 * @return
+	 */
+	public static Map<String,Object> getProjectIndexStyle(){
+		Map<String,Object> map=new HashMap<>();
+		map.put("", "");
+		return map; 
+	}
+}

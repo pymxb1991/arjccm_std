@@ -1,0 +1,238 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.arjjs.ccm.modules.plm.purchase.dao.PlmPurchaseApplyDao">
+    
+	<sql id="plmPurchaseApplyColumns">
+		a.id AS "id",
+		a.proc_ins_id AS "procInsId",
+		a.apply_id AS "applyId",
+		a.depart_id AS "office.id",
+		a.apply_date AS "applyDate",
+		a.funding_name AS "fundingName",
+		a.funding_card AS "fundingCard",
+		a.funding_type AS "fundingType",
+		a.name AS "name",
+		a.pur_budget AS "purBudget",
+		a.pur_head_id AS "userPur.id",
+		a.tech_head_id AS "userTech.id",
+		a.describes AS "describes",
+		a.files AS "files",
+		a.type AS "type",
+		a.extend1 AS "extend1",
+		a.extend2 AS "extend2",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag",
+		u10.name AS "userPur.name",
+		u10.phone AS "userPur.phone",
+		u10.mobile AS "userPur.mobile",
+		u10.email AS "userPur.email",
+		u11.name AS "userTech.name",
+		u11.phone AS "userTech.phone",
+		u11.mobile AS "userTech.mobile",
+		u11.email AS "userTech.email",
+		u12.name AS "createBy.name",
+		o3.name As  "office.name"
+	</sql>
+	
+	<sql id="plmPurchaseApplyJoins">
+		LEFT JOIN sys_office o3 ON o3.id = a.depart_id
+		LEFT JOIN sys_user u10 ON u10.id = a.pur_head_id
+		LEFT JOIN sys_user u11 ON u11.id = a.tech_head_id
+			LEFT JOIN sys_user u12 ON u12.id = a.create_by
+	</sql>
+    
+	<select id="get" resultType="PlmPurchaseApply">
+		SELECT 
+			<include refid="plmPurchaseApplyColumns"/>
+		FROM plm_purchase_apply a
+		<include refid="plmPurchaseApplyJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<!-- 统计各个经费类型的数量 -->
+	<select id="fundingTypeStatistic" parameterType="PlmPurchaseApply" resultType="java.util.HashMap">
+		SELECT 
+			count(a.id) AS value,
+			a.funding_type AS type
+		FROM plm_purchase_apply a	
+		<where>
+		 a.del_flag = #{DEL_FLAG_NORMAL}
+		<if test="office != null and office.id != null and office.id != ''">
+			AND a.depart_id = #{office.id}
+		</if>
+		and YEAR(create_date)=YEAR(NOW())
+		</where>
+		GROUP BY a.funding_type
+	</select>
+	
+	
+	<select id="getByProcInsId" resultType="PlmPurchaseApply">
+		SELECT 
+			<include refid="plmPurchaseApplyColumns"/>
+		FROM plm_purchase_apply a
+		<include refid="plmPurchaseApplyJoins"/>
+		WHERE a.proc_ins_id = #{procInsId}
+	</select>
+	
+	<update id="updateProcInsId">
+		UPDATE plm_purchase_apply SET 
+			proc_ins_id = #{procInsId},
+			update_by = #{updateBy.id}, 
+			update_date = #{updateDate}
+		WHERE id = #{id}
+	</update>
+	
+	<select id="findList" resultType="PlmPurchaseApply">
+		SELECT 
+		act.status AS "plmAct.status",
+			<include refid="plmPurchaseApplyColumns"/>
+		FROM plm_purchase_apply a
+		LEFT JOIN plm_act act ON a.id = act.table_id
+		<include refid="plmPurchaseApplyJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			 AND a.create_by = #{currentUser.id}
+			 <if test="applyId != null and applyId != ''">
+				AND a.apply_id = #{applyId}
+			</if>
+			<if test="office != null and office.id != null and office.id != ''">
+				AND a.depart_id = #{office.id}
+			</if>
+			
+			<if test="beginApplyDate != null and endApplyDate != null and beginApplyDate != '' and endApplyDate != ''">
+				AND a.apply_date BETWEEN #{beginApplyDate} AND #{endApplyDate}
+			</if>
+			<if test="fundingName != null and fundingName != ''">
+				AND a.funding_name LIKE 
+					<if test="dbName == 'oracle'">'%'||#{fundingName}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{fundingName}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{fundingName},'%')</if>
+			</if>
+			<if test="fundingType != null and fundingType != ''">
+				AND a.funding_type = #{fundingType}
+			</if>
+			<if test="name != null and name != ''">
+				AND a.name LIKE 
+					<if test="dbName == 'oracle'">'%'||#{name}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{name}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{name},'%')</if>
+			</if>
+			
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+		
+		
+	</select>
+	
+	<select id="findAllList" resultType="PlmPurchaseApply">
+		SELECT 
+			<include refid="plmPurchaseApplyColumns"/>
+		FROM plm_purchase_apply a
+		<include refid="plmPurchaseApplyJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO plm_purchase_apply(
+			id,
+			proc_ins_id,
+			apply_id,
+			depart_id,
+			apply_date,
+			funding_name,
+			funding_card,
+			funding_type,
+			name,
+			pur_budget,
+			pur_head_id,
+			tech_head_id,
+			describes,
+			files,
+			type,
+			extend1,
+			extend2,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag
+		) VALUES (
+			#{id},
+			#{procInsId},
+			#{applyId},
+			#{office.id},
+			#{applyDate},
+			#{fundingName},
+			#{fundingCard},
+			#{fundingType},
+			#{name},
+			#{purBudget},
+			#{userPur.id},
+			#{userTech.id},
+			#{describes},
+			#{files},
+			#{type},
+			#{extend1},
+			#{extend2},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE plm_purchase_apply SET 	
+			proc_ins_id = #{procInsId},
+			apply_id = #{applyId},			
+			depart_id = #{office.id},
+			apply_date = #{applyDate},
+			funding_name = #{fundingName},
+			funding_card = #{fundingCard},
+			funding_type = #{fundingType},
+			name = #{name},
+			pur_budget = #{purBudget},
+			pur_head_id = #{userPur.id},
+			tech_head_id = #{userTech.id},
+			describes = #{describes},
+			files = #{files},
+			type = #{type},
+			extend1 = #{extend1},
+			extend2 = #{extend2},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE plm_purchase_apply SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

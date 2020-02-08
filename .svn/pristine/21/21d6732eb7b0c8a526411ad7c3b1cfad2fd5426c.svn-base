@@ -1,0 +1,218 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.arjjs.ccm.modules.ccm.shake.dao.CcmShakePovertyPeopleDao">
+    
+	<sql id="ccmShakePovertyPeopleColumns">
+		a.id AS "id",
+		a.name AS "name",
+		a.sex AS "sex",
+		a.area_grid_id AS "areaGridId",
+		a.ident AS "ident",
+		a.accountidentity AS "accountidentity",
+		a.birthday AS "birthday",
+		a.filing_time AS "filingTime",
+		a.area_town_id AS "areaTownId",
+		a.area_community_id AS "areaCommunityId",
+		a.sp_alleviation AS "spAlleviation",
+		a.sp_people_alleviation AS "spPeopleAlleviation",
+		a.sp_reason AS "spReason",
+		a.sp_health AS "spHealth",
+		a.sp_labor_skill AS "spLaborSkill",
+		a.sp_income_type AS "spIncomeType",
+		a.sp_income_amount AS "spIncomeAmount",
+		a.sp_time AS "spTime",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag"
+	</sql>
+	
+	<sql id="ccmShakePovertyPeopleJoins">
+	</sql>
+    
+	<select id="get" resultType="CcmShakePovertyPeople">
+		SELECT 
+			<include refid="ccmShakePovertyPeopleColumns"/>
+		FROM ccm_shake_poverty_people a
+		<include refid="ccmShakePovertyPeopleJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="CcmShakePovertyPeople">
+		SELECT 
+			<include refid="ccmShakePovertyPeopleColumns"/>
+		FROM ccm_shake_poverty_people a
+		<include refid="ccmShakePovertyPeopleJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="id != null and id != ''">
+				AND a.id = #{id}
+			</if>
+			<if test="name != null and name != ''">
+				AND a.name LIKE 
+					<if test="dbName == 'oracle'">'%'||#{name}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{name}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{name},'%')</if>
+			</if>
+			<if test="sex != null and sex != ''">
+				AND a.sex = #{sex}
+			</if>
+			<if test="areaGridId != null and areaGridId != ''">
+				AND a.area_grid_id = #{areaGridId}
+			</if>
+			<if test="ident != null and ident != ''">
+				AND a.ident = #{ident}
+			</if>
+			<if test="accountidentity != null and accountidentity != ''">
+				AND a.accountidentity = #{accountidentity}
+			</if>
+			<if test="birthday != null and birthday != ''">
+				AND a.birthday = #{birthday}
+			</if>
+			<if test="filingTime != null and filingTime != ''">
+				AND a.filing_time = #{filingTime}
+			</if>
+			<if test="areaTownId != null and areaTownId != ''">
+				AND a.area_town_id = #{areaTownId}
+			</if>
+			<if test="spAlleviation != null and spAlleviation != ''">
+				AND a.sp_alleviation = #{spAlleviation}
+			</if>
+			<if test="spPeopleAlleviation != null and spPeopleAlleviation != ''">
+				AND a.sp_people_alleviation = #{spPeopleAlleviation}
+			</if>
+			<if test="spReason != null and spReason != ''">
+				AND a.sp_reason = #{spReason}
+			</if>
+			<if test="spHealth != null and spHealth != ''">
+				AND a.sp_health = #{spHealth}
+			</if>
+			<if test="spLaborSkill != null and spLaborSkill != ''">
+				AND a.sp_labor_skill = #{spLaborSkill}
+			</if>
+			<if test="spIncomeType != null and spIncomeType != ''">
+				AND a.sp_income_type = #{spIncomeType}
+			</if>
+			<if test="spIncomeAmount != null and spIncomeAmount != ''">
+				AND a.sp_income_amount = #{spIncomeAmount}
+			</if>
+			<if test="spTime != null and spTime != ''">
+				AND a.sp_time = #{spTime}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="CcmShakePovertyPeople">
+		SELECT 
+			<include refid="ccmShakePovertyPeopleColumns"/>
+		FROM ccm_shake_poverty_people a
+		<include refid="ccmShakePovertyPeopleJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO ccm_shake_poverty_people(
+			id,
+			name,
+			sex,
+			area_grid_id,
+			ident,
+			accountidentity,
+			birthday,
+			filing_time,
+			area_town_id,
+			area_community_id,
+			sp_alleviation,
+			sp_people_alleviation,
+			sp_reason,
+			sp_health,
+			sp_labor_skill,
+			sp_income_type,
+			sp_income_amount,
+			sp_time,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag
+		) VALUES (
+			#{id},
+			#{name},
+			#{sex},
+			#{areaGridId},
+			#{ident},
+			#{accountidentity},
+			#{birthday},
+			#{filingTime},
+			#{areaTownId},
+			#{areaCommunityId},
+			#{spAlleviation},
+			#{spPeopleAlleviation},
+			#{spReason},
+			#{spHealth},
+			#{spLaborSkill},
+			#{spIncomeType},
+			#{spIncomeAmount},
+			#{spTime},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE ccm_shake_poverty_people SET 	
+			name = #{name},
+			sex = #{sex},
+			area_grid_id = #{areaGridId},
+			ident = #{ident},
+			accountidentity = #{accountidentity},
+			birthday = #{birthday},
+			filing_time = #{filingTime},
+			area_town_id = #{areaTownId},
+			area_community_id = #{areaCommunityId},
+			sp_alleviation = #{spAlleviation},
+			sp_people_alleviation = #{spPeopleAlleviation},
+			sp_reason = #{spReason},
+			sp_health = #{spHealth},
+			sp_labor_skill = #{spLaborSkill},
+			sp_income_type = #{spIncomeType},
+			sp_income_amount = #{spIncomeAmount},
+			sp_time = #{spTime},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE ccm_shake_poverty_people SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

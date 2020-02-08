@@ -1,0 +1,46 @@
+$(document).ready(function() {
+	$("#btnSubmit").on("click" ,function(){
+		$("#searchForm").submit();
+	})
+});
+function page(n, s) {
+	$("#pageNo").val(n);
+	$("#pageSize").val(s);
+	$("#searchForm").submit();
+	return false;
+}
+//全选、取消
+function allcheck() {
+	var nn = $("#allboxs").is(":checked"); //判断th中的checkbox是否被选中，如果被选中则nn为true，反之为false
+    if(nn == true) {
+        var namebox = $("input[name^='boxs']");  //获取name值为boxs的所有input
+        for(i = 0; i < namebox.length; i++) {
+            namebox[i].checked=true;    //js操作选中checkbox
+        }
+    }
+    if(nn == false) {
+        var namebox = $("input[name^='boxs']");
+        for(i = 0; i < namebox.length; i++) {
+            namebox[i].checked=false;
+        }
+    }
+}
+
+function casedeal(_this){
+	debugger
+	var ccmEventCasedeal = {};
+	if(_this == "ratify"){
+		ccmEventCasedeal.ratify = 1;
+	}else if(_this == "stick"){
+		ccmEventCasedeal.stick = 1;
+	}else if(_this == "urgent"){
+		ccmEventCasedeal.urgent = 1;
+	}else if(_this == "historyLegacy"){
+		ccmEventCasedeal.historyLegacy = 1;
+	}else{
+		return false;
+	}
+	$.post(ctx + '/event/ccmEventCasedeal/casedeal',ccmEventCasedeal,function(){
+		
+	})
+}

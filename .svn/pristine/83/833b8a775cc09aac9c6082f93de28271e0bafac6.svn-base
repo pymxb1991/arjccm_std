@@ -1,0 +1,83 @@
+/**
+ * Copyright &copy; 2012-2016 <a href="https://github.com/thinkgem/jeesite">JeeSite</a> All rights reserved.
+ */
+package com.arjjs.ccm.modules.ccm.test.entity;
+
+import org.hibernate.validator.constraints.Length;
+
+import com.arjjs.ccm.common.persistence.DataEntity;
+
+/**
+ * 测试Entity
+ * @author cs
+ * @version 2018-01-26
+ */
+public class CcmMapTest extends DataEntity<CcmMapTest> {
+	
+	private static final long serialVersionUID = 1L;
+	private String name;		// name
+	private String ccmPoint;		// ccm_point
+	private String ccmMpoint;		// ccm_mpoint
+	private String ccmPolygon;		// ccm_polygon
+	private String ccmMpolygon;		// ccm_mpolygon
+	private String memo;		// memo
+	
+	public CcmMapTest() {
+		super();
+	}
+
+	public CcmMapTest(String id){
+		super(id);
+	}
+
+	@Length(min=0, max=100, message="name长度必须介于 0 和 100 之间")
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+	
+	public String getCcmPoint() {
+		return ccmPoint;
+	}
+
+	public void setCcmPoint(String ccmPoint) {
+		this.ccmPoint = ccmPoint;
+	}
+	
+	public String getCcmMpoint() {
+		return ccmMpoint;
+	}
+
+	public void setCcmMpoint(String ccmMpoint) {
+		this.ccmMpoint = ccmMpoint;
+	}
+	
+	public String getCcmPolygon() {
+		return ccmPolygon;
+	}
+
+	public void setCcmPolygon(String ccmPolygon) {
+		this.ccmPolygon = ccmPolygon;
+	}
+	
+	public String getCcmMpolygon() {
+		return ccmMpolygon;
+	}
+
+	public void setCcmMpolygon(String ccmMpolygon) {
+		this.ccmMpolygon = ccmMpolygon;
+	}
+	
+	@Length(min=0, max=512, message="memo长度必须介于 0 和 512 之间")
+	public String getMemo() {
+		return memo;
+	}
+
+	public void setMemo(String memo) {
+		this.memo = memo;
+	}
+	
+}

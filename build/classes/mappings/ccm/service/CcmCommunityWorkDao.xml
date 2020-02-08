@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.arjjs.ccm.modules.ccm.service.dao.CcmCommunityWorkDao">
+    
+	<sql id="ccmCommunityWorkColumns">
+		a.id AS "id",
+		a.type1 AS "type1",
+		a.type2 AS "type2",
+		a.title AS "title",
+		a.content AS "content",
+		a.files AS "files",
+		a.status AS "status",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag",
+		(case a.status 
+			when 01 then '已发布' 
+			when 02 then '待审核' 
+			else '' end) "statusLable"
+	</sql>
+	
+	<sql id="ccmCommunityWorkJoins">
+	</sql>
+    
+	<select id="get" resultType="CcmCommunityWork">
+		SELECT 
+			<include refid="ccmCommunityWorkColumns"/>
+		FROM ccm_community_work a
+		<include refid="ccmCommunityWorkJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="CcmCommunityWork">
+		SELECT 
+			<include refid="ccmCommunityWorkColumns"/>
+		FROM ccm_community_work a
+		<include refid="ccmCommunityWorkJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="type1 != null and type1 != ''">
+				AND a.type1 = #{type1}
+			</if>
+			<if test="type2 != null and type2 != ''">
+				AND a.type2 = #{type2}
+			</if>
+			<if test="status != null and status != ''">
+                AND a.status = #{status}
+            </if>
+			<if test="title != null and title != ''">
+				AND a.title LIKE 
+					<if test="dbName == 'oracle'">'%'||#{title}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{title}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{title},'%')</if>
+			</if>
+			<if test="beginCreateDate != null and endCreateDate != null and beginCreateDate != '' and endCreateDate != ''">
+				AND a.create_date BETWEEN #{beginCreateDate} AND #{endCreateDate}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="CcmCommunityWork">
+		SELECT 
+			<include refid="ccmCommunityWorkColumns"/>
+		FROM ccm_community_work a
+		<include refid="ccmCommunityWorkJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO ccm_community_work(
+			id,
+			type1,
+			type2,
+			title,
+			content,
+			files,
+			status,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag
+		) VALUES (
+			#{id},
+			#{type1},
+			#{type2},
+			#{title},
+			#{content},
+			#{files},
+			#{status},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE ccm_community_work SET 	
+			type1 = #{type1},
+			type2 = #{type2},
+			title = #{title},
+			content = #{content},
+			files = #{files},
+			status = #{status},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE ccm_community_work SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

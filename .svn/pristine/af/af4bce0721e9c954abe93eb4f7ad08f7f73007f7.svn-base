@@ -1,0 +1,42 @@
+package com.arjjs.ccm.tool.geoJson;
+
+import java.util.List;
+
+import org.apache.commons.lang3.StringUtils;
+
+public class GeoJSON {
+
+	private static String FEATURECOLLECTION = "FeatureCollection";
+
+	private String type;
+
+	private String[] centpoint;
+
+	private List<Features> features;
+
+	public String getType() {
+		return StringUtils.isEmpty(type) ? FEATURECOLLECTION : type;
+	}
+
+	public void setType(String type) {
+		this.type = type;
+	}
+
+	public List<Features> getFeatures() {
+		return features;
+	}
+
+	public void setFeatures(List<Features> features) {
+		this.features = features;
+	}
+
+	public String[] getCentpoint() {
+		return centpoint;
+	}
+
+	public void setCentpoint(String[] centpoint) {
+		this.centpoint = centpoint;
+	}
+
+
+}

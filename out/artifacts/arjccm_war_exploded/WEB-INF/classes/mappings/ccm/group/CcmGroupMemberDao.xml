@@ -1,0 +1,184 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.arjjs.ccm.modules.ccm.group.dao.CcmGroupMemberDao">
+    
+	<sql id="ccmGroupMemberColumns">
+		a.id AS "id",
+		a.name AS "name",
+		a.sex AS "sex",
+		a.nickname AS "nickname",
+		a.loginname AS "loginname",
+		a.password AS "password",
+		a.repassword AS "repassword",
+		a.photopath AS "photopath",
+		a.idnumber AS "idnumber",
+		a.phonenumber AS "phonenumber",
+		a.fax AS "fax",
+		a.address AS "address",
+		a.postcode AS "postcode",
+		a.emailaddress AS "emailaddress",
+		a.birth AS "birth",
+		a.job AS "job",
+		a.sort AS "sort",
+		a.type AS "type",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag"
+	</sql>
+	
+	<sql id="ccmGroupMemberJoins">
+	</sql>
+    
+	<select id="get" resultType="CcmGroupMember">
+		SELECT 
+			<include refid="ccmGroupMemberColumns"/>
+		FROM ccm_group_member a
+		<include refid="ccmGroupMemberJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="CcmGroupMember">
+		SELECT 
+			<include refid="ccmGroupMemberColumns"/>
+		FROM ccm_group_member a
+		<include refid="ccmGroupMemberJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="name != null and name != ''">
+				AND a.name LIKE 
+					<if test="dbName == 'oracle'">'%'||#{name}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{name}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{name},'%')</if>
+			</if>
+			<if test="sex != null and sex != ''">
+				AND a.sex = #{sex}
+			</if>
+			<if test="phonenumber != null and phonenumber != ''">
+				AND a.phonenumber LIKE 
+					<if test="dbName == 'oracle'">'%'||#{phonenumber}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{phonenumber}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{phonenumber},'%')</if>
+			</if>
+			<if test="type != null and type != ''">
+				AND a.type LIKE 
+					<if test="dbName == 'oracle'">'%'||#{type}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{type}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{type},'%')</if>
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="CcmGroupMember">
+		SELECT 
+			<include refid="ccmGroupMemberColumns"/>
+		FROM ccm_group_member a
+		<include refid="ccmGroupMemberJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO ccm_group_member(
+			id,
+			name,
+			sex,
+			nickname,
+			loginname,
+			password,
+			repassword,
+			photopath,
+			idnumber,
+			phonenumber,
+			fax,
+			address,
+			postcode,
+			emailaddress,
+			birth,
+			job,
+			sort,
+			type,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag
+		) VALUES (
+			#{id},
+			#{name},
+			#{sex},
+			#{nickname},
+			#{loginname},
+			#{password},
+			#{repassword},
+			#{photopath},
+			#{idnumber},
+			#{phonenumber},
+			#{fax},
+			#{address},
+			#{postcode},
+			#{emailaddress},
+			#{birth},
+			#{job},
+			#{sort},
+			#{type},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE ccm_group_member SET 	
+			name = #{name},
+			sex = #{sex},
+			nickname = #{nickname},
+			loginname = #{loginname},
+			password = #{password},
+			repassword = #{repassword},
+			photopath = #{photopath},
+			idnumber = #{idnumber},
+			phonenumber = #{phonenumber},
+			fax = #{fax},
+			address = #{address},
+			postcode = #{postcode},
+			emailaddress = #{emailaddress},
+			birth = #{birth},
+			job = #{job},
+			sort = #{sort},
+			type = #{type},
+			create_date = #{createDate},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE ccm_group_member SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

@@ -1,0 +1,255 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.arjjs.ccm.modules.ccm.org.dao.CcmOrgTeamDao">
+    
+	<sql id="ccmOrgTeamColumns">
+		a.id AS "id",
+		a.user_id AS "user.id",
+		a.sex AS "sex",
+		a.nation AS "nation",
+		a.politics AS "politics",
+		a.iden_num AS "idenNum",
+		a.birthday AS "birthday",
+		a.grade AS "grade",
+		a.service AS "service",
+		a.prof_expertise AS "profExpertise",
+		a.education AS "education",
+		a.fix_tel AS "fixTel",
+		a.team_type AS "teamType",
+		a.status AS "status",
+		a.more1 AS "more1",
+		a.more2 AS "more2",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag",
+		u2.name AS "user.name"
+	</sql>
+	
+	<sql id="ccmOrgTeamJoins">
+		LEFT JOIN sys_user u2 ON u2.id = a.user_id
+	</sql>
+    
+	<select id="get" resultType="CcmOrgTeam">
+		SELECT 
+			<include refid="ccmOrgTeamColumns"/>
+		FROM ccm_org_team a
+		<include refid="ccmOrgTeamJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<!-- 新填findUserId查询  -->
+	<select id="findUserId" resultType="CcmOrgTeam">
+		SELECT 
+			<include refid="ccmOrgTeamColumns"/>
+		FROM ccm_org_team a
+		<include refid="ccmOrgTeamJoins"/>
+		WHERE a.user_id = #{user.id}
+	</select>
+	
+	<!-- 根据OfficeId获取用户（树查询用户时用） -->
+	<select id="findUserByOfficeId" resultType="User" useCache="true">
+		SELECT
+			a.id, a.name, a.login_name
+		FROM sys_user a
+		LEFT JOIN ccm_org_team b on a.id=b.user_id
+		WHERE a.del_flag = #{DEL_FLAG_NORMAL}
+			AND a.office_id = #{user.office.id}
+			<if test="teamType != null and teamType != ''">
+			AND b.team_type in 
+			(
+			<foreach collection="teamType.split(',')" item="itemCode"  separator=",">#{itemCode}</foreach>
+			) 
+			</if>	
+		ORDER BY a.name
+	</select>
+	
+	<sql id="userColumns">
+    	a.id,
+    	a.id AS "user.id",
+    	a.company_id AS "user.company.id",
+    	a.office_id AS "user.office.id",
+    	a.login_name,
+    	a.password,
+    	a.no,
+		a.name AS "user.name",
+		a.email,
+		a.phone,
+		a.mobile,
+		a.user_type,
+		a.login_ip,
+		a.login_date,
+		a.remarks,
+		a.login_flag,
+		a.has_permission,
+		a.permission_key,
+		a.photo,
+		a.create_by AS "createBy.id",
+		a.create_date,
+		a.update_by AS "updateBy.id",
+		a.update_date,
+		a.del_flag
+    </sql>
+	
+	<select id="queryUserByOfficeId" resultType="CcmOrgTeam">
+		SELECT
+			<include refid="userColumns"/>,
+			b.team_type AS "teamType"
+		FROM sys_user a
+		LEFT JOIN ccm_org_team b on a.id=b.user_id and b.del_flag = #{DEL_FLAG_NORMAL}
+		WHERE a.del_flag = #{DEL_FLAG_NORMAL}
+			AND a.office_id = #{user.office.id}
+		ORDER BY a.name
+	</select>
+	
+	<select id="findList" resultType="CcmOrgTeam">
+		SELECT 
+			<include refid="ccmOrgTeamColumns"/>
+		FROM ccm_org_team a
+		<include refid="ccmOrgTeamJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="sex != null and sex != ''">
+				AND a.sex = #{sex}
+			</if>
+			<if test="nation != null and nation != ''">
+				AND a.nation = #{nation}
+			</if>
+			<if test="politics != null and politics != ''">
+				AND a.politics = #{politics}
+			</if>
+			<if test="idenNum != null and idenNum != ''">
+				AND a.iden_num LIKE '%${idenNum}%'
+					<!-- <if test="dbName == 'oracle'">'%'||#{idenNum}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{idenNum}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{idenNum},'%')</if> -->
+			</if>
+			<if test="beginBirthday != null and endBirthday != null and beginBirthday != '' and endBirthday != ''">
+				AND a.birthday BETWEEN #{beginBirthday} AND #{endBirthday}
+			</if>
+			<if test="grade != null and grade != ''">
+				AND a.grade = #{grade}
+			</if>
+			<if test="education != null and education != ''">
+				AND a.education = #{education}
+			</if>
+			<if test="profExpertises != null and profExpertises.length > 0">
+				AND (
+				<foreach collection="profExpertises" item="m"  separator=" OR " >
+					<if test="m != null and m != ''">
+		           	   a.prof_expertise LIKE concat('%',#{m},'%')
+		           	</if>
+		        </foreach>
+		        )
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="CcmOrgTeam">
+		SELECT 
+			<include refid="ccmOrgTeamColumns"/>
+		FROM ccm_org_team a
+		<include refid="ccmOrgTeamJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO ccm_org_team(
+			id,
+			user_id,
+			sex,
+			nation,
+			politics,
+			iden_num,
+			birthday,
+			grade,
+			service,
+			prof_expertise,
+			education,
+			fix_tel,
+			team_type,
+			status,
+			more1,
+			more2,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag
+		) VALUES (
+			#{id},
+			#{user.id},
+			#{sex},
+			#{nation},
+			#{politics},
+			#{idenNum},
+			#{birthday},
+			#{grade},
+			#{service},
+			#{profExpertise},
+			#{education},
+			#{fixTel},
+			#{teamType},
+			#{status},
+			#{more1},
+			#{more2},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE ccm_org_team SET 	
+			user_id = #{user.id},
+			sex = #{sex},
+			nation = #{nation},
+			politics = #{politics},
+			iden_num = #{idenNum},
+			birthday = #{birthday},
+			grade = #{grade},
+			service = #{service},
+			prof_expertise = #{profExpertise},
+			education = #{education},
+			fix_tel = #{fixTel},
+			team_type = #{teamType},
+			status = #{status},
+			more1 = #{more1},
+			more2 = #{more2},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE ccm_org_team SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

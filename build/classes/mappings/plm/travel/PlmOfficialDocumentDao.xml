@@ -1,0 +1,185 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.arjjs.ccm.modules.plm.travel.dao.PlmOfficialDocumentDao">
+    
+	<sql id="plmOfficialDocumentColumns">
+		a.id AS "id",
+		a.proc_ins_id AS "procInsId",
+		a.title AS "title",
+		a.document_type AS "documentType",
+		a.code AS "code",
+		a.urgent AS "urgent",
+		a.confidentiality AS "confidentiality",
+		a.date AS "date",
+		a.deadline AS "deadline",
+		a.from_dept AS "fromDept.id",
+		a.to_dept AS "toDept.id",
+		a.associated_dept AS "associatedDept.id",
+		a.type AS "type",
+		a.file AS "file",
+		a.extend1 AS "extend1",
+		a.extend2 AS "extend2",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag",
+		o10.name AS "fromDept.name",
+		o11.name AS "toDept.name",
+		o12.name AS "associatedDept.name"
+	</sql>
+	
+	<sql id="plmOfficialDocumentJoins">
+		LEFT JOIN sys_office o10 ON o10.id = a.from_dept
+		LEFT JOIN sys_office o11 ON o11.id = a.to_dept
+		LEFT JOIN sys_office o12 ON o12.id = a.associated_dept
+	</sql>
+    
+	<select id="get" resultType="PlmOfficialDocument">
+		SELECT 
+			<include refid="plmOfficialDocumentColumns"/>
+		FROM plm_official_document a
+		<include refid="plmOfficialDocumentJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="PlmOfficialDocument">
+		SELECT 
+		 act.status AS "plmAct.status",
+			<include refid="plmOfficialDocumentColumns"/>
+			
+		FROM plm_official_document a
+		LEFT JOIN plm_act act ON a.id = act.table_id
+		<include refid="plmOfficialDocumentJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			 AND a.create_by = #{currentUser.id}
+			<if test="title != null and title != ''">
+				AND a.title LIKE 
+					<if test="dbName == 'oracle'">'%'||#{title}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{title}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{title},'%')</if>
+			</if>
+			<if test="urgent != null and urgent != ''">
+				AND a.urgent = #{urgent}
+			</if>
+			<if test="confidentiality != null and confidentiality != ''">
+				AND a.confidentiality = #{confidentiality}
+			</if>
+			<if test="beginDate != null and endDate != null and beginDate != '' and endDate != ''">
+				AND a.date BETWEEN #{beginDate} AND #{endDate}
+			</if>
+			<if test="fromDept != null and fromDept.id != null and fromDept.id != ''">
+				AND a.from_dept = #{fromDept.id}
+			</if>
+			<if test="type != null and type != ''">
+				AND a.type = #{type}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="PlmOfficialDocument">
+		SELECT 
+			<include refid="plmOfficialDocumentColumns"/>
+		FROM plm_official_document a
+		<include refid="plmOfficialDocumentJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO plm_official_document(
+			id,
+			proc_ins_id,
+			title,
+			document_type,
+			code,
+			urgent,
+			confidentiality,
+			date,
+			deadline,
+			from_dept,
+			to_dept,
+			associated_dept,
+			type,
+			file,
+			extend1,
+			extend2,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag
+		) VALUES (
+			#{id},
+			#{procInsId},
+			#{title},
+			#{documentType},
+			#{code},
+			#{urgent},
+			#{confidentiality},
+			#{date},
+			#{deadline},
+			#{fromDept.id},
+			#{toDept.id},
+			#{associatedDept.id},
+			#{type},
+			#{file},
+			#{extend1},
+			#{extend2},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE plm_official_document SET 	
+			proc_ins_id = #{procInsId},
+			title = #{title},
+			document_type = #{documentType},
+			code = #{code},
+			urgent = #{urgent},
+			confidentiality = #{confidentiality},
+			date = #{date},
+			deadline = #{deadline},
+			from_dept = #{fromDept.id},
+			to_dept = #{toDept.id},
+			associated_dept = #{associatedDept.id},
+			type = #{type},
+			file = #{file},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE plm_official_document SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

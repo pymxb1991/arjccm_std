@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.arjjs.ccm.modules.plm.statistics.dao.PlmStatisticsDetailDao">
+    
+	<sql id="plmStatisticsDetailColumns">
+		a.id AS "id",
+		a.parent_id AS "parent.id",
+		a.title AS "title",
+		a.content AS "content",
+		a.long_itude AS "longItude",
+		a.lat_itude AS "latItude",
+		a.type AS "type",
+		a.sort AS "sort",
+		a.extend1 AS "extend1",
+		a.extend2 AS "extend2",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag"
+	</sql>
+	
+	<sql id="plmStatisticsDetailJoins">
+	</sql>
+    
+	<select id="get" resultType="PlmStatisticsDetail">
+		SELECT 
+			<include refid="plmStatisticsDetailColumns"/>
+		FROM plm_statistics_detail a
+		<include refid="plmStatisticsDetailJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="PlmStatisticsDetail">
+		SELECT 
+			<include refid="plmStatisticsDetailColumns"/>
+		FROM plm_statistics_detail a
+		<include refid="plmStatisticsDetailJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="parent != null and parent.id != null and parent.id != ''">
+				AND a.parent_id = #{parent.id}
+			</if>
+			<if test="title != null and title != ''">
+				AND a.title LIKE 
+					<if test="dbName == 'oracle'">'%'||#{title}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{title}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{title},'%')</if>
+			</if>
+			<if test="content != null and content != ''">
+				AND a.content = #{content}
+			</if>
+			<if test="longItude != null and longItude != ''">
+				AND a.long_itude = #{longItude}
+			</if>
+			<if test="latItude != null and latItude != ''">
+				AND a.lat_itude = #{latItude}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="PlmStatisticsDetail">
+		SELECT 
+			<include refid="plmStatisticsDetailColumns"/>
+		FROM plm_statistics_detail a
+		<include refid="plmStatisticsDetailJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO plm_statistics_detail(
+			id,
+			parent_id,
+			title,
+			content,
+			long_itude,
+			lat_itude,
+			type,
+			sort,
+			extend1,
+			extend2,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag
+		) VALUES (
+			#{id},
+			#{parent.id},
+			#{title},
+			#{content},
+			#{longItude},
+			#{latItude},
+			#{type},
+			#{sort},
+			#{extend1},
+			#{extend2},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE plm_statistics_detail SET 	
+			parent_id = #{parent.id},
+			title = #{title},
+			content = #{content},
+			long_itude = #{longItude},
+			lat_itude = #{latItude},
+			type = #{type},
+			sort = #{sort},
+			extend1 = #{extend1},
+			extend2 = #{extend2},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE plm_statistics_detail SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

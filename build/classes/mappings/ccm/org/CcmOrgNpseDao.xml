@@ -1,0 +1,893 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.arjjs.ccm.modules.ccm.org.dao.CcmOrgNpseDao">
+
+	<sql id="ccmOrgNpseColumns">
+		a.id AS "id",
+		a.comp_id AS "compId",
+		a.comp_name AS
+		"compName",
+		a.comp_type AS "compType",
+		a.comp_add AS "compAdd",
+		a.comp_tl AS "compTl",
+		a.company_num AS "companyNum",
+		a.legal_repr_code
+		AS "legalReprCode",
+		a.legal_repr_id AS "legalReprId",
+		a.legal_repr_name
+		AS "legalReprName",
+		a.legal_repr_tl AS "legalReprTl",
+		a.secu_name AS
+		"secuName",
+		a.secu_phone AS "secuPhone",
+		a.ente_prin_name AS
+		"entePrinName",
+		a.dang_comp AS "dangComp",
+		a.ente_principal_tl AS
+		"entePrincipalTl",
+		a.safe_haza_type AS "safeHazaType",
+		a.conc_exte AS "concExte",
+		a.risk_rank AS "riskRank",
+		a.regi_type AS "regiType",
+		a.esta_orga_cond AS
+		"estaOrgaCond",
+		a.hold_case AS "holdCase",
+		a.comp_impo_type AS
+		"compImpoType",
+		a.esta_orga AS "estaOrga",
+		a.party_mem AS "partyMem",
+		a.labor_union AS "laborUnion",
+		a.labor_union_num AS "laborUnionNum",
+		a.youth_leag_orga AS "youthLeagOrga",
+		a.youth_leag_orga_num AS
+		"youthLeagOrgaNum",
+		a.women_org AS "womenOrg",
+		a.women_num AS
+		"womenNum",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.area_id AS "area.id",
+		a.update_date AS
+		"updateDate",
+		a.registered_fund AS "registeredFund",
+		a.remarks AS
+		"remarks",
+		a.manage_scope AS "manageScope",
+		a.del_flag AS "delFlag",
+		a.ente_type AS "enteType",
+		a.serv_brand AS "servBrand",
+		a.industry AS
+		"industry",
+		a.comp_area AS "compArea",
+		a.danger_case AS "dangerCase",
+		a.reform_case AS "reformCase",
+		a.images AS "images",
+		a.surv_came_num AS
+		"survCameNum",
+		a.x_ray_num AS "xRayNum",
+		a.chec_pack AS "checPack",
+		a.real_name AS "realName",
+		a.x_ray_chec AS "xRayChec",
+		a.area_map AS
+		"areaMap",
+		a.area_point AS "areaPoint",
+		a.is_special AS "is_special",
+		a.is_sdyq AS "is_sdyq",
+		a.icon AS "icon",
+		a.register_date AS "registerDate",
+		a.more1 AS
+		"more1",
+		a.more2 AS "more2",
+		a.more3 AS "more3",
+		(case when a34.name is null then '' else a34.name end) AS "area.name",
+		(case a.conc_exte when 01 then '高' when 02 then '中' when 03 then '低' else '' end) "concExteLable"
+	</sql>
+
+	<sql id="ccmOrgNpseJoins">
+		LEFT JOIN sys_area a34 ON a34.id = a.area_id
+	</sql>
+
+	<select id="get" resultType="CcmOrgNpse">
+		SELECT
+		<include refid="ccmOrgNpseColumns" />
+		FROM ccm_org_npse a
+		<include refid="ccmOrgNpseJoins" />
+		WHERE a.id = #{id}
+	</select>
+
+	<!-- 报表:非公有经济组织数量 -->
+	<select id="findNumStatistics" resultType="com.arjjs.ccm.tool.SearchTabMore">
+		SELECT
+			SUM(a.company_num) AS "value1",
+			SUM(a.esta_orga) AS "value2",
+			SUM(a.party_mem) AS "value3",
+			SUM(a.labor_union) AS "value4",
+			SUM(a.labor_union_num) AS "value5",
+			SUM(a.youth_leag_orga) AS "value6",
+			SUM(a.youth_leag_orga_num) AS "value7",
+			SUM(a.women_org) AS "value8",
+			SUM(a.women_num) AS "value9"
+		FROM
+			ccm_org_npse a
+		WHERE
+			a.del_flag = "0"
+		
+	</select>
+	
+	<!-- 报表:非公有经济组织类别 -->
+	<select id="findCompType" resultType="com.arjjs.ccm.tool.EchartType">
+		SELECT
+			a.comp_type AS "typeO",
+			b.label AS "type",
+			COUNT(*) AS "value"
+		FROM
+			ccm_org_npse a
+		LEFT JOIN sys_dict b ON b.type = "ccm_buss_cate" AND a.comp_type = b.value
+		WHERE
+			a.del_flag = "0"
+			AND a.comp_type IS NOT NULL
+			AND a.comp_type != ""
+		GROUP BY
+			a.comp_type
+		
+	</select>
+	<!--报表:非公有经济组织控股情况 -->
+	<select id="findHoldCase" resultType="com.arjjs.ccm.tool.EchartType">
+		SELECT
+			a.hold_case AS "typeO",
+			b.label AS "type",
+			COUNT(*) AS "value"
+		FROM
+			ccm_org_npse a
+		LEFT JOIN sys_dict b ON b.type = "ccm_hold_cond" AND a.hold_case = b.value
+		WHERE
+			a.del_flag = "0"
+			AND a.hold_case IS NOT NULL
+			AND a.hold_case != ""
+		GROUP BY
+			a.hold_case
+		
+	</select>
+	<!-- 报表:非公有经济组织安全隐患类型 -->
+	<select id="findSafeHazaType" resultType="com.arjjs.ccm.tool.EchartType">
+		SELECT
+			a.safe_haza_type AS "typeO",
+			b.label AS "type",
+			COUNT(*) AS "value"
+		FROM
+			ccm_org_npse a
+		LEFT JOIN sys_dict b ON b.type = "ccm_pori_type" AND a.safe_haza_type = b.value
+		WHERE
+			a.del_flag = "0"
+			AND a.safe_haza_type IS NOT NULL
+			AND a.safe_haza_type != ""
+		GROUP BY
+			a.safe_haza_type
+		
+	</select>
+	<!-- 报表:非公有经济组织重点类型 -->
+	<select id="findCompImpoType" resultType="com.arjjs.ccm.tool.EchartType">
+		SELECT
+			a.comp_impo_type AS "typeO",
+			b.label AS "type",
+			COUNT(*) AS "value"
+		FROM
+			ccm_org_npse a
+		LEFT JOIN sys_dict b ON b.type = "comp_impo_type" AND a.comp_impo_type = b.value
+		WHERE
+			a.del_flag = "0"
+			AND a.comp_impo_type IS NOT NULL
+			AND a.comp_impo_type != ""
+		GROUP BY
+			a.comp_impo_type
+		
+	</select>
+	<!-- 报表:非公有经济组织重点类型-无关联 -->
+	<select id="findCompImpoType2" resultType="com.arjjs.ccm.tool.EchartType">
+		SELECT
+			a.comp_impo_type AS "typeO",
+			COUNT(*) AS "value"
+		FROM
+			ccm_org_npse a
+		WHERE
+			a.del_flag = "0"
+			AND a.comp_impo_type IS NOT NULL
+			AND a.comp_impo_type != ""
+		GROUP BY
+			a.comp_impo_type
+		
+	</select>
+	<!-- 报表:非公有经济组织是否危化企业-->
+	<select id="findDangComp" resultType="com.arjjs.ccm.tool.EchartType">
+		SELECT
+			a.dang_comp AS "typeO",
+			b.label AS "type",
+			COUNT(*) AS "value"
+		FROM
+			ccm_org_npse a
+		LEFT JOIN sys_dict b ON b.type = "yes_no" AND a.dang_comp = b.value
+		WHERE
+			a.del_flag = "0"
+			AND a.dang_comp IS NOT NULL
+		GROUP BY
+			a.dang_comp
+		
+	</select>
+	<!-- 报表:非公有经济组织关注程度-->
+	<select id="findConcExte" resultType="com.arjjs.ccm.tool.EchartType">
+		SELECT
+			a.conc_exte AS "typeO",
+			b.label AS "type",
+			COUNT(*) AS "value"
+		FROM
+			ccm_org_npse a
+		LEFT JOIN sys_dict b ON b.type = "ccm_conc_exte" AND a.conc_exte = b.value
+		WHERE
+			a.del_flag = "0"
+			AND a.conc_exte IS NOT NULL
+			AND a.conc_exte != ""
+		GROUP BY
+			a.conc_exte
+		
+	</select>
+	<!-- 报表:重点场所数据区域 -->
+	<select id="findArea" resultType="com.arjjs.ccm.tool.EchartType">
+		SELECT
+			a.id AS "typeO",
+			a.name AS "type",
+			'0' AS "value"
+		FROM
+			sys_area a,
+			sys_config c
+		WHERE
+			a.del_flag = '0'
+			AND c.id = 'system_level' 
+			AND a.type = 
+			(
+				CASE c.param_str
+				WHEN '2' THEN '5'
+				WHEN '1' THEN '6'
+				ELSE '5'
+				END
+			)
+		GROUP BY
+			a.id
+	</select>
+	<!-- 报表:重点场所数据重点类型 -->
+	<select id="findKeyPlaceType" resultType="com.arjjs.ccm.tool.EchartType">
+		SELECT
+			(
+				CASE c.param_str
+				WHEN '1' THEN cm.id
+				WHEN '2' THEN cm.parent_id
+				ELSE cm.parent_id
+				END
+			) AS "typeO",
+			(
+				CASE c.param_str
+				WHEN '1' THEN cm.name
+				WHEN '2' THEN s.name
+				ELSE s.name
+				END
+			) AS "type",
+			COUNT(org.id) AS "value"
+		FROM
+			ccm_org_npse org,
+			sys_area net,
+			sys_area cm,
+			sys_area s,
+			sys_config c
+		WHERE
+			org.area_id = net.id
+		AND org.del_flag = "0"
+		AND net.del_flag = "0"
+		AND cm.del_flag = "0"
+		AND net.parent_id = cm.id
+		AND cm.parent_id = s.id
+		AND c.id = 'system_level'
+		<if test="value != 'all'">
+            AND org.comp_impo_type = #{value}
+        </if>
+		GROUP BY
+			(
+				CASE c.param_str
+				WHEN '1' THEN cm.id
+				WHEN '2' THEN cm.parent_id
+				ELSE cm.parent_id
+				END
+			)
+	</select>
+	<!-- 报表:重点场所数据重点类型-学校 -->
+	<select id="findSchool" resultType="com.arjjs.ccm.tool.EchartType">
+		SELECT
+			(
+				CASE c.param_str
+				WHEN '1' THEN cm.id
+				WHEN '2' THEN cm.parent_id
+				ELSE cm.parent_id
+				END
+			) AS "typeO",
+			(
+				CASE c.param_str
+				WHEN '1' THEN cm.name
+				WHEN '2' THEN sa.name
+				ELSE sa.name
+				END
+			) AS "type",
+			COUNT(s.id) AS "value"
+		FROM
+			ccm_house_schoolrim s,
+			sys_area cm,
+			sys_area sa,
+			sys_config c
+		WHERE
+			s.area_id = cm.id
+		AND s.del_flag = "0"
+		AND cm.del_flag = "0"
+		AND sa.del_flag = "0"
+		AND c.id = 'system_level'
+		AND cm.parent_id = sa.id
+		GROUP BY
+			(
+				CASE c.param_str
+				WHEN '1' THEN cm.id
+				WHEN '2' THEN cm.parent_id
+				ELSE cm.parent_id
+				END
+			)
+	</select>
+	<!-- 报表:重点场所数据-学校办学类型统计 -->
+	<select id="findSchoolType" resultType="com.arjjs.ccm.tool.EchartType">
+		SELECT
+			s.school_type AS "typeO",
+			b.label AS "type",
+			COUNT(s.id) AS "value"
+		FROM
+			ccm_house_schoolrim s 
+		LEFT JOIN sys_dict b ON b.type = "ccm_schol_type" AND s.school_type = b.VALUE
+		WHERE
+			s.del_flag = "0" 
+			AND s.area_id IS NOT NULL
+			AND s.area_id !=""
+		GROUP BY
+			s.school_type
+	</select>
+	<!-- 重点企业数量 -->
+	<select id="findCompImpoTypes" resultType="int">
+		SELECT
+			COUNT(a.id)
+		FROM
+			ccm_org_npse a
+		WHERE
+			a.comp_impo_type != '00'
+		AND a.comp_impo_type != ''
+		AND a.comp_impo_type IS NOT NULL
+		AND a.del_flag = '0'
+	</select>
+	<!-- 危化企业 -->
+	<select id="getDangComp" resultType="com.arjjs.ccm.tool.EchartType">
+		SELECT
+			a.dang_comp AS "typeO",
+			b.label AS "type",
+			COUNT(*) AS "value"
+		FROM
+			ccm_org_npse a
+		LEFT JOIN sys_dict b ON b.type = "yes_no" AND a.dang_comp = b.value
+		WHERE
+			a.del_flag = "0"
+			AND a.dang_comp IS NOT NULL
+		GROUP BY
+			a.dang_comp
+		
+	</select>
+	<!-- 风险级别数量 -->
+	<select id="findNumRiskRank" resultType="int">
+		SELECT
+		COUNT(a.id)
+		FROM ccm_org_npse a
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			AND a.risk_rank = #{riskRank}
+		</where>
+	</select>
+	<!-- 首页概况各种总数查询//安全生产重点//消防重点//物流安全 -->
+	<select id="findCompImpoTypeData" resultType="int">
+		SELECT
+		COUNT(a.id)
+		FROM ccm_org_npse a
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			AND a.comp_impo_type = #{compImpoType}
+		</where>
+	</select>
+	<!-- 重点企业分布 -->
+	<select id="getCompImpoTypeTrue" resultType="com.arjjs.ccm.tool.EchartType">
+		SELECT
+			(
+				CASE c.param_str
+				WHEN '1' THEN community.name
+				WHEN '2' THEN street.name
+				ELSE street.name
+				END
+			) AS "type",
+			COUNT(a.id) AS "value"
+		FROM
+			ccm_org_npse a
+		LEFT JOIN sys_area net ON a.area_id = net.id
+		LEFT JOIN sys_area community ON community.id = net.parent_id
+		LEFT JOIN sys_area street ON street.id = community.parent_id
+		LEFT JOIN sys_config c ON c.id = 'system_level'
+		WHERE
+			a.del_flag = '0'
+			AND net.del_flag = '0'
+			AND community.del_flag = '0' 
+			AND street.del_flag = '0' 
+			AND a.comp_impo_type IS NOT NULL
+			AND a.comp_impo_type !=''
+			AND a.comp_impo_type !='00'
+		GROUP BY
+			(
+				CASE c.param_str
+				WHEN '1' THEN community.name
+				WHEN '2' THEN street.name
+				ELSE street.name
+				END
+			)
+		ORDER BY
+			--COUNT(a.id) DESC
+		LIMIT 6
+	</select>
+	
+	<!-- 治安重点场所 -->
+	<select id="getSafePubData" resultType="com.arjjs.ccm.tool.EchartType">
+		SELECT
+			a.risk_rank AS "typeO",
+			b.label AS "type",
+			COUNT(*) AS "value"
+		FROM
+			ccm_org_npse a
+		LEFT JOIN sys_dict b ON b.type = "ccm_npse_risk_rank" AND a.risk_rank = b.value
+		WHERE
+			a.del_flag = '0'
+			AND a.risk_rank IS NOT NULL
+			AND a.risk_rank !=''
+			AND a.risk_rank !='01'
+		GROUP BY
+			a.risk_rank
+		
+	</select>
+	<!-- 企业数量-大屏-滨海新区社会网格化管理信息平台 -->
+	<select id="getqiyeNumData" resultType="String">
+		SELECT
+		COUNT(a.id)
+		FROM ccm_org_npse a
+		<include refid="ccmOrgNpseJoins" />
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="compId != null and compId != ''">
+				AND a.comp_id LIKE
+				<if test="dbName == 'oracle'">'%'||#{compId}||'%'</if>
+				<if test="dbName == 'mssql'">'%'+#{compId}+'%'</if>
+				<if test="dbName == 'mysql'">concat('%',#{compId},'%')</if>
+			</if>
+			<if test="compName != null and compName != ''">
+				AND a.comp_name LIKE
+				<if test="dbName == 'oracle'">'%'||#{compName}||'%'</if>
+				<if test="dbName == 'mssql'">'%'+#{compName}+'%'</if>
+				<if test="dbName == 'mysql'">concat('%',#{compName},'%')</if>
+			</if>
+			<if test="compType != null and compType != ''">
+				AND a.comp_type LIKE
+				<if test="dbName == 'oracle'">'%'||#{compType}||'%'</if>
+				<if test="dbName == 'mssql'">'%'+#{compType}+'%'</if>
+				<if test="dbName == 'mysql'">concat('%',#{compType},'%')</if>
+			</if>
+			<!-- compImpoType -->
+			<if test="compImpoType != null and compImpoType != ''">
+				AND a.comp_impo_type in (${compImpoType})
+			</if>
+			<if test="safeHazaType != null and safeHazaType != ''">
+				AND a.safe_haza_type = #{safeHazaType}
+			</if>
+			<if test="area != null and area.id != null and area.id != ''">
+				AND a.area_id = #{area.id}
+			</if>
+			<if test="concExte != null and concExte != ''">
+				AND a.conc_exte = #{concExte}
+			</if>
+			<if test="riskRank != null and riskRank != ''">
+				AND a.risk_rank = #{riskRank}
+			</if>
+			<if test="dangComp != null ">
+				AND a.dang_comp = #{dangComp}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	<!-- 风险单位数据分析-按街道-大屏-滨海新区社会网格化管理信息平台 -->
+	<select id="findSumByString" resultType="com.arjjs.ccm.tool.EchartType">
+		SELECT
+			(
+				CASE c.param_str
+				WHEN '1' THEN community.name 
+				WHEN '2' THEN street.name
+				ELSE street.name
+				END
+			) AS "type",
+			COUNT(a.id) AS "value"
+		FROM
+			ccm_org_npse a
+		LEFT JOIN sys_area net ON a.area_id = net.id
+		LEFT JOIN sys_area community ON community.id = net.parent_id
+		LEFT JOIN sys_area street ON street.id = community.parent_id
+		LEFT JOIN sys_config c ON c.id = 'system_level'
+		WHERE
+			a.del_flag = '0'
+			AND net.del_flag = '0'
+			AND community.del_flag = '0' 
+			AND street.del_flag = '0' 
+			<if test="riskRank != null and riskRank != ''">
+				AND a.risk_rank = #{riskRank}
+			</if>
+		GROUP BY
+			(
+				CASE c.param_str
+				WHEN '1' THEN community.name 
+				WHEN '2' THEN street.name
+				ELSE street.name
+				END
+			)
+	</select>
+	<!-- 街道信息-大屏-滨海新区社会网格化管理信息平台 -->
+    <select id="findListAllData" resultType="com.arjjs.ccm.tool.SearchTab">
+        SELECT
+        <!-- <include refid="ccmOrgNpseColumns" /> -->
+	        a.id AS "type",
+			a.comp_name AS "value",
+			a.area_map AS "value1",
+			a.area_point AS "value2"
+        FROM ccm_org_npse a
+		<include refid="ccmOrgNpseJoins" />
+		LEFT JOIN sys_area community ON community.id = a34.parent_id
+		LEFT JOIN sys_area street ON street.id = community.parent_id
+		WHERE
+			a.del_flag = '0'
+			AND a34.del_flag = '0'
+			AND community.del_flag = '0'
+			AND street.del_flag = '0'
+			AND a.comp_impo_type IS NOT NULL
+			AND a.comp_impo_type !=''
+			AND a.comp_impo_type !='00'
+			<if test="area != null and area.id != null and area.id != ''">
+				AND street.id = #{area.id}
+			</if>
+    </select>
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	<!--  -->
+	<select id="findList" resultType="CcmOrgNpse">
+		SELECT
+		<include refid="ccmOrgNpseColumns" />
+		FROM ccm_org_npse a
+		<include refid="ccmOrgNpseJoins" />
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="compId != null and compId != ''">
+				AND a.comp_id LIKE
+				<if test="dbName == 'oracle'">'%'||#{compId}||'%'</if>
+				<if test="dbName == 'mssql'">'%'+#{compId}+'%'</if>
+				<if test="dbName == 'mysql'">concat('%',#{compId},'%')</if>
+			</if>
+			<if test="beginRegisterDate != null and endRegisterDate != null and beginRegisterDate != '' and endRegisterDate != ''">
+				AND a.register_date BETWEEN #{beginRegisterDate} AND #{endRegisterDate}
+			</if>
+			<if test="compName != null and compName != ''">
+				AND a.comp_name LIKE
+				<if test="dbName == 'oracle'">'%'||#{compName}||'%'</if>
+				<if test="dbName == 'mssql'">'%'+#{compName}+'%'</if>
+				<if test="dbName == 'mysql'">concat('%',#{compName},'%')</if>
+			</if>
+			<if test="compType != null and compType != ''">
+				AND a.comp_type LIKE
+				<if test="dbName == 'oracle'">'%'||#{compType}||'%'</if>
+				<if test="dbName == 'mssql'">'%'+#{compType}+'%'</if>
+				<if test="dbName == 'mysql'">concat('%',#{compType},'%')</if>
+			</if>
+			<!-- compImpoType -->
+			<if test="compImpoType != null and compImpoType != ''">
+				AND a.comp_impo_type in (${compImpoType})
+			</if>
+			<if test="safeHazaType != null and safeHazaType != ''">
+				AND a.safe_haza_type = #{safeHazaType}
+			</if>
+			<if test="area != null and area.id != null and area.id != ''">
+				AND a.area_id = #{area.id}
+			</if>
+			<if test="concExte != null and concExte != ''">
+				AND a.conc_exte = #{concExte}
+			</if>
+			<if test="riskRank != null and riskRank != ''">
+				AND a.risk_rank = #{riskRank}
+			</if>
+			<if test="dangComp != null ">
+				AND a.dang_comp = #{dangComp}
+			</if>
+			<if test="is_special != null and is_special != 0">
+				AND a.is_special = #{is_special}
+			</if>
+			<if test="is_sdyq != null and is_sdyq != 0">
+				AND a.is_sdyq = #{is_sdyq}
+			</if>
+			<if test="industryList != null and industryList.length > 0">
+				AND (
+				<foreach collection="industryList" item="m"  separator=" OR " >
+					<if test="m != null and m != ''">
+		           	   a.industry LIKE concat('%',#{m},'%')
+		           	</if>
+		        </foreach>
+		        )
+			</if>
+			<if test="more1 != null and more1 != ''">
+                AND  (${more1})
+            </if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+
+	<select id="findAllList" resultType="CcmOrgNpse">
+		SELECT
+		<include refid="ccmOrgNpseColumns" />
+		FROM ccm_org_npse a
+		<include refid="ccmOrgNpseJoins" />
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+
+	<insert id="insert">
+		INSERT INTO ccm_org_npse(
+		id,
+		comp_id,
+		comp_name,
+		comp_type,
+		comp_add,
+		comp_tl,
+		company_num,
+		legal_repr_code,
+		legal_repr_id,
+		legal_repr_name,
+		legal_repr_tl,
+		secu_name,
+		secu_phone,
+		ente_prin_name,
+		dang_comp,
+		ente_principal_tl,
+		safe_haza_type,
+		conc_exte,
+		risk_rank,
+		regi_type,
+		esta_orga_cond,
+		hold_case,
+		comp_impo_type,
+		esta_orga,
+		party_mem,
+		labor_union,
+		labor_union_num,
+		youth_leag_orga,
+		youth_leag_orga_num,
+		women_org,
+		women_num,
+		create_by,
+		create_date,
+		update_by,
+		area_id,
+		update_date,
+		registered_fund,
+		remarks,
+		manage_scope,
+		del_flag,
+		ente_type,
+		serv_brand,
+		industry,
+		comp_area,
+		danger_case,
+		reform_case,
+		images,
+		surv_came_num,
+		x_ray_num,
+		chec_pack,
+		real_name,
+		x_ray_chec,
+		area_map,
+		area_point,
+		icon,
+		register_date,
+		more1,
+		more2,
+		more3,
+		is_special,
+		is_sdyq
+		) VALUES (
+		#{id},
+		#{compId},
+		#{compName},
+		#{compType},
+		#{compAdd},
+		#{compTl},
+		#{companyNum},
+		#{legalReprCode},
+		#{legalReprId},
+		#{legalReprName},
+		#{legalReprTl},
+		#{secuName},
+		#{secuPhone},
+		#{entePrinName},
+		#{dangComp},
+		#{entePrincipalTl},
+		#{safeHazaType},
+		#{concExte},
+		#{riskRank},
+		#{regiType},
+		#{estaOrgaCond},
+		#{holdCase},
+		#{compImpoType},
+		#{estaOrga},
+		#{partyMem},
+		#{laborUnion},
+		#{laborUnionNum},
+		#{youthLeagOrga},
+		#{youthLeagOrgaNum},
+		#{womenOrg},
+		#{womenNum},
+		#{createBy.id},
+		#{createDate},
+		#{updateBy.id},
+		#{area.id},
+		#{updateDate},
+		#{registeredFund},
+		#{remarks},
+		#{manageScope},
+		#{delFlag},
+		#{enteType},
+		#{servBrand},
+		#{industry},
+		#{compArea},
+		#{dangerCase},
+		#{reformCase},
+		#{images},
+		#{survCameNum},
+		#{xRayNum},
+		#{checPack},
+		#{realName},
+		#{xRayChec},
+		#{areaMap},
+		#{areaPoint},
+		#{icon},
+		#{registerDate},
+		#{more1},
+		#{more2},
+		#{more3},
+		#{is_special},
+		#{is_sdyq}
+		)
+	</insert>
+
+	<update id="update">
+		UPDATE ccm_org_npse SET
+		comp_id = #{compId},
+		comp_name
+		= #{compName},
+		comp_type = #{compType},
+		comp_add = #{compAdd},
+		comp_tl =
+		#{compTl},
+		company_num = #{companyNum},
+		legal_repr_code =
+		#{legalReprCode},
+		legal_repr_id = #{legalReprId},
+		legal_repr_name =
+		#{legalReprName},
+		legal_repr_tl = #{legalReprTl},
+		secu_name =
+		#{secuName},
+		secu_phone = #{secuPhone},
+		ente_prin_name =
+		#{entePrinName},
+		dang_comp = #{dangComp},
+		ente_principal_tl =
+		#{entePrincipalTl},
+		safe_haza_type = #{safeHazaType},
+		conc_exte = #{concExte},
+		risk_rank = #{riskRank},
+		regi_type = #{regiType},
+		esta_orga_cond = #{estaOrgaCond},
+		hold_case = #{holdCase},
+		comp_impo_type = #{compImpoType},
+		esta_orga =
+		#{estaOrga},
+		party_mem = #{partyMem},
+		labor_union = #{laborUnion},
+		labor_union_num = #{laborUnionNum},
+		youth_leag_orga = #{youthLeagOrga},
+		youth_leag_orga_num = #{youthLeagOrgaNum},
+		women_org = #{womenOrg},
+		women_num = #{womenNum},
+		update_by = #{updateBy.id},
+		area_id =
+		#{area.id},
+		update_date = #{updateDate},
+		registered_fund =
+		#{registeredFund},
+		remarks = #{remarks},
+		manage_scope = #{manageScope},
+		ente_type = #{enteType},
+		serv_brand = #{servBrand},
+		industry =
+		#{industry},
+		comp_area = #{compArea},
+		danger_case = #{dangerCase},
+		reform_case = #{reformCase},
+		images = #{images},
+		surv_came_num =
+		#{survCameNum},
+		x_ray_num = #{xRayNum},
+		chec_pack = #{checPack},
+		real_name = #{realName},
+		x_ray_chec = #{xRayChec},
+		area_map =
+		#{areaMap},
+		area_point = #{areaPoint},
+		icon = #{icon},
+		register_date = #{registerDate},
+		more1 = #{more1},
+		more2 = #{more2},
+		more3 = #{more3},
+		is_special=#{is_special},
+		is_sdyq=#{is_sdyq}
+		WHERE id = #{id}
+	</update>
+
+	<update id="delete">
+		UPDATE ccm_org_npse SET
+		del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	<update id="updateCoordinates">
+		UPDATE ccm_org_npse SET
+		area_map = #{areaMap},
+		area_point = #{areaPoint}
+		WHERE id = #{id}
+		</update>
+</mapper>

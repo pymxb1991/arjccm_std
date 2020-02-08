@@ -1,0 +1,221 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.arjjs.ccm.modules.ccm.attendance.dao.CcmWorkerAttendanceDao">
+    
+	<sql id="ccmWorkerAttendanceColumns">
+		a.id AS "id",
+		a.type AS "type",
+		a.goout_type AS "gooutType",
+		a.leave_type AS "leaveType",
+		a.workingtime_type AS "workingtimeType",
+		a.attendance_begin AS "attendanceBegin",
+		a.attendance_end AS "attendanceEnd",
+		a.days AS "days",
+		a.address AS "address",
+		a.cause AS "cause",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag"
+		,b.name AS "createBy.name"
+		,c.name AS "createBy.office.name"
+	</sql>
+	
+	<sql id="ccmWorkerAttendanceJoins">
+	</sql>
+	<sql id="ccmWorkerAttendanceJoins_User">
+		LEFT JOIN sys_user b ON a.create_by = b.id
+	</sql>
+	<sql id="ccmWorkerAttendanceJoins_Office">
+		LEFT JOIN sys_office c ON b.office_id = c.id
+	</sql>
+    
+	<select id="get" resultType="CcmWorkerAttendance">
+		SELECT 
+			<include refid="ccmWorkerAttendanceColumns"/>
+		FROM ccm_worker_attendance a
+		<include refid="ccmWorkerAttendanceJoins"/>
+		<include refid="ccmWorkerAttendanceJoins_User"/>
+		<include refid="ccmWorkerAttendanceJoins_Office"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="CcmWorkerAttendance">
+		SELECT 
+			<include refid="ccmWorkerAttendanceColumns"/>
+		FROM ccm_worker_attendance a
+		<include refid="ccmWorkerAttendanceJoins"/>
+		<include refid="ccmWorkerAttendanceJoins_User"/>
+		<include refid="ccmWorkerAttendanceJoins_Office"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="type != null and type != ''">
+				AND a.type = #{type}
+			</if>
+			<if test="gooutType != null and gooutType != ''">
+				AND a.goout_type = #{gooutType}
+			</if>
+			<if test="leaveType != null and leaveType != ''">
+				AND a.leave_type = #{leaveType}
+			</if>
+			<if test="workingtimeType != null and workingtimeType != ''">
+				AND a.workingtime_type = #{workingtimeType}
+			</if>
+			<if test="attendanceBegin != null and attendanceBegin != ''">
+				AND a.attendance_begin &gt;= #{attendanceBegin}
+			</if>
+			<if test="attendanceEnd != null and attendanceEnd != ''">
+				AND a.attendance_end &lt;= #{attendanceEnd}
+			</if>
+			<if test="days != null and days != ''">
+				AND a.days = #{days}
+			</if>
+			<if test="address != null and address != ''">
+				AND a.address LIKE 
+					<if test="dbName == 'oracle'">'%'||#{address}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{address}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{address},'%')</if>
+			</if>
+			<if test="cause != null and cause != ''">
+				AND a.cause LIKE 
+					<if test="dbName == 'oracle'">'%'||#{cause}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{cause}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{cause},'%')</if>
+			</if>
+			<if test="createBy != null and createBy.id != null and createBy.id != ''">
+				AND a.create_by = #{createBy.id}
+			</if>
+			<if test="beginCreateDate != null and endCreateDate != null and beginCreateDate != '' and endCreateDate != ''">
+				AND a.create_date BETWEEN #{beginCreateDate} AND #{endCreateDate}
+			</if>
+			<if test="remarks != null and remarks != ''">
+				AND a.remarks LIKE 
+					<if test="dbName == 'oracle'">'%'||#{remarks}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{remarks}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{remarks},'%')</if>
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="CcmWorkerAttendance">
+		SELECT 
+			<include refid="ccmWorkerAttendanceColumns"/>
+		FROM ccm_worker_attendance a
+		<include refid="ccmWorkerAttendanceJoins"/>
+		<include refid="ccmWorkerAttendanceJoins_User"/>
+		<include refid="ccmWorkerAttendanceJoins_Office"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO ccm_worker_attendance(
+			id,
+			type,
+			goout_type,
+			leave_type,
+			workingtime_type,
+			attendance_begin,
+			attendance_end,
+			days,
+			address,
+			cause,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag
+		) VALUES (
+			#{id},
+			#{type},
+			#{gooutType},
+			#{leaveType},
+			#{workingtimeType},
+			#{attendanceBegin},
+			#{attendanceEnd},
+			#{days},
+			#{address},
+			#{cause},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE ccm_worker_attendance SET 	
+			goout_type = #{gooutType},
+			leave_type = #{leaveType},
+			workingtime_type = #{workingtimeType},
+			attendance_begin = #{attendanceBegin},
+			attendance_end = #{attendanceEnd},
+			days = #{days},
+			address = #{address},
+			cause = #{cause},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE ccm_worker_attendance SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+	
+	<select id="getcountPage" resultType="CcmWorkerAttendance">
+		SELECT
+	    	SUM(IF(goout_type = 10, days, 0)) AS "chuchai",
+			SUM(IF(goout_type = 20, days, 0)) AS "waichu",
+			SUM(IF(leave_type = 10, days, 0)) AS "bingjia",
+			SUM(IF(leave_type = 20, days, 0)) AS "shijia",
+			SUM(IF(leave_type = 30, days, 0)) AS "nianxiu",
+			SUM(IF(leave_type = 40, days, 0)) AS "tiaoxiu",
+			SUM(IF(a.type = 3, days, 0)) AS "jiaban",
+			b.name AS "createBy.name",
+			c.name AS "createBy.office.name",
+			b.name AS "createByname",
+			c.name AS "officename"
+		FROM
+			ccm_worker_attendance a 
+			<include refid="ccmWorkerAttendanceJoins"/>
+			<include refid="ccmWorkerAttendanceJoins_User"/>
+			<include refid="ccmWorkerAttendanceJoins_Office"/>
+		WHERE
+			a.del_flag = 0 
+			<if test="attendanceBegin != null and attendanceBegin != ''">
+				AND a.attendance_begin &gt;= #{attendanceBegin}
+			</if>
+			<if test="attendanceEnd != null and attendanceEnd != ''">
+				AND a.attendance_end &lt;= #{attendanceEnd}
+			</if>
+		GROUP BY a.create_by 
+	</select>
+	
+	
+</mapper>

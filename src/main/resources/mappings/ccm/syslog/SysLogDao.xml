@@ -1,0 +1,182 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper
+        namespace="com.arjjs.ccm.modules.ccm.syslog.dao.SysLogDao">
+
+    <sql id="sysLogColumns">
+		a.id AS "id",
+		a.type AS "type",
+		a.title AS "title",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.remote_addr AS "remoteAddr",
+		a.user_agent AS "userAgent",
+		a.request_uri AS "requestUri",
+		a.method AS "method",
+		a.params AS
+		"params",
+		a.exception AS "exception"
+	</sql>
+
+    <sql id="sysLogJoins">
+    </sql>
+
+    <select id="get" resultType="SysLog">
+        SELECT
+        <include refid="sysLogColumns"/>
+        FROM sys_log a
+        <include refid="sysLogJoins"/>
+        WHERE a.id = #{id}
+    </select>
+
+    <select id="getLogByDays"
+            resultType="com.arjjs.ccm.modules.flat.analyst.entity.Count">
+
+		SELECT
+		DATE_FORMAT( create_date, '%Y-%m-%d' ) AS days,
+		count( * ) AS counts
+		FROM
+		( SELECT * FROM sys_log s WHERE s.create_by =
+		#{createBy} and s.title not in ('系统登录') AND create_date BETWEEN
+		#{beginDate} AND #{endDate} ) AS a
+		GROUP BY
+		days
+
+	</select>
+
+    <select id="getDateForDept"
+            resultType="com.arjjs.ccm.modules.flat.analyst.entity.Count">
+        SELECT count(*) AS counts,
+        create_by as userId
+        FROM (SELECT
+        *
+        FROM
+        sys_log s
+        WHERE s.title not in ('系统登录') and
+        s.create_by IN
+        <foreach collection="array" index="index" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+        AND DATE_SUB( CURDATE(), INTERVAL 7 DAY ) &lt;= date( create_date )
+        ) AS a GROUP BY a.create_by
+    </select>
+
+    <select id="findList" resultType="SysLog">
+        SELECT
+        <include refid="sysLogColumns"/>
+        FROM sys_log a
+        <include refid="sysLogJoins"/>
+        <where>
+
+            <if test="type != null and type != ''">
+                AND a.type = #{type}
+            </if>
+            <if test="title != null and title != ''">
+                AND a.title LIKE
+                <if test="dbName == 'oracle'">'%'||#{title}||'%'</if>
+                <if test="dbName == 'mssql'">'%'+#{title}+'%'</if>
+                <if test="dbName == 'mysql'">concat('%',#{title},'%')</if>
+            </if>
+            <if
+                    test="createBy != null and createBy.id != null and createBy.id != ''">
+                AND a.create_by = #{createBy.id}
+            </if>
+            <if
+                    test="beginCreateDate != null and endCreateDate != null and beginCreateDate != '' and endCreateDate != ''">
+                AND a.create_date BETWEEN #{beginCreateDate} AND
+                #{endCreateDate}
+            </if>
+            <if test="remoteAddr != null and remoteAddr != ''">
+                AND a.remote_addr = #{remoteAddr}
+            </if>
+            <if test="userAgent != null and userAgent != ''">
+                AND a.user_agent = #{userAgent}
+            </if>
+            <if test="requestUri != null and requestUri != ''">
+                AND a.request_uri = #{requestUri}
+            </if>
+            <if test="method != null and method != ''">
+                AND a.method = #{method}
+            </if>
+            <if test="params != null and params != ''">
+                AND a.params = #{params}
+            </if>
+            <if test="exception != null and exception != ''">
+                AND a.exception = #{exception}
+            </if>
+        </where>
+        <choose>
+            <when
+                    test="page !=null and page.orderBy != null and page.orderBy != ''">
+                ORDER BY ${page.orderBy}
+            </when>
+            <otherwise>
+            </otherwise>
+        </choose>
+    </select>
+
+    <select id="findAllList" resultType="SysLog">
+        SELECT
+        <include refid="sysLogColumns"/>
+        FROM sys_log a
+        <include refid="sysLogJoins"/>
+        <where>
+
+        </where>
+        <choose>
+            <when
+                    test="page !=null and page.orderBy != null and page.orderBy != ''">
+                ORDER BY ${page.orderBy}
+            </when>
+            <otherwise>
+            </otherwise>
+        </choose>
+    </select>
+
+    <insert id="insert">
+		INSERT INTO sys_log(
+		id,
+		type,
+		title,
+		create_by,
+		create_date,
+		remote_addr,
+		user_agent,
+		request_uri,
+		method,
+		params,
+		exception
+		) VALUES (
+		#{id},
+		#{type},
+		#{title},
+		#{createBy.id},
+		#{createDate},
+		#{remoteAddr},
+		#{userAgent},
+		#{requestUri},
+		#{method},
+		#{params},
+		#{exception}
+		)
+	</insert>
+
+    <update id="update">
+		UPDATE sys_log SET
+		type = #{type},
+		title = #{title},
+		remote_addr = #{remoteAddr},
+		user_agent = #{userAgent},
+		request_uri = #{requestUri},
+		method = #{method},
+		params = #{params},
+		exception = #{exception}
+		WHERE id = #{id}
+	</update>
+
+    <update id="delete">
+		DELETE FROM sys_log
+		WHERE id = #{id}
+	</update>
+
+</mapper>

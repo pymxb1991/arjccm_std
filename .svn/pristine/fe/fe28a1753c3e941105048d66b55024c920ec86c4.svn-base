@@ -1,0 +1,416 @@
+/**
+ * Copyright &copy; 2012-2016 <a href="https://github.com/thinkgem/jeesite">JeeSite</a> All rights reserved.
+ */
+package com.arjjs.ccm.modules.ccm.partybuild.entity;
+
+import com.arjjs.ccm.common.persistence.DataEntity;
+import com.arjjs.ccm.modules.sys.entity.Area;
+import com.arjjs.ccm.modules.sys.entity.User;
+import org.hibernate.validator.constraints.Length;
+
+import javax.validation.constraints.NotNull;
+
+/**
+ * 党组织管理Entity
+ * @author maoxb
+ * @version 2019-08-12
+ */
+public class CcmPartyOrganiz extends DataEntity<CcmPartyOrganiz> {
+	
+	private static final long serialVersionUID = 1L;
+	private String type;		// 党建组织类型  1:社区党员管理2：两新党员管理
+	private String name;		// 组织名称
+	private String allName;		// 组织全称
+	private Area community;		// 选择社区
+	private String faxNum;		// 传真号码
+	private String superOrg;		// 上级组织
+	private String orgAttr;		// 组织属性
+	private String orgAttrRelation;		// 党组织属地关系
+	private String postalCode;		// 邮政编码
+	private String orgCode;		// 党组织编号
+	private String createReferenceNum;		// 建立文号
+	private String telphone;		// 联系电话
+	private User user;		// 负责人
+	private String address;		// 通讯地址
+	private String createReason;		// 建立原因
+	private String deptName;		// 单位名称
+	private String deptAttrRelation;		// 单位隶属关系
+	private String deptAttr;		// 单位属性
+	private String deptIndustry;		// 所属行业
+	private String deptEconomicType;		// 经济类型
+	private String deptEnterpriseType;		// 企业类型
+	private String deptEnterpriseScope;		// 企业规模
+	private String deptImptEnterpriseFlag;		// 重要骨干企业
+	private String deptLegalGrassOrg;		// 法人单位建立党的基层组织
+	private String deptGovePartOrg;		// 政府工作部门建立党组织情况
+	private String deptCityRoadInfo;		// 城市街道社区乡镇标识
+	private String deptMediuOrgType;		// 中介组织类型
+	private String deptPartServFlag;		// 建立党员服务机构标识
+	private String deptPartPostFlag;		// 是否建立党员志愿者队伍
+	private String deptSendPartFlag;		// 是否党建工作指导员联系的
+	private String deptParToFlag;		// 是否党建工作指导员联系的
+	private String deptPartNum;		// 党建指导员数量
+	private String deptModfEnterFlag;		// 是否改制企业
+	private String deptLegalPartFlag;		// 法定代表人是否党员
+	private String deptLegalAllFlag;		// 法定代表兼任企业党组织书记
+	private String deptOnEmployeesNum;		// 在岗职工数从业人数
+	private String deptOnWorkersNum;		// 在岗职工中工人数
+	private String deptTreeFiveNum;		// 35岁以下在岗职工数
+	private String deptProfTechNum;		// 在岗专业技术人员
+	
+	public CcmPartyOrganiz() {
+		super();
+	}
+
+	public CcmPartyOrganiz(String id){
+		super(id);
+	}
+
+	@Length(min=1, max=1, message="党建组织类型长度必须介于 1 和 1 之间")
+	public String getType() {
+		return type;
+	}
+
+	public void setType(String type) {
+		this.type = type;
+	}
+	
+	@Length(min=1, max=100, message="组织名称长度必须介于 1 和 100 之间")
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+	
+	@Length(min=0, max=150, message="组织全称长度必须介于 0 和 150 之间")
+	public String getAllName() {
+		return allName;
+	}
+
+	public void setAllName(String allName) {
+		this.allName = allName;
+	}
+	
+	public Area getCommunity() {
+		return community;
+	}
+
+	public void setCommunity(Area community) {
+		this.community = community;
+	}
+	
+	@Length(min=0, max=64, message="传真号码长度必须介于 0 和 64 之间")
+	public String getFaxNum() {
+		return faxNum;
+	}
+
+	public void setFaxNum(String faxNum) {
+		this.faxNum = faxNum;
+	}
+	
+	@Length(min=0, max=64, message="上级组织长度必须介于 0 和 64 之间")
+	public String getSuperOrg() {
+		return superOrg;
+	}
+
+	public void setSuperOrg(String superOrg) {
+		this.superOrg = superOrg;
+	}
+	
+	@Length(min=1, max=64, message="组织属性长度必须介于 1 和 64 之间")
+	public String getOrgAttr() {
+		return orgAttr;
+	}
+
+	public void setOrgAttr(String orgAttr) {
+		this.orgAttr = orgAttr;
+	}
+	
+	@Length(min=1, max=64, message="党组织属地关系长度必须介于 1 和 64 之间")
+	public String getOrgAttrRelation() {
+		return orgAttrRelation;
+	}
+
+	public void setOrgAttrRelation(String orgAttrRelation) {
+		this.orgAttrRelation = orgAttrRelation;
+	}
+	
+	@Length(min=0, max=64, message="邮政编码长度必须介于 0 和 64 之间")
+	public String getPostalCode() {
+		return postalCode;
+	}
+
+	public void setPostalCode(String postalCode) {
+		this.postalCode = postalCode;
+	}
+	
+	@Length(min=1, max=64, message="党组织编号长度必须介于 1 和 64 之间")
+	public String getOrgCode() {
+		return orgCode;
+	}
+
+	public void setOrgCode(String orgCode) {
+		this.orgCode = orgCode;
+	}
+	
+	@Length(min=0, max=100, message="建立文号长度必须介于 0 和 100 之间")
+	public String getCreateReferenceNum() {
+		return createReferenceNum;
+	}
+
+	public void setCreateReferenceNum(String createReferenceNum) {
+		this.createReferenceNum = createReferenceNum;
+	}
+	
+	@Length(min=0, max=20, message="联系电话长度必须介于 0 和 20 之间")
+	public String getTelphone() {
+		return telphone;
+	}
+
+	public void setTelphone(String telphone) {
+		this.telphone = telphone;
+	}
+	
+	@NotNull(message="负责人不能为空")
+	public User getUser() {
+		return user;
+	}
+
+	public void setUser(User user) {
+		this.user = user;
+	}
+	
+	@Length(min=1, max=200, message="通讯地址长度必须介于 1 和 200 之间")
+	public String getAddress() {
+		return address;
+	}
+
+	public void setAddress(String address) {
+		this.address = address;
+	}
+	
+	public String getCreateReason() {
+		return createReason;
+	}
+
+	public void setCreateReason(String createReason) {
+		this.createReason = createReason;
+	}
+	
+	@Length(min=0, max=100, message="单位名称长度必须介于 0 和 100 之间")
+	public String getDeptName() {
+		return deptName;
+	}
+
+	public void setDeptName(String deptName) {
+		this.deptName = deptName;
+	}
+	
+	@Length(min=0, max=64, message="单位隶属关系长度必须介于 0 和 64 之间")
+	public String getDeptAttrRelation() {
+		return deptAttrRelation;
+	}
+
+	public void setDeptAttrRelation(String deptAttrRelation) {
+		this.deptAttrRelation = deptAttrRelation;
+	}
+	
+	@Length(min=0, max=64, message="单位属性长度必须介于 0 和 64 之间")
+	public String getDeptAttr() {
+		return deptAttr;
+	}
+
+	public void setDeptAttr(String deptAttr) {
+		this.deptAttr = deptAttr;
+	}
+	
+	@Length(min=0, max=64, message="所属行业长度必须介于 0 和 64 之间")
+	public String getDeptIndustry() {
+		return deptIndustry;
+	}
+
+	public void setDeptIndustry(String deptIndustry) {
+		this.deptIndustry = deptIndustry;
+	}
+	
+	@Length(min=0, max=64, message="经济类型长度必须介于 0 和 64 之间")
+	public String getDeptEconomicType() {
+		return deptEconomicType;
+	}
+
+	public void setDeptEconomicType(String deptEconomicType) {
+		this.deptEconomicType = deptEconomicType;
+	}
+	
+	@Length(min=0, max=64, message="企业类型长度必须介于 0 和 64 之间")
+	public String getDeptEnterpriseType() {
+		return deptEnterpriseType;
+	}
+
+	public void setDeptEnterpriseType(String deptEnterpriseType) {
+		this.deptEnterpriseType = deptEnterpriseType;
+	}
+	
+	@Length(min=0, max=64, message="企业规模长度必须介于 0 和 64 之间")
+	public String getDeptEnterpriseScope() {
+		return deptEnterpriseScope;
+	}
+
+	public void setDeptEnterpriseScope(String deptEnterpriseScope) {
+		this.deptEnterpriseScope = deptEnterpriseScope;
+	}
+	
+	@Length(min=0, max=1, message="重要骨干企业长度必须介于 0 和 1 之间")
+	public String getDeptImptEnterpriseFlag() {
+		return deptImptEnterpriseFlag;
+	}
+
+	public void setDeptImptEnterpriseFlag(String deptImptEnterpriseFlag) {
+		this.deptImptEnterpriseFlag = deptImptEnterpriseFlag;
+	}
+	
+	@Length(min=0, max=64, message="法人单位建立党的基层组织长度必须介于 0 和 64 之间")
+	public String getDeptLegalGrassOrg() {
+		return deptLegalGrassOrg;
+	}
+
+	public void setDeptLegalGrassOrg(String deptLegalGrassOrg) {
+		this.deptLegalGrassOrg = deptLegalGrassOrg;
+	}
+	
+	@Length(min=0, max=64, message="政府工作部门建立党组织情况长度必须介于 0 和 64 之间")
+	public String getDeptGovePartOrg() {
+		return deptGovePartOrg;
+	}
+
+	public void setDeptGovePartOrg(String deptGovePartOrg) {
+		this.deptGovePartOrg = deptGovePartOrg;
+	}
+	
+	@Length(min=0, max=64, message="城市街道社区乡镇标识长度必须介于 0 和 64 之间")
+	public String getDeptCityRoadInfo() {
+		return deptCityRoadInfo;
+	}
+
+	public void setDeptCityRoadInfo(String deptCityRoadInfo) {
+		this.deptCityRoadInfo = deptCityRoadInfo;
+	}
+	
+	@Length(min=0, max=64, message="中介组织类型长度必须介于 0 和 64 之间")
+	public String getDeptMediuOrgType() {
+		return deptMediuOrgType;
+	}
+
+	public void setDeptMediuOrgType(String deptMediuOrgType) {
+		this.deptMediuOrgType = deptMediuOrgType;
+	}
+	
+	@Length(min=0, max=1, message="建立党员服务机构标识长度必须介于 0 和 1 之间")
+	public String getDeptPartServFlag() {
+		return deptPartServFlag;
+	}
+
+	public void setDeptPartServFlag(String deptPartServFlag) {
+		this.deptPartServFlag = deptPartServFlag;
+	}
+	
+	@Length(min=0, max=1, message="是否建立党员志愿者队伍长度必须介于 0 和 1 之间")
+	public String getDeptPartPostFlag() {
+		return deptPartPostFlag;
+	}
+
+	public void setDeptPartPostFlag(String deptPartPostFlag) {
+		this.deptPartPostFlag = deptPartPostFlag;
+	}
+	
+	@Length(min=0, max=1, message="是否党建工作指导员联系的长度必须介于 0 和 1 之间")
+	public String getDeptSendPartFlag() {
+		return deptSendPartFlag;
+	}
+
+	public void setDeptSendPartFlag(String deptSendPartFlag) {
+		this.deptSendPartFlag = deptSendPartFlag;
+	}
+	
+	@Length(min=0, max=10, message="党建指导员数量长度必须介于 0 和 10 之间")
+	public String getDeptPartNum() {
+		return deptPartNum;
+	}
+
+	public void setDeptPartNum(String deptPartNum) {
+		this.deptPartNum = deptPartNum;
+	}
+	
+	@Length(min=0, max=1, message="是否改制企业长度必须介于 0 和 1 之间")
+	public String getDeptModfEnterFlag() {
+		return deptModfEnterFlag;
+	}
+
+	public void setDeptModfEnterFlag(String deptModfEnterFlag) {
+		this.deptModfEnterFlag = deptModfEnterFlag;
+	}
+	
+	@Length(min=0, max=1, message="法定代表人是否党员长度必须介于 0 和 1 之间")
+	public String getDeptLegalPartFlag() {
+		return deptLegalPartFlag;
+	}
+
+	public void setDeptLegalPartFlag(String deptLegalPartFlag) {
+		this.deptLegalPartFlag = deptLegalPartFlag;
+	}
+	
+	@Length(min=0, max=1, message="法定代表兼任企业党组织书记长度必须介于 0 和 1 之间")
+	public String getDeptLegalAllFlag() {
+		return deptLegalAllFlag;
+	}
+
+	public void setDeptLegalAllFlag(String deptLegalAllFlag) {
+		this.deptLegalAllFlag = deptLegalAllFlag;
+	}
+	
+	@Length(min=0, max=10, message="在岗职工数从业人数长度必须介于 0 和 10 之间")
+	public String getDeptOnEmployeesNum() {
+		return deptOnEmployeesNum;
+	}
+
+	public void setDeptOnEmployeesNum(String deptOnEmployeesNum) {
+		this.deptOnEmployeesNum = deptOnEmployeesNum;
+	}
+	
+	@Length(min=0, max=10, message="在岗职工中工人数长度必须介于 0 和 10 之间")
+	public String getDeptOnWorkersNum() {
+		return deptOnWorkersNum;
+	}
+
+	public void setDeptOnWorkersNum(String deptOnWorkersNum) {
+		this.deptOnWorkersNum = deptOnWorkersNum;
+	}
+	
+	@Length(min=0, max=10, message="35岁以下在岗职工数长度必须介于 0 和 10 之间")
+	public String getDeptTreeFiveNum() {
+		return deptTreeFiveNum;
+	}
+
+	public void setDeptTreeFiveNum(String deptTreeFiveNum) {
+		this.deptTreeFiveNum = deptTreeFiveNum;
+	}
+	
+	@Length(min=0, max=10, message="在岗专业技术人员长度必须介于 0 和 10 之间")
+	public String getDeptProfTechNum() {
+		return deptProfTechNum;
+	}
+
+	public void setDeptProfTechNum(String deptProfTechNum) {
+		this.deptProfTechNum = deptProfTechNum;
+	}
+
+	public String getDeptParToFlag() {
+		return deptParToFlag;
+	}
+
+	public void setDeptParToFlag(String deptParToFlag) {
+		this.deptParToFlag = deptParToFlag;
+	}
+}

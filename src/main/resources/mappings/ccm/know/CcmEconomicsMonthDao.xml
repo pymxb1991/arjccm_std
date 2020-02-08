@@ -1,0 +1,175 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.arjjs.ccm.modules.ccm.know.dao.CcmEconomicsMonthDao">
+    
+	<sql id="ccmEconomicsMonthColumns">
+		a.id AS "id",
+		a.months AS "months",
+		a.gdp AS "gdp",
+		a.unemployment_rate AS "unemploymentRate",
+		a.interest_rate AS "interestRate",
+		a.ppi AS "ppi",
+		a.cpi AS "cpi",
+		a.personal_income AS "personalIncome",
+		a.revenue AS "revenue",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag"
+	</sql>
+	
+	<sql id="ccmEconomicsMonthJoins">
+	</sql>
+    
+	<select id="get" resultType="CcmEconomicsMonth">
+		SELECT 
+			<include refid="ccmEconomicsMonthColumns"/>
+		FROM ccm_economics_month a
+		<include refid="ccmEconomicsMonthJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	<!-- 经济数据-大屏经济建设 -->
+	<select id="getData" resultType="CcmEconomicsMonth">
+		SELECT 
+			<include refid="ccmEconomicsMonthColumns"/>
+		FROM ccm_economics_month a
+		WHERE
+			a.del_flag = '0'
+			AND(a.months &gt; date_format(
+				DATE_SUB(curdate()
+				, INTERVAL 0
+				MONTH), '%Y-%m')
+				AND
+				a.months &lt;
+				date_format( DATE_SUB(curdate(),
+				INTERVAL - 1
+				MONTH), '%Y-%m'))
+		ORDER BY a.months DESC
+	
+	</select>
+	<!-- 税收统计-大屏经济建设 -->
+	<select id="getShuiShouData" resultType="CcmEconomicsMonth">
+		SELECT 
+			<include refid="ccmEconomicsMonthColumns"/>
+		FROM ccm_economics_month a
+		WHERE
+			a.del_flag = '0'
+			AND(a.months &gt; date_format(
+				DATE_SUB(curdate()
+				, INTERVAL + 1
+				YEAR), '%Y')
+				AND
+				a.months &lt;
+				date_format( DATE_SUB(curdate(),
+				INTERVAL - 1
+				MONTH), '%Y-%m'))
+		GROUP BY a.months
+		ORDER BY a.months 
+	
+	</select>
+	
+	
+	
+	
+	
+	<!--  -->
+	<select id="findList" resultType="CcmEconomicsMonth">
+		SELECT 
+			<include refid="ccmEconomicsMonthColumns"/>
+		FROM ccm_economics_month a
+		<include refid="ccmEconomicsMonthJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="beginMonths != null and endMonths != null and beginMonths != '' and endMonths != ''">
+				AND a.months BETWEEN #{beginMonths} AND #{endMonths}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="CcmEconomicsMonth">
+		SELECT 
+			<include refid="ccmEconomicsMonthColumns"/>
+		FROM ccm_economics_month a
+		<include refid="ccmEconomicsMonthJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO ccm_economics_month(
+			id,
+			months,
+			gdp,
+			unemployment_rate,
+			interest_rate,
+			ppi,
+			cpi,
+			personal_income,
+			revenue,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag
+		) VALUES (
+			#{id},
+			#{months},
+			#{gdp},
+			#{unemploymentRate},
+			#{interestRate},
+			#{ppi},
+			#{cpi},
+			#{personalIncome},
+			#{revenue},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE ccm_economics_month SET 	
+			months = #{months},
+			gdp = #{gdp},
+			unemployment_rate = #{unemploymentRate},
+			interest_rate = #{interestRate},
+			ppi = #{ppi},
+			cpi = #{cpi},
+			personal_income = #{personalIncome},
+			revenue = #{revenue},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE ccm_economics_month SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

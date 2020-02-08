@@ -1,0 +1,22 @@
+#searchForm1 {
+	margin-bottom: 0;
+}
+
+.jiantou{
+  font-size: 50px;
+  cursor:pointer;
+}
+#jiantouleft{
+margin-top:20%;
+float: left;
+
+}
+#jiantouright{
+margin-top:20%;
+float: right;
+
+}
+.pageTitle{
+cursor:pointer;
+}
+

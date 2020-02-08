@@ -1,0 +1,282 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.arjjs.ccm.modules.pbs.person.dao.PbsPartymemregDao">
+
+	<sql id="pbsPartymemregColumns">
+		a.id AS "id",
+		a.s_idtype AS "sIdtype",
+		a.s_idnum AS "sIdnum",
+		a.s_name AS "sName",
+		a.i_sex AS "iSex",
+		a.i_nation AS "iNation",
+		a.dt_birth AS "dtBirth",
+		a.s_education AS "sEducation",
+		a.i_type AS
+		"iType",
+		a.s_partybranch AS "sPartybranch",
+		a.dt_admission AS
+		"dtAdmission",
+		a.dt_correction AS "dtCorrection",
+		a.s_post AS "sPost",
+		a.s_mobilephone AS "sMobilephone",
+		a.s_fixedphone AS "sFixedphone",
+		a.s_homeaddr AS "sHomeaddr",
+		a.i_stat AS "iStat",
+		a.i_outcontact AS
+		"iOutcontact",
+		a.dt_outcontact AS "dtOutcontact",
+		a.i_float AS "iFloat",
+		a.s_floattopro AS "sFloattopro",
+		a.s_floattocity AS "sFloattocity",
+		a.s_floattocounty AS "sFloattocounty",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		<!-- a.s_spare01 AS
+		"sSpare01",
+		a.s_spare02 AS "sSpare02",
+		a.s_spare03 AS "sSpare03",
+		a.s_spare04 AS "sSpare04", -->
+		a.del_flag AS "delFlag",
+		a.s_photo AS
+		"sPhoto",
+		a.s_regip AS "sRegip",
+		a.s_userid AS "Userid",
+		a.s_regstat AS
+		"sRegstat",
+		sUser.name AS "username",
+		sUser.photo AS "userPhoto"
+	</sql>
+
+	<sql id="pbsPartymemregJoins">
+		left join sys_user sUser on sUser.id = a.s_userid
+	</sql>
+
+	<select id="get" resultType="PbsPartymemreg">
+		SELECT
+		<include refid="pbsPartymemregColumns" />
+		FROM pbs_partymemreg a
+		<include refid="pbsPartymemregJoins" />
+		WHERE a.id = #{id}
+	</select>
+
+	<select id="findList" resultType="PbsPartymemreg">
+		SELECT
+		<include refid="pbsPartymemregColumns" />
+		FROM pbs_partymemreg a
+		<include refid="pbsPartymemregJoins" />
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="sIdtype != null and sIdtype != ''">
+				AND a.s_idtype = #{sIdtype}
+			</if>
+			<if test="sIdnum != null and sIdnum != ''">
+				AND a.s_idnum LIKE
+				<if test="dbName == 'oracle'">'%'||#{sIdnum}||'%'</if>
+				<if test="dbName == 'mssql'">'%'+#{sIdnum}+'%'</if>
+				<if test="dbName == 'mysql'">concat('%',#{sIdnum},'%')</if>
+			</if>
+			<if test="sName != null and sName != ''">
+				AND a.s_name LIKE
+				<if test="dbName == 'oracle'">'%'||#{sName}||'%'</if>
+				<if test="dbName == 'mssql'">'%'+#{sName}+'%'</if>
+				<if test="dbName == 'mysql'">concat('%',#{sName},'%')</if>
+			</if>
+			<if
+				test="beginDtBirth != null and endDtBirth != null and beginDtBirth != '' and endDtBirth != ''">
+				AND a.dt_birth BETWEEN #{beginDtBirth} AND #{endDtBirth}
+			</if>
+			<if test="username != null and username != ''">
+				AND sUser.name LIKE concat('%',#{username},'%')
+			</if>
+			<if test="Userid != null and Userid != ''">
+                AND a.s_userid = #{Userid}
+            </if>
+            
+			<if test="sRegstat != null and sRegstat != ''">
+				AND a.s_regstat = #{sRegstat}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+
+	<select id="findAllList" resultType="PbsPartymemreg">
+		SELECT
+		<include refid="pbsPartymemregColumns" />
+		FROM pbs_partymemreg a
+		<include refid="pbsPartymemregJoins" />
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+
+	<insert id="insert">
+		INSERT INTO pbs_partymemreg(
+		id,
+		s_idtype,
+		s_idnum,
+		s_name,
+		i_sex,
+		i_nation,
+		dt_birth,
+		s_education,
+		i_type,
+		s_partybranch,
+		dt_admission,
+		dt_correction,
+		s_post,
+		s_mobilephone,
+		s_fixedphone,
+		s_homeaddr,
+		i_stat,
+		i_outcontact,
+		dt_outcontact,
+		i_float,
+		s_floattopro,
+		s_floattocity,
+		s_floattocounty,
+		create_by,
+		create_date,
+		update_by,
+		update_date,
+		remarks,
+		s_spare01,
+		s_spare02,
+		s_spare03,
+		s_spare04,
+		del_flag,
+		s_photo,
+		s_regip,
+		s_userid,
+		s_regstat
+		) VALUES (
+		#{id},
+		#{sIdtype},
+		#{sIdnum},
+		#{sName},
+		#{iSex},
+		#{iNation},
+		#{dtBirth},
+		#{sEducation},
+		#{iType},
+		#{sPartybranch},
+		#{dtAdmission},
+		#{dtCorrection},
+		#{sPost},
+		#{sMobilephone},
+		#{sFixedphone},
+		#{sHomeaddr},
+		#{iStat},
+		#{iOutcontact},
+		#{dtOutcontact},
+		#{iFloat},
+		#{sFloattopro},
+		#{sFloattocity},
+		#{sFloattocounty},
+		#{createBy.id},
+		#{createDate},
+		#{updateBy.id},
+		#{updateDate},
+		#{remarks},
+		#{sSpare01},
+		#{sSpare02},
+		#{sSpare03},
+		#{sSpare04},
+		#{delFlag},
+		#{sPhoto},
+		#{sRegip},
+		#{Userid},
+		#{sRegstat}
+		)
+	</insert>
+
+	<update id="update">
+		UPDATE pbs_partymemreg SET
+		s_idtype = #{sIdtype},
+		s_idnum = #{sIdnum},
+		s_name = #{sName},
+		i_sex = #{iSex},
+		i_nation =
+		#{iNation},
+		dt_birth = #{dtBirth},
+		s_education = #{sEducation},
+		i_type =
+		#{iType},
+		s_partybranch = #{sPartybranch},
+		dt_admission =
+		#{dtAdmission},
+		dt_correction = #{dtCorrection},
+		s_post = #{sPost},
+		s_mobilephone = #{sMobilephone},
+		s_fixedphone = #{sFixedphone},
+		s_homeaddr = #{sHomeaddr},
+		i_stat = #{iStat},
+		i_outcontact =
+		#{iOutcontact},
+		dt_outcontact = #{dtOutcontact},
+		i_float = #{iFloat},
+		s_floattopro = #{sFloattopro},
+		s_floattocity = #{sFloattocity},
+		s_floattocounty = #{sFloattocounty},
+		update_by = #{updateBy.id},
+		update_date = #{updateDate},
+		remarks = #{remarks},
+		s_spare01 =
+		#{sSpare01},
+		s_spare02 = #{sSpare02},
+		s_spare03 = #{sSpare03},
+		s_spare04
+		= #{sSpare04},
+		s_photo = #{sPhoto},
+		s_regip = #{sRegip},
+		s_userid =
+		#{Userid},
+		s_regstat = #{sRegstat}
+		WHERE id = #{id}
+	</update>
+
+	<update id="delete">
+		UPDATE pbs_partymemreg SET
+		del_flag =
+		#{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+
+	<select id="checkExist" resultType="java.lang.Integer">
+		SELECT
+		count(1)
+		FROM
+		pbs_partymemreg
+		WHERE
+		s_userid = #{Userid}
+		and s_regstat != "2"
+		and
+		del_flag =
+		#{DEL_FLAG_NORMAL}
+	</select>
+
+	<update id="updatepartymemstat">
+		UPDATE pbs_partymemreg SET
+		remarks = #{remarks},
+		s_regstat = #{sRegstat}
+		WHERE id = #{id}
+	</update>
+
+</mapper>

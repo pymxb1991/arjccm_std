@@ -1,0 +1,353 @@
+.header-logo{
+	width: 1560px;
+}
+.header h5 {
+    background: url(../images/headerLogo.png) no-repeat center;
+    background-size: 100% 100%;
+    line-height: 21px;
+    letter-spacing: 10px;
+    line-height: 40px;
+    letter-spacing: 1px;
+    font-size: 26px;
+}
+.header span {
+    background: url(../images/header-right.png) no-repeat center;
+    background-size: 100% 100%;
+}
+.header h5 b{
+	font-size: 20px;
+    font-weight: 545;
+}
+.zhongdianrenyuantongji {
+	width: 84%;
+	height: 98%;
+	background: url("../images/zhongdianrenyuantongji.png") center
+		no-repeat;
+	background-size: 100% 100%;
+	margin: 3px auto
+}
+
+.zhongdianrenyuan {
+	
+}
+
+.shangfangrenyuan {
+	position: absolute;
+	left: 283px;
+    top: 32px;
+}
+
+.aizibingrenyuan {
+	position: absolute;
+	left: 386px;
+    top: 160px;
+}
+
+.xidurenyuan {
+	position: absolute;
+	    left: 187px;
+    top: 160px;
+}
+
+.fanzuiqianke {
+	position: absolute;
+	left: 373px;
+    top: 78px;
+}
+/* .map-1{
+	display: none
+} */
+.jingshenbingrenyuan {
+	position: absolute;
+	left: 482px;
+    top: 120px;
+}
+
+.shejiaorenyuan {
+	position: absolute;
+	    left: 91px;
+    top: 116px;
+}
+
+.zhongdianrenyuan-common:before {
+	width: 3px;
+	height: 3px;
+	background: red;
+	border-radius: 50%;
+}
+
+.zhongdianrenyuan-num {
+	text-align: center;
+	color: #eea807;
+	font-size: 18px;
+}
+
+.liushourenyuan {
+	position: absolute;
+	left: 186px;
+    top: 76px;
+}
+
+.zhongdianqingshaonian {
+	position: absolute;
+	left: 284px;
+    top: 203px;
+}
+
+.quanburenyuan {
+	position: absolute;
+	left: 281px;
+    top: 121px;
+}
+.shouli-all{
+	position: absolute;
+	left:50%;
+	top:10px
+}
+.shouli-all span{
+	 color: #eea807;
+    font-size: 38px;
+     font-family: myFirstFont;
+}
+.YiWan{
+	width:50%;
+	float: left;
+	height: 100%
+}
+.YiWan-name{
+	 font-size: 40px;
+    text-align: center;
+    line-height: 89px;
+    color: #e8da31
+}
+.YiWan-icon{
+	 width: 40px;
+    height: 40px;
+    display: block;
+    background: url(../images/ren.png) center no-repeat;
+    background-size: 100% 100%;
+    float: left;
+    margin-left: 72px;
+    margin-top: 30px;
+}
+.YiWan-zong{
+	line-height: 108px;
+}
+.YiWan-unit{
+	line-height: 115px;
+}
+.YiWan-num{
+	color: #1bf79c;
+	font-size: 32px;
+	display:block;
+	float: left;
+	padding: 0px 5px;
+	    margin-left: 15px;
+}
+.YiWan-line{
+	border:1px solid #0c9877;
+	width: 80%;
+	margin: auto
+}
+
+
+.YiWan-name.mei{
+	 font-size: 34px;
+    text-align: center;
+    line-height: 89px;
+    color: #2e8ca8
+}
+.YiWan-icon.mei{
+	 width: 40px;
+    height: 40px;
+    display: block;
+    background: url(../images/mei.png) center no-repeat;
+    background-size: 100% 100%;
+    float: left;
+    margin-left: 72px;
+    margin-top: 30px;
+}
+.YiWan-zong.mei{
+	line-height: 108px;
+}
+.YiWan-unit.mei{
+	line-height: 115px;
+}
+.YiWan-num.mei{
+	color: #457ca7;
+	font-size: 32px;
+	display:block;
+	float: left;
+	padding: 0px 5px;
+	    margin-left: 15px;
+}
+.YiWan-line.mei{
+	border:1px solid #2e8ca8;
+	width: 80%;
+	margin: auto
+}
+
+
+.table-info-table{
+	height: 100%; 
+	width: 77%
+}
+
+@media (min-width: 1601px) and (max-width:1680px)  {
+	.table-info-table{
+	height: 100%; 
+	width: 85%
+}
+.YiWan-icon {
+    margin-left: 39px;
+}
+.YiWan-icon.mei {
+	  margin-left: 43px;
+}
+.YiWan-name.mei {
+    font-size: 30px;
+    }
+    .YiWan-name {
+    font-size: 36px;
+    }
+    	.header-logo {
+    width: 1349px;
+}
+}
+@media (min-width: 1441px) and (max-width:1600px)  {
+	.header h5.header-logo {
+   background: url(../images/headerLogo.png) no-repeat center;
+    background-size: 100% 100%;
+    line-height: 21px;
+    letter-spacing: 10px;
+    line-height: 34px;
+    letter-spacing: 1px;
+    font-size: 18px;
+    width: 100%;
+    height: 52px;
+}
+		.table-info-table{
+	height: 100%; 
+	width: 85%
+}
+.YiWan-icon {
+    margin-left: 39px;
+}
+.YiWan-icon.mei {
+	  margin-left: 29px;
+	    margin-top: 20px;
+}
+.YiWan-zong {
+    line-height: 87px;
+}
+.YiWan-unit {
+    line-height: 98px;
+}
+.YiWan-zong.mei {
+    line-height: 87px;
+}
+.YiWan-name.mei {
+    font-size: 27px;
+    line-height: 57px;
+    
+    }
+    .YiWan-name {
+    font-size: 32px;
+        line-height: 57px;
+    }
+}
+@media (min-width: 1367px) and (max-width:1440px)  {
+.header h5.header-logo {
+    background: url(../images/headerLogo.png) no-repeat center;
+    background-size: 100% 100%;
+    line-height: 21px;
+    letter-spacing: 10px;
+    line-height: 34px;
+    letter-spacing: 0px;
+    font-size: 18px;
+    width: 100%;
+}
+.table-info-table{
+	height: 100%; 
+	width: 85%
+}
+.YiWan-icon {
+   margin-left: 22px;
+}
+.YiWan-icon.mei {
+	  margin-left: 29px;
+	    margin-top: 20px;
+}
+.YiWan-icon {
+    margin-top: 20px;
+}
+.YiWan-zong {
+    line-height: 87px;
+}
+.YiWan-unit {
+    line-height: 98px;
+}
+.YiWan-zong.mei {
+    line-height: 87px;
+}
+.YiWan-name.mei {
+    font-size: 24px;
+    line-height: 57px;
+    
+    }
+    .YiWan-name {
+    font-size: 32px;
+        line-height: 57px;
+    }
+}
+@media  (max-width:1366px)  {
+.header h5.header-logo {
+       background: url(../images/headerLogo.png) no-repeat center;
+    background-size: 100% 100%;
+    line-height: 21px;
+    letter-spacing: 10px;
+    line-height: 28px;
+    letter-spacing: 0px;
+    font-size: 16px;
+    width: 100%;
+}
+.table-info-table{
+	height: 100%; 
+	width: 85%
+}
+.YiWan-icon {
+   margin-left: 22px;
+}
+.YiWan-icon.mei {
+	  margin-left: 29px;
+	    margin-top: 8px;
+}
+.YiWan-icon {
+    margin-top: 8px;
+}
+.YiWan-zong {
+    line-height: 60px;
+}
+.YiWan-zong.mei {
+    line-height: 62px;
+}
+.YiWan-unit {
+    line-height: 73px;
+}
+
+.YiWan-name.mei {
+    font-size: 22px;
+    line-height: 49px;
+    
+    }
+    .YiWan-name {
+        font-size: 30px;
+    line-height: 49px;
+    }
+    .YiWan-num {
+    margin-left: 3px;
+}
+.YiWan-num.mei {
+    margin-left: 1px;
+}
+}

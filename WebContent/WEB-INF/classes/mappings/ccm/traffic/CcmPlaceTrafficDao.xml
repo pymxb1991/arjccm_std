@@ -1,0 +1,194 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.arjjs.ccm.modules.ccm.traffic.dao.CcmPlaceTrafficDao">
+    
+	<sql id="ccmPlaceTrafficColumns">
+		a.id AS "id",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.type AS "type",
+		a.station_type AS "stationType",
+		a.station_nature AS "stationNature",
+		a.station_rank AS "stationRank",
+		a.park_space_number AS "parkSpaceNumber",
+		a.park_space_pay AS "parkSpacePay",
+		a.park_space_maxpay AS "parkSpaceMaxpay",
+		a.gas_station_type AS "gasStationType",
+		a.gas_station_level AS "gasStationLevel",
+		a.gas_station_tanker AS "gasStationTanker",
+		a.base_place_id AS "basePlaceId",
+		a.del_flag AS "delFlag",
+		s.name AS "ccmBasePlace.area.name"
+	</sql>
+	<sql id="ccmPlaceTrafficAllColumns">
+		a.id AS "id",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.type AS "type",
+		a.station_type AS "stationType",
+		a.station_nature AS "stationNature",
+		a.station_rank AS "stationRank",
+		a.park_space_number AS "parkSpaceNumber",
+		a.park_space_pay AS "parkSpacePay",
+		a.park_space_maxpay AS "parkSpaceMaxpay",
+		a.gas_station_type AS "gasStationType",
+		a.gas_station_level AS "gasStationLevel",
+		a.gas_station_tanker AS "gasStationTanker",
+		a.base_place_id AS "basePlaceId",
+		a.del_flag AS "delFlag",
+		b.place_name AS "placeName",
+		b.leader_name AS "leaderName",
+		b.leader_id_card  AS"leaderIdCard",
+		b.leader_contact  AS"leaderContact",
+		b.relevance_org  AS"relevanceOrg",
+		b.place_picture AS"placePicture"
+		
+	</sql>
+	
+	<sql id="ccmPlaceTrafficJoins">
+	LEFT JOIN sys_area s ON s.id = b.administrative_division
+	</sql>
+    
+	<select id="get" resultType="CcmPlaceTraffic">
+		SELECT 
+			<include refid="ccmPlaceTrafficColumns"/>
+		FROM ccm_place_traffic a
+		LEFT JOIN ccm_base_place b ON a.base_place_id = b.id
+		<include refid="ccmPlaceTrafficJoins"/>
+		WHERE a.id = #{id} OR a.base_place_id = #{basePlaceId}
+	</select>
+	
+	<select id="findList" resultType="CcmPlaceTraffic">
+		SELECT 
+			<include refid="ccmPlaceTrafficAllColumns"/>
+		FROM ccm_place_traffic a LEFT JOIN ccm_base_place b ON a.base_place_id = b.id
+		<include refid="ccmPlaceTrafficJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="placeName != null and placeName != ''">
+				AND b.place_name LIKE
+				<if test="dbName == 'oracle'">'%'||#{placeName}||'%'</if>
+				<if test="dbName == 'mssql'">'%'+#{placeName}+'%'</if>
+				<if test="dbName == 'mysql'">concat('%',#{placeName},'%')</if>
+			</if>
+			<if test="leaderName != null and leaderName != ''">
+				AND b.leader_name LIKE
+				<if test="dbName == 'oracle'">'%'||#{leaderName}||'%'</if>
+				<if test="dbName == 'mssql'">'%'+#{leaderName}+'%'</if>
+				<if test="dbName == 'mysql'">concat('%',#{leaderName},'%')</if>
+			</if>
+			<if test="leaderContact != null and leaderContact != ''">
+				AND b.leader_contact LIKE
+				<if test="dbName == 'oracle'">'%'||#{leaderContact}||'%'</if>
+				<if test="dbName == 'mssql'">'%'+#{leaderContact}+'%'</if>
+				<if test="dbName == 'mysql'">concat('%',#{leaderContact},'%')</if>
+			</if>
+			<if test="type != null and type != ''">
+				AND a.type = #{type}
+			</if>
+			<if test="beginCreateDate != null and endCreateDate != null and beginCreateDate != '' and endCreateDate != ''">
+				AND a.create_date BETWEEN #{beginCreateDate} AND #{endCreateDate}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="CcmPlaceTraffic">
+		SELECT 
+			<include refid="ccmPlaceTrafficColumns"/>
+		FROM ccm_place_traffic a
+		<include refid="ccmPlaceTrafficJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO ccm_place_traffic(
+			id,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			type,
+			station_type,
+			station_nature,
+			station_rank,
+			park_space_number,
+			park_space_pay,
+			park_space_maxpay,
+			gas_station_type,
+			gas_station_level,
+			gas_station_tanker,
+			base_place_id,
+			del_flag
+		) VALUES (
+			#{id},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{type},
+			#{stationType},
+			#{stationNature},
+			#{stationRank},
+			#{parkSpaceNumber},
+			#{parkSpacePay},
+			#{parkSpaceMaxpay},
+			#{gasStationType},
+			#{gasStationLevel},
+			#{gasStationTanker},
+			#{basePlaceId},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE ccm_place_traffic SET 	
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks},
+			type = #{type},
+			station_type = #{stationType},
+			station_nature = #{stationNature},
+			station_rank = #{stationRank},
+			park_space_number = #{parkSpaceNumber},
+			park_space_pay = #{parkSpacePay},
+			park_space_maxpay = #{parkSpaceMaxpay},
+			gas_station_type = #{gasStationType},
+			gas_station_level = #{gasStationLevel},
+			gas_station_tanker = #{gasStationTanker},
+			base_place_id = #{basePlaceId}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE ccm_place_traffic SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

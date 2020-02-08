@@ -1,0 +1,111 @@
+var uuid = "";
+var mqFlag = true;
+window.onload = function() {
+	alarmVerify();
+	// init();
+	initActiveMQ();
+};
+
+function initActiveMQ() {
+	var amq = new org.activemq.AmqClass();
+
+	var amqPath = window.location.href.substring(0, window.location.href
+			.indexOf("arjccm"))
+			+ "arjccm/amq/";
+	amq.init({
+		uri : amqPath,
+		timeout : 5,
+		clientId : "topic://ccm-4232342-activemq-topic-id",
+		connectStatusHandler : connectStatusHandler
+	});
+	// amq.addListener('chat', "topic://ccm-4232342-activemq-topic-id", message,
+	// 'text');
+	amq.addListener('chat', "topic://ccm-4232342-activemq-topic-id", message,
+			"amq-msg-type=>'text'");
+}
+
+function connectStatusHandler(connected) {
+	if (!connected) {
+		if (!mqFlag) {
+			return;
+		}
+		mqFlag = false;
+		setTimeout(function() {
+			// initActiveMQ();
+			window.onload();
+			mqFlag = true;
+		}, 70000);
+	}
+}
+
+// 注册uuid
+function alarmVerify() {
+	var webServicePath = window.location.href.substring(0, window.location.href
+			.indexOf("arjccm"))
+			+ "arjccm/app/rest/";
+	$.ajax({
+		async : false,
+		type : "get",
+		cache : false,
+		url : webServicePath + "event/subscribeAmq",
+		success : function(data) {
+			if (data) {
+				uuid = data.result;// 获取到uuid
+			}
+		}
+	});
+}
+
+// 中间件返回消息
+var message = function(msg) {
+	// 解析对象字符串
+	var msgObj = (msg["data"] + "").replace(/"(\w+)"(\s*:\s*)/g, "$1$2");
+	var obj = eval('(' + msgObj + ')');
+	//
+	// layer.restore(layerIndex1);
+	top.$.jBox.tip('有新事件上报，请您查收！');
+	if($('#layui-layer1 .layui-layer-ico').hasClass("layui-layer-maxmin")){
+		$('#layui-layer1 .layui-layer-ico').click()
+	}
+	$(".def").hide();
+	var clock="";
+	var clock1="";
+	var year,month,day,hh,mm,ss;
+	var eventTime = new Date(obj["happenDate"].time);
+	year = eventTime.getFullYear(); //年  
+	month = eventTime.getMonth() + 1; //月  
+	day = eventTime.getDate(); //日  
+	hh = eventTime.getHours(); //时  
+	mm = eventTime.getMinutes(); //分  
+	ss = eventTime.getSeconds(); //秒  
+	
+	if (month < 10){
+		month = "0"+month;
+	}
+	if (day < 10){
+		day="0"+day;
+	}
+	if (hh < 10){
+		hh = "0"+hh;
+	}
+	if (mm < 10)
+		mm = '0'+mm;
+
+	if (ss < 10){
+		ss = '0'+ss;
+	}
+	clock = year + "-"+month+"-"+day+" "+hh+":"+mm+":"+ss;
+	clock1=year + "年"+month+"月"+day+"日 "+hh+"时"+mm+"分"+ss+"秒";
+	var name=decodeURIComponent(obj["caseName"]);
+	// 生成新的文字插入对话框中
+	var htmlM = '<tr><td><a title="'+clock1+name+'" onclick="re(\'' + obj["id"]
+			+ '\')" class="ccmEventLayer' + obj["id"] + ' masked active"  attrid="'
+			+ obj["id"] + '" attpoint="' + obj["areaPoint"] + '" attname="'
+			+ obj["caseName"] + '" > ' + clock+ '：' + name + '</a></td></tr>';
+	// 插入
+	$("#eventTbody tr:first-child").before(htmlM);
+	
+	var  textNAme=clock1+name
+	speak(textNAme)
+}
+

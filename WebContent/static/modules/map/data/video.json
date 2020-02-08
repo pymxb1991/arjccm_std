@@ -1,0 +1,126 @@
+{
+  "type": "FeatureCollection",
+    "centpoint":[
+    106.293500,
+    38.300110
+  ],
+  "features": [
+
+    {
+      "type": "Feature",
+      "id": "B",
+      "properties": {
+        "name": "摄像机A",
+        "video":{
+        "protocol":"video/x-flv",
+        "param":"http://220.194.101.62:8089/live.flv?devid=96&ch=0&stream=0"
+        },
+        "icon": "video.png",
+        "info": {
+          "地点": "XI社区",
+          "IP": "192.168.1.1"
+        }
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          106.193500,
+          38.380110
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "C",
+      "properties": {
+        "name": "摄像机B",
+         "video":{
+        "protocol":"video/x-flv",
+        "param":"http://220.194.101.62:8089/live.flv?devid=99&ch=0&stream=0"
+        },
+        "icon": "video.png",
+        "info": {
+          "地点": "CS社区",
+          "IP": "192.168.1.2"
+        }
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          106.193500,
+          38.420110
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "D",
+      "properties": {
+        "name": "摄像机C",
+           "video":{
+        "protocol":"video/x-flv",
+        "param":"http://220.194.101.62:8089/live.flv?devid=101&ch=0&stream=0"
+        },
+        "icon": "video.png",
+        "info": {
+          "地点": "V3小区",
+          "IP": "192.168.1.3"
+        }
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          106.153500,
+          38.420110
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "E",
+      "properties": {
+        "name": "摄像机D",
+           "video":{
+        "protocol":"video/x-flv",
+        "param":"http://220.194.101.62:8089/live.flv?devid=102&ch=0&stream=0 "
+        },
+        "icon": "video.png",
+        "info": {
+          "地点": "yu小区",
+          "IP": "192.168.1.5"
+        }
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          106.203500,
+          38.400110
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "F",
+      "properties": {
+        "name": "摄像机E",
+        "icon": "video.png",
+           "video":{
+        "protocol":"video/x-flv",
+        "param":"http://220.194.101.62:8089/live.flv?devid=100&ch=0&stream=0"
+        },
+        "info": {
+          "地点": "xi小区",
+          "IP": "192.168.1.6"
+        }
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          106.103500,
+          38.360110
+        ]
+      }
+    }
+  ]
+}
+

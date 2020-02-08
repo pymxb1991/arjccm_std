@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.arjjs.ccm.modules.cms.dao.CmsBbsCommentDao">
+    
+	<sql id="cmsBbsCommentColumns">
+		a.id AS "id",
+		a.com_content AS "comContent",
+		a.article_id AS "articleId",
+		a.font_user_id AS "fontUserId",
+		a.com_time AS "comTime",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag"
+	</sql>
+	
+	<sql id="cmsBbsCommentJoins">
+	</sql>
+    
+	<select id="get" resultType="CmsBbsComment">
+		SELECT 
+			<include refid="cmsBbsCommentColumns"/>
+		FROM cms_bbs_comment a
+		<include refid="cmsBbsCommentJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="CmsBbsComment">
+		SELECT 
+			<include refid="cmsBbsCommentColumns"/>
+		FROM cms_bbs_comment a
+		<include refid="cmsBbsCommentJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="comContent != null and comContent != ''">
+				AND a.com_content = #{comContent}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="CmsBbsComment">
+		SELECT 
+			<include refid="cmsBbsCommentColumns"/>
+		FROM cms_bbs_comment a
+		<include refid="cmsBbsCommentJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO cms_bbs_comment(
+			id,
+			com_content,
+			article_id,
+			font_user_id,
+			com_time,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag
+		) VALUES (
+			#{id},
+			#{comContent},
+			#{articleId},
+			#{fontUserId},
+			#{comTime},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE cms_bbs_comment SET 	
+			com_content = #{comContent}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE cms_bbs_comment SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+</mapper>

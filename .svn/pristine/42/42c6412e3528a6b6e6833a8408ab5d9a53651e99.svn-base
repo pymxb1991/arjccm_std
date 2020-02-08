@@ -1,0 +1,211 @@
+<%@ page contentType="text/html;charset=UTF-8" %>
+<%@ include file="/WEB-INF/views/include/taglib.jsp"%>
+<html>
+<head>
+	<title>公文管理</title>
+	<meta name="decorator" content="default"/>
+	<link href="${ctxStatic}/common/zztable.css" type="text/css"
+	rel="stylesheet">
+	<!-- 表格试表单css -->
+	<%-- <link href="${ctxStatic}/common/zzformtable.css" type="text/css"
+	rel="stylesheet"> --%>
+	<link href="${ctxStatic}/form/css/formTable.css" rel="stylesheet" />
+	<script type="text/javascript" src="${ctxStatic}/plm/act/supervise.js"></script> 
+	<script type="text/javascript">
+		$(document).ready(function() {
+			//$("#name").focus();
+			$('#btnSubmit').click(function(){
+				$('#inputForm').submit();
+			});
+			$("#inputForm").validate({
+				submitHandler: function(form){
+					$("#btnSubmit").attr("disabled", true);
+					loading('正在提交，请稍等...');
+					form.submit();
+				},
+				errorContainer: "#messageBox",
+				errorPlacement: function(error, element) {
+					$("#btnSubmit").removeAttr('disabled');
+					$("#messageBox").text("输入有误，请先更正。");
+					if (element.is(":checkbox")||element.is(":radio")||element.parent().is(".input-append")){
+						error.appendTo(element.parent().parent());
+					} else {
+						error.insertAfter(element);
+					}
+				}
+			});
+          $("#btnCancel").on("click", function(){
+				
+				/* confirmx("确定要撤销申请吗？",function(){ */
+					$('#flag').val('no');
+					$("#inputForm").attr("action","${ctx}/travel/plmOfficialDocument/apply");
+					$("#inputForm").submit();
+				/* }); */
+			});
+			$("#btnSubmit").on("click", function(){
+				$("#inputForm").attr("action","${ctx}/travel/plmOfficialDocument/save");
+				$("#inputForm").submit();
+			});
+			$("#btnApply").on("click", function(){
+				confirmx("提交申请后无法修改申请信息",function(){
+					$('#flag').val('yes');
+					$("#inputForm").attr("action","${ctx}/travel/plmOfficialDocument/apply");
+					$("#inputForm").submit();
+				});
+			});
+			$("#type").on("change",function(){
+				var type = $(this).val();
+				if (type == "1") {
+					$("#associatedDeptName").attr("disabled","true");
+					$("#associatedDeptName").attr("placeholder","接文申请该类型不可用...")
+				}
+				if (type == "2") {
+					$("#associatedDeptName").removeAttr("disabled");
+					$("#associatedDeptName").attr("placeholder","")
+				}
+			});
+			if ($("#type").val() == "1") {
+				$("#associatedDeptName").attr("disabled","true");
+				$("#associatedDeptName").attr("placeholder","接文申请该类型不可用...")
+			}
+		});
+	</script>
+</head>
+<body>
+	<form:form target="_parent"  id="inputForm" modelAttribute="plmOfficialDocument" action="${ctx}/travel/plmOfficialDocument/save" method="post" class="form-horizontal">
+		<form:hidden path="id"/>
+		<form:hidden path="plmAct.id"/>
+		<form:hidden path="plmAct.title"/>
+		<form:hidden path="plmAct.tableName"/>
+		<form:hidden path="plmAct.tableId"/>
+		<form:hidden path="plmAct.formUrl"/>
+		
+		<form:hidden path="procInsId"/>
+		<form:hidden path="act.taskId" />
+		<form:hidden path="act.taskName" />
+		<form:hidden path="act.taskDefKey" />
+		<form:hidden path="act.procInsId" />
+		<form:hidden path="act.procDefId" />
+		<form:hidden id="flag" path="act.flag" />
+		<sys:message content="${message}"/>
+		<h2>公文收发申请</h2>
+		<table id="tabletop" class="table">
+			<tr>
+				<td class="tabletop" colspan="2" style="width: 25%"></td>
+				<td class="tabletop" colspan="4" style="width: 50%"></td>
+				<td class="tabletop" colspan="2">申请编号(系统生成)：&nbsp;&nbsp; &nbsp;&nbsp;<span>${plmOfficialDocument.code}</span>&nbsp;&nbsp; &nbsp;&nbsp;</td>
+			</tr>
+			<tr>
+				<td class="tabletop" colspan="2">密级：<span class="help-inline"><font color="red">*</font> </span>：
+				<form:select path="confidentiality" class="input-medium required">
+					
+					<form:options items="${fns:getDictList('confident_type')}" itemLabel="label" itemValue="value" htmlEscape="false"/>
+				</form:select></td>
+				<td class="tabletop" colspan="4"></td>
+				<td class="tabletop" colspan="2">申请日期：<span class="help-inline"><font color="red">*</font> </span>：<input name="date" type="text" readonly="readonly" maxlength="20" class="input-medium Wdate required"
+					value="<fmt:formatDate value="${plmOfficialDocument.date}" pattern="yyyy-MM-dd"/>"
+					onclick="WdatePicker({dateFmt:'yyyy-MM-dd',isShowClear:false});"/></td>
+			</tr>
+		</table>
+		<table id="table" class="table table-condensed ">
+			<tr>
+				<td class="trtop" colspan="2">标题<span class="help-inline"><font color="red">*</font> </span></td>
+				<td colspan="2"><form:input path="title" htmlEscape="false" maxlength="255" class="input-xlarge required"/></td>
+				<td class="trtop" colspan="2">申请类型<span class="help-inline"><font color="red">*</font> </span></td>
+				<td colspan="2">
+					<form:select path="type" class="input-xlarge required ">
+						<form:option value="0" label="接收公文"/>
+						<form:option value="1" label="下发公文"/>
+					</form:select>
+				</td>
+			</tr>
+			<tr>
+				<td class="trtop" colspan="2">文案类型<span class="help-inline"><font color="red">*</font> </span></td>
+				<td colspan="2"><form:select path="documentType" class="input-xlarge required">
+					<%-- <form:option value="" label="未选择"/> --%>
+					<form:options items="${fns:getDictList('official_doc_type')}" itemLabel="label" itemValue="value" htmlEscape="false"/>
+				</form:select></td>
+				<td class="trtop" colspan="2">保密期限<span class="help-inline"><font color="red">*</font> </span></td>
+				<td colspan="2"><form:select path="deadline" class="input-xlarge required">
+					<%-- <form:option value="" label=""/> --%>
+					<form:options items="${fns:getDictList('deadline_type')}" itemLabel="label" itemValue="value" htmlEscape="false"/>
+				</form:select></td>
+			</tr>
+			<tr>
+				<td class="trtop" colspan="2">紧急程度<span class="help-inline"><font color="red">*</font> </span></td>
+				<td colspan="2"><form:select path="urgent" class="input-xlarge required">
+					<%-- <form:option value="" label=""/> --%>
+					<form:options items="${fns:getDictList('urgent_type')}" itemLabel="label" itemValue="value" htmlEscape="false"/>
+				</form:select></td>
+				<td class="trtop" colspan="2">发送单位</td>
+				<td colspan="2"><sys:treeselect id="fromDept" name="fromDept.id" value="${plmOfficialDocument.fromDept.id}" labelName="fromDept.name" labelValue="${plmOfficialDocument.fromDept.name}"
+					title="部门" url="/sys/office/treeData?type=2" cssClass="" allowClear="true" notAllowSelectParent="true" isAll="true"/></td>
+			</tr>
+			<tr>
+				<td class="trtop" colspan="2">联合行文单位</td>
+				<td colspan="2"><sys:treeselect id="associatedDept" name="associatedDept.id" value="${plmOfficialDocument.associatedDept.id}" labelName="associatedDept.name" labelValue="${plmOfficialDocument.associatedDept.name}"
+					title="部门" url="/sys/office/treeData?type=2" cssClass="" allowClear="true" notAllowSelectParent="true" isAll="true"/></td>
+				<td class="trtop" colspan="2">接收单位</td>
+				<td colspan="2"><sys:treeselect id="toDept" name="toDept.id" value="${plmOfficialDocument.toDept.id}" labelName="toDept.name" labelValue="${plmOfficialDocument.toDept.name}"
+					title="部门" url="/sys/office/treeData?type=2" cssClass="" allowClear="true" notAllowSelectParent="true"  isAll="true"/></td>
+			</tr>
+			<tr>
+				<td class="trtop" colspan="2">备注信息</td>
+				<td colspan="6"><form:textarea path="remarks" htmlEscape="false" rows="4" maxlength="255" class="input-xxlarge "/></td>
+			</tr>
+			<tr>
+				<td class="trtop" colspan="2" style="width: 20%">是否督办</td>
+				<td id="isSubTd" colspan="6">
+					<form:radiobuttons path="plmAct.isSup" items="${fns:getDictList('yes_no')}" itemLabel="label" itemValue="value" htmlEscape="false" class=""/>
+				</td>
+				<td class="trtop isSup" colspan="2" style="width: 20%">督办人</td>
+				<td class="isSup" colspan="2" style="width: 30%">
+					<sys:treeselect id="supExe" name="plmAct.supExe.id" value="${plmOfficialDocument.plmAct.supExe.id}" labelName="plmAct.supExe.name" labelValue="${plmOfficialDocument.plmAct.supExe.name}"
+					title="用户" url="/sys/office/treeData?type=3" cssClass="" allowClear="true" notAllowSelectParent="true" isAll="true"/>
+				</td>
+			</tr>		
+			<tr class="isSup">
+				<td class="trtop" colspan="2">督办明细</td>
+				<td colspan="6">
+					<form:textarea path="plmAct.supDetail" htmlEscape="false" rows="4" maxlength="256" class="input-xxlarge "/>
+				</td>
+			</tr>			
+			<c:if test="${not empty plmOfficialDocument.procInsId}">
+				<act:histoicTable procInsId="${plmOfficialDocument.procInsId}" colspan="6" titleColspan="2"/>
+			</c:if>
+			<c:if test="${not empty plmOfficialDocument.procInsId}">
+				<tr>
+					<td class="trtop" colspan="2">修改备注</td>
+					<td colspan="6">
+					   <form:textarea path="act.comment" htmlEscape="false" rows="5" maxlength="255" class="input-xxlarge "/>
+					</td>				
+				</tr>			
+			</c:if>
+			<tr>
+				<td class="trtop" colspan="2">附件</td>
+				<td colspan="6">
+					<form:hidden id="file" path="file" htmlEscape="false" maxlength="4000" class="input-xlarge"/>
+					<sys:ckfinder input="file" type="files" uploadPath="/travel/plmOfficialDocument" selectMultiple="false"/>
+				</td>
+			</tr>
+		</table>		
+		<div class="form-actions">
+			
+			<a id="btnApply" class="btn btn-primary" href="javascript:;"><i class="icon-print"></i>提交申请</a>&nbsp;
+			<c:if test="${ empty plmOfficialDocument.procInsId}">
+			<a id="btnSubmit" class="btn btn-primary" href="javascript:;"><i class="icon-ok"></i>保存</a>&nbsp;
+			</c:if>
+			<c:if test="${not empty plmOfficialDocument.procInsId}">
+				<a id="btnCancel" class="btn btn-primary" href="javascript:;"><i class="icon-minus-sign"></i>作废</a>&nbsp;
+			</c:if>
+			
+			<c:if test="${not empty plmOfficialDocument.id}">
+			<a id="btnCancel" class="btn" href="javascript:;" onclick="history.go(-1)" ><i class="icon-reply"></i>返回</a>
+			</c:if>
+			<c:if test="${empty plmOfficialDocument.id}">
+			<a id="btnCancelf" class="btn btn-primary" href="javascript:;" onclick="parent.layer.closeAll();" ><i class="icon-remove-circle"></i>关闭</a>
+			</c:if>
+		</div>
+	</form:form>
+</body>
+</html>

@@ -1,0 +1,265 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.arjjs.ccm.modules.pbs.person.dao.PbsPartymembindDao">
+
+	<sql id="pbsPartymembindColumns">
+		a.id AS "id",
+		a.s_partymemid AS "sPartymemid",
+		a.s_type AS
+		"sType",
+		a.s_name AS "sName",
+		a.s_source AS "sSource",
+		a.s_primarykey01
+		AS "sPrimarykey01",
+		a.s_primarykey02 AS "sPrimarykey02",
+		a.s_primarykey03 AS "sPrimarykey03",
+		a.s_primarykey04 AS
+		"sPrimarykey04",
+		a.s_primarykey05 AS "sPrimarykey05",
+		<!-- a.s_spare01 AS
+		"sSpare01",
+		a.s_spare02 AS "sSpare02",
+		a.s_spare03 AS "sSpare03",
+		a.s_spare04 AS "sSpare04", -->
+		a.create_by AS "createBy.id",
+		a.create_date
+		AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS
+		"updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag",
+		sUser.name AS "username",
+		partymem.s_name AS "partymemname"
+	</sql>
+
+	<sql id="pbsPartymembindJoins">
+		left join sys_user sUser on sUser.id = a.s_primarykey01
+		left join pbs_partymem partymem on partymem.id = a.s_partymemid
+	</sql>
+
+	<select id="get" resultType="PbsPartymembind">
+		SELECT
+		<include refid="pbsPartymembindColumns" />
+		FROM pbs_partymembind a
+		<include refid="pbsPartymembindJoins" />
+		<where>
+			a.id = #{id}
+		</where>
+	</select>
+
+	<select id="findList" resultType="PbsPartymembind">
+		SELECT
+		<include refid="pbsPartymembindColumns" />
+		FROM pbs_partymembind a
+		<include refid="pbsPartymembindJoins" />
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			and partymem.del_flag =
+			#{DEL_FLAG_NORMAL}
+			and sUser.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="username != null and username != ''">
+				and sUser.name like
+				<if test="dbName == 'oracle'">'%'||#{username}||'%'</if>
+				<if test="dbName == 'mssql'">'%'+#{username}+'%'</if>
+				<if test="dbName == 'mysql'">concat('%',#{username},'%')</if>
+			</if>
+			<if test="partymemname != null and partymemname != ''">
+				and partymem.s_name like
+				<if test="dbName == 'oracle'">'%'||#{partymemname}||'%'</if>
+				<if test="dbName == 'mssql'">'%'+#{partymemname}+'%'</if>
+				<if test="dbName == 'mysql'">concat('%',#{partymemname},'%')</if>
+			</if>
+			<if test="sPartymemid != null and sPartymemid != ''">
+				and s_partymemid = #{sPartymemid}
+			</if>
+			<if test="sPrimarykey01 != null and sPrimarykey01 != ''">
+				and s_primarykey01 = #{sPrimarykey01}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+
+	<select id="findAllList" resultType="PbsPartymembind">
+		SELECT
+		<include refid="pbsPartymembindColumns" />
+		FROM pbs_partymembind a
+		<include refid="pbsPartymembindJoins" />
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+
+	<insert id="insert">
+		INSERT INTO pbs_partymembind(
+		id,
+		s_partymemid,
+		s_type,
+		s_name,
+		s_source,
+		s_primarykey01,
+		s_primarykey02,
+		s_primarykey03,
+		s_primarykey04,
+		s_primarykey05,
+		s_spare01,
+		s_spare02,
+		s_spare03,
+		s_spare04,
+		create_by,
+		create_date,
+		update_by,
+		update_date,
+		remarks,
+		del_flag
+		) VALUES (
+		#{id},
+		#{sPartymemid},
+		#{sType},
+		#{sName},
+		#{sSource},
+		#{sPrimarykey01},
+		#{sPrimarykey02},
+		#{sPrimarykey03},
+		#{sPrimarykey04},
+		#{sPrimarykey05},
+		#{sSpare01},
+		#{sSpare02},
+		#{sSpare03},
+		#{sSpare04},
+		#{createBy.id},
+		#{createDate},
+		#{updateBy.id},
+		#{updateDate},
+		#{remarks},
+		#{delFlag}
+		)
+	</insert>
+
+	<update id="update">
+		UPDATE pbs_partymembind SET
+		s_partymemid =
+		#{sPartymemid},
+		s_type = #{sType},
+		s_name = #{sName},
+		s_source =
+		#{sSource},
+		s_primarykey01 = #{sPrimarykey01},
+		s_primarykey02 =
+		#{sPrimarykey02},
+		s_primarykey03 = #{sPrimarykey03},
+		s_primarykey04 =
+		#{sPrimarykey04},
+		s_primarykey05 = #{sPrimarykey05},
+		s_spare01 =
+		#{sSpare01},
+		s_spare02 = #{sSpare02},
+		s_spare03 = #{sSpare03},
+		s_spare04
+		= #{sSpare04},
+		update_by = #{updateBy.id},
+		update_date = #{updateDate},
+		remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+
+	<update id="delete">
+		UPDATE pbs_partymembind SET
+		del_flag =
+		#{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+
+	<update id="deleteByUser">
+		UPDATE pbs_partymembind SET
+		del_flag =
+		#{DEL_FLAG_DELETE}
+		WHERE
+		s_primarykey01 = #{sPrimarykey01}
+	</update>
+
+	<select id="checkExist" resultType="java.lang.Integer">
+		SELECT
+		count(1)
+		FROM
+		pbs_partymembind a
+		WHERE
+		id &lt;&gt; #{id} and
+		a.s_primarykey01 =
+		#{sPrimarykey01}
+		and a.s_partymemid = #{sPartymemid}
+		and a.del_flag =
+		#{DEL_FLAG_NORMAL}
+	</select>
+
+	<select id="getItemByUser" resultType="PbsPartymem">
+		SELECT
+		a.id AS "id",
+        a.s_idtype AS "sIdtype",
+        a.s_idnum AS "sIdnum",
+        a.s_name AS
+        "sName",
+        a.i_sex AS "iSex",
+        a.i_nation AS "iNation",
+        a.dt_birth AS
+        "dtBirth",
+        a.s_education AS "sEducation",
+        a.i_type AS
+        "iType",
+        a.s_partybranch AS "sPartybranch",
+        a.dt_admission AS
+        "dtAdmission",
+        a.dt_correction AS "dtCorrection",
+        a.s_post AS "sPost",
+        a.s_mobilephone
+        AS "sMobilephone",
+        a.s_fixedphone AS "sFixedphone",
+        a.s_homeaddr AS
+        "sHomeaddr",
+        a.i_stat AS "iStat",
+        a.i_outcontact AS
+        "iOutcontact",
+        a.dt_outcontact AS "dtOutcontact",
+        a.i_float AS "iFloat",
+        a.s_floattopro AS "sFloattopro",
+        a.s_floattocity AS "sFloattocity",
+        a.s_floattocounty AS "sFloattocounty",
+        a.create_by AS "createBy.id",
+        a.create_date AS "createDate",
+        a.update_by AS "updateBy.id",
+        a.update_date AS "updateDate",
+        a.remarks AS "remarks",
+        <!-- a.s_spare01 AS "sSpare01", a.s_spare02 AS "sSpare02", a.s_spare03 
+            AS "sSpare03", a.s_spare04 AS "sSpare04", -->
+        a.del_flag AS "delFlag",
+        a.s_photo AS "sPhoto",
+        a.s_othercontact AS
+        "sOthercontact"
+		FROM
+		pbs_partymem a
+		LEFT JOIN pbs_partymembind bind ON a.id =
+		bind.s_partymemid
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			and bind.del_flag = #{DEL_FLAG_NORMAL}
+			and bind.s_source = "sys_user"
+			and bind.s_primarykey01 = #{sPrimarykey01}
+		</where>
+	</select>
+
+</mapper>

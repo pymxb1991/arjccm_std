@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.arjjs.ccm.modules.ccm.patrol.dao.CcmPatrolUserDao">
+
+	<sql id="ccmPatrolUserColumns">
+		a.id AS "id",
+		a.plan_id AS "planId",
+		a.user_id AS "user.id",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks
+		AS "remarks",
+		a.del_flag AS "delFlag",
+		u3.name AS "user.name"
+	</sql>
+
+	<sql id="ccmPatrolUserJoins">
+		LEFT JOIN sys_user u3 ON u3.id = a.user_id
+	</sql>
+
+	<select id="get" resultType="CcmPatrolUser">
+		SELECT
+		<include refid="ccmPatrolUserColumns" />
+		FROM ccm_patrol_user a
+		<include refid="ccmPatrolUserJoins" />
+		WHERE a.id = #{id}
+	</select>
+
+	<select id="findList" resultType="CcmPatrolUser">
+		SELECT
+		<include refid="ccmPatrolUserColumns" />
+		FROM ccm_patrol_user a
+		<include refid="ccmPatrolUserJoins" />
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test=" planId != null and planId !='' ">
+			and	plan_id = #{planId}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+
+	<select id="findAllList" resultType="CcmPatrolUser">
+		SELECT
+		<include refid="ccmPatrolUserColumns" />
+		FROM ccm_patrol_user a
+		<include refid="ccmPatrolUserJoins" />
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+
+	<insert id="insert">
+		INSERT INTO ccm_patrol_user(
+		id,
+		plan_id,
+		user_id,
+		create_by,
+		create_date,
+		update_by,
+		update_date,
+		remarks,
+		del_flag
+		) VALUES (
+		#{id},
+		#{planId},
+		#{user.id},
+		#{createBy.id},
+		#{createDate},
+		#{updateBy.id},
+		#{updateDate},
+		#{remarks},
+		#{delFlag}
+		)
+	</insert>
+
+	<update id="update">
+		UPDATE ccm_patrol_user SET
+		plan_id = #{planId},
+		user_id = #{user.id},
+		update_by = #{updateBy.id},
+		update_date =
+		#{updateDate},
+		remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+
+	<update id="delete">
+		UPDATE ccm_patrol_user SET
+		del_flag =
+		#{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+
+	<delete id="deleteByPatrolUserId">
+		DELETE FROM ccm_patrol_user
+		WHERE plan_id = #{planId}
+	</delete>
+	<!-- read_time AS "readTime" -->
+	<insert id="insertAll" parameterType="List">
+		INSERT INTO ccm_patrol_user(
+		id,
+		plan_id,
+		user_id,
+		create_by,
+		create_date,
+		update_by,
+		update_date,
+		remarks,
+		del_flag
+		)
+		<if test="list.get(0).dbName == 'mssql' or list.get(0).dbName == 'mysql'">
+			VALUES
+			<foreach collection="list" item="e" open="" separator=","
+				close="">
+				(
+				#{e.id},
+				#{e.ccmPatrolPlan.id},
+				#{e.user.id},
+				#{e.createBy.id},
+				#{e.createDate},
+				#{e.updateBy.id},
+				#{e.updateDate},
+				#{e.remarks},
+				#{e.delFlag}
+				)
+			</foreach>
+		</if>
+	</insert>
+
+</mapper>

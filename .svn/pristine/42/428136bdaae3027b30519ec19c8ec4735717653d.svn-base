@@ -1,0 +1,25 @@
+/* ֽ����ʽ���css */
+h2{
+		margin:0 auto;
+		text-align: center;
+	}	
+	.table td {
+	height: 40px;
+		text-align: left;
+}
+	#table td{
+	 /*border: 1px solid black;*/
+	 word-wrap:break-word; 
+	 max-width: 80%;
+	  word-break:break-all;
+     word-wrap:break-word;
+	}
+	#tabletop .tabletop {
+	border-top: 0px  ;
+	}		
+	.table .trtop{		
+		text-align:center;
+		font-weight:800 ;
+		min-width: 10%;
+	   max-width: 20%;
+	}	

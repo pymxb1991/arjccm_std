@@ -1,0 +1,125 @@
+/**
+ * Copyright &copy; 2012-2016 <a href="https://github.com/thinkgem/jeesite">JeeSite</a> All rights reserved.
+ */
+package com.arjjs.ccm.modules.ccm.event.dao;
+
+import java.util.List;
+
+import com.arjjs.ccm.common.persistence.CrudDao;
+import com.arjjs.ccm.common.persistence.annotation.MyBatisDao;
+import com.arjjs.ccm.modules.ccm.event.entity.CcmEventIncident;
+import com.arjjs.ccm.tool.EchartType;
+import com.arjjs.ccm.tool.SearchTab;
+
+/**
+ * 案事件登记DAO接口
+ * 
+ * @author arj
+ * @version 2018-01-10
+ */
+@MyBatisDao
+public interface CcmEventIncidentDao extends CrudDao<CcmEventIncident> {
+
+	// 查询相关案事件
+	List<CcmEventIncident> findOtherId(CcmEventIncident ccmEventIncident);
+ 
+
+	/**
+	 * @see 根据案事件性质统计情况。
+	 * @return 
+	 */
+	List<EchartType> getItemByProperty();
+
+	/**
+	 * @see 根据案事件分级统计情况
+	 * @return
+	 */
+	List<EchartType> getItemByScale();
+
+
+	/**
+	 * @see 查询出所有的 案事件根据地区以及分级数量
+	 * @param ccmEventIncident 案事件实体
+	 * @return
+	 */
+	List<EchartType> getItemByScaleTable(CcmEventIncident ccmEventIncident);
+
+	/**
+	 * @see 案事件统计 是否解决
+	 * @return
+	 */
+	List<EchartType> getItemBySum();
+
+	/**
+	 * @see 前10的地区破案率 
+	 * @return
+	 */
+	List<EchartType> findSolveByArea();
+
+	/**
+	 * @see 按月统计的案事件数  
+	 * @return
+	 */
+	List<EchartType> findSumByMon(CcmEventIncident ccmEventIncident);
+ 
+	/**
+	 * @see 按月统计的处理率 
+	 * @return
+	 */
+	List<EchartType> findSolveByMon();
+
+	/**
+	 * @see 最新案事件
+	 * @return
+	 */
+	List<SearchTab> findSumByCondition();
+
+	/**
+	 * @see 案事件类型统计
+	 * @return
+	 */
+	List<EchartType> findSumByEventType();
+	
+	//线路相关案事件
+	public List<CcmEventIncident> findPageLine(CcmEventIncident ccmEventIncident);
+	
+	//师生相关案事件
+	public List<CcmEventIncident> findPageStudent(CcmEventIncident ccmEventIncident);
+
+	//命案案事件
+	public List<CcmEventIncident> findPageMurder(CcmEventIncident ccmEventIncident);
+
+	// 获取一周内的数量
+	public List<EchartType> findSumByEventWeek();
+
+	//今日案事件统计
+	List<EchartType> getItemBySumToday();
+
+	//今日前10条案事件
+	List<CcmEventIncident> getListToday();
+
+	//安全事故分布
+	List<EchartType> getSafeDisData(CcmEventIncident ccmEventIncident);
+
+	//事故类型
+	List<EchartType> getSafeTypeData(CcmEventIncident ccmEventIncident);
+
+	//事故级别
+	List<EchartType> getSafeLevelData(CcmEventIncident ccmEventIncident);
+
+	//事件分类
+	List<EchartType> findEventFenLeiData();
+
+	//事件查询Line
+	CcmEventIncident getLine(String id);
+
+	//本月事件发生前十
+	List<EchartType> findEventMonthMap();
+
+	//近一年事件发生/重点人员帮扶趋势图
+	List<SearchTab> findEventYearMap();
+	
+	
+	
+	
+}

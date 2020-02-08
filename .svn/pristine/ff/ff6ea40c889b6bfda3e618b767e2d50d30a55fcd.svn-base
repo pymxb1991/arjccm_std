@@ -1,0 +1,146 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+		<link rel="stylesheet" href="js/bootstrap/css/bootstrap.css">
+		<link rel="stylesheet" type="text/css" href="css/reset.css" />
+		<link rel="stylesheet" type="text/css" href="css/style.css" />
+		
+		<link rel="stylesheet" type="text/css" href="css/progress.css" />
+		<link rel="stylesheet" type="text/css" href="css/index.css" />
+		<title></title>
+	</head>
+
+	<body>
+		<div id="main">
+			<div id="header">
+				头部导航条
+			</div>
+			<div class="container-fluid height90">
+				<div class="content row height100">
+					<div class="col-xs-3 height100" style="margin-right: 0;padding-right: 0;">
+						<div class="col-xs-12 height33 Bordereffect">
+							<div class="echarts" id="EchartsSex">
+
+							</div>
+						</div>
+						<div class="col-xs-12 height33 Bordereffect">
+							<h4>学员年龄构成</h4>
+							<div class="Trafficvolume" style="margin-top: 5px;">
+								<b>30岁及以下</b>
+								<div class="progress">
+									<span class="blue" style="width: 100%;"><span>1989人</span></span>
+								</div>
+							</div>
+							<div class="Trafficvolume">
+								<b>31岁-35岁</b>
+								<div class="progress">
+									<span class="red" style="width: 90%;"><span>1677人</span></span>
+								</div>
+							</div>
+							<div class="Trafficvolume">
+								<b>36岁-40岁</b>
+								<div class="progress">
+									<span class="green" style="width: 80%;"><span>489人</span></span>
+								</div>
+							</div>
+							<div class="Trafficvolume">
+								<b>41岁-45岁</b>
+								<div class="progress">
+									<span class="orange" style="width: 70%;"><span>348人</span></span>
+								</div>
+							</div>
+							<div class="Trafficvolume">
+								<b>46岁-50岁</b>
+								<div class="progress">
+									<span class="blue1" style="width: 60%;"><span>328人</span></span>
+								</div>
+							</div>
+							<div class="Trafficvolume">
+								<b>51岁-55岁</b>
+								<div class="progress">
+									<span class="blue" style="width: 55%;"><span>325人</span></span>
+								</div>
+							</div>
+							<div class="Trafficvolume">
+								<b>56岁-60岁</b>
+								<div class="progress">
+									<span class="red" style="width: 50%;"><span>115人</span></span>
+								</div>
+							</div>
+							<div class="Trafficvolume">
+								<b>60岁以上</b>
+								<div class="progress">
+									<span class="orange" style="width: 50%;"><span>115人</span></span>
+								</div>
+							</div>
+						</div>
+						<div class="col-xs-12 height33 Bordereffect">
+							<div class="echarts" id="EchartsOccupation">
+
+							</div>
+						</div>
+					</div>
+					<div class="col-xs-4 height100">
+						<div class="col-xs-12 height33 margin0 Bordereffect">
+							<div class="echarts" id="EchartsNumber">
+
+							</div>
+						</div>
+						<div class="col-xs-12 height33 margin0 Bordereffect">
+							<div class="echarts" id="EchartsActivity">
+
+							</div>
+						</div>
+						<div class="col-xs-12 height33 margin0 Bordereffect">
+							<div class="echarts" id="EchartsExamination">
+
+							</div>
+						</div>
+					</div>
+					<div class="col-xs-5 height100 Bordereffect" style="height:104%;">
+						<h4>党支部成员分布</h4>
+						<div id="mapMask" class="map"></div>
+						<div id="map" style="width: 100%; height: 100%;" class="map">
+							<div id="popup" class="ol-popup  bb">
+								<div class="">
+									<a href="#" id="popup-closer" class="ol-popup-closer  icon-remove " title="关闭" onmouseover="$(this).addClass('jbox-close-hover');" onmouseout="$(this).removeClass('jbox-close-hover');" style="position: absolute; display: block; cursor: pointer; top: 11px; right: 11px; width: 15px; height: 15px; color: #fff"></a>
+									<div class="jbox-title-panel" style="height: 25px;">
+										<div class="jbox-title">信息</div>
+									</div>
+									<div class="jbox-state">
+										<div id="popup-content" style="padding: 8px 15px;"></div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<!--<div id="main">
+			<div class="container margin0">
+				<div class="row height8">
+					<div class="col-xs-12">
+						<div class="header">
+							头部导航
+						</div>
+					</div>
+				</div>
+				<div class="row height90">
+					<div class="col-xs-3 height100 margin0"></div>
+					<div class="col-xs-9 height100 margin0"></div>
+				</div>
+				<div class="row height90">
+					页尾
+				</div>
+			</div>
+		</div>-->
+		<script type="text/javascript" src="js/jquery-2.2.4.min.js"></script>
+		<script src="modules/map/js/commonMap.js"></script>
+		<script type="text/javascript" src="js/echarts/echarts.min.js"></script>
+		<script type="text/javascript" src="js/index.js"></script>
+	</body>
+
+</html>

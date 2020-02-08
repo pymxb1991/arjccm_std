@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.arjjs.ccm.modules.kpi.scheme.dao.KpiSchemeKpiDao">
+    
+	<sql id="kpiSchemeKpiColumns">
+		a.id AS "id",
+		a.parent_id AS "parentId",
+		a.name AS "name",
+		a.score AS "score",
+		a.type AS "type",
+		a.scheme_id AS "schemeId",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag"
+	</sql>
+	
+	<sql id="kpiSchemeKpiJoins">
+	</sql>
+    
+	<select id="get" resultType="KpiSchemeKpi">
+		SELECT 
+			<include refid="kpiSchemeKpiColumns"/>
+		FROM kpi_scheme_kpi a
+		<include refid="kpiSchemeKpiJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	<!-- 查找状态 -->
+	<select id="getAll" resultType="KpiSchemeKpi">
+		SELECT 
+			<include refid="kpiSchemeKpiColumns"/>
+			,scheme.name  AS "schemeName",scheme.state  AS "schemeState"
+		FROM kpi_scheme_kpi a, kpi_scheme scheme
+		<include refid="kpiSchemeKpiJoins"/>
+		WHERE a.id = #{id}
+			AND a.del_flag = #{DEL_FLAG_NORMAL}
+			AND scheme.del_flag = #{DEL_FLAG_NORMAL}
+			AND a.scheme_id = scheme.id
+	</select>
+	
+	
+	
+	
+	<select id="findList" resultType="KpiSchemeKpi">
+		SELECT 
+			<include refid="kpiSchemeKpiColumns"/>
+		FROM kpi_scheme_kpi a
+		<include refid="kpiSchemeKpiJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="name != null and name != ''">
+				AND a.name LIKE 
+					<if test="dbName == 'oracle'">'%'||#{name}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{name}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{name},'%')</if>
+			</if>
+			<if test="type != null and type != ''">
+				AND a.type = #{type}
+			</if>
+			<if test="schemeId != null and schemeId != ''">
+				AND a.scheme_id = #{schemeId}
+			</if>
+		</where>
+		ORDER BY a.id
+	</select>
+	
+	<select id="findAllList" resultType="KpiSchemeKpi">
+		SELECT 
+			<include refid="kpiSchemeKpiColumns"/>
+		FROM kpi_scheme_kpi a
+		<include refid="kpiSchemeKpiJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	
+	
+	<select id="findPageSubjective" resultType="KpiSchemeKpi">
+		SELECT DISTINCT
+			<include refid="kpiSchemeKpiColumns"/>
+			,scheme.name  AS "schemeName",scheme.state  AS "schemeState"
+		FROM kpi_scheme_kpi a, kpi_scheme_subjectivity subjectivity, kpi_scheme scheme
+		<include refid="kpiSchemeKpiJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			AND subjectivity.del_flag = #{DEL_FLAG_NORMAL}
+			AND scheme.del_flag = #{DEL_FLAG_NORMAL}
+			AND a.scheme_id = scheme.id
+			AND a.id = subjectivity.kpi_id
+			AND subjectivity.scorer_id = #{currentUser.id}
+		</where>
+		ORDER BY a.scheme_id
+	</select>
+	
+	
+	
+	<insert id="insert">
+		INSERT INTO kpi_scheme_kpi(
+			id,
+			parent_id,
+			name,
+			score,
+			type,
+			scheme_id,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag
+		) VALUES (
+			#{id},
+			#{parentId},
+			#{name},
+			#{score},
+			#{type},
+			#{schemeId},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE kpi_scheme_kpi SET 	
+			parent_id = #{parentId},
+			name = #{name},
+			score = #{score},
+			type = #{type},
+			scheme_id = #{schemeId},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE kpi_scheme_kpi SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

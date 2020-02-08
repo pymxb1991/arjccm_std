@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.arjjs.ccm.modules.ccm.sys.dao.SysConfigDao">
+    
+	<sql id="sysConfigColumns">
+		a.id AS "id",
+		a.param_str AS "paramStr",
+		a.param_int AS "paramInt",
+		a.param_date AS "paramDate",
+		a.table_name AS "tableName",
+		a.obj_id AS "objId",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag"
+	</sql>
+	
+	<sql id="sysConfigJoins">
+	</sql>
+    
+	<select id="get" resultType="SysConfig">
+		SELECT 
+			<include refid="sysConfigColumns"/>
+		FROM sys_config a
+		<include refid="sysConfigJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="SysConfig">
+		SELECT 
+			<include refid="sysConfigColumns"/>
+		FROM sys_config a
+		<include refid="sysConfigJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="id != null and id != ''">
+				AND a.id = #{id}
+			</if>
+			<if test="paramStr != null and paramStr != ''">
+				AND a.param_str LIKE 
+					<if test="dbName == 'oracle'">'%'||#{paramStr}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{paramStr}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{paramStr},'%')</if>
+			</if>
+			<if test="paramInt != null and paramInt != ''">
+				AND a.param_int = #{paramInt}
+			</if>
+			<if test="beginParamDate != null and endParamDate != null and beginParamDate != '' and endParamDate != ''">
+				AND a.param_date BETWEEN #{beginParamDate} AND #{endParamDate}
+			</if>
+			<if test="tableName != null and tableName != ''">
+				AND a.table_name = #{tableName}
+			</if>
+			<if test="objId != null and objId != ''">
+				AND a.obj_id = #{objId}
+			</if>
+			<if test="remarks != null and remarks != ''">
+				AND a.remarks LIKE 
+					<if test="dbName == 'oracle'">'%'||#{remarks}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{remarks}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{remarks},'%')</if>
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="SysConfig">
+		SELECT 
+			<include refid="sysConfigColumns"/>
+		FROM sys_config a
+		<include refid="sysConfigJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO sys_config(
+			id,
+			param_str,
+			param_int,
+			param_date,
+			table_name,
+			obj_id,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag
+		) VALUES (
+			#{id},
+			#{paramStr},
+			#{paramInt},
+			#{paramDate},
+			#{tableName},
+			#{objId},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE sys_config SET 	
+			id = #{id},
+			param_str = #{paramStr},
+			param_int = #{paramInt},
+			param_date = #{paramDate},
+			table_name = #{tableName},
+			obj_id = #{objId},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE sys_config SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

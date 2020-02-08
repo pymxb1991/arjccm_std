@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper
+	namespace="com.arjjs.ccm.modules.ccm.catering.dao.CcmPlaceCateringDao">
+
+	<sql id="ccmPlaceCateringColumns">
+		a.id AS "id",
+		a.create_by AS "createBy.id",
+		a.create_date AS
+		"createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS
+		"updateDate",
+		a.type AS "type",
+		a.business_hours AS "businessHours",
+		a.catering_scope AS "cateringScope",
+		a.remarks AS "remarks",
+		a.base_place_id AS "basePlaceId",
+		a.del_flag AS "delFlag",
+		s.name AS "ccmBasePlace.area.name"
+	</sql>
+	<sql id="ccmPlaceCateringAllColumns">
+		a.id AS "id",
+		a.create_by AS "createBy.id",
+		a.create_date AS
+		"createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS
+		"updateDate",
+		a.type AS "type",
+		a.business_hours AS "businessHours",
+		a.catering_scope AS "cateringScope",
+		a.remarks AS "remarks",
+		a.base_place_id AS "basePlaceId",
+		a.del_flag AS "delFlag",
+		b.place_name
+		AS "placeName",
+		b.leader_name AS "leaderName",
+		b.leader_id_card
+		AS"leaderIdCard",
+		b.leader_contact AS"leaderContact",
+		b.relevance_org
+		AS"relevanceOrg",
+		b.place_picture AS"placePicture"
+	</sql>
+
+	<sql id="ccmPlaceCateringJoins">
+	LEFT JOIN sys_area s ON s.id = b.administrative_division
+	</sql>
+
+	<select id="get" resultType="CcmPlaceCatering">
+		SELECT
+		<include refid="ccmPlaceCateringAllColumns" />
+		FROM ccm_place_catering a LEFT JOIN ccm_base_place b ON
+		a.base_place_id = b.id
+		<include refid="ccmPlaceCateringJoins" />
+		WHERE a.id = #{id} OR a.base_place_id = #{basePlaceId}
+	</select>
+
+	<select id="findList" resultType="CcmPlaceCatering">
+		SELECT
+		<include refid="ccmPlaceCateringAllColumns" />
+		FROM ccm_place_catering a LEFT JOIN ccm_base_place b ON
+		a.base_place_id = b.id
+		<include refid="ccmPlaceCateringJoins" />
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="placeName != null and placeName != ''">
+				AND b.place_name LIKE
+				<if test="dbName == 'oracle'">'%'||#{placeName}||'%'</if>
+				<if test="dbName == 'mssql'">'%'+#{placeName}+'%'</if>
+				<if test="dbName == 'mysql'">concat('%',#{placeName},'%')</if>
+			</if>
+			<if test="leaderName != null and leaderName != ''">
+				AND b.leader_name LIKE
+				<if test="dbName == 'oracle'">'%'||#{leaderName}||'%'</if>
+				<if test="dbName == 'mssql'">'%'+#{leaderName}+'%'</if>
+				<if test="dbName == 'mysql'">concat('%',#{leaderName},'%')</if>
+			</if>
+			<if test="leaderContact != null and leaderContact != ''">
+				AND b.leader_contact LIKE
+				<if test="dbName == 'oracle'">'%'||#{leaderContact}||'%'</if>
+				<if test="dbName == 'mssql'">'%'+#{leaderContact}+'%'</if>
+				<if test="dbName == 'mysql'">concat('%',#{leaderContact},'%')</if>
+			</if>
+			<if
+				test="beginCreateDate != null and endCreateDate != null and beginCreateDate != '' and endCreateDate != ''">
+				AND a.create_date BETWEEN #{beginCreateDate} AND
+				#{endCreateDate}
+			</if>
+			<if test="type != null and type != ''">
+				AND a.type = #{type}
+			</if>
+		</where>
+		<choose>
+			<when
+				test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+
+	<select id="findAllList" resultType="CcmPlaceCatering">
+		SELECT
+		<include refid="ccmPlaceCateringColumns" />
+		FROM ccm_place_catering a
+		<include refid="ccmPlaceCateringJoins" />
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>
+		<choose>
+			<when
+				test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+
+	<insert id="insert">
+		INSERT INTO ccm_place_catering(
+		id,
+		create_by,
+		create_date,
+		update_by,
+		update_date,
+		type,
+		business_hours,
+		catering_scope,
+		remarks,
+		base_place_id,
+		del_flag
+		) VALUES (
+		#{id},
+		#{createBy.id},
+		#{createDate},
+		#{updateBy.id},
+		#{updateDate},
+		#{type},
+		#{businessHours},
+		#{cateringScope},
+		#{remarks},
+		#{basePlaceId},
+		#{delFlag}
+		)
+	</insert>
+
+	<update id="update">
+		UPDATE ccm_place_catering SET
+		update_by = #{updateBy.id},
+		update_date = #{updateDate},
+		type = #{type},
+		business_hours = #{businessHours},
+		catering_scope = #{cateringScope},
+		remarks = #{remarks},
+		base_place_id = #{basePlaceId}
+		WHERE id = #{id}
+	</update>
+
+	<update id="delete">
+		UPDATE ccm_place_catering SET
+		del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+
+</mapper>

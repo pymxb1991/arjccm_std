@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.arjjs.ccm.modules.ccm.service.dao.CcmServiceWechatDao">
+    
+	<sql id="ccmServiceWechatColumns">
+		a.id AS "id",
+		a.type AS "type",
+		a.content AS "content",
+		a.file1 AS "file1",
+		a.file2 AS "file2",
+		a.file3 AS "file3",
+		a.name AS "name",
+		a.create_date AS "createDate",
+		a.phone AS "phone",
+		a.workunit AS "workunit",
+		a.ip AS "ip",
+		a.re_name AS "reName",
+		a.re_content AS "reContent",
+		a.extend1 AS "extend1",
+		a.extend2 AS "extend2",
+		a.create_by AS "createBy.id",
+		a.email AS "email",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag"
+	</sql>
+	
+	<sql id="ccmServiceWechatJoins">
+	</sql>
+    
+	<select id="get" resultType="CcmServiceWechat">
+		SELECT 
+			<include refid="ccmServiceWechatColumns"/>
+		FROM ccm_service_wechat a
+		<include refid="ccmServiceWechatJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="CcmServiceWechat">
+		SELECT 
+			<include refid="ccmServiceWechatColumns"/>
+		FROM ccm_service_wechat a
+		<include refid="ccmServiceWechatJoins"/>
+		<where>
+			a.del_flag = #{delFlag}
+			<if test="type != null and type != ''">
+				AND a.type = #{type}
+			</if>
+			<if test="content != null and content != ''">
+				AND a.content LIKE 
+					<if test="dbName == 'oracle'">'%'||#{content}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{content}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{content},'%')</if>
+			</if>
+			<if test="name != null and name != ''">
+				AND a.name LIKE 
+					<if test="dbName == 'oracle'">'%'||#{name}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{name}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{name},'%')</if>
+			</if>
+			<!-- 我的上报信息 -->
+			<if test="isSelf">
+				AND a.create_by = #{currentUser.id}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="CcmServiceWechat">
+		SELECT 
+			<include refid="ccmServiceWechatColumns"/>
+		FROM ccm_service_wechat a
+		<include refid="ccmServiceWechatJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO ccm_service_wechat(
+			id,
+			type,
+			content,
+			file1,
+			file2,
+			file3,
+			name,
+			create_date,
+			phone,
+			workunit,
+			ip,
+			re_name,
+			re_content,
+			extend1,
+			extend2,
+			create_by,
+			email,
+			update_by,
+			update_date,
+			remarks,
+			del_flag
+		) VALUES (
+			#{id},
+			#{type},
+			#{content},
+			#{file1},
+			#{file2},
+			#{file3},
+			#{name},
+			#{createDate},
+			#{phone},
+			#{workunit},
+			#{ip},
+			#{reName},
+			#{reContent},
+			#{extend1},
+			#{extend2},
+			#{createBy.id},
+			#{email},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE ccm_service_wechat SET 	
+			type = #{type},
+			content = #{content},
+			file1 = #{file1},
+			file2 = #{file2},
+			file3 = #{file3},
+			name = #{name},
+			phone = #{phone},
+			workunit = #{workunit},
+			ip = #{ip},
+			re_name = #{reName},
+			re_content = #{reContent},
+			extend1 = #{extend1},
+			extend2 = #{extend2},
+			email = #{email},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			del_flag = #{delFlag}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE ccm_service_wechat SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

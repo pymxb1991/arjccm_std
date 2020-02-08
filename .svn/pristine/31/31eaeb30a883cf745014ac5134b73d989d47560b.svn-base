@@ -1,0 +1,178 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.arjjs.ccm.modules.ccm.line.dao.CcmLineProtectDao">
+    
+	<sql id="ccmLineProtectColumns">
+		a.id AS "id",
+		a.name AS "name",
+		a.line_type AS "lineType",
+		a.comp_name AS "compName",
+		a.comp_add AS "compAdd",
+		a.comp_tel AS "compTel",
+		a.comp_prin_name AS "compPrinName",
+		a.comp_prin_tel AS "compPrinTel",
+		a.gove_name AS "goveName",
+		a.gove_add AS "goveAdd",
+		a.gove_tel AS "goveTel",
+		a.secu_name AS "secuName",
+		a.secu_tel AS "secuTel",
+		a.dang_case AS "dangCase",
+		a.dang_grade AS "dangGrade",
+		a.line AS "line",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag"
+	</sql>
+	
+	<sql id="ccmLineProtectJoins">
+	</sql>
+    
+	<select id="get" resultType="CcmLineProtect">
+		SELECT 
+			<include refid="ccmLineProtectColumns"/>
+		FROM ccm_line_protect a
+		<include refid="ccmLineProtectJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<!-- 首页线路数量统计 -->
+	<select id="findCountLine" resultType="CcmLineProtect">
+		SELECT
+			count( a.id ) AS "count" 
+		FROM
+			 ccm_line_protect a
+		WHERE
+			a.del_flag = 0 
+	</select>
+	
+	<select id="findList" resultType="CcmLineProtect">
+		SELECT 
+			<include refid="ccmLineProtectColumns"/>
+		FROM ccm_line_protect a
+		<include refid="ccmLineProtectJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="name != null and name != ''">
+				AND a.name LIKE 
+					<if test="dbName == 'oracle'">'%'||#{name}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{name}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{name},'%')</if>
+			</if>
+			<if test="lineType != null and lineType != ''">
+				AND a.line_type = #{lineType}
+			</if>
+			<if test="dangGrade != null and dangGrade != ''">
+				AND a.dang_grade = #{dangGrade}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="CcmLineProtect">
+		SELECT 
+			<include refid="ccmLineProtectColumns"/>
+		FROM ccm_line_protect a
+		<include refid="ccmLineProtectJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO ccm_line_protect(
+			id,
+			name,
+			line_type,
+			comp_name,
+			comp_add,
+			comp_tel,
+			comp_prin_name,
+			comp_prin_tel,
+			gove_name,
+			gove_add,
+			gove_tel,
+			secu_name,
+			secu_tel,
+			dang_case,
+			dang_grade,
+			line,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag
+		) VALUES (
+			#{id},
+			#{name},
+			#{lineType},
+			#{compName},
+			#{compAdd},
+			#{compTel},
+			#{compPrinName},
+			#{compPrinTel},
+			#{goveName},
+			#{goveAdd},
+			#{goveTel},
+			#{secuName},
+			#{secuTel},
+			#{dangCase},
+			#{dangGrade},
+			#{line},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE ccm_line_protect SET 	
+			name = #{name},
+			line_type = #{lineType},
+			comp_name = #{compName},
+			comp_add = #{compAdd},
+			comp_tel = #{compTel},
+			comp_prin_name = #{compPrinName},
+			comp_prin_tel = #{compPrinTel},
+			gove_name = #{goveName},
+			gove_add = #{goveAdd},
+			gove_tel = #{goveTel},
+			secu_name = #{secuName},
+			secu_tel = #{secuTel},
+			dang_case = #{dangCase},
+			dang_grade = #{dangGrade},
+			line = #{line},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE ccm_line_protect SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

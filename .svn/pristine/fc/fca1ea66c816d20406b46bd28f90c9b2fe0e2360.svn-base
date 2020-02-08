@@ -1,0 +1,29 @@
+package com.arjjs.ccm.modules.im.web;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.RequestMapping;
+
+import com.arjjs.ccm.common.web.BaseController;
+import com.arjjs.ccm.modules.im.entity.ImParamData;
+import com.arjjs.ccm.modules.im.service.BphImService;
+import com.arjjs.ccm.tool.Pager;
+
+@Controller
+@RequestMapping(value = "${adminPath}/im")
+public class BphImController extends BaseController {
+	
+	@Autowired
+	private BphImService bphImService;
+	
+	@RequestMapping(value = "historymessage")
+	public String historymessage(Model model, HttpServletRequest request,HttpServletResponse response,ImParamData paramData) {
+		Pager pager = bphImService.historymessage(paramData);
+		model.addAttribute("pager", pager);
+		return "layim/page/historymessage";
+	}
+}

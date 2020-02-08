@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.arjjs.ccm.modules.ccm.service.dao.CcmServiceDutyDao">
+    
+	<sql id="ccmServiceDutyColumns">
+		a.id AS "id",
+		a.name AS "name",
+		a.code AS "code",
+		a.department AS "department",
+		a.chief AS "chief",
+		a.summary AS "summary",
+		a.duty AS "duty",
+		a.skill AS "skill",
+		a.quality AS "quality",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag"
+	</sql>
+	
+	<sql id="ccmServiceDutyJoins">
+	</sql>
+    
+	<select id="get" resultType="CcmServiceDuty">
+		SELECT 
+			<include refid="ccmServiceDutyColumns"/>
+		FROM ccm_service_duty a
+		<include refid="ccmServiceDutyJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="CcmServiceDuty">
+		SELECT 
+			<include refid="ccmServiceDutyColumns"/>
+		FROM ccm_service_duty a
+		<include refid="ccmServiceDutyJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="name != null and name != ''">
+				AND a.name LIKE 
+					<if test="dbName == 'oracle'">'%'||#{name}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{name}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{name},'%')</if>
+			</if>
+			<if test="department != null and department != ''">
+				AND a.department LIKE 
+					<if test="dbName == 'oracle'">'%'||#{department}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{department}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{department},'%')</if>
+			</if>
+			<if test="chief != null and chief != ''">
+				AND a.chief LIKE 
+					<if test="dbName == 'oracle'">'%'||#{chief}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{chief}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{chief},'%')</if>
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="CcmServiceDuty">
+		SELECT 
+			<include refid="ccmServiceDutyColumns"/>
+		FROM ccm_service_duty a
+		<include refid="ccmServiceDutyJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO ccm_service_duty(
+			id,
+			name,
+			code,
+			department,
+			chief,
+			summary,
+			duty,
+			skill,
+			quality,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag
+		) VALUES (
+			#{id},
+			#{name},
+			#{code},
+			#{department},
+			#{chief},
+			#{summary},
+			#{duty},
+			#{skill},
+			#{quality},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE ccm_service_duty SET 	
+			name = #{name},
+			code = #{code},
+			department = #{department},
+			chief = #{chief},
+			summary = #{summary},
+			duty = #{duty},
+			skill = #{skill},
+			quality = #{quality},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE ccm_service_duty SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

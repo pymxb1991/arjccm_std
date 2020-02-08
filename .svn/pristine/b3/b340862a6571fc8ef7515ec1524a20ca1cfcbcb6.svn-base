@@ -1,0 +1,186 @@
+/**
+ * Copyright &copy; 2012-2016 <a href="https://github.com/thinkgem/jeesite">JeeSite</a> All rights reserved.
+ */
+package com.arjjs.ccm.modules.ccm.organization.entity;
+
+import org.hibernate.validator.constraints.Length;
+import com.arjjs.ccm.modules.sys.entity.Area;
+
+import com.arjjs.ccm.common.persistence.DataEntity;
+
+/**
+ * 调解组织管理Entity
+ * @author chengdezheng
+ * @version 2019-08-13
+ */
+public class CcmEventOrganization extends DataEntity<CcmEventOrganization> {
+	
+	private static final long serialVersionUID = 1L;
+	private String more2;		// 父级编号
+	private String more3;		// 所有父级编号
+	private String more4;		// 排序
+	private Area area;		// 归属区域
+	private String code;		// 区域编码
+	private String orgName;		// 组织名称
+	private String orgPhone;		// 组织联系方式
+	private String orgAdd;		// 组织详址
+	private String orgType;		// 组织类型
+	private String orgScale;		// 组织层级
+	private String guidePart;		// 业务指导部门
+	private String manNum;		// 人员数量
+	private String mainFunc;		// 主要职能
+	private String more1;		// 冗余字段1
+	private String areaMap;		// 区域图
+	private String areaPoint;		// 中心点
+	
+	public CcmEventOrganization() {
+		super();
+	}
+
+	public CcmEventOrganization(String id){
+		super(id);
+	}
+
+	@Length(min=0, max=64, message="父级编号长度必须介于 0 和 64 之间")
+	public String getMore2() {
+		return more2;
+	}
+
+	public void setMore2(String more2) {
+		this.more2 = more2;
+	}
+	
+	@Length(min=0, max=2000, message="所有父级编号长度必须介于 0 和 2000 之间")
+	public String getMore3() {
+		return more3;
+	}
+
+	public void setMore3(String more3) {
+		this.more3 = more3;
+	}
+	
+	public String getMore4() {
+		return more4;
+	}
+
+	public void setMore4(String more4) {
+		this.more4 = more4;
+	}
+	
+	public Area getArea() {
+		return area;
+	}
+
+	public void setArea(Area area) {
+		this.area = area;
+	}
+	
+	@Length(min=0, max=100, message="区域编码长度必须介于 0 和 100 之间")
+	public String getCode() {
+		return code;
+	}
+
+	public void setCode(String code) {
+		this.code = code;
+	}
+	
+	@Length(min=0, max=100, message="组织名称长度必须介于 0 和 100 之间")
+	public String getOrgName() {
+		return orgName;
+	}
+
+	public void setOrgName(String orgName) {
+		this.orgName = orgName;
+	}
+	
+	@Length(min=0, max=50, message="组织联系方式长度必须介于 0 和 50 之间")
+	public String getOrgPhone() {
+		return orgPhone;
+	}
+
+	public void setOrgPhone(String orgPhone) {
+		this.orgPhone = orgPhone;
+	}
+	
+	@Length(min=0, max=200, message="组织详址长度必须介于 0 和 200 之间")
+	public String getOrgAdd() {
+		return orgAdd;
+	}
+
+	public void setOrgAdd(String orgAdd) {
+		this.orgAdd = orgAdd;
+	}
+	
+	@Length(min=0, max=2, message="组织类型长度必须介于 0 和 2 之间")
+	public String getOrgType() {
+		return orgType;
+	}
+
+	public void setOrgType(String orgType) {
+		this.orgType = orgType;
+	}
+	
+	@Length(min=0, max=2, message="组织层级长度必须介于 0 和 2 之间")
+	public String getOrgScale() {
+		return orgScale;
+	}
+
+	public void setOrgScale(String orgScale) {
+		this.orgScale = orgScale;
+	}
+	
+	@Length(min=0, max=200, message="业务指导部门长度必须介于 0 和 200 之间")
+	public String getGuidePart() {
+		return guidePart;
+	}
+
+	public void setGuidePart(String guidePart) {
+		this.guidePart = guidePart;
+	}
+	
+	@Length(min=0, max=6, message="人员数量长度必须介于 0 和 6 之间")
+	public String getManNum() {
+		return manNum;
+	}
+
+	public void setManNum(String manNum) {
+		this.manNum = manNum;
+	}
+	
+	@Length(min=0, max=1024, message="主要职能长度必须介于 0 和 1024 之间")
+	public String getMainFunc() {
+		return mainFunc;
+	}
+
+	public void setMainFunc(String mainFunc) {
+		this.mainFunc = mainFunc;
+	}
+	
+	@Length(min=0, max=100, message="冗余字段1长度必须介于 0 和 100 之间")
+	public String getMore1() {
+		return more1;
+	}
+
+	public void setMore1(String more1) {
+		this.more1 = more1;
+	}
+	
+	@Length(min=0, max=2000, message="区域图长度必须介于 0 和 2000 之间")
+	public String getAreaMap() {
+		return areaMap;
+	}
+
+	public void setAreaMap(String areaMap) {
+		this.areaMap = areaMap;
+	}
+	
+	@Length(min=0, max=40, message="中心点长度必须介于 0 和 40 之间")
+	public String getAreaPoint() {
+		return areaPoint;
+	}
+
+	public void setAreaPoint(String areaPoint) {
+		this.areaPoint = areaPoint;
+	}
+	
+}

@@ -1,0 +1,262 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.arjjs.ccm.modules.ccm.citycomponents.dao.CcmCityComponentsDao">
+    
+	<sql id="ccmCityComponentsColumns">
+		a.id AS "id",
+		a.type AS "type",
+		a.name AS "name",
+		a.code AS "code",
+		a.competent_department_code AS "competentDepartmentCode",
+		a.competent_department_name AS "competentDepartmentName",
+		a.ownership_department_code AS "ownershipDepartmentCode",
+		a.ownership_department_name AS "ownershipDepartmentName",
+		a.maintain_department_code AS "maintainDepartmentCode",
+		a.maintain_department_name AS "maintainDepartmentName",
+		a.maintain_department_tel AS "maintainDepartmentTel",
+		a.area_id AS "area.id",
+		a.address AS "address",
+		a.image_path AS "imagePath",
+		a.spatial_form AS "spatialForm",
+		a.status AS "status",
+		a.area_map AS "areaMap",
+		a.area_point AS "areaPoint",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag",
+		a12.name AS "area.name"
+	</sql>
+	
+	<sql id="ccmCityComponentsJoins">
+		LEFT JOIN sys_area a12 ON a12.id = a.area_id
+	</sql>
+    
+	<select id="get" resultType="CcmCityComponents">
+		SELECT 
+			<include refid="ccmCityComponentsColumns"/>
+		FROM ccm_city_components a
+		<include refid="ccmCityComponentsJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	<!-- 城市部件状态 -->
+	<select id="getCityTypeGY" resultType="com.arjjs.ccm.tool.EchartType">
+		SELECT
+			a.status AS "typeO",
+			b21.label AS "type",
+			COUNT(1) AS "value"
+		FROM
+			ccm_city_components a
+		LEFT JOIN sys_dict b21 ON b21.value = a.status AND b21.type = "ccm_city_components_status"
+		where
+			a.del_flag='0'
+			<if test="types != null and types.length > 0">
+				AND (
+				<foreach collection="types" item="m"  separator=" OR " >
+					<if test="m != null and m != ''">
+		           	   a.type = #{m}
+		           	</if>
+		        </foreach>
+		        )
+			</if>
+		GROUP BY a.status
+	</select>
+	<!-- 城市部件数量-->
+    <select id="findListNum" resultType="int">
+       	SELECT
+			COUNT(*)
+		FROM
+			ccm_city_components a
+		WHERE
+			a.del_flag = "0"
+    </select>
+	
+	
+	
+	<!--  -->
+	<select id="findList" resultType="CcmCityComponents">
+		SELECT 
+			<include refid="ccmCityComponentsColumns"/>
+		FROM ccm_city_components a
+		<include refid="ccmCityComponentsJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="type != null and type != ''">
+				AND a.type = #{type}
+			</if>
+			<if test="name != null and name != ''">
+				AND a.name LIKE 
+					<if test="dbName == 'oracle'">'%'||#{name}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{name}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{name},'%')</if>
+			</if>
+			<if test="code != null and code != ''">
+				AND a.code LIKE 
+					<if test="dbName == 'oracle'">'%'||#{code}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{code}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{code},'%')</if>
+			</if>
+			<if test="area != null and area.id != null and area.id != ''">
+				AND a.area_id = #{area.id}
+			</if>
+			<if test="status != null and status != ''">
+				AND a.status = #{status}
+			</if>
+			<if test="more1 != null and more1 != ''">
+                AND  (${more1})
+            </if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="CcmCityComponents">
+		SELECT 
+			<include refid="ccmCityComponentsColumns"/>
+		FROM ccm_city_components a
+		<include refid="ccmCityComponentsJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO ccm_city_components(
+			id,
+			type,
+			name,
+			code,
+			competent_department_code,
+			competent_department_name,
+			ownership_department_code,
+			ownership_department_name,
+			maintain_department_code,
+			maintain_department_name,
+			maintain_department_tel,
+			area_id,
+			address,
+			image_path,
+			spatial_form,
+			status,
+			area_map,
+			area_point,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag
+		) VALUES (
+			#{id},
+			#{type},
+			#{name},
+			#{code},
+			#{competentDepartmentCode},
+			#{competentDepartmentName},
+			#{ownershipDepartmentCode},
+			#{ownershipDepartmentName},
+			#{maintainDepartmentCode},
+			#{maintainDepartmentName},
+			#{maintainDepartmentTel},
+			#{area.id},
+			#{address},
+			#{imagePath},
+			#{spatialForm},
+			#{status},
+			#{areaMap},
+			#{areaPoint},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE ccm_city_components SET 	
+			type = #{type},
+			name = #{name},
+			code = #{code},
+			competent_department_code = #{competentDepartmentCode},
+			competent_department_name = #{competentDepartmentName},
+			ownership_department_code = #{ownershipDepartmentCode},
+			ownership_department_name = #{ownershipDepartmentName},
+			maintain_department_code = #{maintainDepartmentCode},
+			maintain_department_name = #{maintainDepartmentName},
+			maintain_department_tel = #{maintainDepartmentTel},
+			area_id = #{area.id},
+			address = #{address},
+			image_path = #{imagePath},
+			spatial_form = #{spatialForm},
+			status = #{status},
+			area_map = #{areaMap},
+			area_point = #{areaPoint},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE ccm_city_components SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="updateCoordinates">
+        UPDATE ccm_city_components SET  
+            area_map = #{areaMap},
+            area_point = #{areaPoint} 
+        WHERE id = #{id}
+    </update>
+
+<!--	<resultMap id="BaseResult" type="com.arjjs.ccm.modules.ccm.sys.entity.CcmMapDictAreaVo" >
+		<result column="dict_value" property="dictValue" jdbcType="VARCHAR" />
+		<result column="dict_label" property="dictLabel" jdbcType="VARCHAR" />
+		<collection property="cityList"   ofType="com.arjjs.ccm.modules.ccm.sys.entity.CityComponents">
+			<id column="id" property="id" jdbcType="VARCHAR" />
+			<result column="name" property="name" jdbcType="VARCHAR" />
+			<result column="area_point" property="areaPoint" jdbcType="VARCHAR" />
+		</collection>
+	</resultMap>-->
+
+    <select id="selectByAreaGIdAndName" resultType="com.arjjs.ccm.modules.ccm.pop.entity.CcmAreaPoint" parameterType="com.arjjs.ccm.modules.ccm.sys.entity.CcmAreaPointVo">
+		SELECT
+
+			/*t2.label dict_label,*/
+			t1.id,/*t1.`name`,*/
+			t1.area_point,
+			t2.`value` AS type
+		FROM
+			ccm_city_components t1
+		LEFT JOIN sys_dict t2 on t2.`value` = t1.type
+		WHERE
+		t1.del_flag = 0
+		and t2.type = 'ccm_city_components_type'
+		<if test="areaId != null and areaId !=''">
+			and t1.area_id = #{areaId}
+		</if>
+		<if test="name != null and name !=''">
+			and t1.name like  '%${name}%'
+		</if>
+		order by t2.`value`
+	</select>
+</mapper>

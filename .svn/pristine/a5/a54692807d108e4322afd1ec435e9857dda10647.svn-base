@@ -1,0 +1,209 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.arjjs.ccm.modules.ccm.house.dao.CcmHouseBuildmanageUnitDao">
+    
+	<sql id="ccmHouseBuildmanageUnitColumns">
+		a.id AS "id",
+		a.buildmanage_id AS "buildmanageId",
+		a.residential_unit AS "residentialUnit",
+		a.x AS "x",
+		a.y AS "y",
+		a.house_num AS "houseNum",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag",
+		t.id as "tId",
+		t.house_build AS "houseBuild",
+		t.house_place AS "housePlace",
+		t.house_prup AS "housePrup",
+		t.building_id AS "buildingId",
+		t.build_door_num AS "buildDoorNum",
+		t.floor_num AS "floorNum",
+		t.door_num AS "doorNum",
+		t.house_area AS "houseArea",
+		t.house_type AS "houseType",
+		t.iden_code AS "idenCode",
+		t.iden_num AS "idenNum",
+		t.house_name AS "houseName",
+		t.house_tl AS "houseTl",
+		t.house_cur AS "houseCur",
+		t.rent_pur AS "rentPur",
+		t.hazard AS "hazard",
+		t.tenant_id AS "tenantId",
+		t.tenant_name AS "tenantName",
+		t.tenant_tl AS "tenantTl",
+		t.area_id AS "areaId",
+		t.area_map AS "areaMap",
+		t.area_point AS "areaPoint",
+		t.image AS "image",
+		b.name	AS "bName",
+		b.buildname AS "bBuildName",
+		b.area_id AS "bAreaId",
+		b.floor_area AS "bFloorArea",
+		b.piles_num AS "bPilesNum",
+		b.elem_num AS "bElemNum",
+		b.build_num AS "bBuildNum",
+		b.build_peo AS "bBuildPeo",
+		b.build_pname AS "bBuildPname",
+		b.sex AS "bSex",
+		b.nation AS "bNation",
+		b.content AS "bContent",
+		b.birthday AS "bBorthday",
+		b.education AS "bEducation",
+		b.tel AS "bTel",
+		b.phone AS "bPhone",
+		b.residence AS "bResidence",
+		b.residencedetail AS "bResidencedetail",
+		b.area_map AS "bAreaMap",
+		b.area_point AS "bAreaPoint",
+		b.image AS "bImage",
+		b.images AS "bImages"
+	</sql>
+	
+	<sql id="ccmHouseBuildmanageUnitJoins">
+		LEFT JOIN ccm_pop_tenant t ON t.id = a.house_num
+		LEFT JOIN ccm_house_buildmanage b ON b.id = a.buildmanage_id 
+	</sql>
+    
+	<select id="get" resultType="CcmHouseBuildmanageUnit">
+		SELECT 
+			<include refid="ccmHouseBuildmanageUnitColumns"/>
+		FROM ccm_house_buildmanage_unit a
+		<include refid="ccmHouseBuildmanageUnitJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="CcmHouseBuildmanageUnit">
+		SELECT 
+			<include refid="ccmHouseBuildmanageUnitColumns"/>
+		FROM ccm_house_buildmanage_unit a
+		<include refid="ccmHouseBuildmanageUnitJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findListByBuildmanageId" resultType="CcmHouseBuildmanageUnit">
+		SELECT
+			<include refid="ccmHouseBuildmanageUnitColumns"/>
+		FROM
+			ccm_house_buildmanage_unit a
+			<include refid="ccmHouseBuildmanageUnitJoins"/>
+		WHERE
+			a.buildmanage_id = #{buildmanageId}
+	</select>
+	
+	<select id="findAllList" resultType="CcmHouseBuildmanageUnit">
+		SELECT 
+			<include refid="ccmHouseBuildmanageUnitColumns"/>
+		FROM ccm_house_buildmanage_unit a
+		<include refid="ccmHouseBuildmanageUnitJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO ccm_house_buildmanage_unit(
+			id,
+			buildmanage_id,
+			residential_unit,
+			x,
+			y,
+			house_num,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag
+		) VALUES (
+			#{id},
+			#{buildmanageId},
+			#{residentialUnit},
+			#{x},
+			#{y},
+			#{houseNum},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag}
+		)
+	</insert>
+	
+	<insert id="saveData">
+		INSERT INTO ccm_house_buildmanage_unit(
+			id,
+			buildmanage_id,
+			residential_unit,
+			x,
+			y,
+			house_num,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			del_flag
+		) VALUES 
+		<foreach collection="list" item="CcmHouseBuildmanageUnit" separator =",">
+			(
+				UUID(),
+				#{CcmHouseBuildmanageUnit.buildmanageId},
+				#{CcmHouseBuildmanageUnit.residentialUnit},
+				#{CcmHouseBuildmanageUnit.x},
+				#{CcmHouseBuildmanageUnit.y},
+				#{CcmHouseBuildmanageUnit.houseNum},
+				#{CcmHouseBuildmanageUnit.userId},
+				now(),
+				#{CcmHouseBuildmanageUnit.userId},
+				now(),
+				0
+			)
+		</foreach>
+	</insert>
+	
+	<update id="update">
+		UPDATE ccm_house_buildmanage_unit SET 	
+			buildmanage_id = #{buildmanageId},
+			residential_unit = #{residentialUnit},
+			x = #{x},
+			y = #{y},
+			house_num = #{houseNum},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE ccm_house_buildmanage_unit SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+	<delete id="deleteHouseBuildmanageUnit">
+		DELETE FROM ccm_house_buildmanage_unit WHERE buildmanage_id = #{buildmanageId}
+	</delete>
+	
+</mapper>

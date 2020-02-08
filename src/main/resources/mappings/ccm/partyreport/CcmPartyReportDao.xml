@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.arjjs.ccm.modules.ccm.partyreport.dao.CcmPartyReportDao">
+    
+	<sql id="ccmPartyReportColumns">
+		a.id AS "id",
+		a.community AS "community.id",
+		a2.name AS "community.name",
+		a.org_party AS "orgParty",
+		a.reporting_time AS "reportingTime",
+		a.type AS "type",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag"
+	</sql>
+	
+	<sql id="ccmPartyReportJoins">
+		LEFT JOIN sys_area a2 ON a2.id = a.community
+	</sql>
+	<sql id="ccmPartyReportJoinsOrg">
+		LEFT JOIN ccm_party_organization a3 ON a3.id = a.org_party
+	</sql>
+	<sql id="ccmPartyReportJoinsPer">
+		LEFT JOIN ccm_party_person a4 ON a4.id = a.org_party
+	</sql>
+    
+	<select id="get" resultType="CcmPartyReport">
+		SELECT 
+			<include refid="ccmPartyReportColumns"/>
+		FROM ccm_party_report a
+		<include refid="ccmPartyReportJoins"/>
+
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="CcmPartyReport">
+		SELECT 
+			<include refid="ccmPartyReportColumns"/>
+		FROM ccm_party_report a
+		<include refid="ccmPartyReportJoins"/>
+			<if test="officeId != null and officeId != ''">
+				LEFT JOIN sys_office office ON office.area_id = a2.id
+			</if>
+		<where>
+			<if test="officeId != null and officeId != ''">
+				(office.id = #{officeId} or office.parent_ids LIKE concat('%',#{officeId},'%')) AND 
+			</if>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="orgParty != null and orgParty != ''">
+				AND a.org_party LIKE 
+					<if test="dbName == 'oracle'">'%'||#{orgParty}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{orgParty}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{orgParty},'%')</if>
+			</if>
+			<if test="type != null and type != '' ">
+				AND a.type = #{type}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="CcmPartyReport">
+		SELECT 
+			<include refid="ccmPartyReportColumns"/>
+		FROM ccm_party_report a
+		<include refid="ccmPartyReportJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO ccm_party_report(
+			id,
+			community,
+			org_party,
+			reporting_time,
+			type,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag
+		) VALUES (
+			#{id},
+			#{community.id},
+			#{orgParty},
+			#{reportingTime},
+			#{type},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE ccm_party_report SET 	
+			community = #{community.id},
+			org_party = #{orgParty},
+			reporting_time = #{reportingTime},
+			type = #{type},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE ccm_party_report SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.arjjs.ccm.modules.ccm.organization.dao.CcmEventOrganizationDao">
+    
+	<sql id="ccmEventOrganizationColumns">
+		a.id AS "id",
+		a.more2 AS "more2",
+		a.more3 AS "more3",
+		a.more4 AS "more4",
+		a.area_id AS "area.id",
+		a.code AS "code",
+		a.org_name AS "orgName",
+		a.org_phone AS "orgPhone",
+		a.org_add AS "orgAdd",
+		a.org_type AS "orgType",
+		a.org_scale AS "orgScale",
+		a.guide_part AS "guidePart",
+		a.man_num AS "manNum",
+		a.main_func AS "mainFunc",
+		a.more1 AS "more1",
+		a.area_map AS "areaMap",
+		a.area_point AS "areaPoint",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag",
+		a5.name AS "area.name"
+	</sql>
+	
+	<sql id="ccmEventOrganizationJoins">
+		LEFT JOIN sys_area a5 ON a5.id = a.area_id
+	</sql>
+    
+	<select id="get" resultType="CcmEventOrganization">
+		SELECT 
+			<include refid="ccmEventOrganizationColumns"/>
+		FROM ccm_event_organization a
+		<include refid="ccmEventOrganizationJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="CcmEventOrganization">
+		SELECT 
+			<include refid="ccmEventOrganizationColumns"/>
+		FROM ccm_event_organization a
+		<include refid="ccmEventOrganizationJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="CcmEventOrganization">
+		SELECT 
+			<include refid="ccmEventOrganizationColumns"/>
+		FROM ccm_event_organization a
+		<include refid="ccmEventOrganizationJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO ccm_event_organization(
+			id,
+			more2,
+			more3,
+			more4,
+			area_id,
+			code,
+			org_name,
+			org_phone,
+			org_add,
+			org_type,
+			org_scale,
+			guide_part,
+			man_num,
+			main_func,
+			more1,
+			area_map,
+			area_point,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag
+		) VALUES (
+			#{id},
+			#{more2},
+			#{more3},
+			#{more4},
+			#{area.id},
+			#{code},
+			#{orgName},
+			#{orgPhone},
+			#{orgAdd},
+			#{orgType},
+			#{orgScale},
+			#{guidePart},
+			#{manNum},
+			#{mainFunc},
+			#{more1},
+			#{areaMap},
+			#{areaPoint},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE ccm_event_organization SET 	
+			more2 = #{more2},
+			more3 = #{more3},
+			more4 = #{more4},
+			area_id = #{area.id},
+			code = #{code},
+			org_name = #{orgName},
+			org_phone = #{orgPhone},
+			org_add = #{orgAdd},
+			org_type = #{orgType},
+			org_scale = #{orgScale},
+			guide_part = #{guidePart},
+			man_num = #{manNum},
+			main_func = #{mainFunc},
+			more1 = #{more1},
+			area_map = #{areaMap},
+			area_point = #{areaPoint},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE ccm_event_organization SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

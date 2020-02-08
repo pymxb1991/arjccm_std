@@ -1,0 +1,209 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.arjjs.ccm.modules.iot.device.dao.CcmDeviceControlDao">
+    
+	<sql id="ccmDeviceControlColumns">
+		a.id AS "id",
+		a.name AS "name",
+		a.sex AS "sex",
+		a.age AS "age",
+		a.id_card AS "idCard",
+		a.people_type AS "peopleType",
+		a.reason AS "reason",
+		a.start_date AS "startDate",
+		a.end_date AS "endDate",
+		a.grade AS "grade",
+		a.control_range AS "controlRange",
+		a.control_type AS "controlType",
+		a.control_by AS "controlBy",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag",
+		a.people_emphasis AS "peopleEmphasis",
+		a.reserved1 AS "reserved1",
+		a.reserved2 AS "reserved2",
+		a.device_code AS "deviceCode",
+		a.phones AS "phones"
+	</sql>
+	
+	<sql id="ccmDeviceControlJoins">
+	</sql>
+    
+	<select id="get" resultType="CcmDeviceControl">
+		SELECT 
+			<include refid="ccmDeviceControlColumns"/>
+		FROM ccm_device_control a
+		<include refid="ccmDeviceControlJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="CcmDeviceControl">
+		SELECT 
+			<include refid="ccmDeviceControlColumns"/>
+		FROM ccm_device_control a
+		<include refid="ccmDeviceControlJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="name != null and name != ''">
+				AND a.name LIKE 
+					<if test="dbName == 'oracle'">'%'||#{name}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{name}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{name},'%')</if>
+			</if>
+			<if test="idCard != null and idCard != ''">
+				AND a.id_card LIKE 
+					<if test="dbName == 'oracle'">'%'||#{idCard}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{idCard}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{idCard},'%')</if>
+			</if>
+			<if test="peopleType != null and peopleType != ''">
+				AND a.people_type = #{peopleType}
+			</if>
+			<if test="startDate != null and startDate != ''">
+				AND a.start_date &gt;= #{startDate}
+			</if>
+			<if test="endDate != null and endDate != ''">
+				AND a.end_date &lt;= #{endDate}
+			</if>
+			<if test="grade != null and grade != ''">
+				AND a.grade = #{grade}
+			</if>
+			<if test="controlType != null and controlType != ''">
+				AND a.control_type = #{controlType}
+			</if>
+			<if test="controlBy != null and controlBy != ''">
+				AND a.control_by = #{controlBy}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="CcmDeviceControl">
+		SELECT 
+			<include refid="ccmDeviceControlColumns"/>
+		FROM ccm_device_control a
+		<include refid="ccmDeviceControlJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO ccm_device_control(
+			id,
+			name,
+			sex,
+			age,
+			id_card,
+			people_type,
+			reason,
+			start_date,
+			end_date,
+			grade,
+			control_Range,
+			control_type,
+			control_by,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag,
+			people_emphasis,
+			reserved1,
+			reserved2,
+			device_code,
+			phones
+		) VALUES (
+			#{id},
+			#{name},
+			#{sex},
+			#{age},
+			#{idCard},
+			#{peopleType},
+			#{reason},
+			#{startDate},
+			#{endDate},
+			#{grade},
+			#{controlRange},
+			#{controlType},
+			#{controlBy},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag},
+			#{peopleEmphasis},
+			#{reserved1},
+			#{reserved2},
+			#{deviceCode},
+			#{phones}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE ccm_device_control SET 	
+			name = #{name},
+			sex = #{sex},
+			age = #{age},
+			id_card = #{idCard},
+			people_type = #{peopleType},
+			reason = #{reason},
+			start_date = #{startDate},
+			end_date = #{endDate},
+			grade = #{grade},
+			control_range = #{controlRange},
+			control_type = #{controlType},
+			control_by = #{controlBy},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks},
+			people_emphasis = #{peopleEmphasis},
+			reserved1 = #{reserved1},
+			reserved2 = #{reserved2},
+			device_code = #{deviceCode},
+			phones = #{phones}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE ccm_device_control SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+
+	<update id="deleteByIdent">
+		UPDATE ccm_device_control SET
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id_card = #{idCard}
+	</update>
+
+	<select id="getCount" resultType="java.util.HashMap">
+		SELECT
+		control_by,COUNT(1) AS count
+		FROM ccm_device_control
+		<where>
+			del_flag = #{DEL_FLAG_NORMAL}
+		</where>
+		GROUP BY control_by
+	</select>
+</mapper>

@@ -1,0 +1,1185 @@
+ ::-webkit-scrollbar {
+    width: 5px;
+}
+
+::-webkit-scrollbar {
+    height: 5px;
+}
+
+::-webkit-scrollbar-track {
+    background-color: #bee1eb;
+}
+
+::-webkit-scrollbar-thumb {
+    background-color: #00aff0;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background-color: #9c3
+}
+
+::-webkit-scrollbar-thumb:active {
+    background-color: #00aff0
+}
+ .map {
+	width: 100%;
+	height: 100%;
+	background: #fff;
+	overflow: hidden;
+}
+
+.map {
+	position: relative;
+}
+/*  a.skiplink {
+            position: absolute;
+            clip: rect(1px, 1px, 1px, 1px);
+            padding: 0;
+            border: 0;
+            height: 1px;
+            width: 1px;
+            overflow: hidden;
+        }
+
+        a.skiplink:focus {
+            clip: auto;
+            height: auto;
+            width: auto;
+            background-color: #fff;
+            padding: 0.3em;
+        }
+
+        #map:focus {
+            outline: #4A74A8 solid 0.15em;
+        } */
+.ol-popup {
+	position: absolute;
+	background-color: white;
+	-webkit-filter: drop-shadow(0 1px 4px rgba(0, 0, 0, 0.2));
+	filter: drop-shadow(0 1px 4px rgba(0, 0, 0, 0.2));
+	padding: 8px;
+	border-radius: 10px;
+	border: 1px solid #fff;
+	bottom: 12px;
+	left: -50px;
+	min-width: 360px;
+	z-index: 199201;
+	display: none;
+}
+
+.ol-popup table {
+	width: 100%;
+}
+
+.ol-popup table td {
+	white-space: nowrap;
+/* 	border-bottom: 1px solid #e3e3e5; */
+	padding: 3px;
+	
+}
+/* .ol-popup.bb table td{
+	color: #fff;
+} */
+td{
+	font-size:14px;
+}
+
+.ol-popup table tr:last-child  td {
+	border-bottom: 0
+}
+ .ol-popup:after, .ol-popup:before {
+	top: 100%;
+	border: solid transparent;
+	content: " ";
+	height: 0;
+	width: 0;
+	position: absolute;
+	pointer-events: none;
+} 
+
+.ol-popup:after {
+	border-top-color: #fff;
+	border-width: 10px;
+	left: 48px;
+	margin-left: -10px;
+} 
+.ol-popup:before {
+	border-top-color: #cccccc;
+	border-width: 11px;
+	left: 48px;
+	margin-left: -11px;
+}
+
+.ol-popup-closer {
+	text-decoration: none;
+	position: absolute;
+	top: 2px;
+	right: 8px;
+}
+
+/* .ol-popup-closer:after {
+	content: "✖";
+} */
+
+/* 图层控件层样式设置 */
+.layerControl {
+	position: absolute;
+	min-width: 200px;
+	width: 200px;
+	height: auto;
+	padding: 10px;
+	left: 12px;
+	top: 12px;
+	z-index: 2001; /*在地图容器中的层，要设置z-index的值让其显示在地图上层*/
+	color: #ffffff;
+	background-color: rgba(0, 0, 0, 0.6);
+	border-width: 10px; /*边缘的宽度*/
+	border-radius: 10px; /*圆角的大小 */
+	border-color: #000 #000 #000 #000; /*边框颜色*/
+}
+
+.layerControl .title {
+	font-weight: bold;
+	font-size: 15px;
+	margin: 10px;
+	width: auto;
+	background: none;
+	height: auto;
+	text-align: left;
+}
+
+#detailsDialog {
+	z-index: 9999;
+	color:#fff;
+}
+#detailsDialog table{
+	color:#fff;
+}
+
+/* .layerTree li {
+	list-style: none;
+	margin: 5px 10px;
+} */
+  @-webkit-keyframes shineBlue {
+            from { -webkit-box-shadow: 0 0 9px #333; }
+            50% { -webkit-box-shadow: 0 0 18px blue; }
+            to { -webkit-box-shadow: 0 0 9px #333; }
+        }
+#detailsDialog {
+	position: absolute;
+	height: 38%;
+	width: 100%;
+	/* background: rgba(0, 0, 0, 0.8); */
+	bottom: 0;
+	display: none;
+	background:  url("../images/bg/bg80.png") center no-repeat;
+	background-size: 100% 100%;
+	-webkit-box-shadow: 0 0 8px #10559a;
+	-moz-box-shadow: 0 0 8px #10559a;
+	-os-box-shadow: 0 0 8px #10559a;
+	-o-box-shadow: 0 0 8px #10559a;
+	box-shadow: 0 0 8px #10559a;
+	 border: 1px solid #10559a;
+  /*   -webkit-animation: shineBlue 3s infinite;
+	-moz-animation: shineBlue 3s infinite;
+    -o-animation: shineBlue 3s infinite;
+	-os-animation: shineBlue 3s infinite;
+    animation: shineBlue 3s infinite; */
+	
+}
+
+.common-pading {
+	width: 100%;
+	height: 100%;
+	overflow: hidden
+}
+
+.echarts {
+	width: 100%;
+	height: 100%;
+	margin-top: 1%
+}
+
+.echarts.echarts1 {
+	height: 200px;
+}
+
+.marker {
+	background: #fff;
+	position: relative;
+	top: 0;
+	display: inline-block;
+}
+.marker td{
+	padding: 0px;
+}
+.marker a {
+	color: #000;
+	font-weight: 600;
+	text-decoration: none;
+	display: inline-block;
+	float: left;
+	background: #fff;
+	padding: 5px 5px 4px 5px;
+	white-space: nowrap;
+	text-align: center;
+	font-size: 14px;
+	max-width: 200px;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+.marker span {
+	background:#1777DF;
+	width: 20px;
+	height: 20px;
+	overflow: hidden;
+	display: inline-block;
+	float: left;
+	padding: 5px 5px 4px 5px;
+}
+
+.marker span img {
+	width: 16px;
+	height: 16px;
+	vertical-align: middle;
+}
+
+.marker-line {
+	width: 0px;
+	height: 70px;
+	border: 1px solid #fff;
+	position: absolute;
+	right: 0;
+	top: 29px;
+}
+
+.marker-circle {
+	width: 0px;
+	height: 0px;
+	border: 4px solid #fff;
+	border-radius: 50%;
+	position: absolute;
+	right: -3px;
+	top: 100px;
+}
+/* 首页图标 */
+.marker-icon {
+	/* background: #fff; */
+	position: relative;
+	top: 0;
+	display: inline-block;
+}
+.marker-icon td{
+	padding: 0px;
+}
+.marker-icon a {
+	color: #000;
+	font-weight: 600;
+	text-decoration: none;
+	display: inline-block;
+	float: left;
+	/* background: #fff; */
+	padding: 5px 5px 4px 5px;
+	white-space: nowrap;
+	text-align: center;
+	font-size: 14px;
+}
+
+.marker-icon span {
+	/* background:#1777DF; */
+	    width: 46px;
+    height: 78px;
+	overflow: hidden;
+	display: inline-block;
+	float: left;
+	padding: 5px 5px 4px 5px;
+}
+
+.marker-icon span img {
+	    width: 46px;
+    height: 78px;
+	vertical-align: middle;
+}
+
+.marker-icon-line {
+	width: 0px;
+	height: 70px;
+	border: 1px solid #fff;
+	position: absolute;
+	right: 0;
+	top: 29px;
+}
+
+.marker-icon-circle {
+	width: 0px;
+	height: 0px;
+	border: 4px solid #fff;
+	border-radius: 50%;
+	position: absolute;
+	right: -3px;
+	top: 100px;
+}
+/* 公共机构 */
+
+.marker-publicPlace{
+	background: #fff;
+	position: relative;
+	top: 0;
+	display: inline-block;
+}
+.marker-publicPlace td{
+	padding: 0px;
+}
+.marker-publicPlace a {
+	color: #000;
+	font-weight: 600;
+	text-decoration: none;
+	display: inline-block;
+	float: left;
+	background: #fff;
+	padding: 5px 5px 4px 5px;
+	white-space: nowrap;
+	text-align: center;
+	font-size: 14px;
+}
+
+.marker-publicPlace span {
+	background: #0f60c4;
+	width: 20px;
+	height: 20px;
+	overflow: hidden;
+	display: inline-block;
+	float: left;
+	padding: 5px 5px 4px 5px;
+}
+.dot-bottom {  
+    font-size: 0;  
+    line-height: 0;  
+    border-width: 10px;  
+    border-color: #0f60c4;  
+    border-bottom-width: 0;  
+    border-style: dashed;  
+    border-top-style: solid;  
+    border-left-color: transparent;  
+    border-right-color: transparent;  
+}
+.marker-publicPlace span img {
+	width: 13px;
+    height: 13px;
+    vertical-align: middle;
+    background: #fff;
+    border-radius: 50%;
+    margin-left: 4px;
+    margin-top: 4px;}
+
+.marker-publicPlace-line {
+	font-size: 0;  
+    line-height: 0;  
+    border-width: 10px;  
+    border-color: #0f60c4;  
+    border-bottom-width: 0;  
+    border-style: dashed;  
+    border-top-style: solid;  
+    border-left-color: transparent;  
+    border-right-color: transparent; 
+	position: absolute;
+	left: 5px;
+	top: 29px;
+}
+
+.marker-publicPlace-circle {
+	width: 0px;
+	height: 0px;
+	/* border: 4px solid #fff; */
+	border-radius: 50%;
+	position: absolute;
+	right: -3px;
+	top: 100px;
+}
+/* 事件 */
+.marker-event {
+	background: transparent;
+	position: relative;
+	top: 0;
+	display: inline-block;
+}
+.marker-event td{
+	padding: 0px;
+}
+.marker-event a {
+	color: #ff0000;
+	font-weight: 600;
+	text-decoration: none;
+	display: inline-block;
+	float: left;
+	background: transparent;
+	padding: 5px 5px 4px 5px;
+	white-space: nowrap;
+	text-align: center;
+	font-size: 14px;
+	width: 120px;
+    overflow: hidden;
+    text-overflow:ellipsis;
+}
+
+.marker-event span {
+	/* background: #17896f; */
+	width: 20px;
+	height: 20px;
+	overflow: hidden;
+	display: inline-block;
+	float: left;
+	padding: 5px 5px 4px 5px;
+	border: 1px solid red;
+    border-radius: 50%;
+    text-align: center;
+}
+
+.marker-event span img {
+	width: 16px;
+	height: 16px;
+	vertical-align: middle;
+}
+
+.marker-event-line {
+	width: 2px;
+	height: 70px;
+	position: absolute;
+	right: 0;
+	top: 29px;
+	background-color: hsla(0, 100%, 67%, 1);
+    box-shadow: 0 0 2rem 0.5rem hsla(0, 50%, 59%, .7);
+}
+
+.marker-event-circle {
+	width: 0px;
+	height: 0px;
+	border: 4px solid  hsla(0, 100%, 67%, 1);
+	border-radius: 50%;
+	position: absolute;
+	right: -3px;
+	top: 100px;
+}
+ul {
+	list-style: none;
+}
+
+#myTabContent {
+	width: 100%;
+	height: 90%;
+	overflow: hidden;
+}
+/*工具栏  */
+#tool {
+	position: absolute;
+	right: 10px;
+	top: 24px;
+	z-index: 9999999999;
+}
+
+#toolCenter {
+	width: 240px;
+	background: #fff;
+	border-radius: 2px;
+	box-shadow: 1px 2px 1px rgba(0, 0, 0, .15);
+	z-index: 9999999999;
+	padding-left: 9px;
+}
+
+.tool-container {
+	/* line-height: 32px; */
+	
+}
+
+.tool-list {
+	line-height: 32px;
+	overflow: hidden;
+	cursor: pointer;
+	-webkit-transition: background-color .2s ease-in;
+	-moz-transition: background-color .2s ease-in;
+	-ms-transition: background-color .2s ease-in;
+	-o-transition: background-color .2s ease-in;
+	transition: background-color .2s ease-in;
+}
+
+.tool-list:hover, .tool-list.active {
+	color: #3c82ff;
+}
+
+.tool-gap {
+	float: left;
+	height: 15px;
+	display: inline-block;
+	border-right: 1px solid #ddd;
+	position: relative;
+	top: 8px;
+	left: 8px;
+}
+
+.tool-list span {
+	float: left;
+}
+
+.tag-panl-close:hover i {
+	color: #3c82ff;
+}
+
+.tool-icon {
+	display: inline-block;
+	float: left;
+	width: 16px;
+	height: 16px;
+	margin: 8px 1px;
+}
+
+.tool-flag {
+	background: url("../images/tool/flag.png") center no-repeat;
+	background-size: 100% 100%;
+}
+
+.tool-flag.active, .tool-list:hover .tool-flag {
+	background: url("../images/tool/flag-active.png") center no-repeat;
+	background-size: 100% 100%;
+}
+.tool-sign {
+	margin-top:7px;
+	background: url("../images/tool/sign.png") center no-repeat;
+	background-size: 100% 100%;
+}
+
+.tool-sign.active, .tool-list:hover .tool-sign {
+	background: url("../images/tool/sign-active.png") center no-repeat;
+	background-size: 100% 100%;
+}
+
+.tool-edit {
+	background: url("../images/tool/edit.png") center no-repeat;
+	background-size: 100% 100%;
+}
+
+.tool-edit.active, .tool-list:hover .tool-edit {
+	background: url("../images/tool/edit-active.png") center no-repeat;
+	background-size: 100% 100%;
+}
+
+.tool-remove {
+	background: url("../images/tool/remove.png") center no-repeat;
+	background-size: 100% 100%;
+}
+
+.tool-remove.active, .tool-list:hover .tool-remove {
+	background: url("../images/tool/remove-active.png") center no-repeat;
+	background-size: 100% 100%;
+}
+
+.tool-save {
+	background: url("../images/tool/save.png") center no-repeat;
+	background-size: 100% 100%;
+}
+
+.tool-save.active, .tool-list:hover .tool-save {
+	background: url("../images/tool/save-active.png") center no-repeat;
+	background-size: 100% 100%;
+}
+
+#TagPanl {
+	width: 119px;
+	height: 71px;
+	display: none
+}
+
+.tag-panl {
+	position: absolute;
+	z-index: 20000;
+	bottom: auto;
+	left: 2px;
+	top: 37px;
+	right: auto;
+	background: #fff;
+	border: 1px solid #a6a6a6;
+	overflow: hidden;
+}
+
+#PointBox,#TextBox {
+	width: 100px;
+	height: 71px;
+	display: none
+}
+
+#LineBox {
+	width: 141px;
+	height: 71px;
+	display: none
+}
+
+#PolygonBox {
+	width: 141px;
+	height: 154px;
+	display: none
+}
+
+#ArrowBox {
+	width: 141px;
+	height: 100px;
+	display: none
+}
+
+.tag-panl-header {
+	background: #f9f9f9;
+	line-height: 30px;
+	border-bottom: 1px solid #dadada;
+}
+
+.tag-panl-header i {
+	line-height: 30px;
+}
+
+.tag-panl-close {
+	cursor: pointer;
+}
+
+.tag-panl-center {
+	padding-left: 4px
+}
+
+.tag-panl-center div {
+	
+}
+
+.tag-panl-center .tag-panl-span {
+	display: block;
+	width: 30px;
+	height: 26px;
+	cursor: pointer;
+	margin: 5px 0px;
+	border: 1px solid transparent;
+	-webkit-transition: background-color .2s ease-in;
+	-moz-transition: background-color .2s ease-in;
+	-ms-transition: background-color .2s ease-in;
+	-o-transition: background-color .2s ease-in;
+	transition: background-color .2s ease-in;
+}
+
+.tag-panl-center .tag-panl-span.active, .tag-panl-center .tag-panl-span:hover
+	{
+	border: 1px solid #7aa5ef;
+	border-radius: 2px;
+	background: #f5f8ff;
+	box-shadow: 0px 0px 1px 0px rgba(122, 165, 239, 0.5);
+}
+
+.tag-panl-center .tool-icon {
+	width: 22px;
+	height: 22px;
+	margin: 3px 2px;
+}
+
+.tool-point {
+	background: url("../images/tool/point.png") center no-repeat;
+	background-size: 100% 100%;
+}
+
+.tag-panl-span.active .tool-point, .tag-panl-span:hover .tool-point,
+	.tool-list.active .tool-point, .tool-list:hover .tool-point {
+	background: url("../images/tool/point-active.png") center no-repeat;
+	background-size: 100% 100%;
+}
+
+.tool-line {
+	background: url("../images/tool/line.png") center no-repeat;
+	background-size: 100% 100%;
+}
+
+.tag-panl-span.active .tool-line, .tag-panl-span:hover .tool-line,
+	.tool-list.active .tool-line, .tool-list:hover .tool-line {
+	background: url("../images/tool/line-active.png") center no-repeat;
+	background-size: 100% 100%;
+}
+
+.tool-polygon {
+	background: url("../images/tool/polygon.png") center no-repeat;
+	background-size: 100% 100%;
+}
+
+.tag-panl-span.active .tool-polygon, .tag-panl-span:hover .tool-polygon,
+	.tool-list.active .tool-polygon, .tool-list:hover .tool-polygon {
+	background: url("../images/tool/polygon-active.png") center no-repeat;
+	background-size: 100% 100%;
+}
+
+.tool-draw {
+	background: url("../images/tool/draw.png") center no-repeat;
+	background-size: 100% 100%;
+}
+
+.tool-list.active .tool-draw, .tool-list:hover .tool-draw {
+	background: url("../images/tool/draw-active.png") center no-repeat;
+	background-size: 100% 100%;
+}
+
+.tool-full {
+	background: url("../images/tool/full.png") center no-repeat;
+	background-size: 100% 100%;
+}
+.tool-full.tool-small{
+	background: url("../images/tool/small.png") center no-repeat;
+	background-size: 100% 100%;
+} 
+
+.tool-list.active .tool-full, .tool-list:hover .tool-full {
+	background: url("../images/tool/full-active.png") center no-repeat;
+	background-size: 100% 100%;
+}
+.tool-list.active .tool-full.tool-small, .tool-list:hover .tool-full.tool-small {
+	background: url("../images/tool/small-active.png") center no-repeat;
+	background-size: 100% 100%;
+}
+.tool-map {
+	background: url("../images/tool/map.png") center no-repeat;
+	background-size: 100% 100%;
+}
+.tool-list.active .tool-map, .tool-list:hover .tool-map {
+	background: url("../images/tool/map-active.png") center no-repeat;
+	background-size: 100% 100%;
+}
+.tool-select {
+	background: url("../images/tool/select.png") center no-repeat;
+	background-size: 100% 100%;
+}
+.tool-list.active .tool-select, .tool-list:hover .tool-select{
+	background: url("../images/tool/select-active.png") center no-repeat;
+	background-size: 100% 100%;
+}
+.tool-layers{
+	background: url("../images/tool/layers.png") center no-repeat;
+	background-size: 100% 100%;
+}
+.tool-list.active .tool-layers, .tool-list:hover .tool-layers {
+	background: url("../images/tool/layers-active.png") center no-repeat;
+	background-size: 100% 100%;
+}
+.tool-arrow-up {
+	background: url("../images/tool/arrow-down.png") center no-repeat;
+	background-size: 100% 100%;
+}
+
+.tool-list.active .tool-arrow-up {
+	background: url("../images/tool/arrow-up.png") center no-repeat;
+	background-size: 100% 100%;
+}
+
+#toolDetailBox,#LayersBox {
+	display: none
+}
+
+.detail-box {
+	position: absolute;
+	width: 80px;
+	background: #fff;
+	box-shadow: 1px 2px 1px rgba(0, 0, 0, .15);
+	top: 32px;
+	left: 0;
+	float: left;
+}
+#toolDetailBox.detail-box{
+	left:0px;
+}
+
+ul.boxinfo {
+	padding: 0;
+	margin: 0;
+}
+
+ul.boxinfo li {
+	line-height: 32px;
+	padding-left: 10px;
+	cursor: pointer;
+}
+
+.tool-arrow-up {
+	background: url("../images/tool/arrow-down.png") center  no-repeat;
+	background-size: 100% 100%;
+}
+
+.tool-list.active .tool-arrow-up {
+	background: url("../images/tool/arrow-up.png") center no-repeat;
+	background-size: 100% 100%;
+}
+
+.tool-arrow {
+	background: url("../images/tool/arrow.png") center no-repeat;
+	background-size: 100% 100%;
+}
+
+.tool-list.active .tool-arrow, .tool-list:hover .tool-arrow {
+	background: url("../images/tool/arrow-active.png") center no-repeat;
+	background-size: 100% 100%;
+}
+.tool-text {
+	background: url("../images/tool/text.png") center no-repeat;
+	background-size: 80% 80%;
+}
+
+.tool-list.active .tool-text, .tool-list:hover .tool-text ,.tag-panl-span.active .tool-text, .tag-panl-span:hover .tool-text{
+	background: url("../images/tool/text-active.png") center no-repeat;
+	background-size: 80% 80%;
+}
+#TextOverlay{
+	z-index:9999999
+}
+.textarea-overlay{
+	width:auto;
+	height:auto;
+	border:1px solid transparent;
+	background: transparent;
+	color: #eea807;
+	resize: none;
+	overflow: hidden;
+}
+
+/* 工具栏 */
+/* 波纹效果 */
+ 
+        .circle-container {
+            position: relative;
+            width: 40px;
+            height: 40px;
+            /*border: 1px solid #000; hovertree.com */
+        }
+        /* 保持大小不变的小圆圈 何问起 */
+        .dot {
+	    position: absolute;
+	    width: 16px;
+	    height: 16px;
+	    left: 15px;
+	    top: 15px;
+	    -webkit-border-radius: 50%;
+	    -moz-border-radius: 50%;
+          /*   border: 1px solid red; */
+            border-radius: 50%;
+            z-index: 2;
+       background: url("../images/tool/flag.png") center no-repeat;
+	background-size: 100% 100%;
+        }
+        /* 产生动画（向外扩散变大）的圆圈  */
+        .pulse {
+            position: absolute;
+            width: 40px;
+            height: 40px;
+            left: 2px;
+            top: 2px;
+            border: 2px solid red;
+            -webkit-border-radius: 50%;
+            -moz-border-radius: 50%;
+            border-radius: 50%;
+            z-index: 1;
+            opacity: 0;
+            -webkit-animation: warn 2s ease-out;
+            -moz-animation: warn 2s ease-out;
+            animation: warn 2s ease-out;
+            -webkit-animation-iteration-count: infinite;
+            -moz-animation-iteration-count: infinite;
+            animation-iteration-count: infinite;
+            box-shadow: 1px 1px 30px red;
+        }
+
+        .pulse1 {
+            position: absolute;
+            width: 40px;
+            height: 40px;
+            left: 2px;
+            top: 2px;
+            border: 2px solid red;
+            -webkit-border-radius: 50%;
+            -moz-border-radius: 50%;
+            border-radius: 50%;
+            z-index: 1;
+            opacity: 0;
+            -webkit-animation: warn1 2s ease-out;
+            -moz-animation: warn1 2s ease-out;
+            animation: warn1 2s ease-out;
+            -webkit-animation-iteration-count: infinite;
+            -moz-animation-iteration-count: infinite;
+            animation-iteration-count: infinite;
+            box-shadow: 1px 1px 30px red;
+        }
+               @keyframes warn {
+            0% {
+                transform: scale(0.3);
+                -webkit-transform: scale(0.3);
+                opacity: 0.0;
+            }
+
+            25% {
+                transform: scale(0.3);
+                -webkit-transform: scale(0.3);
+                opacity: 0.1;
+            }
+
+            50% {
+                transform: scale(0.5);
+                -webkit-transform: scale(0.5);
+                opacity: 0.3;
+            }
+
+            75% {
+                transform: scale(0.8);
+                -webkit-transform: scale(0.8);
+                opacity: 0.5;
+            }
+
+            100% {
+                transform: scale(1);
+                -webkit-transform: scale(1);
+                opacity: 0.0;
+            }
+        }
+
+        @keyframes warn1 {
+            0% {
+                transform: scale(0.3);
+                -webkit-transform: scale(0.3);
+                opacity: 0.0;
+            }
+
+            33.3% {
+                transform: scale(0.3);
+                -webkit-transform: scale(0.3);
+                opacity: 0.1;
+            }
+
+            66.6% {
+                transform: scale(0.3);
+                -webkit-transform: scale(0.3);
+                opacity: 0.3;
+            }
+
+            99.9% {
+                transform: scale(0.5);
+                -webkit-transform: scale(0.5);
+                opacity: 0.5;
+            }
+
+            100% {
+                transform: scale(0.8);
+                -webkit-transform: scale(0.8);
+                opacity: 0.0;
+            }
+        }
+        
+        
+     /* 弹框动画 */
+   .bb, .bb::before, .bb::after {
+
+		  position: absolute;
+		  top: 0;
+		  bottom: 0;
+		  left: 0;
+		  right: 0;
+
+		}
+
+/* 		.bb {
+		  width: 388px;
+          height: 188px;
+		  margin: -205px auto;
+		  background: rgba(15, 34, 43, 0.7);
+		  background:  url("../images/bg/bg_dialog.png") center no-repeat;
+	      background-size: 100% 100%;
+		  color: #2fa4e7;
+		  box-shadow: inset 0 0 0 1px rgba(47, 164, 231, 0.5);
+		  overflow-X: hidden;
+		  overflow-y: auto;
+		} */
+
+		.bb::before, .bb::after {
+	/* 	  content: '';
+		  z-index: -1;
+		  margin:0px;
+		  box-shadow: inset 0 0 0 2px;
+		  animation: clipMe 8s linear infinite; */
+
+		}
+
+		.bb::before {
+		  animation-delay: -4s;
+
+		}
+
+	/* 	.bb:hover::after, .bb:hover::before {
+
+		  background-color: rgba(255, 0, 0, 0.3);
+
+		} */
+
+
+
+		@keyframes clipMe {
+
+		  0% ,100%{
+
+		       clip: rect(0px, 210px, 110px, 0px);
+
+		  }
+
+		  25% {
+
+		      clip: rect(110px, 210px, 220px, 0px);
+
+		  }
+
+		  50% {
+
+		        clip: rect(110px, 420px, 220px, 210px);
+
+		  }
+
+		  75% {
+
+		       clip: rect(0px, 420px, 110px, 210px);
+
+		  }
+		}
+		
+	/* 详情信息框 */	
+	.height90 {
+	  height:90%
+	}
+	.height83{
+	  height:83%;
+	  width:99%;
+	}
+	.height100 {
+	  height:94.5%
+	}
+	.margin0{
+    margin-left: 0;
+    margin-right: 0;
+     padding-right: 0;
+     padding-left: 0;
+}
+.details-common{
+    width: 100%;
+    height: 100%;
+    position: relative;
+    padding: 10px;
+}
+.common.common-small-left{
+    padding-left: 3px;
+}
+.common.common-small-right{
+    padding-right: 2px;
+}
+.common-header{
+    position: absolute;
+    top: -5px;
+    left: 80px;
+    display: inline-block;
+    padding: 5px 30px;
+    border: 1px solid #10559a;
+    transform: skew(-20deg);
+    background: #10559a;
+    color: #fff;
+    font-weight: bold;
+    position: absolute;
+}	
+.common-header div {
+    transform: skew(20deg);
+    white-space: nowrap;
+}
+.common-center{
+       padding: 20px 2px 2px 2px;
+}
+.show {
+    border: 1px solid #10559a;
+}
+.marker-index0{
+	width:16px;
+	height:16px;
+	background:  url("../images/alarm.png") center no-repeat;
+	background-size: 100% 100%;
+}
+.marker-index1{
+	width:64px;
+	height:64px;
+	background:  url("../images/alarm1.png") center no-repeat;
+	background-size: 100% 100%;
+}
+.gis-marker{
+	background-image:  url("../images/markers_gis.png");
+	text-align: center;
+    background-position: -227px -225px;
+    width: 21px;
+    height: 33px;
+    color: #fff;
+    font-weight: bold;
+    overflow: hidden;
+    cursor: pointer;
+}
+.gis-marker:hover,.gis-marker.active{
+	    background-position: -227px -189px;
+}
+.gis-marker.activeMax{
+	 background-position: -227px -189px;
+}
+.ol-overlay-container.activeMax{
+	z-index: 1992
+}
+.ol-overlay-container.active,.ol-overlay-container:hover{
+	z-index: 1993
+}
+.map_markers{
+   	background-image:  url("../images/markers_gis.png");
+	 background-position: -227px -225px;
+    width: 21px;
+    height: 33px;
+	display: inline-block;
+	margin-left: 6px;
+	margin-top: 4px;
+	text-align: center;
+    color: #fff;
+}
+.map_list_data:hover .map_markers {
+	    background-position: -227px -189px;
+}
+.map_list_data a:hover {
+    color: #fff;
+}
+
+/*鹰眼自定义样式控件 */
+.ol-custom-overviewmap,
+.ol-custom-overviewmap.ol-uncollapsible {
+    bottom: auto;
+    left: auto;
+    right: 0;
+    /*右侧显示*/
+    top: 0;
+    /*顶部显示*/
+}
+/* 鹰眼控件展开时控件外框的样式 */
+
+.ol-custom-overviewmap:not(.ol-collapsed) {
+    border: 1px solid black;
+}
+/* 鹰眼控件中地图容器的样式 */
+
+.ol-custom-overviewmap .ol-overviewmap-map {
+    border: none;
+    width: 300px;
+}
+/* 在鹰眼控件中显示当前窗口中主图区域的边框 */
+
+.ol-custom-overviewmap .ol-overviewmap-box {
+    border: 2px solid red;
+}
+/* 在鹰眼控件张开时其控件按钮图标的样式 */
+
+.ol-custom-overviewmap:not(.ol-collapsed) button {
+    bottom: auto;
+    left: auto;
+    right: 1px;
+    top: 1px;
+}
+		

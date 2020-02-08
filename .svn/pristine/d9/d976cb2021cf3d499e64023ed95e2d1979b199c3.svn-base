@@ -1,0 +1,336 @@
+package com.arjjs.ccm.modules.ccm.videoData.service;
+
+import java.util.Date;
+import java.util.UUID;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
+import com.arjjs.ccm.common.config.Global;
+import com.arjjs.ccm.common.utils.StringUtils;
+import com.arjjs.ccm.common.web.BaseController;
+import com.arjjs.ccm.modules.ccm.ccmsys.dao.CcmDeviceDao;
+import com.arjjs.ccm.modules.ccm.ccmsys.entity.CcmDevice;
+import com.arjjs.ccm.modules.ccm.rest.entity.CcmRestResult;
+import com.arjjs.ccm.modules.ccm.rest.entity.CcmRestType;
+import com.arjjs.ccm.modules.ccm.sys.entity.SysConfig;
+import com.arjjs.ccm.modules.ccm.sys.service.SysConfigService;
+import com.arjjs.ccm.modules.sys.entity.Area;
+import com.arjjs.ccm.modules.sys.entity.User;
+import com.arjjs.ccm.tool.Tool;
+
+@Service
+@Transactional(readOnly = true)
+public class CcmTiandyVideoService extends BaseController {
+	@Autowired
+	private SysConfigService sysConfigService;
+	
+	@Autowired
+	private CcmDeviceDao ccmDeviceDao;
+	
+	public CcmRestResult getCameras() {
+		CcmRestResult result = new CcmRestResult();
+		SysConfig sysConfig = sysConfigService.get("tiandy_video_ocx_play");
+		//解JSON
+		JSONObject jsonObject = JSONObject.parseObject(sysConfig.getParamStr());
+		String tiandyIp = null;
+		if(jsonObject.containsKey("tiandyIp")) {
+			tiandyIp = jsonObject.getString("tiandyIp");
+		}
+		String tiandyPort = null;
+		if(jsonObject.containsKey("tiandyPort")) {
+			tiandyPort = jsonObject.getString("tiandyPort");
+		}
+		if(StringUtils.isNotEmpty(tiandyIp) && StringUtils.isNotEmpty(tiandyPort)) {			
+			if(isStopThread) {	
+				TiandyCamerasInsertThread tiandyCamerasInsertThread = new TiandyCamerasInsertThread();
+				tiandyCamerasInsertThread.start();
+			}
+			result.setCode(CcmRestType.OK);
+			result.setResult(null);
+		}else {
+			result.setCode(CcmRestType.ERROR_PARAM);
+			result.setResult(null);
+		}
+		return result;
+	}
+	
+	private static boolean isStopThread = true;
+	
+	class TiandyCamerasInsertThread extends Thread {
+		public void run() {
+			System.out.println("获取监控点开始");
+			isStopThread = false;
+			SysConfig sysConfig = sysConfigService.get("tiandy_video_ocx_play");
+			//解JSON
+			JSONObject jsonObject = JSONObject.parseObject(sysConfig.getParamStr());
+			String tiandyIp = jsonObject.getString("tiandyIp");
+			String tiandyPort = jsonObject.getString("tiandyPort");
+			if(jsonObject.containsKey("tiandyUserName")) {
+				username = jsonObject.getString("tiandyUserName");
+			}
+			if(jsonObject.containsKey("tiandyPassWord")) {
+				password = jsonObject.getString("tiandyPassWord");
+			}
+			try {
+				String urlUserId = "http://" + tiandyIp + ":" + tiandyPort + "/Easy7/apps/WebService/LogIn.jsp?";
+				if(StringUtils.isNotEmpty(username) && StringUtils.isNotEmpty(password)) {
+					urlUserId += "UserName=" + username + "&Password=" + password;
+				}else {
+					urlUserId += "UserName=admin&Password=1111";
+				}
+				System.out.println("获取userid的url === 》》》 " + urlUserId);
+				String userIdReturn = Tool.getRestReturn(urlUserId);
+				String tiandyUserId = null;
+				if(StringUtils.isNotBlank(userIdReturn)) {
+					JSONObject dataJson = JSONObject.parseObject(userIdReturn);
+					if(dataJson.containsKey("content")) {
+						tiandyUserId = dataJson.getString("content");
+					}
+				}
+				System.out.println("tiandyUserId === 》》》 " + tiandyUserId);
+				if(StringUtils.isNotEmpty(tiandyUserId)) {
+					String urlRest = "http://" + tiandyIp + ":" + tiandyPort + "/Easy7/apps/WebService/GetResourceTree_Ex.jsp?CurrentUserId=" + tiandyUserId;
+					if(StringUtils.isNotEmpty(username) && StringUtils.isNotEmpty(password)) {
+						urlRest += "&UserId=" + username + "&Password=" + password;
+					}else {
+						urlRest += "&UserId=admin&Password=1111";
+					}
+					System.out.println("获取相机的url === 》》》 " + urlRest);
+					String restReturn = Tool.getRestReturn(urlRest);
+					//logger.debug("获取相机的返回参数----------》》》》》》》》》"+restReturn);
+					if(StringUtils.isNotBlank(restReturn)) {
+						JSONArray dataJson = JSONArray.parseArray(restReturn);
+						if(dataJson.size() > 0) {
+							System.out.println("开始便利数组");
+							forEachData(dataJson);
+						}
+					}
+				}
+			} catch (Exception e) {
+				e.printStackTrace();
+			}finally {
+				System.out.println("获取监控点结束");
+				isStopThread = true;
+			}
+		}
+		private String client_sup_id = null;
+		private String client_sup_ip = null;
+		private String client_sup_port = null;
+		private String dev_sup_id = null;
+		private String dev_id = null;
+		private String username = null;
+		private String password = null;
+		public void forEachData(JSONArray dataJson) {
+			for (int i = 0; i < dataJson.size(); i++) {
+				JSONObject deviceJson = dataJson.getJSONObject(i);
+				String typeId = null;
+				if(deviceJson.containsKey("typeId")) {
+					typeId = deviceJson.getString("typeId");
+				}
+				if(StringUtils.isNotBlank(typeId)) {
+					if(typeId.equals("3")) {
+						if(deviceJson.containsKey("id")) {
+							client_sup_id = deviceJson.getString("id");
+						}
+						if(deviceJson.containsKey("ip")) {
+							client_sup_ip = deviceJson.getString("ip");
+						}
+						if(deviceJson.containsKey("port")) {
+							client_sup_port = deviceJson.getString("port");
+						}
+						if(deviceJson.containsKey("items") && StringUtils.isNotBlank(deviceJson.getString("items"))) {
+							JSONArray itemsJson = deviceJson.getJSONArray("items");
+							forEachMsData(itemsJson);
+						}
+					}else {
+						if(deviceJson.containsKey("items") && StringUtils.isNotBlank(deviceJson.getString("items"))) {
+							JSONArray itemsJson = deviceJson.getJSONArray("items");
+							forEachData(itemsJson);
+						}
+					}
+				}
+			}
+		}
+		public void forEachMsData(JSONArray dataJson) {
+			for (int i = 0; i < dataJson.size(); i++) {
+				JSONObject deviceJson = dataJson.getJSONObject(i);
+				String typeId = null;
+				if(deviceJson.containsKey("typeId")) {
+					typeId = deviceJson.getString("typeId");
+				}
+				if(StringUtils.isNotBlank(typeId)) {
+					if(typeId.equals("3")) {
+						if(deviceJson.containsKey("id")) {
+							dev_sup_id = deviceJson.getString("id");
+						}
+						if(deviceJson.containsKey("items") && StringUtils.isNotBlank(deviceJson.getString("items"))) {
+							JSONArray itemsJson = deviceJson.getJSONArray("items");
+							forEachMsData(itemsJson);
+						}
+					}else if(typeId.equals("4")) {
+						if(deviceJson.containsKey("id")) {
+							dev_id = deviceJson.getString("id");
+						}
+						if(StringUtils.isBlank(dev_sup_id)) {
+							dev_sup_id = client_sup_id;
+						}
+						if(deviceJson.containsKey("items") && StringUtils.isNotBlank(deviceJson.getString("items"))) {
+							JSONArray itemsJson = deviceJson.getJSONArray("items");
+							forEachDeviceData(itemsJson);
+						}
+					}
+				}
+			}
+		}
+		public void forEachDeviceData(JSONArray dataJson) {
+			for (int i = 0; i < dataJson.size(); i++) {
+				JSONObject deviceJson = dataJson.getJSONObject(i);
+				String typeId = null;
+				if(deviceJson.containsKey("typeId")) {
+					typeId = deviceJson.getString("typeId");
+				}
+				if(StringUtils.isNotBlank(typeId)) {
+					if(typeId.equals("5")) {
+						String code = null;
+						String longitude = null;
+						if(deviceJson.containsKey("longitude")) {
+							longitude = deviceJson.getString("longitude");
+						}
+						String latitude = null;
+						if(deviceJson.containsKey("latitude")) {
+							latitude = deviceJson.getString("latitude");
+						}
+						if(StringUtils.isNotBlank(longitude) && StringUtils.isNotBlank(latitude)
+								&& !longitude.equals("") && !latitude.equals("")
+								&& !longitude.equals("0.0") && !latitude.equals("0.0")
+								&& !longitude.equals("0") && !latitude.equals("0")
+								&& !longitude.equals("null") && !latitude.equals("null")) {							
+							if(deviceJson.containsKey("gaysId")) {
+								code = deviceJson.getString("gaysId");
+							}
+							if(StringUtils.isNotBlank(code)) {
+								CcmDevice ccmDevice = ccmDeviceDao.getByCode(code);
+								if(ccmDevice == null) {	        					
+									this.insertDevice(deviceJson);
+								}else {
+									this.updateDevice(deviceJson, ccmDevice);
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+		public void insertDevice(JSONObject deviceJson) {
+			CcmDevice ccmDevice = new CcmDevice();
+			ccmDevice.setId(UUID.randomUUID().toString());
+			if(deviceJson.containsKey("gaysId")) {
+				ccmDevice.setCode(deviceJson.getString("gaysId"));
+			}
+			String caption = null;
+			if(deviceJson.containsKey("caption")) {
+				caption = deviceJson.getString("caption");
+				ccmDevice.setName(deviceJson.getString("caption"));
+			}
+			String longitude = null;
+			if(deviceJson.containsKey("longitude")) {
+				longitude = deviceJson.getString("longitude");
+			}
+			String latitude = null;
+			if(deviceJson.containsKey("latitude")) {
+				latitude = deviceJson.getString("latitude");
+			}
+			if(StringUtils.isNotBlank(longitude) && StringUtils.isNotBlank(latitude)) {	        				
+				String coordinate = longitude + "," + latitude;
+				ccmDevice.setCoordinate(coordinate);
+			}
+			String ch = null;
+			if(deviceJson.containsKey("ch")) {	        					
+				ch = deviceJson.getString("ch");
+				ccmDevice.setChannelNum(deviceJson.getString("ch"));
+			}
+			JSONObject jsonOBJ = new JSONObject();
+			jsonOBJ.put("caption", caption);
+			jsonOBJ.put("dev_id", dev_id);
+			jsonOBJ.put("username", username);
+			jsonOBJ.put("password", password);
+			jsonOBJ.put("client_sup_id", client_sup_id);
+			jsonOBJ.put("dev_sup_id", dev_sup_id);
+			jsonOBJ.put("client_sup_ip", client_sup_ip);
+			jsonOBJ.put("client_sup_port", client_sup_port);
+			jsonOBJ.put("ch", ch);
+			jsonOBJ.put("data_type", 0);
+			ccmDevice.setParam(jsonOBJ.toJSONString());
+			ccmDevice.setCompanyId("tiandy");
+			ccmDevice.setTypeId("003");
+			ccmDevice.setImagePath("video.png");
+			ccmDevice.setTypeVidicon("4");
+			Area areaTmp = new Area();
+			String areaId = Global.getConfig("DOCKING_MONITORING_POINT");
+			if(StringUtils.isBlank(areaId)) {
+				areaId = "0ac94bc554e241e9abeedcb982000003";
+			}
+			areaTmp.setId(areaId);
+			ccmDevice.setArea(areaTmp);
+			User userTmp = new User();
+			userTmp.setId("1");
+			ccmDevice.setCreateBy(userTmp);
+			ccmDevice.setCreateDate(new Date());
+			ccmDevice.setUpdateBy(userTmp);
+			ccmDevice.setUpdateDate(new Date());
+			ccmDeviceDao.insert(ccmDevice);
+		}
+		public void updateDevice(JSONObject deviceJson,CcmDevice ccmDevice) {
+			if(deviceJson.containsKey("gaysId") && StringUtils.isNotBlank(deviceJson.getString("gaysId"))) {
+				ccmDevice.setCode(deviceJson.getString("gaysId"));
+			}
+			String caption = null;
+			if(deviceJson.containsKey("caption") && StringUtils.isNotBlank(deviceJson.getString("caption"))) {
+				caption = deviceJson.getString("caption");
+				ccmDevice.setName(deviceJson.getString("caption"));
+			}
+			String longitude = null;
+			if(deviceJson.containsKey("longitude")) {
+				longitude = deviceJson.getString("longitude");
+			}
+			String latitude = null;
+			if(deviceJson.containsKey("latitude")) {
+				latitude = deviceJson.getString("latitude");
+			}
+			if(StringUtils.isNotBlank(longitude) && StringUtils.isNotBlank(latitude)) {	        				
+				String coordinate = longitude + "," + latitude;
+				ccmDevice.setCoordinate(coordinate);
+			}
+			String ch = null;
+			if(deviceJson.containsKey("ch") && StringUtils.isNotBlank(deviceJson.getString("ch"))) {	        					
+				ch = deviceJson.getString("ch");
+				ccmDevice.setChannelNum(deviceJson.getString("ch"));
+			}
+			JSONObject jsonOBJ = new JSONObject();
+			jsonOBJ.put("caption", caption);
+			jsonOBJ.put("dev_id", dev_id);
+			jsonOBJ.put("username", username);
+			jsonOBJ.put("password", password);
+			jsonOBJ.put("client_sup_id", client_sup_id);
+			jsonOBJ.put("dev_sup_id", dev_sup_id);
+			jsonOBJ.put("client_sup_ip", client_sup_ip);
+			jsonOBJ.put("client_sup_port", client_sup_port);
+			jsonOBJ.put("ch", ch);
+			jsonOBJ.put("data_type", 0);
+			ccmDevice.setParam(jsonOBJ.toJSONString());
+			ccmDevice.setCompanyId("tiandy");
+			ccmDevice.setTypeId("003");
+			ccmDevice.setImagePath("video.png");
+			ccmDevice.setTypeVidicon("4");
+			User userTmp = new User();
+			userTmp.setId("1");
+			ccmDevice.setUpdateBy(userTmp);
+			ccmDevice.setUpdateDate(new Date());
+			ccmDeviceDao.update(ccmDevice);
+		}
+	}
+}

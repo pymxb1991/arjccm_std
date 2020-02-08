@@ -1,0 +1,73 @@
+#map-left{
+	width: 300px;
+	height: 100%;
+	position: absolute;
+	left:0;
+	top:0;
+}
+#map-left>div{
+	width:100%;
+	height:48%;
+}
+#map-right{
+	width: 300px;
+	height: 100%;
+	position: absolute;
+	right:0;
+	top:0;
+}
+.checkbox-success label{
+    -o-user-select: none;
+    -moz-user-select: none; /*火狐 firefox*/
+    -webkit-user-select: none; /*webkit浏览器*/
+    -ms-user-select: none; /*IE10+*/
+    -khtml-user-select :none; /*早期的浏览器*/
+    user-select: none; 
+}
+.fourColorsLegend{
+	width: 100%;
+	float: left;
+	line-height: 26px;
+}
+.color-bg{
+	width: 160px;
+	height:20px;
+	float: left;
+	margin-top: 2px;
+    margin-right: 5px;
+}
+.color-bg1{
+	background: #21c909;
+}
+.color-bg2{
+	background: #ffec05;
+}
+.color-bg3{
+	background: #ffa408;
+}
+.color-bg4{
+	background: #ff390d;
+}
+.query-criteria{
+	background-size: 100% 100%;
+	min-height: 200px;
+	overflow: hidden;
+}
+#CaseTYpe>div{
+	float:left;
+	width:45%;
+}
+.presentation-mode{
+	background-size: 100% 100%;
+	min-height: 155px;
+	overflow: hidden;
+}
+#okBtn.btn-primary,#okBtn.btn-primary:hover,#removeBtn.btn-primary,#removeBtn.btn-primary:hover {
+    color: #fff;
+    border-color: none;
+    border:none;
+    background: url("../images/btn-bg.png") center no-repeat !important;
+	background-size: 100% 100%;
+    margin-left: 10px;
+    margin-top: 10px;
+}

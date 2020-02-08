@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper
+	namespace="com.arjjs.ccm.modules.plm.home.dao.PlmPortalDictDao">
+
+	<sql id="plmPortalDictColumns">
+		a.id AS "id",
+		a.title AS "title",
+		a.connect AS "connect",
+		a.content AS "content",
+		a.line AS "line",
+		a.type AS "type",
+		a.extend1 AS
+		"extend1",
+		a.extend2 AS "extend2",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS
+		"delFlag"
+	</sql>
+
+	<sql id="plmPortalDictJoins">
+	</sql>
+
+	<select id="get" resultType="PlmPortalDict">
+		SELECT
+		<include refid="plmPortalDictColumns" />
+		FROM plm_portal_dict a
+		<include refid="plmPortalDictJoins" />
+		WHERE a.id = #{id}
+	</select>
+
+	<select id="findList" resultType="PlmPortalDict">
+		SELECT
+		<include refid="plmPortalDictColumns" />
+		FROM plm_portal_dict a
+		<include refid="plmPortalDictJoins" />
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="title != null and title != ''">
+				AND a.title LIKE
+				<if test="dbName == 'oracle'">'%'||#{title}||'%'</if>
+				<if test="dbName == 'mssql'">'%'+#{title}+'%'</if>
+				<if test="dbName == 'mysql'">concat('%',#{title},'%')</if>
+			</if>
+			<if test="extend1 != null and extend1 != ''">
+				AND a.extend1 = #{extend1}
+			</if>
+			<if test="content != null and content != ''">
+				AND a.content = #{content}
+			</if>
+			<if test="type != null and type != ''">
+				AND a.type = #{type}
+			</if>
+		</where>
+		<choose>
+			<when
+				test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+
+	<select id="findAllList" resultType="PlmPortalDict">
+		SELECT
+		<include refid="plmPortalDictColumns" />
+		FROM plm_portal_dict a
+		<include refid="plmPortalDictJoins" />
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>
+		<choose>
+			<when
+				test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+
+	<insert id="insert">
+		INSERT INTO plm_portal_dict(
+		id,
+		title,
+		connect,
+		content,
+		line,
+		type,
+		extend1,
+		extend2,
+		create_by,
+		create_date,
+		update_by,
+		update_date,
+		remarks,
+		del_flag
+		) VALUES (
+		#{id},
+		#{title},
+		#{connect},
+		#{content},
+		#{line},
+		#{type},
+		#{extend1},
+		#{extend2},
+		#{createBy.id},
+		#{createDate},
+		#{updateBy.id},
+		#{updateDate},
+		#{remarks},
+		#{delFlag}
+		)
+	</insert>
+
+	<update id="update">
+		UPDATE plm_portal_dict SET
+		title = #{title},
+		connect = #{connect},
+		content = #{content},
+		line = #{line},
+		type = #{type},
+		extend1 = #{extend1},
+		extend2 = #{extend2},
+		update_by = #{updateBy.id},
+		update_date = #{updateDate},
+		remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+
+	<update id="delete">
+		UPDATE plm_portal_dict SET
+		del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+
+</mapper>

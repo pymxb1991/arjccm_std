@@ -1,0 +1,272 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.arjjs.ccm.modules.pbs.flow.dao.PbsFlowworkDao">
+
+	<sql id="pbsFlowworkColumns">
+		a.id AS "id",
+		a.s_name AS "sName",
+		a.s_flowid AS
+		"sFlowid.id",
+		a.s_flowurl AS "sFlowurl",
+		a.dt_startdate AS
+		"dtStartdate",
+		a.dt_enddate AS "dtEnddate",
+		a.s_binddata AS "sBinddata",
+		a.s_bindkey AS "sBindkey",
+		a.s_description AS "sDescription",
+		<!-- a.s_spare01 AS "sSpare01",
+		a.s_spare02 AS "sSpare02",
+		a.s_spare03 AS "sSpare03",
+		a.s_spare04 AS "sSpare04", -->
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag",
+		a.s_bindstat AS "sBindstat",
+		a.s_operator AS "sOperator.id",
+		u20.name AS "sOperator.name",
+		a.s_bindmember AS "sBindmember.id",
+		mem.s_name AS "sBindmember.sName",
+		flowdefinition.s_typecode AS
+		"sFlowid.sTypecode",
+		flowdefinition.s_name AS "sFlowid.sName"
+	</sql>
+
+	<sql id="pbsFlowworkJoins">
+		LEFT JOIN sys_user u20 ON u20.id = a.s_operator
+		LEFT JOIN
+		pbs_partymem mem ON mem.id = a.s_bindmember
+		LEFT JOIN
+		pbs_flowdefinition flowdefinition on flowdefinition.id =
+		a.s_flowid
+	</sql>
+
+
+	<sql id="pbsFlowworkJoinsApprove">
+		LEFT JOIN sys_user u20 ON u20.id = a.s_operator
+		LEFT JOIN
+		pbs_partymem mem ON mem.id = a.s_bindmember
+		LEFT JOIN
+		pbs_flowdefinition flowdefinition ON flowdefinition.id =
+		a.s_flowid
+		LEFT JOIN pbs_flowworknode worknode ON worknode.s_flowworkid = a.id
+		LEFT JOIN pbs_flownode flownode ON flownode.id = worknode.s_nodeid
+		LEFT JOIN pbs_fnodeapprover approver ON approver.s_flownodeid =
+		flownode.id
+	</sql>
+
+	<select id="get" resultType="PbsFlowwork">
+		SELECT
+		<include refid="pbsFlowworkColumns" />
+		FROM pbs_flowwork a
+		<include refid="pbsFlowworkJoins" />
+		WHERE a.id = #{id}
+	</select>
+
+	<select id="findList" resultType="PbsFlowwork">
+		SELECT
+		<include refid="pbsFlowworkColumns" />
+		FROM pbs_flowwork a
+		<include refid="pbsFlowworkJoins" />
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="sName != null and sName != ''">
+				AND a.s_name like
+				<if test="dbName == 'oracle'">'%'||#{sName}||'%'</if>
+				<if test="dbName == 'mssql'">'%'+#{sName}+'%'</if>
+				<if test="dbName == 'mysql'">concat('%',#{sName},'%')</if>
+			</if>
+			<if
+				test="sFlowid != null and sFlowid != '' and sFlowid.id != null and sFlowid.id != ''">
+				AND a.s_flowid = #{sFlowid.id}
+			</if>
+			<if
+				test="sFlowid != null and sFlowid != '' and sFlowid.sName != null and sFlowid.sName != ''">
+				AND flowdefinition.s_name LIKE CONCAT('%',#{sFlowid.sName},'%')
+			</if>
+			
+			<if test="sBinddata != null and sBinddata != ''">
+				AND a.s_binddata = #{sBinddata}
+			</if>
+			<if test="sBindkey != null and sBindkey != ''">
+				AND a.s_bindkey = #{sBindkey}
+			</if>
+			<if
+				test="sBindmember != null and sBindmember != '' and sBindmember.id != null and sBindmember.id != ''">
+				AND a.s_bindmember = #{sBindmember.id}
+			</if>
+			<if test="flowType != null and flowType !=''">
+				AND flowdefinition.s_typecode = #{flowType}
+			</if>
+		</where>
+		GROUP BY a.id
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+
+	<select id="findAllList" resultType="PbsFlowwork">
+		SELECT
+		<include refid="pbsFlowworkColumns" />
+		FROM pbs_flowwork a
+		<include refid="pbsFlowworkJoins" />
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+
+	<insert id="insert">
+		INSERT INTO pbs_flowwork(
+		id,
+		s_name,
+		s_flowid,
+		s_flowurl,
+		dt_startdate,
+		dt_enddate,
+		s_binddata,
+		s_bindkey,
+		s_description,
+		create_by,
+		create_date,
+		update_by,
+		update_date,
+		remarks,
+		del_flag,
+		s_operator,
+		s_bindmember,
+		s_bindstat
+		) VALUES (
+		#{id},
+		#{sName},
+		#{sFlowid.id},
+		#{sFlowurl},
+		#{dtStartdate},
+		#{dtEnddate},
+		#{sBinddata},
+		#{sBindkey},
+		#{sDescription},
+		#{createBy.id},
+		#{createDate},
+		#{updateBy.id},
+		#{updateDate},
+		#{remarks},
+		#{delFlag},
+		#{sOperator.id},
+		#{sBindmember.id},
+		#{sBindstat}
+		)
+	</insert>
+
+	<update id="update">
+		UPDATE pbs_flowwork SET
+		s_name = #{sName},
+		s_flowid =
+		#{sFlowid.id},
+		s_flowurl = #{sFlowurl},
+		dt_startdate = #{dtStartdate},
+		dt_enddate = #{dtEnddate},
+		s_binddata = #{sBinddata},
+		s_bindkey =
+		#{sBindkey},
+		s_description = #{sDescription},
+		update_by =
+		#{updateBy.id},
+		update_date = #{updateDate},
+		remarks = #{remarks},
+		s_operator = #{sOperator.id},
+		s_bindmember = #{sBindmember.id},
+		s_bindstat = #{sBindstat}
+		WHERE id = #{id}
+	</update>
+
+	<update id="delete">
+		UPDATE pbs_flowwork SET
+		del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+
+	<update id="updateSbindstat">
+		UPDATE pbs_flowwork SET
+		s_bindstat = #{sBindstat}
+		WHERE id = #{id}
+	</update>
+
+	<select id="findListByApprover" resultType="PbsFlowwork">
+		SELECT
+		<include refid="pbsFlowworkColumns" />
+		FROM pbs_flowwork a
+		<include refid="pbsFlowworkJoinsApprove" />
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			and worknode.del_flag =
+			#{DEL_FLAG_NORMAL}
+			and a.s_bindstat = "0"
+			<!-- and worknode.s_setstatval= 0 -->
+			<if
+				test="sBindmember != null and sBindmember != '' and sBindmember.id != null and sBindmember.id != ''">
+				AND approver.s_approver = #{sBindmember.id}
+			</if>
+			<if test="sName != null and sName != ''">
+				AND a.s_name like
+				<if test="dbName == 'oracle'">'%'||#{sName}||'%'</if>
+				<if test="dbName == 'mssql'">'%'+#{sName}+'%'</if>
+				<if test="dbName == 'mysql'">concat('%',#{sName},'%')</if>
+			</if>
+			<if
+				test="sFlowid != null and sFlowid != '' and sFlowid.sName != null and sFlowid.sName != ''">
+				AND flowdefinition.s_name LIKE CONCAT('%',#{sFlowid.sName},'%') 
+			</if>
+			<if test="flowType != null and flowType !=''">
+				AND flowdefinition.s_typecode = #{flowType}
+			</if>
+		</where>
+		GROUP BY a.id ORDER BY a.update_date DESC
+	</select>
+
+	<select id="findListFinish" resultType="PbsFlowwork">
+		SELECT
+		<include refid="pbsFlowworkColumns" />
+		FROM pbs_flowwork a
+		<include refid="pbsFlowworkJoinsApprove" />
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			and worknode.s_sort != 0
+			<!-- AND flownode.s_nodetype =99 -->
+			and worknode.del_flag =
+			#{DEL_FLAG_NORMAL}
+			<if
+				test="sBindmember != null and sBindmember != '' and sBindmember.id != null and sBindmember.id != ''">
+				AND worknode.s_bindmember = #{sBindmember.id}
+			</if>
+			<if
+				test="sFlowid != null and sFlowid != '' and sFlowid.sName != null and sFlowid.sName != ''">
+				AND flowdefinition.s_name LIKE CONCAT('%',#{sFlowid.sName},'%') 
+			</if>
+			<if test="sName != null and sName != ''">
+				AND a.s_name like
+				<if test="dbName == 'oracle'">'%'||#{sName}||'%'</if>
+				<if test="dbName == 'mssql'">'%'+#{sName}+'%'</if>
+				<if test="dbName == 'mysql'">concat('%',#{sName},'%')</if>
+			</if>
+			<if test="flowType != null and flowType !=''">
+				AND flowdefinition.s_typecode = #{flowType}
+			</if>
+		</where>
+		GROUP BY a.id ORDER BY a.update_date DESC
+	</select>
+</mapper>

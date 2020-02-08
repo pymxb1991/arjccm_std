@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.arjjs.ccm.modules.ccm.list.dao.CcmListDao">
+    
+	<sql id="ccmListColumns">
+		a.id AS "id",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag",
+		a.name AS "name",
+		a.type AS "type",
+		a.description AS "description"
+	</sql>
+	
+	<sql id="ccmListJoins">
+	</sql>
+    
+	<select id="get" resultType="CcmList">
+		SELECT 
+			<include refid="ccmListColumns"/>
+		FROM ccm_list a
+		<include refid="ccmListJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="getList" resultType="CcmList">
+		SELECT 
+			<include refid="ccmListColumns"/>
+			, COUNT( p.id ) AS "peopleCount"
+		FROM ccm_list a
+		LEFT JOIN ccm_list_people p ON p.list_id = a.id AND p.del_flag = #{DEL_FLAG_NORMAL}
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="type != null and type != ''">
+				AND a.type = #{type}
+			</if>
+		</where>
+		GROUP BY a.id
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="getPeopleCount" resultType="Integer">
+		SELECT 
+			COUNT( a.id ) AS "allCount"
+		FROM ccm_list a
+		RIGHT JOIN ccm_list_people p ON p.list_id = a.id 
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			AND p.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="type != null and type != ''">
+				AND a.type = #{type}
+			</if>
+		</where>
+	</select>
+	
+	<select id="findList" resultType="CcmList">
+		SELECT 
+			<include refid="ccmListColumns"/>
+		FROM ccm_list a
+		<include refid="ccmListJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="name != null and name != ''">
+				AND a.name LIKE 
+					<if test="dbName == 'oracle'">'%'||#{name}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{name}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{name},'%')</if>
+			</if>
+			<if test="type != null and type != ''">
+				AND a.type = #{type}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="CcmList">
+		SELECT 
+			<include refid="ccmListColumns"/>
+		FROM ccm_list a
+		<include refid="ccmListJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO ccm_list(
+			id,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag,
+			name,
+			type,
+			description
+		) VALUES (
+			#{id},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag},
+			#{name},
+			#{type},
+			#{description}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE ccm_list SET 	
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks},
+			name = #{name},
+			type = #{type},
+			description = #{description}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE ccm_list SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

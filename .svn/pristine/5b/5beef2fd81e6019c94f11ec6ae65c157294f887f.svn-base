@@ -1,0 +1,170 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.arjjs.ccm.modules.ccm.cpp.dao.CppPopPopDao">
+    
+	<sql id="cppPopPopColumns">
+		a.id AS "id",
+		a.id_card1 AS "idCard1",
+		a.id_card2 AS "idCard2",
+		a.other_name AS "otherName",
+		a.type AS "type",
+		a.time_relation AS "timeRelation",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag",
+		a21.name AS "name1",
+		a22.name AS "name2"
+	</sql>
+	
+	<sql id="cppPopPopJoins">
+	     LEFT JOIN ccm_people a21 ON a21.ident = a.id_card1
+	     LEFT JOIN ccm_people a22 ON a22.ident = a.id_card2
+	</sql>
+    
+	<select id="get" resultType="CppPopPop">
+		SELECT 
+			<include refid="cppPopPopColumns"/>
+		FROM cpp_pop_pop a
+		<include refid="cppPopPopJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="getByIdCard" resultType="CppPopPop">
+		SELECT 
+			<include refid="cppPopPopColumns"/>
+		FROM cpp_pop_pop a
+		<include refid="cppPopPopJoins"/>
+		WHERE a.id_card1 = #{idCard1}
+	</select>
+	
+	<select id="getIdCard" resultType="CcmPeople" parameterType="CcmPeople">
+		SELECT 
+			a.name
+		FROM ccm_people a
+		WHERE a.ident = #{ident}
+	</select>
+	
+	<select id="findList" resultType="CppPopPop">
+		SELECT 
+			<include refid="cppPopPopColumns"/>
+		FROM cpp_pop_pop a
+		<include refid="cppPopPopJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="idCard1 != null and idCard1 != ''">
+				AND (a.id_card1 = #{idCard1} or a.id_card2 = #{idCard1} ) 
+			</if>
+			
+			<if test="type != null and type != ''">
+				AND a.type = #{type}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findListAddTime" resultType="CppPopPop">
+		SELECT 
+			<include refid="cppPopPopColumns"/>
+		FROM cpp_pop_pop a
+		<include refid="cppPopPopJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="idCard1 != null and idCard1 != ''">
+				AND a.id_card1 = #{idCard1} 
+			</if>
+			<if test="addTime != null and addTime != ''">
+				AND a.create_date > #{addTime} 
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="CppPopPop">
+		SELECT 
+			<include refid="cppPopPopColumns"/>
+		FROM cpp_pop_pop a
+		<include refid="cppPopPopJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO cpp_pop_pop(
+			id,
+			id_card1,
+			id_card2,
+			other_name ,
+			type,
+			time_relation,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag,
+			name1,
+			name2
+		) VALUES (
+			#{id},
+			#{idCard1},
+			#{idCard2},
+			#{otherName},
+			#{type},
+			#{timeRelation},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag},
+			#{name1},
+			#{name2}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE cpp_pop_pop SET 	
+			id_card1 = #{idCard1},
+			id_card2 = #{idCard2},
+			other_name =#{otherName},
+			type = #{type},
+			time_relation = #{timeRelation},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE cpp_pop_pop SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

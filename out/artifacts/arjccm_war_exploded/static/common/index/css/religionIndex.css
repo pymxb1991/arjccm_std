@@ -1,0 +1,107 @@
+.left_part{
+    width: 15.4vw;
+    height: 100vh;
+    margin-top: -7px;
+    background:url("../images/statIndexZj/xmzj_place1.png") no-repeat center;
+    background-size: 100% 100%;
+    float: left;
+}
+.left_part li{
+    width: 100%;
+    padding: 0.9vw 0;
+}
+.left_part li a{
+    display: block;
+}
+.left_part li.select{
+    background-image: linear-gradient(to right, rgba(0,216,255,0.3),rgba(0,216,255,0) );
+}
+.left_part li:first-child{
+    margin-top: 1.5vw;
+}
+
+.left_part .l_part{
+    width: 12.76vw;
+    height: 3.33vw;
+    margin-left: 1.45vw;
+}
+
+
+
+.l_title{
+    display: block;
+    text-align: left;
+    font-size:1vw;
+    font-family:Microsoft YaHei;
+    font-weight:400;
+    color: #ffffff;
+    /*line-height:29px;*/
+    /*padding-top: 35px;*/
+    padding-left: 3.8vw;
+    margin-top: 0.5vw;
+
+}
+
+.l_title_English{
+    display: block;
+    text-align: left;
+    font-size:12px;
+    font-family:Microsoft YaHei;
+    font-weight:400;
+    color:#ffffff;
+    line-height:100%;
+    padding-left: 3.8vw;
+}
+
+.right_part{
+    width: calc(100% - 16vw);
+    height: calc(100vh - 90px);
+    float: left;
+    overflow: auto;
+}
+.right_part .r_part{
+    padding: 0 2vw;
+}
+.right_part ul li{
+    width: 18.7vw;
+    height: 18.2vw;
+    background:url("../images/statIndexZj/xmzj_place3.png") no-repeat center;
+    background-size: 100% 100%;
+    padding: 2.07vw 2.3vw 0;
+    float: left;
+    margin-right: 1.4vw;
+    margin-bottom: 1.5vw;
+}
+.right_part ul li:nth-of-type(4n){
+    margin-right: 0;
+}
+.right_part ul li .imgbox{
+    width: 14.2vw;
+    height: 9.6vw;
+    background: url("../images/statIndexZj/xmzj_moren.png") no-repeat center;;
+    border-radius: 6px;
+}
+.right_part ul li .imgbox img{
+    width: 100%;
+    height: 100%;
+    border-radius: 6px;
+}
+.right_part ul li .title{
+    font-size: 0.83vw;
+    text-align: center;
+    line-height: 100%;
+    padding: 1vw 0;
+}
+.right_part ul li .text{
+    font-size: 12px;
+    text-align: left;
+    height: 36px;
+    line-height: 18px;
+    color: #99BECC;
+    overflow: hidden;
+}
+.right_part ul li .line-clamp{
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+}

@@ -1,0 +1,242 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.arjjs.ccm.modules.cms.dao.CcmFontUserDao">
+    
+	<sql id="ccmFontUserColumns">
+		a.id AS "id",
+		a.login_name AS "loginName",
+		a.password AS "password",
+		a.no AS "no",
+		a.name AS "name",
+		a.email AS "email",
+		a.phone AS "phone",
+		a.mobile AS "mobile",
+		a.photo AS "photo",		
+		a.login_flag AS "loginFlag",
+		a.login_type AS "loginType",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag",
+		a.area_com_id AS "areaComId.id",
+		area.name  AS "areaComId.name",
+		a.is_name_visable AS "isNameVisable",
+		a.is_no_visable AS "isNoVisable",
+		a.is_email_visable AS "isEmailVisable",
+		a.is_moblie_visable AS "isMobileVisable"
+	</sql>
+	
+	<sql id="ccmFontUserJoins">
+		LEFT JOIN sys_area area ON area.id = a.area_com_id
+	</sql>
+    
+    
+    
+	<select id="get" resultType="CcmFontUser">
+		SELECT 
+			<include refid="ccmFontUserColumns"/>
+		FROM ccm_font_user a
+		<include refid="ccmFontUserJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	<!-- 根据登录名查询用户 -->
+	<select id="getByLoginName" resultType="CcmFontUser" parameterType="CcmFontUser">
+		SELECT
+			<include refid="ccmFontUserColumns"/>
+		FROM ccm_font_user a
+		<include refid="ccmFontUserJoins"/>
+		WHERE a.login_name = #{loginName} AND a.del_flag = #{DEL_FLAG_NORMAL}
+		<if test="loginFlag != null and loginFlag != ''">
+				AND a.login_flag = #{loginFlag}
+		</if>
+	</select>
+	
+	<select id="findList" resultType="CcmFontUser">
+		SELECT 
+			<include refid="ccmFontUserColumns"/>
+		FROM ccm_font_user a
+		<include refid="ccmFontUserJoins"/>
+			<if test="officeId != null and officeId != ''">
+				LEFT JOIN sys_office office ON office.area_id = area.id
+			</if>
+		<where>
+			<if test="officeId != null and officeId != ''">
+				(office.id = #{officeId} or office.parent_ids LIKE concat('%',#{officeId},'%')) AND 
+			</if>
+				a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="loginName != null and loginName != ''">
+				AND a.login_name = #{loginName}
+			</if>
+			<if test="password != null and password != ''">
+				AND a.password = #{password}
+			</if>
+			<if test="no != null and no != ''">
+				AND a.no = #{no}
+			</if>
+			<if test="name != null and name != ''">
+				AND a.name LIKE 
+					<if test="dbName == 'oracle'">'%'||#{name}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{name}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{name},'%')</if>
+			</if>
+			<if test="email != null and email != ''">
+				AND a.email = #{email}
+			</if>		
+			<if test="loginFlag != null and loginFlag != ''">
+				AND a.login_flag = #{loginFlag}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+		      ,a.login_flag DESC
+	</select>
+	
+	<select id="findareaList" resultType="CcmFontUser">
+		SELECT 
+			<include refid="ccmFontUserColumns"/>
+		FROM ccm_font_user a
+		<include refid="ccmFontUserJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL} AND a.area_com_id = #{areaComId.id} AND a.login_flag = #{loginFlag}
+			<if test="loginName != null and loginName != ''">
+				AND a.login_name = #{loginName}
+			</if>
+			<if test="password != null and password != ''">
+				AND a.password = #{password}
+			</if>
+			<if test="no != null and no != ''">
+				AND a.no = #{no}
+			</if>
+			<if test="name != null and name != ''">
+				AND a.name LIKE 
+					<if test="dbName == 'oracle'">'%'||#{name}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{name}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{name},'%')</if>
+			</if>
+			<if test="email != null and email != ''">
+				AND a.email = #{email}
+			</if>		
+			<if test="loginFlag != null and loginFlag != ''">
+				AND a.login_flag = #{loginFlag}
+			</if>
+				<if test="loginType != null and loginType != ''">
+				AND a.login_type = #{loginType}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+		      ,a.login_flag DESC
+	</select>
+	
+	<select id="findAllList" resultType="CcmFontUser">
+		SELECT 
+			<include refid="ccmFontUserColumns"/>
+		FROM ccm_font_user a
+		<include refid="ccmFontUserJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO ccm_font_user(
+			id,
+			login_name,
+			password,
+			no,
+			name,
+			email,
+			phone,
+			mobile,
+			photo,			
+			login_flag,
+			login_type,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag,
+			area_com_id,
+			is_name_visable,
+			is_no_visable,
+			is_email_visable,
+			is_moblie_visable
+		) VALUES (
+			#{id},
+			#{loginName},
+			#{password},
+			#{no},
+			#{name},
+			#{email},
+			#{phone},
+			#{mobile},
+			#{photo},			
+			#{loginFlag},
+			#{loginType},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag},
+			#{areaComId.id},
+			#{isNameVisable},
+			#{isNoVisable},
+			#{isEmailVisable},
+			#{isMobileVisable}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE ccm_font_user SET 	
+			login_name = #{loginName},
+			password = #{password},
+			no = #{no},
+			name = #{name},
+			email = #{email},
+			phone = #{phone},
+			mobile = #{mobile},
+			photo = #{photo},			
+			login_flag = #{loginFlag},
+			login_type = #{loginType},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks},
+			area_com_id = #{areaComId.id},
+			is_name_visable = #{isNameVisable},
+			is_no_visable = #{isNoVisable},
+			is_email_visable = #{isEmailVisable},
+			is_moblie_visable = #{isMobileVisable}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE ccm_font_user SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

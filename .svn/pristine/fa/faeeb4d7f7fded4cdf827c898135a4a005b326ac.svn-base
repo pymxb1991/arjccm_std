@@ -1,0 +1,242 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.arjjs.ccm.modules.ccm.carpass.dao.CcmCarPassDao">
+    
+	<sql id="ccmCarPassColumns">
+		a.id AS "id",
+		a.plate AS "plate",
+		a.number AS "number",
+		a.bayonet AS "bayonet",
+		a.lane AS "lane",
+		a.brand AS "brand",
+		a.type AS "type",
+		a.passtime AS "passtime",
+		a.direction AS "direction",
+		a.lanenumber AS "lanenumber",
+		a.longitude AS "longitude",
+		a.latitude AS "latitude",
+		a.condition AS "condition",
+		a.speed AS "speed",
+		a.platetype AS "platetype",
+		a.platecolor AS "platecolor",
+		a.cartype AS "cartype",
+		a.carcolor AS "carcolor",
+		a.illegaltype AS "illegaltype",
+		a.sunlouver AS "sunlouver",
+		a.subbrand AS "subbrand",
+		a.outincity AS "outincity",
+		a.issafety AS "issafety",
+		a.pendant AS "pendant",
+		a.iscall AS "iscall",
+		a.yellowcar AS "yellowcar",
+		a.dangerous AS "dangerous",
+		a.chronology AS "chronology",
+		a.headdirection AS "headdirection",
+		a.carphotos AS "carphotos",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag"
+	</sql>
+	
+	<sql id="ccmCarPassJoins">
+	</sql>
+    
+	<select id="get" resultType="CcmCarPass">
+		SELECT 
+			<include refid="ccmCarPassColumns"/>
+		FROM ccm_car_pass a
+		<include refid="ccmCarPassJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="CcmCarPass">
+		SELECT 
+			<include refid="ccmCarPassColumns"/>
+		FROM ccm_car_pass a
+		<include refid="ccmCarPassJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="number != null and number != ''">
+				AND a.number LIKE 
+					<if test="dbName == 'oracle'">'%'||#{number}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{number}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{number},'%')</if>
+			</if>
+			<if test="bayonet != null and bayonet != ''">
+				AND a.bayonet LIKE 
+					<if test="dbName == 'oracle'">'%'||#{bayonet}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{bayonet}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{bayonet},'%')</if>
+			</if>
+			<if test="lane != null and lane != ''">
+				AND a.lane LIKE 
+					<if test="dbName == 'oracle'">'%'||#{lane}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{lane}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{lane},'%')</if>
+			</if>
+			<if test="brand != null and brand != ''">
+				AND a.brand LIKE 
+					<if test="dbName == 'oracle'">'%'||#{brand}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{brand}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{brand},'%')</if>
+			</if>
+			<if test="type != null and type != ''">
+				AND a.type LIKE 
+					<if test="dbName == 'oracle'">'%'||#{type}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{type}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{type},'%')</if>
+			</if>
+			<if test="beginPasstime != null and endPasstime != null and beginPasstime != '' and endPasstime != ''">
+				AND a.passtime BETWEEN #{beginPasstime} AND #{endPasstime}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="CcmCarPass">
+		SELECT 
+			<include refid="ccmCarPassColumns"/>
+		FROM ccm_car_pass a
+		<include refid="ccmCarPassJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO ccm_car_pass(
+			id,
+			plate,
+			number,
+			bayonet,
+			lane,
+			brand,
+			type,
+			passtime,
+			direction,
+			lanenumber,
+			longitude,
+			latitude,
+			condition,
+			speed,
+			platetype,
+			platecolor,
+			cartype,
+			carcolor,
+			illegaltype,
+			sunlouver,
+			subbrand,
+			outincity,
+			issafety,
+			pendant,
+			iscall,
+			yellowcar,
+			dangerous,
+			chronology,
+			headdirection,
+			carphotos,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag
+		) VALUES (
+			#{id},
+			#{plate},
+			#{number},
+			#{bayonet},
+			#{lane},
+			#{brand},
+			#{type},
+			#{passtime},
+			#{direction},
+			#{lanenumber},
+			#{longitude},
+			#{latitude},
+			#{condition},
+			#{speed},
+			#{platetype},
+			#{platecolor},
+			#{cartype},
+			#{carcolor},
+			#{illegaltype},
+			#{sunlouver},
+			#{subbrand},
+			#{outincity},
+			#{issafety},
+			#{pendant},
+			#{iscall},
+			#{yellowcar},
+			#{dangerous},
+			#{chronology},
+			#{headdirection},
+			#{carphotos},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE ccm_car_pass SET 	
+			plate = #{plate},
+			number = #{number},
+			bayonet = #{bayonet},
+			lane = #{lane},
+			brand = #{brand},
+			type = #{type},
+			passtime = #{passtime},
+			direction = #{direction},
+			lanenumber = #{lanenumber},
+			longitude = #{longitude},
+			latitude = #{latitude},
+			condition = #{condition},
+			speed = #{speed},
+			platetype = #{platetype},
+			platecolor = #{platecolor},
+			cartype = #{cartype},
+			carcolor = #{carcolor},
+			illegaltype = #{illegaltype},
+			sunlouver = #{sunlouver},
+			subbrand = #{subbrand},
+			outincity = #{outincity},
+			issafety = #{issafety},
+			pendant = #{pendant},
+			iscall = #{iscall},
+			yellowcar = #{yellowcar},
+			dangerous = #{dangerous},
+			chronology = #{chronology},
+			headdirection = #{headdirection},
+			carphotos = #{carphotos}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE ccm_car_pass SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

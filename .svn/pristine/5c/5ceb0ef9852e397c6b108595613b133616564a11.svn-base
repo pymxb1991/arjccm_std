@@ -1,0 +1,245 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.arjjs.ccm.modules.pbs.sys.dao.PbsDepartmentetcDao">
+
+	<sql id="pbsDepartmentetcColumns">
+		a.id AS "id",
+		a.s_departmentid AS "office.id",
+		a.s_imgurl AS
+		"sImgurl",
+		a.s_masterid AS "sMasterid",
+		a.s_spare01 AS "sSpare01",
+		a.s_spare02 AS "sSpare02",
+		a.s_spare03 AS "sSpare03",
+		a.s_spare04 AS
+		"sSpare04",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks
+		AS "remarks",
+		a.del_flag AS "delFlag",
+		o2.name AS "office.name",
+		u4.s_name AS "mastername"
+	</sql>
+
+	<sql id="pbsDepartmentetcJoins">
+		LEFT JOIN sys_office o2 ON o2.id = a.s_departmentid
+		LEFT
+		JOIN pbs_partymem u4 ON u4.id = a.s_masterid
+	</sql>
+
+	<select id="get" resultType="PbsDepartmentetc">
+		SELECT
+		<include refid="pbsDepartmentetcColumns" />
+		FROM pbs_departmentetc a
+		<include refid="pbsDepartmentetcJoins" />
+		WHERE a.id = #{id}
+	</select>
+
+	<select id="findList" resultType="PbsDepartmentetc">
+		SELECT
+		<include refid="pbsDepartmentetcColumns" />
+		FROM pbs_departmentetc a
+		<include refid="pbsDepartmentetcJoins" />
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="office != null and office.id != null and office.id != ''">
+				AND a.s_departmentid = #{office.id}
+			</if>
+			<if test="sMasterid != null and sMasterid != ''">
+				AND a.s_masterid = #{sMasterid}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+
+	<select id="findAllList" resultType="PbsDepartmentetc">
+		SELECT
+		<include refid="pbsDepartmentetcColumns" />
+		FROM pbs_departmentetc a
+		<include refid="pbsDepartmentetcJoins" />
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+
+	<insert id="insert">
+		INSERT INTO pbs_departmentetc(
+		id,
+		s_departmentid,
+		s_imgurl,
+		s_masterid,
+		s_spare01,
+		s_spare02,
+		s_spare03,
+		s_spare04,
+		create_by,
+		create_date,
+		update_by,
+		update_date,
+		remarks,
+		del_flag
+		) VALUES (
+		#{id},
+		#{office.id},
+		#{sImgurl},
+		#{sMasterid},
+		#{sSpare01},
+		#{sSpare02},
+		#{sSpare03},
+		#{sSpare04},
+		#{createBy.id},
+		#{createDate},
+		#{updateBy.id},
+		#{updateDate},
+		#{remarks},
+		#{delFlag}
+		)
+	</insert>
+
+	<update id="update">
+		UPDATE pbs_departmentetc SET
+		s_departmentid =
+		#{office.id},
+		s_imgurl = #{sImgurl},
+		s_masterid = #{sMasterid},
+		s_spare01 = #{sSpare01},
+		s_spare02 = #{sSpare02},
+		s_spare03 =
+		#{sSpare03},
+		s_spare04 = #{sSpare04},
+		update_by = #{updateBy.id},
+		update_date = #{updateDate},
+		remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+
+	<update id="delete">
+		UPDATE pbs_departmentetc SET
+		del_flag =
+		#{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+
+	<select id="checkExist" resultType="java.lang.Integer">
+		SELECT
+		count(1)
+		FROM
+		pbs_departmentetc a
+		WHERE
+		id &lt;&gt; #{id}
+		and a.s_departmentid =
+		#{office.id}
+		and del_flag = #{DEL_FLAG_NORMAL}
+	</select>
+
+	<select id="getAllOfficeWithName" resultType="com.arjjs.ccm.modules.sys.entity.Office">
+		SELECT
+		distinct(a.id),
+		a.parent_id AS "parent.id",
+		a.parent_ids,
+		a.area_id AS
+		"area.id",
+		a. CODE,
+		a. NAME,
+		a.sort,
+		a.type,
+		a.grade,
+		a.address,
+		a.zip_code,
+		a. MASTER,
+		a.phone,
+		a.fax,
+		a.email,
+		a.remarks,
+		a.create_by AS
+		"createBy.id",
+		a.create_date,
+		a.update_by AS
+		"updateBy.id",
+		a.update_date,
+		a.del_flag,
+		a.useable AS useable,
+		getParentListName(a.id) AS "parentName"
+		FROM
+		sys_office a
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="type != null and type != ''">
+				and a.type = #{type}
+			</if>
+			<if test="parentIds != null and parentIds != ''">
+				and (a.parent_ids LIKE concat('%',#{parentIds},'%')
+
+				)
+			</if>
+		</where>
+		ORDER BY a.parent_id ,a.sort
+	</select>
+
+
+	<select id="getAllOfficeWithMem" resultType="com.arjjs.ccm.modules.sys.entity.Office">
+		<foreach collection="list" open="" close="" item="item"
+			separator="UNION">
+			SELECT
+			a.id,
+			a.parent_id AS "parent.id",
+			a.parent_ids,
+			a.area_id AS
+			"area.id",
+			a. CODE,
+			a. NAME,
+			a.sort,
+			a.type,
+			a.grade,
+			a.address,
+			a.zip_code,
+			a. MASTER,
+			a.phone,
+			a.fax,
+			a.email,
+			a.useable AS useable,
+			a.remarks,
+			a.create_by AS
+			"createBy.id",
+			a.create_date,
+			a.update_by AS
+			"updateBy.id",
+			a.update_date,
+			a.del_flag,
+			getParentListName(a.id) AS
+			"parentName"
+			FROM
+			sys_office a
+			<where>
+				a.del_flag = #{item.DEL_FLAG_NORMAL}
+				<if test="item.type != null and item.type != ''">
+					and a.type = #{item.type}
+				</if>
+				<if test="item.id != null and item.id != ''">
+					and( a.parent_ids LIKE concat('%',#{item.id},'%') or
+					a.id=#{item.id})
+				</if>
+			</where>
+		</foreach>
+		GROUP BY id
+		ORDER BY "parent.id" ,sort
+	</select>
+</mapper>

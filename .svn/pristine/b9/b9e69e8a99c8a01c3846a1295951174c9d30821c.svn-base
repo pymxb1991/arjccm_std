@@ -1,0 +1,141 @@
+package com.arjjs.ccm.modules.ccm.rest.web;
+
+import java.io.IOException;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import com.arjjs.ccm.common.persistence.Page;
+import com.arjjs.ccm.common.web.BaseController;
+import com.arjjs.ccm.modules.ccm.house.entity.CcmHouseBuildmanage;
+import com.arjjs.ccm.modules.ccm.org.entity.CcmOrgNpse;
+import com.arjjs.ccm.modules.ccm.org.service.CcmOrgNpseService;
+import com.arjjs.ccm.modules.ccm.rest.entity.CcmRestResult;
+import com.arjjs.ccm.modules.ccm.rest.entity.CcmRestType;
+import com.arjjs.ccm.modules.sys.entity.User;
+
+/**
+ * 非公有制经济组织-重点场所接口类
+ * 
+ * @author pengjianqiang
+ * @version 2018-02-23
+ */
+@Controller
+@RequestMapping(value = "${appPath}/rest/keyPlace")
+public class CcmRestKeyPlace extends BaseController {
+
+	@Autowired
+	private CcmOrgNpseService ccmOrgNpseService;
+
+	/**
+	 * @see  获取单个重点场所信息
+	 * @param id  ID
+	 * @return 
+	 * @author pengjianqiang
+	 * @version 2018-02-23
+	 */
+	@ResponseBody
+	@RequestMapping(value="/get", method = RequestMethod.GET)
+	public CcmRestResult get(String userId,HttpServletRequest req, HttpServletResponse resp, String id) throws IOException {
+		CcmRestResult result = new CcmRestResult();
+		User sessionUser = (User) req.getSession().getAttribute("user");
+		if (sessionUser== null) {
+			result.setCode(CcmRestType.ERROR_USER_NOT_EXIST);
+			return result;
+		}
+		String sessionUserId = sessionUser.getId();
+		if (userId== null || "".equals(userId) ||!userId.equals(sessionUserId)) {
+			result.setCode(CcmRestType.ERROR_USER_NOT_EXIST);
+			return result;
+		}
+		if (id == null || "".equals(id)) {//参数id不对
+			result.setCode(CcmRestType.ERROR_PARAM);
+			return result;
+		}
+		
+		CcmOrgNpse ccmOrgNpse = ccmOrgNpseService.get(id);
+		
+		result.setCode(CcmRestType.OK);
+		result.setResult(ccmOrgNpse);
+		
+		return result;
+	}
+	
+	/**
+	 * @see  查询重点场所信息
+	 * @param ccmOrgNpse(compImpoType 企业重点类型)
+	 * @param pageNo 页码
+	 * @param pageSize 分页大小
+	 * @return 
+	 * @author pengjianqiang
+	 * @version 2018-02-23
+	 */
+	@ResponseBody
+	@RequestMapping(value="/query", method = RequestMethod.GET)
+	public CcmRestResult query(String userId,CcmOrgNpse ccmOrgNpse, HttpServletRequest req, HttpServletResponse resp) throws IOException {
+		CcmRestResult result = new CcmRestResult();
+		User sessionUser = (User) req.getSession().getAttribute("user");
+		if (sessionUser== null) {
+			result.setCode(CcmRestType.ERROR_USER_NOT_EXIST);
+			return result;
+		}
+		String sessionUserId = sessionUser.getId();
+		if (userId== null || "".equals(userId) ||!userId.equals(sessionUserId)) {
+			result.setCode(CcmRestType.ERROR_USER_NOT_EXIST);
+			return result;
+		}
+		ccmOrgNpse.setCheckUser(sessionUser);
+		Page<CcmOrgNpse> page = ccmOrgNpseService.findPage(new Page<CcmOrgNpse>(req, resp), ccmOrgNpse);
+	
+		result.setCode(CcmRestType.OK);
+		result.setResult(page.getList());
+		
+		return result;
+	}
+	
+	/**
+	 * @see  保存重点场所信息
+	 * @param 
+	 * @return 
+	 * @author fuxinshuang
+	 * @version 2018-03-06
+	 */
+	@ResponseBody
+	@RequestMapping(value="/save", method = RequestMethod.POST)
+	public CcmRestResult modify(String userId,CcmOrgNpse ccmOrgNpse,HttpServletRequest req, HttpServletResponse resp) throws IOException {
+		CcmRestResult result = new CcmRestResult();
+		User sessionUser = (User) req.getSession().getAttribute("user");
+		if (sessionUser== null) {
+			result.setCode(CcmRestType.ERROR_USER_NOT_EXIST);
+			return result;
+		}
+		String sessionUserId = sessionUser.getId();
+		if (userId== null || "".equals(userId) ||!userId.equals(sessionUserId)) {
+			result.setCode(CcmRestType.ERROR_USER_NOT_EXIST);
+			return result;
+		}
+		if (ccmOrgNpse.getId()!= null && !"".equals(ccmOrgNpse.getId())) {
+			CcmOrgNpse ccmOrgNpseDB = ccmOrgNpseService.get(ccmOrgNpse.getId());
+			if (ccmOrgNpseDB == null ) {//从数据库中没有取到对应数据
+				result.setCode(CcmRestType.ERROR_DB_NOT_EXIST);
+			}
+		}
+		if (ccmOrgNpse.getCreateBy()== null) {
+			ccmOrgNpse.setCreateBy(new User(userId));
+		}
+		ccmOrgNpse.setUpdateBy(new User(userId));
+		ccmOrgNpseService.save(ccmOrgNpse);
+		result.setCode(CcmRestType.OK);
+		result.setResult("成功");
+		return result;
+		
+	}
+	
+
+}

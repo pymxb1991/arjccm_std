@@ -1,0 +1,67 @@
+.ratify{
+	float: right;
+	width: 18px;
+	height: 18px;
+	background :url("../images/ratify.png");
+    margin-top: 2px;
+	margin-right: 5px;
+}
+/*.noratify{
+	float: right;
+	width: 18px;
+	height: 18px;
+background-color: transparent;
+	margin-top: 2px;
+	margin-right: 5px;
+}*/
+.stick{
+	transform:rotate(0deg);
+	width:36px;
+	height: 36px;
+	background :url("../images/stick.png");
+	float:left;
+    margin-left: -15px;
+    margin-top: -19px;
+}
+.nostick{
+	transform:rotate(0deg);
+	width:36px;
+	height: 36px;
+	background-color: transparent;
+	float:left;
+	margin-left: -14px;
+	margin-top: -18px;
+}
+.urgent{
+	float: right;
+	width: 18px;
+	height: 18px;
+	margin-top: 2px;
+	margin-right: 5px;
+	background :url("../images/urgent.png");
+}
+/*.nourgent{
+	float: right;
+	width: 18px;
+	height: 18px;
+	margin-top: 2px;
+	margin-right: 5px;
+	background-color: transparent;
+}*/
+.historyLegacy{
+	float: right;
+	width: 18px;
+	height: 18px;
+	margin-top: 2px;
+	margin-right: 5px;
+	background :url("../images/historyLegacy.png");
+}
+/*
+.nohistoryLegacy{
+	float: right;
+	width: 18px;
+	height: 18px;
+	margin-top: 2px;
+	margin-right: 5px;
+	background-color: transparent;
+}*/

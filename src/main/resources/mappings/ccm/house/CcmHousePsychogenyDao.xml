@@ -1,0 +1,314 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.arjjs.ccm.modules.ccm.house.dao.CcmHousePsychogenyDao">
+
+	<sql id="ccmHousePsychogenyColumns">
+		a.id AS "id",
+		a.people_id AS "peopleId",
+		a.economic AS
+		"economic",
+		a.allowance AS "allowance",
+		a.guar_iden AS "guarIden",
+		a.guar_name AS "guarName",
+		a.guar_tel AS "guarTel",
+		a.dateonset AS
+		"dateonset",
+		a.diag_type AS "diagType",
+		a.atte_type AS "atteType",
+		a.acci_hist AS "acciHist",
+		a.acci_count AS "acciCount",
+		a.acci_last AS "acciLast",
+		a.dang_asse AS
+		"dangAsse",
+		a.trea_cond AS "treaCond",
+		a.hospital AS "hospital",
+		a.hosp_reason AS "hospReason",
+		a.trai_inst AS "traiInst",
+		a.management
+		AS "management",
+		a.helpcase AS "helpcase",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS
+		"delFlag"
+	</sql>
+
+	<sql id="ccmHousePsychogenyAllColumns">
+		a.id AS "id",
+		a.people_id AS "peopleId",
+		a.economic AS
+		"economic",
+		a.allowance AS "allowance",
+		a.guar_iden AS "guarIden",
+		a.guar_name AS "guarName",
+		a.guar_tel AS "guarTel",
+		a.dateonset AS
+		"dateonset",
+		a.diag_type AS "diagType",
+		a.atte_type AS "atteType",
+		a.acci_hist AS "acciHist",
+		a.acci_count AS "acciCount",
+		a.acci_last AS "acciLast",
+		a.dang_asse AS
+		"dangAsse",
+		a.trea_cond AS "treaCond",
+		a.hospital AS "hospital",
+		a.hosp_reason AS "hospReason",
+		a.trai_inst AS "traiInst",
+		a.management
+		AS "management",
+		a.helpcase AS "helpcase",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS
+		"delFlag",
+
+		b.ident AS "ident",
+		b. NAME AS "name",
+		b.sex AS "sex",
+		b.telephone AS
+		"telephone",
+		b.type AS "type",
+		b.censu AS "censu",
+		b.domiciledetail AS
+		"domiciledetail",
+		b.residencedetail AS
+		"residencedetail",
+		b.images AS
+		"images",
+		b.birthday AS "birthday",
+		a20.name AS "comName",
+        (case a.atte_type when 01 then '高' when 02 then '中' when 03 then '低' else '' end) "atteTypeLable"
+
+
+	</sql>
+
+	<sql id="ccmHousePsychogenyJoins">
+	</sql>
+	<!--区域 -->
+	<sql id="ccmPopComJoins">
+		LEFT JOIN sys_area a20 ON a20.id = b.area_com_id
+	</sql>
+	<sql id="ccmPopGridJoins">
+		LEFT JOIN sys_area a21 ON a21.id = b.area_grid_id
+	</sql>
+	
+	<select id="get" resultType="CcmHousePsychogeny">
+		SELECT
+		<include refid="ccmHousePsychogenyAllColumns" />
+		FROM ccm_house_psychogeny a LEFT JOIN ccm_people b ON a.people_id =
+		b.id
+		<include refid="ccmHousePsychogenyJoins" />
+		<include refid="ccmPopComJoins"/>
+		<include refid="ccmPopGridJoins"/>
+		WHERE 
+			a.id = #{id}
+	</select>
+
+	<select id="getItemByPeopleId" resultType="CcmHousePsychogeny">
+		SELECT
+		<include refid="ccmHousePsychogenyAllColumns" />
+		FROM ccm_house_psychogeny a LEFT JOIN ccm_people b
+		ON a.people_id = b.id
+		<include refid="ccmHousePsychogenyJoins" />
+		<include refid="ccmPopComJoins"/>
+		<include refid="ccmPopGridJoins"/>
+		<where>
+			a.people_id = #{id}
+			and
+			a.del_flag = '0'
+		</where>
+	</select>
+
+	<select id="findList" resultType="CcmHousePsychogeny">
+		SELECT
+		<include refid="ccmHousePsychogenyAllColumns" />
+		FROM ccm_house_psychogeny a LEFT JOIN ccm_people b
+		ON a.people_id = b.id
+		<include refid="ccmHousePsychogenyJoins" />
+		<include refid="ccmPopComJoins"/>
+		<include refid="ccmPopGridJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="peopleId != null and peopleId != ''">
+				AND a.people_id = #{peopleId}
+			</if>
+			<if test="name != null and name != ''">
+				AND b.name LIKE
+				<if test="dbName == 'oracle'">'%'||#{name}||'%'</if>
+				<if test="dbName == 'mssql'">'%'+#{name}+'%'</if>
+				<if test="dbName == 'mysql'">concat('%',#{name},'%')</if>
+			</if>
+
+			<if test="ident != null and ident != ''">
+				AND b.ident LIKE
+				<if test="dbName == 'oracle'">'%'||#{ident}||'%'</if>
+				<if test="dbName == 'mssql'">'%'+#{ident}+'%'</if>
+				<if test="dbName == 'mysql'">concat('%',#{ident},'%')</if>
+			</if>
+			<if test="censu != null and censu != ''">
+				AND b.censu LIKE
+				<if test="dbName == 'oracle'">'%'||#{censu}||'%'</if>
+				<if test="dbName == 'mssql'">'%'+#{censu}+'%'</if>
+				<if test="dbName == 'mysql'">concat('%',#{censu},'%')</if>
+			</if>
+			<if test="telephone != null and telephone != ''">
+				AND b.telephone LIKE
+				<if test="dbName == 'oracle'">'%'||#{telephone}||'%'</if>
+				<if test="dbName == 'mssql'">'%'+#{telephone}+'%'</if>
+				<if test="dbName == 'mysql'">concat('%',#{telephone},'%')</if>
+			</if>
+			<if test="sex != null and sex != ''">
+				AND b.sex = #{sex}
+			</if>
+			<if test="diagType != null and diagType != ''">
+				AND a.diag_type = #{diagType}
+			</if>
+			<if test="atteType != null and atteType != ''">
+				AND a.atte_type = #{atteType}
+			</if>
+			<if test="acciHist != null and acciHist != ''">
+				AND a.acci_hist = #{acciHist}
+			</if>
+			<if test="acciHist != null and acciHist == ''">
+				AND a.acci_hist = 0
+			</if>
+			<if test="dangAsse != null and dangAsse != ''">
+				AND a.dang_asse = #{dangAsse}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+
+	<select id="findAllList" resultType="CcmHousePsychogeny">
+		SELECT
+		<include refid="ccmHousePsychogenyColumns" />
+		FROM ccm_house_psychogeny a LEFT JOIN ccm_people b
+		ON a.people_id = b.id
+		<include refid="ccmHousePsychogenyJoins" />
+		<include refid="ccmPopComJoins"/>
+		<include refid="ccmPopGridJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+
+	<insert id="insert">
+		INSERT INTO ccm_house_psychogeny(
+		id,
+		people_id,
+		economic,
+		allowance,
+		guar_iden,
+		guar_name,
+		guar_tel,
+		dateonset,
+		diag_type,
+		atte_type,
+		acci_hist,
+		acci_count,
+		acci_last,
+		dang_asse,
+		trea_cond,
+		hospital,
+		hosp_reason,
+		trai_inst,
+		management,
+		helpcase,
+		create_by,
+		create_date,
+		update_by,
+		update_date,
+		remarks,
+		del_flag
+		) VALUES (
+		#{id},
+		#{peopleId},
+		#{economic},
+		#{allowance},
+		#{guarIden},
+		#{guarName},
+		#{guarTel},
+		#{dateonset},
+		#{diagType},
+		#{atteType},
+		#{acciHist},
+		#{acciCount},
+		#{acciLast},
+		#{dangAsse},
+		#{treaCond},
+		#{hospital},
+		#{hospReason},
+		#{traiInst},
+		#{management},
+		#{helpcase},
+		#{createBy.id},
+		#{createDate},
+		#{updateBy.id},
+		#{updateDate},
+		#{remarks},
+		#{delFlag}
+		)
+	</insert>
+
+	<update id="update">
+		UPDATE ccm_house_psychogeny SET
+		people_id =
+		#{peopleId},
+		economic = #{economic},
+		allowance = #{allowance},
+		guar_iden
+		= #{guarIden},
+		guar_name = #{guarName},
+		guar_tel = #{guarTel},
+		dateonset
+		= #{dateonset},
+		diag_type = #{diagType},
+		atte_type = #{atteType},
+		acci_hist = #{acciHist},
+		acci_count = #{acciCount},
+		acci_last = #{acciLast},
+		dang_asse =
+		#{dangAsse},
+		trea_cond = #{treaCond},
+		hospital = #{hospital},
+		hosp_reason = #{hospReason},
+		trai_inst = #{traiInst},
+		management =
+		#{management},
+		helpcase = #{helpcase},
+		update_by = #{updateBy.id},
+		update_date = #{updateDate},
+		remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+
+	<update id="delete">
+		UPDATE ccm_house_psychogeny SET
+		del_flag =
+		#{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+
+</mapper>

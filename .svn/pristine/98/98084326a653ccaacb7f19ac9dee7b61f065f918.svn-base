@@ -1,0 +1,429 @@
+/**
+ * Copyright &copy; 2012-2016 <a href="https://github.com/thinkgem/jeesite">JeeSite</a> All rights reserved.
+ */
+package com.arjjs.ccm.modules.flat.handle.entity;
+
+import com.arjjs.ccm.common.persistence.DataEntity;
+import com.arjjs.ccm.modules.ccm.rest.entity.AlarmHandleUserStatus;
+import com.arjjs.ccm.modules.flat.action.entity.BphActionInfo;
+import com.arjjs.ccm.modules.flat.planinfo.entity.BphPlanInfo;
+import com.arjjs.ccm.modules.flat.stepinfo.entity.BphStepInfo;
+import com.arjjs.ccm.modules.sys.entity.User;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import org.hibernate.validator.constraints.Length;
+
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+/**
+ * 出警信息Entity
+ * @author liu
+ * @version 2018-11-22
+ */
+public class BphAlarmHandle extends DataEntity<BphAlarmHandle> {
+	
+	private static final long serialVersionUID = 1L;
+	private String alarmId;		// 警情id
+	private List<String> alarmIds;		// 警情ids
+	private String handleCode;		// 处警单编号
+	private String handlePoliceId;		// 处警员id
+	private String task;		// 任务描述
+	private double destinyX;		// 目的地经度
+	private double destinyY;		// 目的地纬度
+	private Date dispatchTime;		// 派单时间
+	private Date receiveTime;		// 接单时间
+	private Date arriveTime;		// 到达时间
+	private Date finishTime;		// 处置完成时间
+	private String receiveX;		// 接单时经度
+	private String receiveY;		// 接单时纬度
+	private String arriveX;		// 到达现场时经度
+	private String arriveY;		// 到达现场时纬度
+	private String finishX;		// 处警完成时经度
+	private String finishY;		// 处警完成时纬度
+	private String handleResult;		// 反馈信息
+	private String status;		// 处置状态
+	private String planId;		// 预案ID
+	private String stepId;		// 步骤ID
+	private String actionId;		// 动作ID
+	private String longinName;//user_longinName
+	private String userId;
+	private String name;     //处警员姓名
+	private BphPlanInfo plan;
+	private BphStepInfo step;
+	private BphActionInfo action;
+	private User user;
+	
+	private String officeId;//部门Id
+	private String officeName;//部门名称
+	private String VALUE0;//当天处警时间均值
+	private String VALUE1;//前1天处警时间均值
+	private String VALUE2;//前2天处警时间均值
+	private String VALUE3;//前3天处警时间均值
+	private String VALUE4;//前4天处警时间均值
+	private String VALUE5;//前5天处警时间均值
+	private String VALUE6;//前6天处警时间均值
+	private String alarmGenerCode;
+	private String alarmTypeCode;
+	private String alarmSmallTypeCode;
+
+	Map<String,List<AlarmHandleUserStatus>> alarmHandleUserStatusMap = new HashMap<String,List<AlarmHandleUserStatus>>();
+	
+	public List<String> getAlarmIds() {
+		return alarmIds;
+	}
+
+	public void setAlarmIds(List<String> alarmIds) {
+		this.alarmIds = alarmIds;
+	}
+
+	public User getUser() {
+		return user;
+	}
+
+	public void setUser(User user) {
+		this.user = user;
+	}
+
+	public BphPlanInfo getPlan() {
+		return plan;
+	}
+
+	public void setPlan(BphPlanInfo plan) {
+		this.plan = plan;
+	}
+
+	public BphStepInfo getStep() {
+		return step;
+	}
+
+	public void setStep(BphStepInfo step) {
+		this.step = step;
+	}
+
+	public BphActionInfo getAction() {
+		return action;
+	}
+
+	public void setAction(BphActionInfo action) {
+		this.action = action;
+	}
+
+	public String getOfficeId() {
+		return officeId;
+	}
+
+	public void setOfficeId(String officeId) {
+		this.officeId = officeId;
+	}
+
+	public String getOfficeName() {
+		return officeName;
+	}
+
+	public void setOfficeName(String officeName) {
+		this.officeName = officeName;
+	}
+
+	public String getVALUE0() {
+		return VALUE0;
+	}
+
+	public void setVALUE0(String vALUE0) {
+		VALUE0 = vALUE0;
+	}
+
+	public String getVALUE1() {
+		return VALUE1;
+	}
+
+	public void setVALUE1(String vALUE1) {
+		VALUE1 = vALUE1;
+	}
+
+	public String getVALUE2() {
+		return VALUE2;
+	}
+
+	public void setVALUE2(String vALUE2) {
+		VALUE2 = vALUE2;
+	}
+
+	public String getVALUE3() {
+		return VALUE3;
+	}
+
+	public void setVALUE3(String vALUE3) {
+		VALUE3 = vALUE3;
+	}
+
+	public String getVALUE4() {
+		return VALUE4;
+	}
+
+	public void setVALUE4(String vALUE4) {
+		VALUE4 = vALUE4;
+	}
+
+	public String getVALUE5() {
+		return VALUE5;
+	}
+
+	public void setVALUE5(String vALUE5) {
+		VALUE5 = vALUE5;
+	}
+
+	public String getVALUE6() {
+		return VALUE6;
+	}
+
+	public void setVALUE6(String vALUE6) {
+		VALUE6 = vALUE6;
+	}
+
+	public String getUserId() {
+		return userId;
+	}
+
+	public void setUserId(String userId) {
+		this.userId = userId;
+	}
+
+	public String getLonginName() {
+		return longinName;
+	}
+
+	public void setLonginName(String longinName) {
+		this.longinName = longinName;
+	}
+
+	public BphAlarmHandle() {
+		super();
+	}
+
+	public BphAlarmHandle(String id){
+		super(id);
+	}
+
+	@Length(min=0, max=64, message="警情id长度必须介于 0 和 64 之间")
+	public String getAlarmId() {
+		return alarmId;
+	}
+
+	public void setAlarmId(String alarmId) {
+		this.alarmId = alarmId;
+	}
+	
+	@Length(min=0, max=64, message="处警单编号长度必须介于 0 和 64 之间")
+	public String getHandleCode() {
+		return handleCode;
+	}
+
+	public void setHandleCode(String handleCode) {
+		this.handleCode = handleCode;
+	}
+	
+	@Length(min=0, max=64, message="处警员id长度必须介于 0 和 64 之间")
+	public String getHandlePoliceId() {
+		return handlePoliceId;
+	}
+
+	public void setHandlePoliceId(String handlePoliceId) {
+		this.handlePoliceId = handlePoliceId;
+	}
+	
+	@Length(min=0, max=128, message="任务描述长度必须介于 0 和 128 之间")
+	public String getTask() {
+		return task = (task == null) ? "" : task;
+	}
+
+	public void setTask(String task) {
+		this.task = task;
+	}
+	
+	public double getDestinyX() {
+		return destinyX;
+	}
+
+	public void setDestinyX(double destinyX) {
+		this.destinyX = destinyX;
+	}
+	
+	public double getDestinyY() {
+		return destinyY;
+	}
+
+	public void setDestinyY(double destinyY) {
+		this.destinyY = destinyY;
+	}
+	
+	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+	public Date getDispatchTime() {
+		return dispatchTime;
+	}
+
+	public void setDispatchTime(Date dispatchTime) {
+		this.dispatchTime = dispatchTime;
+	}
+	
+	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+	public Date getReceiveTime() {
+		return receiveTime;
+	}
+
+	public void setReceiveTime(Date receiveTime) {
+		this.receiveTime = receiveTime;
+	}
+	
+	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+	public Date getArriveTime() {
+		return arriveTime;
+	}
+
+	public void setArriveTime(Date arriveTime) {
+		this.arriveTime = arriveTime;
+	}
+	
+	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+	public Date getFinishTime() {
+		return finishTime;
+	}
+
+	public void setFinishTime(Date finishTime) {
+		this.finishTime = finishTime;
+	}
+	
+	public String getReceiveX() {
+		return receiveX;
+	}
+
+	public void setReceiveX(String receiveX) {
+		this.receiveX = receiveX;
+	}
+	
+	public String getReceiveY() {
+		return receiveY;
+	}
+
+	public void setReceiveY(String receiveY) {
+		this.receiveY = receiveY;
+	}
+	
+	public String getArriveX() {
+		return arriveX;
+	}
+
+	public void setArriveX(String arriveX) {
+		this.arriveX = arriveX;
+	}
+	
+	public String getArriveY() {
+		return arriveY;
+	}
+
+	public void setArriveY(String arriveY) {
+		this.arriveY = arriveY;
+	}
+	
+	public String getFinishX() {
+		return finishX;
+	}
+
+	public void setFinishX(String finishX) {
+		this.finishX = finishX;
+	}
+	
+	public String getFinishY() {
+		return finishY;
+	}
+
+	public void setFinishY(String finishY) {
+		this.finishY = finishY;
+	}
+	
+	@Length(min=0, max=512, message="反馈信息长度必须介于 0 和 512 之间")
+	public String getHandleResult() {
+		return handleResult = (handleResult == null) ? "" : handleResult;
+	}
+
+	public void setHandleResult(String handleResult) {
+		this.handleResult = handleResult;
+	}
+	
+	@Length(min=0, max=1, message="处置状态长度必须介于 0 和 1 之间")
+	public String getStatus() {
+		return status;
+	}
+
+	public void setStatus(String status) {
+		this.status = status;
+	}
+	
+	@Length(min=0, max=64, message="预案ID长度必须介于 0 和 64 之间")
+	public String getPlanId() {
+		return planId;
+	}
+
+	public void setPlanId(String planId) {
+		this.planId = planId;
+	}
+	
+	@Length(min=0, max=64, message="步骤ID长度必须介于 0 和 64 之间")
+	public String getStepId() {
+		return stepId;
+	}
+
+	public void setStepId(String stepId) {
+		this.stepId = stepId;
+	}
+	
+	@Length(min=0, max=64, message="动作ID长度必须介于 0 和 64 之间")
+	public String getActionId() {
+		return actionId;
+	}
+
+	public void setActionId(String actionId) {
+		this.actionId = actionId;
+	}
+
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	public String getAlarmGenerCode() {
+		return alarmGenerCode;
+	}
+
+	public void setAlarmGenerCode(String alarmGenerCode) {
+		this.alarmGenerCode = alarmGenerCode;
+	}
+
+	public String getAlarmTypeCode() {
+		return alarmTypeCode;
+	}
+
+	public void setAlarmTypeCode(String alarmTypeCode) {
+		this.alarmTypeCode = alarmTypeCode;
+	}
+
+	public String getAlarmSmallTypeCode() {
+		return alarmSmallTypeCode;
+	}
+
+	public void setAlarmSmallTypeCode(String alarmSmallTypeCode) {
+		this.alarmSmallTypeCode = alarmSmallTypeCode;
+	}
+
+	public Map<String, List<AlarmHandleUserStatus>> getAlarmHandleUserStatusMap() {
+		return alarmHandleUserStatusMap;
+	}
+
+	public void setAlarmHandleUserStatusMap(Map<String, List<AlarmHandleUserStatus>> alarmHandleUserStatusMap) {
+		this.alarmHandleUserStatusMap = alarmHandleUserStatusMap;
+	}
+}

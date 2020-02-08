@@ -1,0 +1,32 @@
+/**
+ * Copyright &copy; 2012-2016 <a href="https://github.com/thinkgem/jeesite">JeeSite</a> All rights reserved.
+ */
+package com.arjjs.ccm.modules.ccm.org.dao;
+
+import com.arjjs.ccm.common.persistence.CrudDao;
+import com.arjjs.ccm.common.persistence.annotation.MyBatisDao;
+import com.arjjs.ccm.modules.ccm.org.entity.CcmOrgTeam;
+import com.arjjs.ccm.modules.ccm.org.entity.CcmUserDevicePo;
+import com.arjjs.ccm.modules.sys.entity.User;
+
+import java.util.List;
+
+/**
+ * 综治队伍DAO接口
+ * @author liang
+ * @version 2018-01-13
+ */
+@MyBatisDao
+public interface CcmOrgTeamDao extends CrudDao<CcmOrgTeam> {
+	/**
+	 * 新填userId查询
+	 * @param  
+	 * @return
+	 */
+	public CcmOrgTeam findUserId(String userId);
+	
+	public List<User> findUserByOfficeId(CcmOrgTeam ccmOrgTeam);
+	public List<CcmOrgTeam> queryUserByOfficeId(CcmOrgTeam ccmOrgTeam);
+	public List<String> findOnlineUserId();
+	public List<CcmUserDevicePo> findOnlineUserInfo();
+}

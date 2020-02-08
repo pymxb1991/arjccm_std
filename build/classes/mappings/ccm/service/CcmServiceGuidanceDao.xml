@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.arjjs.ccm.modules.ccm.service.dao.CcmServiceGuidanceDao">
+    
+	<sql id="ccmServiceGuidanceColumns">
+		a.id AS "id",
+		a.type AS "type",
+		a.title AS "title",
+		a.pcs_people AS "pcsPeople",
+		a.pcs_conditions AS "pcsConditions",
+		a.pcs_files AS "pcsFiles",
+		a.attention AS "attention",
+		a.expense AS "expense",
+		a.process AS "process",
+		a.pcs_add AS "pcsAdd",
+		a.office_hours AS "officeHours",
+		a.file AS "file",
+		a.extend1 AS "extend1",
+		a.extend2 AS "extend2",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag",
+		(case a.type 
+			when 01 then '群众来访' 
+			when 02 then '司法调解' 
+			when 03 then '问题投诉'
+			else '' end) "typeLable"
+	</sql>
+	
+	<sql id="ccmServiceGuidanceJoins">
+	</sql>
+    
+	<select id="get" resultType="CcmServiceGuidance">
+		SELECT 
+			<include refid="ccmServiceGuidanceColumns"/>
+		FROM ccm_service_guidance a
+		<include refid="ccmServiceGuidanceJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="CcmServiceGuidance">
+		SELECT 
+			<include refid="ccmServiceGuidanceColumns"/>
+		FROM ccm_service_guidance a
+		<include refid="ccmServiceGuidanceJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="type != null and type != ''">
+				AND a.type = #{type}
+			</if>
+			<if test="title != null and title != ''">
+				AND a.title LIKE 
+					<if test="dbName == 'oracle'">'%'||#{title}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{title}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{title},'%')</if>
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="CcmServiceGuidance">
+		SELECT 
+			<include refid="ccmServiceGuidanceColumns"/>
+		FROM ccm_service_guidance a
+		<include refid="ccmServiceGuidanceJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO ccm_service_guidance(
+			id,
+			type,
+			title,
+			pcs_people,
+			pcs_conditions,
+			pcs_files,
+			attention,
+			expense,
+			process,
+			pcs_add,
+			office_hours,
+			file,
+			extend1,
+			extend2,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag
+		) VALUES (
+			#{id},
+			#{type},
+			#{title},
+			#{pcsPeople},
+			#{pcsConditions},
+			#{pcsFiles},
+			#{attention},
+			#{expense},
+			#{process},
+			#{pcsAdd},
+			#{officeHours},
+			#{file},
+			#{extend1},
+			#{extend2},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE ccm_service_guidance SET 	
+			type = #{type},
+			title = #{title},
+			pcs_people = #{pcsPeople},
+			pcs_conditions = #{pcsConditions},
+			pcs_files = #{pcsFiles},
+			attention = #{attention},
+			expense = #{expense},
+			process = #{process},
+			pcs_add = #{pcsAdd},
+			office_hours = #{officeHours},
+			file = #{file},
+			extend1 = #{extend1},
+			extend2 = #{extend2},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE ccm_service_guidance SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

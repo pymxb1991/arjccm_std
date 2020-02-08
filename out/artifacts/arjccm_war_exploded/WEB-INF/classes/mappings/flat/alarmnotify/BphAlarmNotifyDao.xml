@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.arjjs.ccm.modules.flat.alarmnotify.dao.BphAlarmNotifyDao">
+    
+	<sql id="bphAlarmNotifyColumns">
+		a.id AS "id",
+		a.alarm_id AS "alarmId",
+		a.receive_user_id AS "receiveUserId",
+		u.name AS "receiveUserName",
+		a.type AS "type",
+		a.title AS "title",
+		a.content AS "content",
+		a.status AS "status",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.plan_id AS "planId",
+		a.step_id AS "stepId",
+		a.action_id AS "actionId",
+		a.del_flag AS "delFlag"
+	</sql>
+	
+	<sql id="bphAlarmNotifyJoins">
+		LEFT JOIN sys_user u on a.receive_user_id = u.id
+	</sql>
+    
+	<select id="get" resultType="BphAlarmNotify">
+		SELECT 
+			<include refid="bphAlarmNotifyColumns"/>
+		FROM bph_alarm_notify a
+		<include refid="bphAlarmNotifyJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="BphAlarmNotify">
+		SELECT 
+			<include refid="bphAlarmNotifyColumns"/>
+		FROM bph_alarm_notify a
+		<include refid="bphAlarmNotifyJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<!-- <if test="receiveUserId != null and receiveUserId != ''">
+				AND a.receive_user_id = #{receiveUserId}
+			</if> -->
+			<if test="receiveUserName != null and receiveUserName != ''">
+				AND u.name = #{receiveUserName}
+			</if>
+			<if test="type != null and type != ''">
+				AND a.type = #{type}
+			</if>
+			<if test="status != null and status != ''">
+				AND a.status = #{status}
+			</if>
+			<if test="alarmId != null and alarmId != ''">
+				AND a.alarm_id = #{alarmId}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="BphAlarmNotify">
+		SELECT 
+			<include refid="bphAlarmNotifyColumns"/>
+		FROM bph_alarm_notify a
+		<include refid="bphAlarmNotifyJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO bph_alarm_notify(
+			id,
+			alarm_id,
+			receive_user_id,
+			type,
+			title,
+			content,
+			status,
+			plan_id,
+			step_id,
+			action_id,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag
+		) VALUES (
+			#{id},
+			#{alarmId},
+			#{receiveUserId},
+			#{type},
+			#{title},
+			#{content},
+			#{status},
+			#{planId},
+			#{stepId},
+			#{actionId},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE bph_alarm_notify SET 	
+			alarm_id = #{alarmId},
+			receive_user_id = #{receiveUserId},
+			type = #{type},
+			title = #{title},
+			content = #{content},
+			status = #{status},
+			plan_id = #{planId},
+			step_id = #{stepId},
+			action_id = #{actionId},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE bph_alarm_notify SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

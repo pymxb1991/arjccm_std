@@ -1,0 +1,198 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.arjjs.ccm.modules.ccm.event.dao.CcmEventRequestdealDao">
+
+	<sql id="ccmEventRequestdealColumns">
+		a.id AS "id",
+		a.event_request_id AS "eventRequestId",
+		a.deal_unit AS "dealUnit",
+		a.event_principal AS "eventPrincipal",
+		a.tel_person AS "telPerson",
+		a.tel_com AS "telCom",
+		a.create_by AS
+		"createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS
+		"updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag"
+	</sql>
+
+	<sql id="ccmEventRequestdealAllColumns">
+		a.id AS "id",
+		a.event_request_id AS "eventRequestId",
+		a.deal_unit AS "dealUnit",
+		a.event_principal AS "eventPrincipal",
+		a.tel_person AS "telPerson",
+		a.tel_com AS "telCom",
+		a.create_by AS
+		"createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS
+		"updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag",
+		b.name AS "createName",
+		c.case_name AS
+		"caseName"
+	</sql>
+
+
+	<sql id="ccmEventRequestdealJoins">
+	</sql>
+
+	<sql id="ccmEventIncidentJoinsUser">
+		LEFT JOIN sys_user b ON b.id = a.create_by
+	</sql>
+
+	<sql id="ccmEventCasedealJoinsWithIncident">
+		LEFT JOIN ccm_event_request c ON c.id =a.event_request_id
+	</sql>
+
+	<select id="get" resultType="CcmEventRequestdeal">
+		SELECT
+		<include refid="ccmEventRequestdealAllColumns" />
+		FROM ccm_event_requestdeal a
+		<include refid="ccmEventIncidentJoinsUser" />
+		<include refid="ccmEventCasedealJoinsWithIncident" />
+		WHERE a.id = #{id}
+	</select>
+
+	<select id="findList" resultType="CcmEventRequestdeal">
+		SELECT
+		<include refid="ccmEventRequestdealAllColumns" />
+		FROM ccm_event_requestdeal a
+		<include refid="ccmEventIncidentJoinsUser" />
+		<include refid="ccmEventCasedealJoinsWithIncident" />
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="eventRequestId != null and eventRequestId != ''">
+				AND a.event_request_id LIKE
+				<if test="dbName == 'oracle'">'%'||#{eventRequestId}||'%'</if>
+				<if test="dbName == 'mssql'">'%'+#{eventRequestId}+'%'</if>
+				<if test="dbName == 'mysql'">concat('%',#{eventRequestId},'%')</if>
+			</if>
+			
+			
+			<if test="caseName != null and caseName != ''">
+				AND c.case_name LIKE
+				<if test="dbName == 'oracle'">'%'||#{caseName}||'%'</if>
+				<if test="dbName == 'mssql'">'%'+#{caseName}+'%'</if>
+				<if test="dbName == 'mysql'">concat('%',#{caseName},'%')</if>
+			</if>
+			
+			<if test="dealUnit != null and dealUnit != ''">
+				AND a.deal_unit LIKE
+				<if test="dbName == 'oracle'">'%'||#{dealUnit}||'%'</if>
+				<if test="dbName == 'mssql'">'%'+#{dealUnit}+'%'</if>
+				<if test="dbName == 'mysql'">concat('%',#{dealUnit},'%')</if>
+			</if>
+			<if test="eventPrincipal != null and eventPrincipal != ''">
+				AND a.event_principal LIKE
+				<if test="dbName == 'oracle'">'%'||#{eventPrincipal}||'%'</if>
+				<if test="dbName == 'mssql'">'%'+#{eventPrincipal}+'%'</if>
+				<if test="dbName == 'mysql'">concat('%',#{eventPrincipal},'%')</if>
+			</if>
+			<if test="telPerson != null and telPerson != ''">
+				AND a.tel_person LIKE
+				<if test="dbName == 'oracle'">'%'||#{telPerson}||'%'</if>
+				<if test="dbName == 'mssql'">'%'+#{telPerson}+'%'</if>
+				<if test="dbName == 'mysql'">concat('%',#{telPerson},'%')</if>
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+
+	<select id="findAllList" resultType="CcmEventRequestdeal">
+		SELECT
+		<include refid="ccmEventRequestdealColumns" />
+		FROM ccm_event_requestdeal a
+		<include refid="ccmEventRequestdealJoins" />
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+
+	<insert id="insert">
+		INSERT INTO ccm_event_requestdeal(
+		id,
+		event_request_id,
+		deal_unit,
+		event_principal,
+		tel_person,
+		tel_com,
+		create_by,
+		create_date,
+		update_by,
+		update_date,
+		remarks,
+		del_flag
+		) VALUES (
+		#{id},
+		#{eventRequestId},
+		#{dealUnit},
+		#{eventPrincipal},
+		#{telPerson},
+		#{telCom},
+		#{createBy.id},
+		#{createDate},
+		#{updateBy.id},
+		#{updateDate},
+		#{remarks},
+		#{delFlag}
+		)
+	</insert>
+
+	<update id="update">
+		UPDATE ccm_event_requestdeal SET
+		event_request_id =
+		#{eventRequestId},
+		deal_unit = #{dealUnit},
+		event_principal =
+		#{eventPrincipal},
+		tel_person = #{telPerson},
+		tel_com = #{telCom},
+		update_by = #{updateBy.id},
+		update_date = #{updateDate},
+		remarks =
+		#{remarks}
+		WHERE id = #{id}
+	</update>
+
+	<update id="delete">
+		UPDATE ccm_event_requestdeal SET
+		del_flag =
+		#{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+
+	<!-- listWithPID -->
+	<select id="listWithPID" resultType="CcmEventRequestdeal">
+		SELECT
+		<include refid="ccmEventRequestdealColumns" />
+		FROM ccm_event_requestdeal a
+		<where>
+			<!-- Not deleted -->
+			a.del_flag = "0"
+			and a.event_request_id = #{id}
+		</where>
+
+	</select>
+</mapper>

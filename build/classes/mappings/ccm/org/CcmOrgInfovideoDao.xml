@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.arjjs.ccm.modules.ccm.org.dao.CcmOrgInfovideoDao">
+    
+	<sql id="ccmOrgInfovideoColumns">
+		a.id AS "id",
+		a.centre_name AS "centreName",
+		a.centre_tel AS "centreTel",
+		a.centre_scale AS "centreScale",
+		a.centre_resp_name AS "centreRespName",
+		a.specialty_num AS "specialtyNum",
+		a.work_area AS "workArea",
+		a.expenditure AS "expenditure",
+		a.video_secu_num AS "videoSecuNum",
+		a.office_allday AS "officeAllday",
+		a.address AS "address",
+		a.add_detail AS "addDetail",
+		a.area_map AS "areaMap",
+		a.area_point AS "areaPoint",
+		a.icon AS "icon",
+		a.images AS "images",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag"
+	</sql>
+	
+	<sql id="ccmOrgInfovideoJoins">
+	</sql>
+    
+	<select id="get" resultType="CcmOrgInfovideo">
+		SELECT 
+			<include refid="ccmOrgInfovideoColumns"/>
+		FROM ccm_org_infovideo a
+		<include refid="ccmOrgInfovideoJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="CcmOrgInfovideo">
+		SELECT 
+			<include refid="ccmOrgInfovideoColumns"/>
+		FROM ccm_org_infovideo a
+		<include refid="ccmOrgInfovideoJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="centreName != null and centreName != ''">
+				AND a.centre_name LIKE 
+					<if test="dbName == 'oracle'">'%'||#{centreName}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{centreName}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{centreName},'%')</if>
+			</if>
+			<if test="centreScale != null and centreScale != ''">
+				AND a.centre_scale = #{centreScale}
+			</if>
+			<if test="centreRespName != null and centreRespName != ''">
+				AND a.centre_resp_name = #{centreRespName}
+			</if>
+			<if test="address != null and address != ''">
+				AND a.address = #{address}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="CcmOrgInfovideo">
+		SELECT 
+			<include refid="ccmOrgInfovideoColumns"/>
+		FROM ccm_org_infovideo a
+		<include refid="ccmOrgInfovideoJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO ccm_org_infovideo(
+			id,
+			centre_name,
+			centre_tel,
+			centre_scale,
+			centre_resp_name,
+			specialty_num,
+			work_area,
+			expenditure,
+			video_secu_num,
+			office_allday,
+			address,
+			add_detail,
+			area_map,
+			area_point,
+			icon,
+			images,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag
+		) VALUES (
+			#{id},
+			#{centreName},
+			#{centreTel},
+			#{centreScale},
+			#{centreRespName},
+			#{specialtyNum},
+			#{workArea},
+			#{expenditure},
+			#{videoSecuNum},
+			#{officeAllday},
+			#{address},
+			#{addDetail},
+			#{areaMap},
+			#{areaPoint},
+			#{icon},
+			#{images},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE ccm_org_infovideo SET 	
+			centre_name = #{centreName},
+			centre_tel = #{centreTel},
+			centre_scale = #{centreScale},
+			centre_resp_name = #{centreRespName},
+			specialty_num = #{specialtyNum},
+			work_area = #{workArea},
+			expenditure = #{expenditure},
+			video_secu_num = #{videoSecuNum},
+			office_allday = #{officeAllday},
+			address = #{address},
+			add_detail = #{addDetail},
+			area_map = #{areaMap},
+			area_point = #{areaPoint},
+			icon = #{icon},
+			images = #{images},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE ccm_org_infovideo SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

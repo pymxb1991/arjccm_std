@@ -1,0 +1,300 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.arjjs.ccm.modules.ccm.partybuild.dao.CcmPartyOrganizDao">
+    
+	<sql id="ccmPartyOrganizColumns">
+		a.id AS "id",
+		a.type AS "type",
+		a.name AS "name",
+		a.all_name AS "allName",
+		a.community AS "community.id",
+		a20.name AS "community.name",
+		a.fax_num AS "faxNum",
+		a.super_org AS "superOrg",
+		a.org_attr AS "orgAttr",
+		a.org_attr_relation AS "orgAttrRelation",
+		a.postal_code AS "postalCode",
+		a.org_code AS "orgCode",
+		a.create_reference_num AS "createReferenceNum",
+		a.telphone AS "telphone",
+		a.user_id AS "user.id",
+		a.address AS "address",
+		a.create_reason AS "createReason",
+		a.dept_name AS "deptName",
+		a.dept_attr_relation AS "deptAttrRelation",
+		a.dept_attr AS "deptAttr",
+		a.dept_industry AS "deptIndustry",
+		a.dept_economic_type AS "deptEconomicType",
+		a.dept_enterprise_type AS "deptEnterpriseType",
+		a.dept_enterprise_scope AS "deptEnterpriseScope",
+		a.dept_impt_enterprise_flag AS "deptImptEnterpriseFlag",
+		a.dept_legal_grass_org AS "deptLegalGrassOrg",
+		a.dept_gove_part_org AS "deptGovePartOrg",
+		a.dept_city_road_info AS "deptCityRoadInfo",
+		a.dept_mediu_org_type AS "deptMediuOrgType",
+		a.dept_part_serv_flag AS "deptPartServFlag",
+		a.dept_part_post_flag AS "deptPartPostFlag",
+		a.dept_send_part_flag AS "deptSendPartFlag",
+		a.dept_part_to_flag AS "deptParToFlag",
+		a.dept_part_num AS "deptPartNum",
+		a.dept_modf_enter_flag AS "deptModfEnterFlag",
+		a.dept_legal_part_flag AS "deptLegalPartFlag",
+		a.dept_legal_all_flag AS "deptLegalAllFlag",
+		a.dept_on_employees_num AS "deptOnEmployeesNum",
+		a.dept_on_workers_num AS "deptOnWorkersNum",
+		a.dept_tree_five_num AS "deptTreeFiveNum",
+		a.dept_prof_tech_num AS "deptProfTechNum",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag",
+		u14.name AS "user.name"
+	</sql>
+	
+	<sql id="ccmPartyOrganizJoins">
+		LEFT JOIN sys_user u14 ON u14.id = a.user_id
+	</sql>
+	<sql id="ccmPartyOrganizJoinsArea">
+		LEFT JOIN sys_area a20 ON a20.id = a.community
+	</sql>
+
+
+    
+	<select id="get" resultType="CcmPartyOrganiz">
+		SELECT 
+			<include refid="ccmPartyOrganizColumns"/>
+
+		FROM ccm_party_organization a
+		<include refid="ccmPartyOrganizJoins"/>
+		<include refid="ccmPartyOrganizJoinsArea"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="CcmPartyOrganiz">
+		SELECT 
+			<include refid="ccmPartyOrganizColumns"/>
+		FROM ccm_party_organization a
+		<include refid="ccmPartyOrganizJoins"/>
+		<include refid="ccmPartyOrganizJoinsArea" />
+			<if test="officeId != null and officeId != ''">
+				LEFT JOIN sys_office office ON office.area_id = a20.id
+			</if>
+		<where>
+			<if test="officeId != null and officeId != ''">
+				(office.id = #{officeId} or office.parent_ids LIKE concat('%',#{officeId},'%')) AND 
+			</if>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="name != null and name != ''">
+				AND a.name LIKE 
+					<if test="dbName == 'oracle'">'%'||#{name}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{name}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{name},'%')</if>
+			</if>
+			<if test="community != null and community.id != null and community.id != ''">
+				AND a.community = #{community.id}
+			</if>
+			<if test="orgCode != null and orgCode != ''">
+				AND a.org_code = #{orgCode}
+			</if>
+			<if test="type != null and type != ''">
+				AND a.type = #{type}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="CcmPartyOrganiz">
+		SELECT 
+			<include refid="ccmPartyOrganizColumns"/>
+		FROM ccm_party_organization a
+		<include refid="ccmPartyOrganizJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="type != null and type != ''">
+				AND a.type = #{type}
+			</if>
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO ccm_party_organization(
+			id,
+			type,
+			name,
+			all_name,
+			community,
+			fax_num,
+			super_org,
+			org_attr,
+			org_attr_relation,
+			postal_code,
+			org_code,
+			create_reference_num,
+			telphone,
+			user_id,
+			address,
+			create_reason,
+			dept_name,
+			dept_attr_relation,
+			dept_attr,
+			dept_industry,
+			dept_economic_type,
+			dept_enterprise_type,
+			dept_enterprise_scope,
+			dept_impt_enterprise_flag,
+			dept_legal_grass_org,
+			dept_gove_part_org,
+			dept_city_road_info,
+			dept_mediu_org_type,
+			dept_part_serv_flag,
+			dept_part_post_flag,
+			dept_send_part_flag,
+			dept_part_to_flag,
+			dept_part_num,
+			dept_modf_enter_flag,
+			dept_legal_part_flag,
+			dept_legal_all_flag,
+			dept_on_employees_num,
+			dept_on_workers_num,
+			dept_tree_five_num,
+			dept_prof_tech_num,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag
+		) VALUES (
+			#{id},
+			#{type},
+			#{name},
+			#{allName},
+			#{community.id},
+			#{faxNum},
+			#{superOrg},
+			#{orgAttr},
+			#{orgAttrRelation},
+			#{postalCode},
+			#{orgCode},
+			#{createReferenceNum},
+			#{telphone},
+			#{user.id},
+			#{address},
+			#{createReason},
+			#{deptName},
+			#{deptAttrRelation},
+			#{deptAttr},
+			#{deptIndustry},
+			#{deptEconomicType},
+			#{deptEnterpriseType},
+			#{deptEnterpriseScope},
+			#{deptImptEnterpriseFlag},
+			#{deptLegalGrassOrg},
+			#{deptGovePartOrg},
+			#{deptCityRoadInfo},
+			#{deptMediuOrgType},
+			#{deptPartServFlag},
+			#{deptPartPostFlag},
+			#{deptSendPartFlag},
+			#{deptParToFlag},
+			#{deptPartNum},
+			#{deptModfEnterFlag},
+			#{deptLegalPartFlag},
+			#{deptLegalAllFlag},
+			#{deptOnEmployeesNum},
+			#{deptOnWorkersNum},
+			#{deptTreeFiveNum},
+			#{deptProfTechNum},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE ccm_party_organization SET 	
+			type = #{type},
+			name = #{name},
+			all_name = #{allName},
+			community = #{community.id},
+			fax_num = #{faxNum},
+			super_org = #{superOrg},
+			org_attr = #{orgAttr},
+			org_attr_relation = #{orgAttrRelation},
+			postal_code = #{postalCode},
+			org_code = #{orgCode},
+			create_reference_num = #{createReferenceNum},
+			telphone = #{telphone},
+			user_id = #{user.id},
+			address = #{address},
+			create_reason = #{createReason},
+			dept_name = #{deptName},
+			dept_attr_relation = #{deptAttrRelation},
+			dept_attr = #{deptAttr},
+			dept_industry = #{deptIndustry},
+			dept_economic_type = #{deptEconomicType},
+			dept_enterprise_type = #{deptEnterpriseType},
+			dept_enterprise_scope = #{deptEnterpriseScope},
+			dept_impt_enterprise_flag = #{deptImptEnterpriseFlag},
+			dept_legal_grass_org = #{deptLegalGrassOrg},
+			dept_gove_part_org = #{deptGovePartOrg},
+			dept_city_road_info = #{deptCityRoadInfo},
+			dept_mediu_org_type = #{deptMediuOrgType},
+			dept_part_serv_flag = #{deptPartServFlag},
+			dept_part_post_flag = #{deptPartPostFlag},
+			dept_send_part_flag = #{deptSendPartFlag},
+			dept_part_to_flag = #{deptParToFlag},
+			dept_part_num = #{deptPartNum},
+			dept_modf_enter_flag = #{deptModfEnterFlag},
+			dept_legal_part_flag = #{deptLegalPartFlag},
+			dept_legal_all_flag = #{deptLegalAllFlag},
+			dept_on_employees_num = #{deptOnEmployeesNum},
+			dept_on_workers_num = #{deptOnWorkersNum},
+			dept_tree_five_num = #{deptTreeFiveNum},
+			dept_prof_tech_num = #{deptProfTechNum},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE ccm_party_organization SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+
+
+	<select id="getOrgByBussCate" resultType="com.arjjs.ccm.tool.EchartType">
+		SELECT
+		a.dept_enterprise_type AS "type",
+		COUNT(1) AS "value"
+		FROM
+		ccm_party_organization a
+		<where>
+			a.del_flag=0
+			AND `type` = 2
+		</where>
+		GROUP BY a.dept_enterprise_type
+	</select>
+</mapper>

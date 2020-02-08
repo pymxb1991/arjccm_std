@@ -1,0 +1,485 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.arjjs.ccm.modules.ccm.view.dao.VCcmTeamDao">
+
+	<sql id="vCcmTeamColumns">
+		a.id AS "id",
+		a.company_id AS "companyId.id",
+		a.office_id AS
+		"office.id",
+		a.login_name AS "loginName",
+		a.password AS "password",
+		a.no
+		AS "no",
+		a.name AS "name",
+		a.email AS "email",
+		a.phone AS "phone",
+		a.mobile AS "mobile",
+		a.user_type AS "userType",
+		a.photo AS "photo",
+		a.login_ip AS "loginIp",
+		a.login_date AS "loginDate",
+		a.login_flag AS
+		"loginFlag",
+		a.create_by AS "createBy.id",
+		a.create_date AS
+		"createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS
+		"updateDate",
+		(case when a.remarks is null then '' else a.remarks end) AS "remarks",
+		a.del_flag AS "delFlag",
+		a.user_id
+		AS "user.id",
+		a.sex AS "sex",
+		a.nation AS "nation",
+		a.politics AS
+		"politics",
+		a.iden_num AS "idenNum",
+		a.birthday AS "birthday",
+		a.grade AS
+		"grade",
+		a.service AS "service",
+		a.prof_expertise AS "profExpertise",
+		a.education AS "education",
+		a.fix_tel AS "fixTel",
+		a.team_type AS
+		"teamType",
+		a.status AS "status",
+		a.more1 AS "more1",
+		a.more2 AS "more2",
+		c.name AS
+		"companyId.name",
+		c.parent_id AS "companyId.parent.id",
+		c.parent_ids AS "companyId.parentIds",
+		o3.name AS "office.name",
+		a.name AS
+		"user.name"
+	</sql>
+	<sql id="vCcmTeamColumnsRest">
+		a.id AS "id",
+		a.company_id AS "companyId.id",
+		a.office_id AS
+		"office.id",
+		a.login_name AS "loginName",
+		a.password AS "password",
+		a.no AS "no",
+		a.name AS "name",
+		a.email AS "email",
+		a.phone AS "phone",
+		a.mobile AS "mobile",
+		a.user_type AS "userType",
+		a.photo AS "photo",
+		a.login_ip AS "loginIp",
+		a.login_date AS "loginDate",
+		a.login_flag AS "loginFlag",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS
+		"updateDate",
+		(case when a.remarks is null then '' else a.remarks end) AS "remarks",
+		a.del_flag AS "delFlag",
+		a.user_id
+		AS "user.id",
+		a.sex AS "sex",
+		a.nation AS "nation",
+		a.politics AS
+		"politics",
+		a.iden_num AS "idenNum",
+		a.birthday AS "birthday",
+		a.grade AS
+		"grade",
+		a.service AS "service",
+		a.prof_expertise AS "profExpertise",
+		a.education AS "education",
+		a.fix_tel AS "fixTel",
+		a.team_type AS
+		"teamType",
+		a.status AS "status",
+		a.more1 AS "more1",
+		a.more2 AS "more2"
+	</sql>
+
+	<sql id="vCcmTeamJoins">
+		LEFT JOIN sys_office c ON c.id = a.company_id
+		LEFT JOIN
+		sys_office o3 ON o3.id = a.office_id
+	</sql>
+	
+
+	<select id="get" resultType="VCcmTeam">
+		SELECT
+		<include refid="vCcmTeamColumns" />
+		FROM v_ccm_team a
+		<include refid="vCcmTeamJoins" />
+		WHERE a.id = #{id}
+	</select>
+	<!-- -->
+	<select id="findList" resultType="VCcmTeam">
+		SELECT
+		<include refid="vCcmTeamColumns" />
+		FROM v_ccm_team a
+		<include refid="vCcmTeamJoins" />
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if
+				test="companyId != null and companyId.id != null and companyId.id != ''">
+				AND a.company_id = #{companyId.id}
+			</if>
+			<if
+				test="office != null and office.parentIds != null and office.parentIds != '' and office.id != null and office.id != ''">
+				AND ( o3.parent_ids LIKE
+				<if test="dbName == 'oracle'">'%'||#{office.parentIds}||'%'</if>
+				<if test="dbName == 'mssql'">'%'+#{office.parentIds}+'%'</if>
+				<if test="dbName == 'mysql'">concat('%',#{office.parentIds},'%')</if>
+				OR a.office_id = #{office.id} )
+			</if>
+			<if test="office != null and office.id != null and office.id != '' and office.parentIds == null">
+				AND a.office_id = #{office.id}
+			</if>
+			<if test="office != null and office.id != null and office.id != '' and office.parentIds != ''">
+				AND a.office_id = #{office.id}
+			</if>
+			<if test="name != null and name != ''">
+				AND a.name LIKE
+				<if test="dbName == 'oracle'">'%'||#{name}||'%'</if>
+				<if test="dbName == 'mssql'">'%'+#{name}+'%'</if>
+				<if test="dbName == 'mysql'">concat('%',#{name},'%')</if>
+			</if>
+			<if test="userType != null and userType != ''">
+				AND a.user_type = #{userType}
+			</if>
+			<if test="loginFlag != null and loginFlag != ''">
+				AND a.login_flag = #{loginFlag}
+			</if>
+			<if test="teamType != null and teamType != ''">
+				AND a.team_type = #{teamType}
+			</if>
+			<if test="profExpertises != null and profExpertises.length > 0">
+				AND (
+				<foreach collection="profExpertises" item="m"  separator=" OR " >
+					<if test="m != null and m != ''">
+		           	   a.prof_expertise LIKE concat('%',#{m},'%')
+		           	</if>
+		        </foreach>
+		        )
+			</if>
+		</where>
+	</select>
+	
+	
+	<!-- 区域查用户 -->
+	<select id="findAreaList" resultType="VCcmTeam">
+		SELECT
+		<include refid="vCcmTeamColumns" />
+		,d.id AS "ccmMobileDevice.id"
+		,d.device_id AS "ccmMobileDevice.deviceId"
+		,d.user_id AS "ccmMobileDevice.vCcmTeam.id"
+		,d.area_point AS "ccmMobileDevice.areaPoint"
+		,d.is_variable AS "ccmMobileDevice.isVariable"
+		,d.icon AS "ccmMobileDevice.icon"
+		,d.efence_point AS "ccmMobileDevice.efencePoint"
+		,d.efence_scope AS "ccmMobileDevice.efenceScope"
+		,d.remarks AS "ccmMobileDevice.remarks"
+		FROM v_ccm_team a
+		<include refid="vCcmTeamJoins" />
+		LEFT JOIN ccm_mobile_device d ON a.id = d.user_id
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			AND o3.area_id = #{id}
+		</where>
+	</select>
+	
+	
+	
+	
+	
+	
+	
+	<!-- findform -->
+	<select id="findform" resultType="VCcmTeam">
+		SELECT
+		<include refid="vCcmTeamColumns" />
+		FROM v_ccm_team a
+		<include refid="vCcmTeamJoins" />
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if
+				test="companyId != null and companyId.id != null and companyId.id != ''">
+				AND a.company_id = #{companyId.id}
+			</if>
+			<if test="office != null and office.id != null and office.id != ''">
+				AND a.office_id = #{office.id}
+			</if>
+			<if test="loginName != null and loginName != ''">
+				AND a.login_name = #{loginName}
+			</if>
+			<if test="name != null and name != ''">
+				AND a.name LIKE
+				<if test="dbName == 'oracle'">'%'||#{name}||'%'</if>
+				<if test="dbName == 'mssql'">'%'+#{name}+'%'</if>
+				<if test="dbName == 'mysql'">concat('%',#{name},'%')</if>
+			</if>
+			<if test="teamType != null and teamType != ''">
+				AND a.team_type = #{teamType}
+			</if>
+		</where>
+	</select>
+	<select id="findAllList" resultType="VCcmTeam">
+		SELECT
+		<include refid="vCcmTeamColumns" />
+		FROM v_ccm_team a
+		<include refid="vCcmTeamJoins" />
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>
+	</select>
+
+	<select id="findByParentIdsLike" resultType="VCcmTeam">
+		SELECT
+		a.id,
+		a.parent_id AS "parent.id",
+		a.parent_ids
+		FROM v_ccm_team a
+		<include refid="vCcmTeamJoins" />
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			AND a.parent_ids LIKE
+			#{parentIds}
+		</where>
+	</select>
+	
+	<select id="findByOfficeParentIdsLike" resultType="VCcmTeam" parameterType="Office">
+		SELECT
+		<include refid="vCcmTeamColumnsRest" />
+		FROM v_ccm_team a
+
+		LEFT JOIN sys_office b ON a.office_id = b.id
+		WHERE
+			a.del_flag = '0'
+			AND b.id = #{id}
+			OR b.parent_ids LIKE 
+			<if test="dbName == 'oracle'">'%'||#{id}||'%'</if>
+            <if test="dbName == 'mssql'">'%'+#{id}+'%'</if>
+            <if test="dbName == 'mysql'">concat('%',#{id},'%')</if>
+	</select>
+	
+	<select id="findMyFriendAvailablePage" resultType="VCcmTeam">
+		SELECT
+		<include refid="vCcmTeamColumnsRest" />
+		FROM v_ccm_team a
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if
+				test="companyId != null and companyId.id != null and companyId.id != ''">
+				AND a.company_id = #{companyId.id}
+			</if>
+			
+			<if test="name != null and name != ''">
+				AND a.name LIKE
+				<if test="dbName == 'oracle'">'%'||#{name}||'%'</if>
+				<if test="dbName == 'mssql'">'%'+#{name}+'%'</if>
+				<if test="dbName == 'mysql'">concat('%',#{name},'%')</if>
+			</if>
+			<if test="groupId != null and groupId != ''">
+				AND a.id NOT IN
+				(SELECT user_id FROM ccm_user_relationship WHERE group_id = #{groupId}) 
+			</if> 
+			
+		</where>
+	</select>
+	
+	<select id="findUserByOffice" resultType="VCcmTeam">
+		SELECT
+			a.id AS "id",
+			a.`name` AS "name",
+			a.photo AS "photo",
+			o.`name` AS "more1",
+			a.`status` AS "status"
+		FROM v_ccm_team a, sys_office o
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			AND a.office_id = o.id
+			<if test="more1 != null and more1 != ''">
+				AND o. parent_ids LIKE
+				<if test="dbName == 'oracle'">'%'||#{more1}||'%'</if>
+				<if test="dbName == 'mssql'">'%'+#{more1}+'%'</if>
+				<if test="dbName == 'mysql'">concat('%',#{more1},'%')</if>
+			</if>
+		</where>
+	</select>
+	
+	
+	<select id="findByTypes" resultType="com.arjjs.ccm.tool.SearchTab">
+		SELECT
+			a.id AS "value1",
+			a.name AS "value2"
+		FROM sys_office a
+		<where>
+			a.del_flag = 0
+			AND a.type = 2
+		</where>
+		ORDER BY a.sort ASC
+	</select>
+	
+	
+	<insert id="insert">
+		INSERT INTO v_ccm_team(
+		id,
+		company_id,
+		office_id,
+		login_name,
+		password,
+		no,
+		name,
+		email,
+		phone,
+		mobile,
+		user_type,
+		photo,
+		login_ip,
+		login_date,
+		login_flag,
+		create_by,
+		create_date,
+		update_by,
+		update_date,
+		remarks,
+		del_flag,
+		user_id,
+		sex,
+		nation,
+		politics,
+		iden_num,
+		birthday,
+		grade,
+		service,
+		prof_expertise,
+		education,
+		fix_tel,
+		team_type,
+		status,
+		more1,
+		more2
+		) VALUES (
+		#{id},
+		#{companyId.id},
+		#{office.id},
+		#{loginName},
+		#{password},
+		#{no},
+		#{name},
+		#{email},
+		#{phone},
+		#{mobile},
+		#{userType},
+		#{photo},
+		#{loginIp},
+		#{loginDate},
+		#{loginFlag},
+		#{createBy.id},
+		#{createDate},
+		#{updateBy.id},
+		#{updateDate},
+		#{remarks},
+		#{delFlag},
+		#{user.id},
+		#{sex},
+		#{nation},
+		#{politics},
+		#{idenNum},
+		#{birthday},
+		#{grade},
+		#{service},
+		#{profExpertise},
+		#{education},
+		#{fixTel},
+		#{teamType},
+		#{status},
+		#{more1},
+		#{more2}
+		)
+	</insert>
+
+	<update id="update">
+		UPDATE v_ccm_team SET
+		company_id = #{companyId.id},
+		office_id = #{office.id},
+		login_name = #{loginName},
+		password =
+		#{password},
+		no = #{no},
+		name = #{name},
+		email = #{email},
+		phone =
+		#{phone},
+		mobile = #{mobile},
+		user_type = #{userType},
+		photo = #{photo},
+		login_ip = #{loginIp},
+		login_date = #{loginDate},
+		login_flag =
+		#{loginFlag},
+		update_by = #{updateBy.id},
+		update_date = #{updateDate},
+		remarks = #{remarks},
+		user_id = #{user.id},
+		sex = #{sex},
+		nation =
+		#{nation},
+		politics = #{politics},
+		iden_num = #{idenNum},
+		birthday =
+		#{birthday},
+		grade = #{grade},
+		service = #{service},
+		prof_expertise =
+		#{profExpertise},
+		education = #{education},
+		fix_tel = #{fixTel},
+		team_type = #{teamType},
+		status = #{status},
+		more1 = #{more1},
+		more2 = #{more2}
+		WHERE id =
+		#{id}
+	</update>
+
+	<update id="updateParentIds">
+		UPDATE v_ccm_team SET
+		parent_id = #{parent.id},
+		parent_ids = #{parentIds}
+		WHERE id = #{id}
+	</update>
+
+	<update id="delete">
+		UPDATE v_ccm_team SET
+		del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id} OR parent_ids LIKE
+		'%,'||#{id}||',%'
+	</update>
+
+
+	<select id="GetUserByArea" resultType="VCcmTeam">
+		SELECT
+		<include refid="vCcmTeamColumns" />
+		FROM
+		v_ccm_team a
+		<include refid="vCcmTeamJoins" />
+		LEFT JOIN sys_office b ON a.office_id = b.id
+		LEFT JOIN
+		sys_area a2 ON a2.id = b.area_id
+		WHERE
+		a2.id = #{id}
+		And a.del_flag = '0'
+		And c.del_flag = '0'
+		And o3.del_flag = '0'
+		And b.del_flag = '0'
+		And a2.del_flag = '0'
+	</select>
+	
+	
+	
+	
+</mapper>

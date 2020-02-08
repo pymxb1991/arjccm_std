@@ -1,0 +1,63 @@
+.zbdt {
+	overflow: hidden;
+	margin-bottom: 30px;
+	position: relative;
+	z-index: 0;
+	margin:0 0 10px 0;
+}
+.zbdt li {
+	height: auto;
+	padding: 20px 30px;
+	background-color: #f8f8f8;
+	border: #d6d6d6 solid 1px;
+	overflow: hidden;
+	position: relative;
+	left: 0;
+	top: 0;
+	z-index: 0;
+	margin-bottom: 10px;
+	transition: all 0.5 ease-in-out;
+	-moz-transition: all 0.5 ease-in-out;
+	-webkit-transition: all 0.5 ease-in-out;
+	-o-transition: all 0.5 ease-in-out;
+	cursor: pointer;
+}
+.zbdt li:hover {
+	border-color: #cf1105;
+} 
+.zbdt li div {
+	float: left;
+text-indent: 20px;
+border-left: #d2d2d2 solid 1px;
+margin-left: 20px;
+}
+.zbdt li div.list0 {
+	width: 20%;
+	border: none;
+}
+.zbdt li div.list1 {
+	width: 15%;
+}
+.zbdt li div.list2 {
+	width: 20%;
+}
+.zbdt li div.list3 {
+	width: 20%;
+}
+.zbdt li div.list4 {
+	width: 15%;
+}
+.zbdt li h5 {
+	font: 14px/30px "微软雅黑";
+	color: #666;
+}
+.zbdt li h6 {
+	font: 16px/32px "微软雅黑";
+color: #333;
+overflow: hidden;
+text-overflow: ellipsis;
+white-space: nowrap;
+} 
+.zbdt li a {
+	color: #cf1105;
+}

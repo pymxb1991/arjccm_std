@@ -1,0 +1,185 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper
+	namespace="com.arjjs.ccm.modules.pbs.thinkingreport.dao.PbsThinkingreportoptDao">
+
+	<sql id="pbsThinkingreportoptColumns">
+		a.id AS "id",
+		a.s_reportid AS "sReportid.id",
+		threp.s_title
+		AS "sReportid.sTitle",
+		a.s_type AS "sType",
+		a.s_transmem AS
+		"sTransmem.id",
+		mem1.s_name AS "sTransmem.SName",
+		a.s_transcontent AS
+		"sTranscontent",
+		a.s_operatemem AS "sOperatemem.id",
+		mem2.s_name AS
+		"sOperatemem.SName",
+		a.s_operateuser AS "sOperateuser.id",
+		u7.name AS
+		"sOperateuser.name",
+		a.s_content AS "sContent",
+		a.s_level AS "sLevel",
+		a.s_description AS "sDescription",
+		<!-- a.s_spare01 AS "sSpare01",
+		a.s_spare02 AS "sSpare02",
+		a.s_spare03 AS "sSpare03",
+		a.s_spare04 AS
+		"sSpare04", -->
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks
+		AS "remarks",
+		a.del_flag AS "delFlag"
+	</sql>
+
+	<sql id="pbsThinkingreportoptJoins">
+		LEFT JOIN pbs_thinkingreport threp ON threp.id = a.s_reportid
+		LEFT JOIN
+		pbs_partymem mem1 ON mem1.id = a.s_transmem
+		LEFT JOIN pbs_partymem mem2
+		ON mem2.id = a.s_operatemem
+		LEFT JOIN sys_user u7 ON u7.id =
+		a.s_operateuser
+	</sql>
+
+	<select id="get" resultType="PbsThinkingreportopt">
+		SELECT
+		<include refid="pbsThinkingreportoptColumns" />
+		FROM pbs_thinkingreportopt a
+		<include refid="pbsThinkingreportoptJoins" />
+		WHERE a.id = #{id}
+	</select>
+
+	<select id="findList" resultType="PbsThinkingreportopt">
+		SELECT
+		<include refid="pbsThinkingreportoptColumns" />
+		FROM pbs_thinkingreportopt a
+		<include refid="pbsThinkingreportoptJoins" />
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if
+				test="sReportid != null and sReportid != '' and sReportid.sTitle != null and sReportid.sTitle != ''">
+				AND threp.s_title LIKE
+				<if test="dbName == 'oracle'">'%'||#{sReportid.sTitle}||'%'</if>
+				<if test="dbName == 'mssql'">'%'+#{sReportid.sTitle}+'%'</if>
+				<if test="dbName == 'mysql'">concat('%',#{sReportid.sTitle},'%')</if>
+			</if>
+			<if
+				test="sReportid != null and sReportid != '' and sReportid.id != null and sReportid.id != ''">
+				AND threp.id = #{sReportid.id}
+			</if>
+			<if
+                test="sTransmem != null and sTransmem != '' and sTransmem.id != null and sTransmem.id != ''">
+                AND a.id = #{sTransmem.id}
+            </if>
+			<if test="sType != null and sType != ''">
+				AND a.s_type = #{sType}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+
+	<select id="findAllList" resultType="PbsThinkingreportopt">
+		SELECT
+		<include refid="pbsThinkingreportoptColumns" />
+		FROM pbs_thinkingreportopt a
+		<include refid="pbsThinkingreportoptJoins" />
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+
+	<insert id="insert">
+		INSERT INTO pbs_thinkingreportopt(
+		id,
+		s_reportid,
+		s_type,
+		s_transmem,
+		s_transcontent,
+		s_operatemem,
+		s_operateuser,
+		s_content,
+		s_level,
+		s_description,
+		s_spare01,
+		s_spare02,
+		s_spare03,
+		s_spare04,
+		create_by,
+		create_date,
+		update_by,
+		update_date,
+		remarks,
+		del_flag
+		) VALUES (
+		#{id},
+		#{sReportid.id},
+		#{sType},
+		#{sTransmem.id},
+		#{sTranscontent},
+		#{sOperatemem.id},
+		#{sOperateuser.id},
+		#{sContent},
+		#{sLevel},
+		#{sDescription},
+		#{sSpare01},
+		#{sSpare02},
+		#{sSpare03},
+		#{sSpare04},
+		#{createBy.id},
+		#{createDate},
+		#{updateBy.id},
+		#{updateDate},
+		#{remarks},
+		#{delFlag}
+		)
+	</insert>
+
+	<update id="update">
+		UPDATE pbs_thinkingreportopt SET
+		s_reportid = #{sReportid.id},
+		s_type = #{sType},
+		s_transmem = #{sTransmem.id},
+		s_transcontent = #{sTranscontent},
+		s_operatemem = #{sOperatemem.id},
+		s_operateuser = #{sOperateuser.id},
+		s_content = #{sContent},
+		s_level = #{sLevel},
+		s_description = #{sDescription},
+		s_spare01 = #{sSpare01},
+		s_spare02 = #{sSpare02},
+		s_spare03 = #{sSpare03},
+		s_spare04 = #{sSpare04},
+		update_by = #{updateBy.id},
+		update_date = #{updateDate},
+		remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+
+	<update id="delete">
+		UPDATE pbs_thinkingreportopt SET
+		del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+
+</mapper>

@@ -1,0 +1,17 @@
+eclipse.preferences.version=1
+encoding//WebContent/WEB-INF/views/include/ccmlog.jsp=UTF-8
+encoding//WebContent/WEB-INF/views/include/layUI.jsp=UTF-8
+encoding//WebContent/WEB-INF/views/modules/mapping/houseBuild/mapPop.jsp=UTF-8
+encoding//WebContent/WEB-INF/views/modules/sys/index/stat.jsp=UTF-8
+encoding//WebContent/static/activemq/amq_init.js=UTF-8
+encoding//WebContent/static/modules/map/css/map.css=UTF-8
+encoding//WebContent/static/modules/map/data/area.json=UTF-8
+encoding//WebContent/static/modules/map/data/ban.json=UTF-8
+encoding//WebContent/static/modules/map/data/city.json=UTF-8
+encoding//WebContent/static/modules/map/data/event.json=UTF-8
+encoding//WebContent/static/modules/map/data/video.json=UTF-8
+encoding//src/main/java=UTF-8
+encoding//src/main/resources=UTF-8
+encoding//src/test/java=UTF-8
+encoding//src/test/resources=UTF-8
+encoding/<project>=UTF-8

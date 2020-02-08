@@ -1,0 +1,238 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.arjjs.ccm.modules.ccm.hospital.dao.CcmPlaceHospitalDao">
+    
+	<sql id="ccmPlaceHospitalColumns">
+		a.id AS "id",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.type AS "type",
+		a.hopital_type AS "hopitalType",
+		a.hospital_nature AS "hospitalNature",
+		a.hospital_level AS "hospitalLevel",
+		a.hospital_phone_number AS "hospitalPhoneNumber",
+		a.fax_number AS "faxNumber",
+		a.manager_name AS "managerName",
+		a.del_flag AS "delFlag",
+		a.part_manager_name AS "partManagerName",
+		a.manager_phone_number AS "managerPhoneNumber",
+		a.medical_staff_number AS "medicalStaffNumber",
+		a.base_place_id AS "basePlaceId",
+		a.part_manager_phone_number AS "partManagerPhoneNumber",
+		a.is_credentials AS "isCredentials",
+		a.registered_fund AS "registeredFund",
+		a.pharmacist_number AS "pharmacistNumber",
+		a.doctor_number AS "doctorNumber",
+		a.nurse_number AS "nurseNumber",
+		a.diagnosis_subject AS "diagnosisSubject",
+		a.proposer_name AS "proposerName",
+		a.proposer_level AS "proposerLevel"
+	</sql>
+	<sql id="ccmPlaceHospitalAllColumns">
+		a.id AS "id",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.type AS "type",
+		a.hopital_type AS "hopitalType",
+		a.hospital_nature AS "hospitalNature",
+		a.hospital_level AS "hospitalLevel",
+		a.hospital_phone_number AS "hospitalPhoneNumber",
+		a.fax_number AS "faxNumber",
+		a.manager_name AS "managerName",
+		a.del_flag AS "delFlag",
+		a.part_manager_name AS "partManagerName",
+		a.manager_phone_number AS "managerPhoneNumber",
+		a.medical_staff_number AS "medicalStaffNumber",
+		a.base_place_id AS "basePlaceId",
+		a.is_credentials AS "isCredentials",
+		a.registered_fund AS "registeredFund",
+		a.pharmacist_number AS "pharmacistNumber",
+		a.part_manager_phone_number AS "partManagerPhoneNumber",
+		b.place_name AS "placeName",
+		b.leader_name AS "leaderName",
+		b.leader_id_card  AS"leaderIdCard",
+		b.leader_contact  AS"leaderContact",
+		b.relevance_org  AS"relevanceOrg",
+		a.doctor_number AS "doctorNumber",
+		a.nurse_number AS "nurseNumber",
+		a.diagnosis_subject AS "diagnosisSubject",
+		a.proposer_name AS "proposerName",
+		a.proposer_level AS "proposerLevel"
+	</sql>
+	
+	<sql id="ccmPlaceHospitalJoins">
+	</sql>
+    
+	<select id="get" resultType="CcmPlaceHospital">
+		SELECT 
+			<include refid="ccmPlaceHospitalColumns"/>
+		FROM ccm_place_hospital a
+		<include refid="ccmPlaceHospitalJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="CcmPlaceHospital">
+		SELECT 
+			<include refid="ccmPlaceHospitalAllColumns"/>
+		FROM ccm_place_hospital a LEFT JOIN ccm_base_place b ON a.base_place_id = b.id
+		<include refid="ccmPlaceHospitalJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="placeName != null and placeName != ''">
+				AND b.place_name LIKE
+				<if test="dbName == 'oracle'">'%'||#{placeName}||'%'</if>
+				<if test="dbName == 'mssql'">'%'+#{placeName}+'%'</if>
+				<if test="dbName == 'mysql'">concat('%',#{placeName},'%')</if>
+			</if>
+			<if test="leaderContact != null and leaderContact != ''">
+				AND b.leader_contact LIKE
+				<if test="dbName == 'oracle'">'%'||#{leaderContact}||'%'</if>
+				<if test="dbName == 'mssql'">'%'+#{leaderContact}+'%'</if>
+				<if test="dbName == 'mysql'">concat('%',#{leaderContact},'%')</if>
+			</if>
+			<if test="beginCreateDate != null and endCreateDate != null and beginCreateDate != '' and endCreateDate != ''">
+				AND a.create_date BETWEEN #{beginCreateDate} AND #{endCreateDate}
+			</if>
+			<if test="type != null and type != ''">
+				AND a.type = #{type}
+			</if>
+			<if test="hopitalType != null and hopitalType != ''">
+				AND a.hopital_type = #{hopitalType}
+			</if>
+			<if test="placeName != null and placeName != ''">
+				AND b.place_name = #{placeName}
+			</if>
+			
+			<if test="leaderName != null and leaderName != ''">
+				AND b.leader_name = #{leaderName}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="CcmPlaceHospital">
+		SELECT 
+			<include refid="ccmPlaceHospitalColumns"/>
+		FROM ccm_place_hospital a
+		<include refid="ccmPlaceHospitalJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO ccm_place_hospital(
+			id,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			type,
+			hopital_type,
+			hospital_nature,
+			hospital_level,
+			hospital_phone_number,
+			fax_number,
+			manager_name,
+			del_flag,
+			part_manager_name,
+			manager_phone_number,
+			medical_staff_number,
+			base_place_id,
+			part_manager_phone_number,
+			is_credentials,
+			registered_fund,
+			pharmacist_number,
+			doctor_number,
+			nurse_number,
+			diagnosis_subject,
+			proposer_name,
+			proposer_level
+		) VALUES (
+			#{id},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{type},
+			#{hopitalType},
+			#{hospitalNature},
+			#{hospitalLevel},
+			#{hospitalPhoneNumber},
+			#{faxNumber},
+			#{managerName},
+			#{delFlag},
+			#{partManagerName},
+			#{managerPhoneNumber},
+			#{medicalStaffNumber},
+			#{basePlaceId},
+			#{partManagerPhoneNumber},
+			#{isCredentials},
+			#{registeredFund},
+			#{pharmacistNumber},
+			#{doctorNumber},
+			#{nurseNumber},
+			#{diagnosisSubject},
+			#{proposerName},
+			#{proposerLevel}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE ccm_place_hospital SET 	
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks},
+			type = #{type},
+			hopital_type = #{hopitalType},
+			hospital_nature = #{hospitalNature},
+			hospital_level = #{hospitalLevel},
+			hospital_phone_number = #{hospitalPhoneNumber},
+			fax_number = #{faxNumber},
+			manager_name = #{managerName},
+			part_manager_name = #{partManagerName},
+			manager_phone_number = #{managerPhoneNumber},
+			medical_staff_number = #{medicalStaffNumber},
+			base_place_id = #{basePlaceId},
+			part_manager_phone_number = #{partManagerPhoneNumber},
+			is_credentials = #{isCredentials},
+			registered_fund = #{registeredFund},
+			pharmacist_number = #{pharmacistNumber},
+			doctor_number = #{doctorNumber},
+			nurse_number = #{nurseNumber},
+			diagnosis_subject = #{diagnosisSubject},
+			proposer_name = #{proposerName},
+			proposer_level = #{proposerLevel}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE ccm_place_hospital SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

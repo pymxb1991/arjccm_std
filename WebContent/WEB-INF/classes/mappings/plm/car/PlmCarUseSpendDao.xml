@@ -1,0 +1,268 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.arjjs.ccm.modules.plm.car.dao.PlmCarUseSpendDao">
+    
+	<sql id="plmCarUseSpendColumns">
+		a.id AS "id",
+		a.car_use_id AS "carUseId",
+		a.car_id AS "car.id",
+		a.driver_id AS "driver.id",
+		a.use_id AS "use.id",
+		a.repair_com_id AS "repairCom.id",
+		a.type AS "type",
+		a.is_damaged AS "isDamaged",
+		a.mildage AS "mildage",
+		a.oil_fee AS "oilFee",
+		a.toll_fee AS "tollFee",
+		a.parking_fee AS "parkingFee",
+		a.repair_fee AS "repairFee",
+		a.other_fee AS "otherFee",
+		a.tota_fee AS "totaFee",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag",
+		u5.name AS "use.name",
+		b.vehicle AS "car.vehicle",
+		c.name AS "repairCom.name",
+		d.name AS "driver.name"
+	</sql>
+	<sql id="plmCarUseSpendColumnsByUseId">
+		a.id AS "id",
+		a.car_use_id AS "carUseId",
+		a.car_id AS "car.id",
+		a.driver_id AS "driverId",
+		a.use_id AS "use.id",
+		a.repair_com_id AS "repairCom.id",
+		a.type AS "type",
+		a.is_damaged AS "isDamaged",
+		a.mildage AS "mildage",
+		a.oil_fee AS "oilFee",
+		a.toll_fee AS "tollFee",
+		a.parking_fee AS "parkingFee",
+		a.repair_fee AS "repairFee",
+		a.other_fee AS "otherFee",
+		a.tota_fee AS "totaFee",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag"
+	</sql>
+	
+	<sql id="plmCarUseSpendJoins">
+		LEFT JOIN sys_user u5 ON u5.id = a.use_id
+		LEFT JOIN plm_car b ON b.id = a.car_id
+		LEFT JOIN plm_car_driver d ON d.id = a.driver_id
+		LEFT JOIN plm_car_repair c ON c.id = a.repair_com_id
+	</sql>
+    
+	<select id="get" resultType="PlmCarUseSpend">
+		SELECT 
+			<include refid="plmCarUseSpendColumns"/>
+		FROM plm_car_use_spend a
+		<include refid="plmCarUseSpendJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	<select id="getByCarUseId" resultType="PlmCarUseSpend">
+		SELECT 
+			<include refid="plmCarUseSpendColumnsByUseId"/>
+		FROM plm_car_use_spend a
+		WHERE a.car_use_id = #{id}
+	</select>
+	
+	<select id="findList" resultType="PlmCarUseSpend">
+		SELECT 
+			<include refid="plmCarUseSpendColumns"/>
+		FROM plm_car_use_spend a
+		<include refid="plmCarUseSpendJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="car != null and car.id != null and car.id != ''">
+				AND a.car_id = #{car.id}
+			</if>
+			<if test="use != null and use.id != null and use.id != ''">
+				AND a.use_id = #{use.id}
+			</if>
+			<if test="repairCom != null and repairCom.id != null and repairCom.id != ''">
+				AND a.repair_com_id = #{repairCom.id}
+			</if>			
+			<if test="type != null and type != ''">
+				AND a.type = #{type}
+			</if>
+			<if test="isDamaged != null and isDamaged != ''">
+				AND a.is_damaged = #{isDamaged}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="PlmCarUseSpend">
+		SELECT 
+			<include refid="plmCarUseSpendColumns"/>
+		FROM plm_car_use_spend a
+		<include refid="plmCarUseSpendJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	<!-- 车辆费用统计，按用车类型 -->
+	<select id="selectSpendByType" resultType="com.arjjs.ccm.tool.EchartType" parameterType="Office">
+		SELECT
+			a.type AS "type",
+			sum(a.tota_fee) AS "value"
+		FROM plm_car_use_spend a
+		<if test="id != null and id != ''">
+			LEFT JOIN plm_car b ON b.id = a.car_id	
+		</if>		
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="id != null and id != ''">
+				b.office_id = #{id}
+			</if>
+		</where>		
+		group by a.type
+	</select>
+	
+	<!-- 年度车辆费用统计，按部门 -->
+	<select id="selectSpendNumAllByOffice" resultType="com.arjjs.ccm.tool.EchartType" >
+		SELECT
+			o.name AS "type",
+			sum(a.tota_fee) AS "value"
+		FROM plm_car_use_spend a
+		LEFT JOIN sys_user u4 ON u4.id = a.use_id
+		LEFT JOIN sys_office o ON o.id = u4.office_id		
+		<where>
+			a.del_flag = '0'
+			and YEAR(a.create_date)=YEAR(NOW())
+		</where>		
+		group by u4.office_id
+	</select>	
+	
+	<!-- 年度车辆里程统计，按部门 -->
+	<select id="selectDistanceNumAllByOffice" resultType="com.arjjs.ccm.tool.EchartType" >
+		SELECT
+			o.name AS "type",
+			sum(a.mildage) AS "value"
+		FROM plm_car_use_spend a
+		LEFT JOIN sys_user u4 ON u4.id = a.use_id
+		LEFT JOIN sys_office o ON o.id = u4.office_id		
+		<where>
+			a.del_flag = '0'
+			and YEAR(a.create_date)=YEAR(NOW())
+		</where>		
+		group by u4.office_id
+	</select>		
+
+	<!-- 近五个月事故册数/费用统计 -->
+	<select id="selectDamagedAndDisNumByMonth" resultType="com.arjjs.ccm.tool.EchartType" >
+		SELECT
+			extract(MONTH FROM create_date) AS "type",
+			coalesce(SUM(is_damaged),0) AS "value",
+			SUM(tota_fee) AS "value2"
+		FROM
+			plm_car_use_spend
+		WHERE
+			del_flag = '0' and
+			create_date &gt;= DATE_SUB(curdate(), INTERVAL 5 MONTH)
+		GROUP BY
+			extract(YEAR_MONTH FROM create_date)
+		ORDER BY
+		  extract(YEAR_MONTH FROM create_date)
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO plm_car_use_spend(
+			id,
+			car_use_id,
+			car_id,
+			driver_id,
+			use_id,
+			repair_com_id,
+			type,
+			is_damaged,
+			mildage,
+			oil_fee,
+			toll_fee,
+			parking_fee,
+			repair_fee,
+			other_fee,
+			tota_fee,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag
+		) VALUES (
+			#{id},
+			#{carUseId},
+			#{car.id},
+			#{driver.id},
+			#{use.id},
+			#{repairCom.id},
+			#{type},
+			#{isDamaged},
+			#{mildage},
+			#{oilFee},
+			#{tollFee},
+			#{parkingFee},
+			#{repairFee},
+			#{otherFee},
+			#{totaFee},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE plm_car_use_spend SET 	
+			car_use_id = #{carUseId},
+			car_id = #{car.id},
+			driver_id = #{driver.id},
+			use_id = #{use.id},
+			repair_com_id = #{repairCom.id},
+			type = #{type},
+			is_damaged = #{isDamaged},
+			mildage = #{mildage},
+			oil_fee = #{oilFee},
+			toll_fee = #{tollFee},
+			parking_fee = #{parkingFee},
+			repair_fee = #{repairFee},
+			other_fee = #{otherFee},
+			tota_fee = #{totaFee},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE plm_car_use_spend SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

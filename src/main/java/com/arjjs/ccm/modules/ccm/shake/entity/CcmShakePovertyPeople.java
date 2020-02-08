@@ -1,0 +1,264 @@
+/**
+ * Copyright &copy; 2012-2016 <a href="https://github.com/thinkgem/jeesite">JeeSite</a> All rights reserved.
+ */
+package com.arjjs.ccm.modules.ccm.shake.entity;
+
+import com.arjjs.ccm.modules.ccm.org.entity.SysArea;
+import org.hibernate.validator.constraints.Length;
+import com.arjjs.ccm.modules.sys.entity.Area;
+import java.util.Date;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import javax.validation.constraints.NotNull;
+
+import com.arjjs.ccm.common.persistence.DataEntity;
+
+/**
+ * 脱贫攻坚实体类Entity
+ * @author chenboyuan
+ * @version 2019-06-21
+ */
+public class CcmShakePovertyPeople extends DataEntity<CcmShakePovertyPeople> {
+	
+	private static final long serialVersionUID = 1L;
+	private String name;		// 姓名
+	private String sex;		// 性别
+	private SysArea areaGridId;		// 所属网格ID
+	private String ident;		// 公民身份号码
+	private String accountidentity;		// 户主公民身份号码
+	private Date birthday;		// 出生日期
+	private Date filingTime;		// 建档时间
+	private SysArea areaTownId;		// 乡镇id
+	private SysArea areaCommunityId;		// 社区id
+	private String spAlleviation;		// 脱贫属性
+	private String spPeopleAlleviation;		// 贫困户属性
+	private String spReason;		// 致贫原因
+	private String spHealth;		// 健康状况
+	private String spLaborSkill;		// 贫困人口劳动技能
+	private String spIncomeType;		// 脱贫户收入类型
+	private Double spIncomeAmount;		// 脱贫户收入金额
+	private Date spTime;		// 脱贫时间
+	
+	private int sptownNum;  //返贫总数
+	private String townName;  //乡镇名
+	
+	private int baob;  //统计0-18岁的人数
+	private int baqo;  //统计19-60岁的人数
+	private int baow;  //统计60岁往上的人数
+	
+	private int spSum;  //总人数
+	
+	
+		
+
+	public int getSpSum() {
+		return spSum;
+	}
+
+	public void setSpSum(int spSum) {
+		this.spSum = spSum;
+	}
+
+	public int getBaob() {
+		return baob;
+	}
+
+	public void setBaob(int baob) {
+		this.baob = baob;
+	}
+
+	public int getBaqo() {
+		return baqo;
+	}
+
+	public void setBaqo(int baqo) {
+		this.baqo = baqo;
+	}
+
+	public int getBaow() {
+		return baow;
+	}
+
+	public void setBaow(int baow) {
+		this.baow = baow;
+	}
+
+	public String getTownName() {
+		return townName;
+	}
+
+	public void setTownName(String townName) {
+		this.townName = townName;
+	}
+
+	
+
+	public int getSptownNum() {
+		return sptownNum;
+	}
+
+	public void setSptownNum(int sptownNum) {
+		this.sptownNum = sptownNum;
+	}
+
+	public CcmShakePovertyPeople() {
+		super();
+	}
+
+	public CcmShakePovertyPeople(String id){
+		super(id);
+	}
+
+	@Length(min=1, max=50, message="姓名长度必须介于 1 和 50 之间")
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+	
+	@Length(min=1, max=1, message="性别长度必须介于 1 和 1 之间")
+	public String getSex() {
+		return sex;
+	}
+
+	public void setSex(String sex) {
+		this.sex = sex;
+	}
+	
+	public SysArea getAreaGridId() {
+		return areaGridId;
+	}
+
+	public void setAreaGridId(SysArea areaGridId) {
+		this.areaGridId = areaGridId;
+	}
+	
+	@Length(min=1, max=18, message="公民身份号码长度必须介于 1 和 18 之间")
+	public String getIdent() {
+		return ident;
+	}
+
+	public void setIdent(String ident) {
+		this.ident = ident;
+	}
+	
+	@Length(min=0, max=18, message="户主公民身份号码长度必须介于 0 和 18 之间")
+	public String getAccountidentity() {
+		return accountidentity;
+	}
+
+	public void setAccountidentity(String accountidentity) {
+		this.accountidentity = accountidentity;
+	}
+	
+	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+	@NotNull(message="出生日期不能为空")
+	public Date getBirthday() {
+		return birthday;
+	}
+
+	public void setBirthday(Date birthday) {
+		this.birthday = birthday;
+	}
+	
+	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+	@NotNull(message="建档时间不能为空")
+	public Date getFilingTime() {
+		return filingTime;
+	}
+
+	public void setFilingTime(Date filingTime) {
+		this.filingTime = filingTime;
+	}
+	
+	public SysArea getAreaTownId() {
+		return areaTownId;
+	}
+
+	public void setAreaTownId(SysArea areaTownId) {
+		this.areaTownId = areaTownId;
+	}
+	
+	public SysArea getAreaCommunityId() {
+		return areaCommunityId;
+	}
+
+	public void setAreaCommunityId(SysArea areaCommunityId) {
+		this.areaCommunityId = areaCommunityId;
+	}
+	
+	@Length(min=0, max=2, message="脱贫属性长度必须介于 0 和 2 之间")
+	public String getSpAlleviation() {
+		return spAlleviation;
+	}
+
+	public void setSpAlleviation(String spAlleviation) {
+		this.spAlleviation = spAlleviation;
+	}
+	
+	@Length(min=0, max=2, message="贫困户属性长度必须介于 0 和 2 之间")
+	public String getSpPeopleAlleviation() {
+		return spPeopleAlleviation;
+	}
+
+	public void setSpPeopleAlleviation(String spPeopleAlleviation) {
+		this.spPeopleAlleviation = spPeopleAlleviation;
+	}
+	
+	@Length(min=0, max=2, message="致贫原因长度必须介于 0 和 2 之间")
+	public String getSpReason() {
+		return spReason;
+	}
+
+	public void setSpReason(String spReason) {
+		this.spReason = spReason;
+	}
+	
+	@Length(min=0, max=2, message="健康状况长度必须介于 0 和 2 之间")
+	public String getSpHealth() {
+		return spHealth;
+	}
+
+	public void setSpHealth(String spHealth) {
+		this.spHealth = spHealth;
+	}
+	
+	@Length(min=0, max=2, message="贫困人口劳动技能长度必须介于 0 和 2 之间")
+	public String getSpLaborSkill() {
+		return spLaborSkill;
+	}
+
+	public void setSpLaborSkill(String spLaborSkill) {
+		this.spLaborSkill = spLaborSkill;
+	}
+	
+	@Length(min=0, max=2, message="脱贫户收入类型长度必须介于 0 和 2 之间")
+	public String getSpIncomeType() {
+		return spIncomeType;
+	}
+
+	public void setSpIncomeType(String spIncomeType) {
+		this.spIncomeType = spIncomeType;
+	}
+	
+	
+	
+	public Double getSpIncomeAmount() {
+		return spIncomeAmount;
+	}
+
+	public void setSpIncomeAmount(Double spIncomeAmount) {
+		this.spIncomeAmount = spIncomeAmount;
+	}
+
+	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+	public Date getSpTime() {
+		return spTime;
+	}
+
+	public void setSpTime(Date spTime) {
+		this.spTime = spTime;
+	}
+	
+}

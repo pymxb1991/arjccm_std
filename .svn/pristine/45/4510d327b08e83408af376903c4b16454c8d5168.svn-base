@@ -1,0 +1,292 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.arjjs.ccm.modules.ccm.house.dao.CcmHouseSchoolrimDao">
+    
+	<sql id="ccmHouseSchoolrimColumns">
+		a.id AS "id",
+		a.school_name AS "schoolName",
+		a.school_add AS "schoolAdd",
+		a.school_type AS "schoolType",
+		a.school_educ_depa AS "schoolEducDepa",
+		a.school_num AS "schoolNum",
+		a.teacher_num AS "teacherNum",
+		a.teaching_funds AS "teachingFunds",
+		a.head_name AS "headName",
+		a.head_tl AS "headTl",
+		a.secu_bran_name AS "secuBranName",
+		a.secu_bran_tl AS "secuBranTl",
+		a.secu_guard_name AS "secuGuardName",
+		a.secu_guard_tl AS "secuGuardTl",
+		a.secu_name AS "secuName",
+		a.secu_tl AS "secuTl",
+		a.secu_guard_num AS "secuGuardNum",
+		a.area_id AS "area.id",
+		a.area_map AS "areaMap",
+		a.area_point AS "areaPoint",
+		a.image AS "image",
+		a.images AS "images",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag",
+		a16.name AS "area.name",
+		(case a.school_type 
+			when 11 then '幼儿园' 
+			when 21 then '小学' 
+			when 22 then '成人小学'
+			when 31 then '普通初中' 
+			when 32 then '职业初中' 
+			when 33 then '成人初中'
+			when 34 then '普通高中' 
+			when 35 then '成人高中' 
+			when 36 then '中等职业学校' 
+			when 37 then '工读学校' 
+			when 41 then '普通高等学校'
+			when 42 then '成人高等学校' 
+			when 51 then '特殊教育' 
+			when 91 then '培养研究生的科研机构'
+			when 92 then '民办的其他高等教育机构' 
+			when 93 then '中等职业培训机构' 
+			else '' end) "schoolTypeLable"
+	</sql>
+	
+	<sql id="ccmHouseSchoolrimJoins">
+		LEFT JOIN sys_area a16 ON a16.id = a.area_id
+	</sql>
+    
+	<select id="get" resultType="CcmHouseSchoolrim">
+		SELECT 
+			<include refid="ccmHouseSchoolrimColumns"/>
+		FROM ccm_house_schoolrim a
+		<include refid="ccmHouseSchoolrimJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	<!-- 校园周边重点人员区域树 -->
+	<select id="findListSP" resultType="CcmHouseSchoolrim">
+		SELECT
+			dict.`value` AS "id",
+			"rootid" AS "more1",
+			"rootid" AS "more2",
+			dict.label AS "schoolName",
+			"0" AS "more3"
+		FROM
+			sys_dict dict
+		WHERE
+			dict.type = 'ccm_schol_type'
+		UNION
+			SELECT
+				a.id AS "id",
+				a.school_type AS "more1",
+				a.area_id AS "more2",
+				a.school_name AS "schoolName",
+				"1" AS "more3"
+			FROM
+				ccm_house_schoolrim a
+			<include refid="ccmHouseSchoolrimJoins"/>
+			<where>
+				a.del_flag = #{DEL_FLAG_NORMAL}
+			</where>
+	</select>
+	<!-- 街道信息-大屏-滨海新区社会网格化管理信息平台 -->
+	<select id="findListAllData" resultType="com.arjjs.ccm.tool.SearchTab">
+		SELECT 
+			<!-- <include refid="ccmHouseSchoolrimColumns"/> -->
+			a.id AS "type",
+			a.school_name AS "value",
+			a.area_map AS "value1",
+			a.area_point AS "value2"
+		FROM ccm_house_schoolrim a
+		LEFT JOIN sys_area a16 ON a16.id = a.area_id
+		LEFT JOIN sys_area street ON street.id = a16.parent_id
+		where
+			a.del_flag = '0'
+			AND a16.del_flag = '0'
+			AND street.del_flag = '0'
+			<if test="area != null and area.id != null and area.id != ''">
+				AND street.id = #{area.id}
+			</if>
+	</select>
+	
+	
+	<!--  -->
+	<select id="findList" resultType="CcmHouseSchoolrim">
+		SELECT 
+			<include refid="ccmHouseSchoolrimColumns"/>
+		FROM ccm_house_schoolrim a
+		<include refid="ccmHouseSchoolrimJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="schoolName != null and schoolName != ''">
+				AND a.school_name LIKE 
+					<if test="dbName == 'oracle'">'%'||#{schoolName}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{schoolName}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{schoolName},'%')</if>
+			</if>
+			<if test="schoolAdd != null and schoolAdd != ''">
+				AND a.school_add LIKE 
+					<if test="dbName == 'oracle'">'%'||#{schoolAdd}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{schoolAdd}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{schoolAdd},'%')</if>
+			</if>
+			<if test="schoolType != null and schoolType != ''">
+				AND a.school_type LIKE 
+					<if test="dbName == 'oracle'">'%'||#{schoolType}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{schoolType}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{schoolType},'%')</if>
+			</if>
+			<if test="area != null and area.id != null and area.id != ''">
+				AND a.area_id = #{area.id}
+			</if>
+			<if test="more1 != null and more1 != ''">
+                AND  (${more1})
+            </if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="CcmHouseSchoolrim">
+		SELECT 
+			<include refid="ccmHouseSchoolrimColumns"/>
+		FROM ccm_house_schoolrim a
+		<include refid="ccmHouseSchoolrimJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	
+	<!-- 学生人数、教职工人数、教学经费信息 -->
+	<select id="getCountInfo" resultType="com.arjjs.ccm.tool.SearchTabMore">
+		SELECT
+			SUM(a.school_num) AS "value",
+			SUM(a.teacher_num) AS "value1",
+			SUM(a.teaching_funds) AS "value2"
+		FROM
+			ccm_house_schoolrim a
+		WHERE
+			a.del_flag = 0
+	</select>
+	
+	
+	<insert id="insert">
+		INSERT INTO ccm_house_schoolrim(
+			id,
+			school_name,
+			school_add,
+			school_type,
+			school_educ_depa,
+			school_num,
+			teacher_num,
+			teaching_funds,
+			head_name,
+			head_tl,
+			secu_bran_name,
+			secu_bran_tl,
+			secu_guard_name,
+			secu_guard_tl,
+			secu_name,
+			secu_tl,
+			secu_guard_num,
+			area_id,
+			area_map,
+			area_point,
+			image,
+			images,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag
+		) VALUES (
+			#{id},
+			#{schoolName},
+			#{schoolAdd},
+			#{schoolType},
+			#{schoolEducDepa},
+			#{schoolNum},
+			#{teacherNum},
+			#{teachingFunds},
+			#{headName},
+			#{headTl},
+			#{secuBranName},
+			#{secuBranTl},
+			#{secuGuardName},
+			#{secuGuardTl},
+			#{secuName},
+			#{secuTl},
+			#{secuGuardNum},
+			#{area.id},
+			#{areaMap},
+			#{areaPoint},
+			#{image},
+			#{images},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE ccm_house_schoolrim SET 	
+			school_name = #{schoolName},
+			school_add = #{schoolAdd},
+			school_type = #{schoolType},
+			school_educ_depa = #{schoolEducDepa},
+			school_num = #{schoolNum},
+			teacher_num = #{teacherNum},
+			teaching_funds = #{teachingFunds},
+			head_name = #{headName},
+			head_tl = #{headTl},
+			secu_bran_name = #{secuBranName},
+			secu_bran_tl = #{secuBranTl},
+			secu_guard_name = #{secuGuardName},
+			secu_guard_tl = #{secuGuardTl},
+			secu_name = #{secuName},
+			secu_tl = #{secuTl},
+			secu_guard_num = #{secuGuardNum},
+			area_id = #{area.id},
+			area_map = #{areaMap},
+			area_point = #{areaPoint},
+			image = #{image},
+			images = #{images},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE ccm_house_schoolrim SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="updateCoordinates">
+        UPDATE ccm_house_schoolrim SET  
+            area_map = #{areaMap},
+            area_point = #{areaPoint} 
+        WHERE id = #{id}
+    </update>
+    
+</mapper>

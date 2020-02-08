@@ -1,0 +1,649 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.arjjs.ccm.modules.ccm.event.dao.CcmEventCasedealDao">
+
+	<sql id="ccmEventCasedealColumns">
+		a.id AS "id",
+		a.obj_id AS "objId",
+		a.obj_type AS "objType",
+		a.handle_user AS "handleUser.id",
+		a.handle_deadline AS "handleDeadline",
+		a.is_supervise AS "isSupervise",
+		a.handle_date AS "handleDate",
+		a.handle_step AS "handleStep",
+		a.handle_status AS "handleStatus",
+		a.handle_feedback AS "handleFeedback",
+		a.check_date AS "checkDate",
+		a.check_user AS "checkUser",
+		a.check_opinion AS "checkOpinion",
+		a.check_score AS "checkScore",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag",
+		a.manage_type AS "manageType",
+		a.file AS "file",
+		a.grade_num AS "gradeNum",		
+		a.effect_type AS "effectType",
+   		(case  WHEN NOW() > a.handle_deadline AND handle_status !='03'  THEN "1"
+			ELSE '0' END
+		) "isExtension",
+		
+		u3.name AS "handleUser.name"
+	</sql>
+
+	<sql id="ccmEventCasedealColumnsWithIncident">
+		a.id AS "id",
+		a.obj_id AS "objId",
+		a.obj_type AS "objType",
+		a.handle_user AS "handleUser.id",
+		a.handle_deadline AS "handleDeadline",
+		a.is_supervise AS "isSupervise",
+		a.handle_date AS "handleDate",
+		a.handle_step AS "handleStep",
+		a.handle_status AS "handleStatus",
+		a.handle_feedback AS "handleFeedback",
+		a.check_date AS "checkDate",
+		a.check_user AS "checkUser",
+		a.check_opinion AS "checkOpinion",
+		a.check_score AS "checkScore",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag",
+		a.manage_type AS "manageType",
+		a.file AS "file",
+		a.grade_num AS "gradeNum",		
+		a.effect_type AS "effectType",
+   		(case  WHEN NOW() > a.handle_deadline AND handle_status !='03'  THEN "1"
+			ELSE '0' END
+		) "isExtension",
+		
+		u3.name AS "handleUser.name",
+		b.name AS "create_by.name",
+		c.case_name AS "caseName",
+		c.status AS "status",
+		(case a.handle_status 
+			when 01 then '未处理' 
+			when 02 then '处理中' 
+			when 03 then '已完成'
+			else '' end) "statusLable",
+		(case a.obj_type 
+			when 'ccm_event_incident' then '案事件' 
+			when 'ccm_event_ambi' then '矛盾纠纷' 
+			when 'ccm_event_request' then '请求'
+			when 'ccm_wechat_event' then '微信上报'
+			else '' end) "objTypeLable"
+	</sql>
+	<sql id="ccmEventCasedealColumnsWithAmbi">
+		a.id AS "id",
+		a.obj_id AS "objId",
+		a.obj_type AS "objType",
+		a.handle_user AS "handleUser.id",
+		a.handle_deadline AS "handleDeadline",
+		a.is_supervise AS "isSupervise",
+		a.handle_date AS "handleDate",
+		a.handle_step AS "handleStep",
+		a.handle_status AS "handleStatus",
+		a.handle_feedback AS "handleFeedback",
+		a.check_date AS "checkDate",
+		a.check_user AS "checkUser",
+		a.check_opinion AS "checkOpinion",
+		a.check_score AS "checkScore",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag",
+		a.manage_type AS "manageType",
+		a.file AS "file",
+		a.grade_num AS "gradeNum",		
+		a.effect_type AS "effectType",
+   		(case  WHEN NOW() > a.handle_deadline AND handle_status !='03'  THEN "1"
+			ELSE '0' END
+		) "isExtension",
+		
+		u3.name AS "handleUser.name",
+		b.name AS "create_by.name",
+		c.name AS "caseName",
+		c.status AS "status",
+		(case c.status 
+			when 01 then '未处理' 
+			when 02 then '处理中' 
+			when 03 then '已完成'
+			else '' end) "statusLable",
+		(case a.obj_type 
+			when 'ccm_event_incident' then '案事件' 
+			when 'ccm_event_ambi' then '矛盾纠纷' 
+			when 'ccm_event_request' then '请求'
+			when 'ccm_wechat_event' then '微信上报'
+			else '' end) "objTypeLable"
+	</sql>
+	<sql id="ccmEventCasedealColumnsWithRequest">
+		a.id AS "id",
+		a.obj_id AS "objId",
+		a.obj_type AS "objType",
+		a.handle_user AS "handleUser.id",
+		a.handle_deadline AS "handleDeadline",
+		a.is_supervise AS "isSupervise",
+		a.handle_date AS "handleDate",
+		a.handle_step AS "handleStep",
+		a.handle_status AS "handleStatus",
+		a.handle_feedback AS "handleFeedback",
+		a.check_date AS "checkDate",
+		a.check_user AS "checkUser",
+		a.check_opinion AS "checkOpinion",
+		a.check_score AS "checkScore",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag",
+		a.manage_type AS "manageType",
+		a.file AS "file",
+		a.grade_num AS "gradeNum",		
+		a.effect_type AS "effectType",
+   		(case  WHEN NOW() > a.handle_deadline AND handle_status !='03'  THEN "1"
+			ELSE '0' END
+		) "isExtension",
+		
+		u3.name AS "handleUser.name",
+		b.name AS "create_by.name",
+		c.case_name AS "caseName",
+		c.type AS "status",
+		(case c.type 
+			when 01 then '未处理' 
+			when 02 then '处理中' 
+			when 03 then '已完成'
+			else '' end) "statusLable",
+		(case a.obj_type 
+			when 'ccm_event_incident' then '案事件' 
+			when 'ccm_event_ambi' then '矛盾纠纷' 
+			when 'ccm_event_request' then '请求'
+			when 'ccm_wechat_event' then '微信上报'
+			else '' end) "objTypeLable"
+	</sql>
+	<sql id="ccmEventCasedealColumnsWithWechatEvent">
+		a.id AS "id",
+		a.obj_id AS "objId",
+		a.obj_type AS "objType",
+		a.handle_user AS "handleUser.id",
+		a.handle_deadline AS "handleDeadline",
+		a.is_supervise AS "isSupervise",
+		a.handle_date AS "handleDate",
+		a.handle_step AS "handleStep",
+		a.handle_status AS "handleStatus",
+		a.handle_feedback AS "handleFeedback",
+		a.check_date AS "checkDate",
+		a.check_user AS "checkUser",
+		a.check_opinion AS "checkOpinion",
+		a.check_score AS "checkScore",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag",
+		a.manage_type AS "manageType",
+		a.file AS "file",
+		a.grade_num AS "gradeNum",		
+		a.effect_type AS "effectType",
+   		(case  WHEN NOW() > a.handle_deadline AND handle_status !='03'  THEN "1"
+			ELSE '0' END
+		) "isExtension",
+		
+		u3.name AS "handleUser.name",
+		b.name AS "create_by.name",
+		c.report_info AS "caseName",
+		c.status AS "status",
+		(case c.status 
+			when 01 then '未处理' 
+			when 02 then '处理中' 
+			when 03 then '已完成'
+			else '' end) "statusLable",
+		(case a.obj_type 
+			when 'ccm_event_incident' then '案事件' 
+			when 'ccm_event_ambi' then '矛盾纠纷' 
+			when 'ccm_event_request' then '请求'
+			when 'ccm_wechat_event' then '微信上报'
+			else '' end) "objTypeLable"
+	</sql>
+	<sql id="ccmEventCasedealJoins">
+		LEFT JOIN sys_user u3 ON u3.id = a.handle_user
+	</sql>
+
+	<sql id="ccmEventIncidentJoinsUser">
+		LEFT JOIN sys_user b ON b.id = a.create_by
+	</sql>
+
+	<sql id="ccmEventCasedealJoinsWithIncident">
+		LEFT JOIN ccm_event_incident c ON c.id =a.obj_id
+	</sql>
+
+	<sql id="ccmEventCasedealJoinsWithAmbi">
+		LEFT JOIN ccm_event_ambi c ON c.id =a.obj_id
+	</sql>
+	<sql id="ccmEventCasedealJoinsWithRequest">
+		LEFT JOIN ccm_event_request c ON c.id =a.obj_id
+	</sql>
+	<sql id="ccmEventCasedealJoinsWithWechatEvent">
+		LEFT JOIN ccm_wechat_event c ON c.id =a.obj_id
+	</sql>
+	
+	<select id="get" resultType="CcmEventCasedeal">
+		SELECT
+		<include refid="ccmEventCasedealColumnsWithIncident" />
+		FROM ccm_event_casedeal a
+		<include refid="ccmEventCasedealJoins" />
+		<include refid="ccmEventIncidentJoinsUser" />
+		<include refid="ccmEventCasedealJoinsWithIncident" />
+		WHERE a.id = #{id}
+	</select>
+
+	<select id="findList" resultType="CcmEventCasedeal">
+		SELECT * FROM 
+		(	
+		
+			SELECT
+			<include refid="ccmEventCasedealColumnsWithIncident" />
+			FROM ccm_event_casedeal a
+			<include refid="ccmEventCasedealJoins" />
+			<include refid="ccmEventIncidentJoinsUser" />
+			<include refid="ccmEventCasedealJoinsWithIncident" />
+			<where>
+				a.obj_type = 'ccm_event_incident'
+				AND a.del_flag = #{DEL_FLAG_NORMAL}
+				<if test="currentUser.id !='1'.toString() and isCheck != 'check'">
+					AND a.handle_user = #{currentUser.id}
+				</if>
+				<if test="objId != null and objId != ''">
+					AND a.obj_id LIKE
+					<if test="dbName == 'oracle'">'%'||#{objId}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{objId}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{objId},'%')</if>
+				</if>
+				
+				<if test="objType != null and objType != ''">
+					AND a.obj_type = #{objType}
+				</if>
+				
+				<if test="caseName != null and caseName != ''">
+					AND c.case_name LIKE
+					<if test="dbName == 'oracle'">'%'||#{caseName}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{caseName}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{caseName},'%')</if>
+				</if>
+				
+				<if test="status != null and status != ''">
+					AND c.status = #{status}
+				</if>
+				
+				<if test="handleUser != null and handleUser.id != null and handleUser.id != ''">
+					AND a.handle_user = #{handleUser.id}
+				</if>
+				<if test="beginHandleDeadline != null and endHandleDeadline != null and beginHandleDeadline != '' and endHandleDeadline != ''">
+					AND a.handle_deadline BETWEEN #{beginHandleDeadline} AND #{endHandleDeadline}
+				</if>
+				<if test="isSupervise != null and isSupervise != ''">
+					AND a.is_supervise = #{isSupervise}
+				</if>
+				<if test="handleStatus != null and handleStatus != ''">
+					AND a.handle_status = #{handleStatus}
+				</if>
+			</where>
+			
+			UNION
+			SELECT
+			<include refid="ccmEventCasedealColumnsWithAmbi" />
+			FROM ccm_event_casedeal a
+			<include refid="ccmEventCasedealJoins" />
+			<include refid="ccmEventIncidentJoinsUser" />
+			<include refid="ccmEventCasedealJoinsWithAmbi" />
+			<where>
+				a.obj_type = 'ccm_event_ambi'
+				AND a.del_flag = #{DEL_FLAG_NORMAL}
+				<if test="currentUser.id !='1'.toString() and isCheck != 'check'">
+					AND a.handle_user = #{currentUser.id}
+				</if>
+				<if test="objId != null and objId != ''">
+					AND a.obj_id LIKE
+					<if test="dbName == 'oracle'">'%'||#{objId}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{objId}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{objId},'%')</if>
+				</if>
+				
+				<if test="objType != null and objType != ''">
+					AND a.obj_type = #{objType}
+				</if>
+				
+				<if test="caseName != null and caseName != ''">
+					AND c.name LIKE
+					<if test="dbName == 'oracle'">'%'||#{caseName}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{caseName}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{caseName},'%')</if>
+				</if>
+				
+				<if test="status != null and status != ''">
+					AND c.status = #{status}
+				</if>
+				
+				<if test="handleUser != null and handleUser.id != null and handleUser.id != ''">
+					AND a.handle_user = #{handleUser.id}
+				</if>
+				<if test="beginHandleDeadline != null and endHandleDeadline != null and beginHandleDeadline != '' and endHandleDeadline != ''">
+					AND a.handle_deadline BETWEEN #{beginHandleDeadline} AND #{endHandleDeadline}
+				</if>
+				<if test="isSupervise != null and isSupervise != ''">
+					AND a.is_supervise = #{isSupervise}
+				</if>
+				<if test="handleStatus != null and handleStatus != ''">
+					AND a.handle_status = #{handleStatus}
+				</if>
+			</where>
+			
+			UNION
+			SELECT
+			<include refid="ccmEventCasedealColumnsWithRequest" />
+			FROM ccm_event_casedeal a
+			<include refid="ccmEventCasedealJoins" />
+			<include refid="ccmEventIncidentJoinsUser" />
+			<include refid="ccmEventCasedealJoinsWithRequest" />	
+			<where>
+				a.obj_type = 'ccm_event_request'
+				AND a.del_flag = #{DEL_FLAG_NORMAL}
+				<if test="currentUser.id !='1'.toString() and isCheck != 'check'">
+					AND a.handle_user = #{currentUser.id}
+				</if>
+				<if test="objId != null and objId != ''">
+					AND a.obj_id LIKE
+					<if test="dbName == 'oracle'">'%'||#{objId}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{objId}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{objId},'%')</if>
+				</if>
+				
+				<if test="objType != null and objType != ''">
+					AND a.obj_type = #{objType}
+				</if>
+				
+				<if test="caseName != null and caseName != ''">
+					AND c.case_name LIKE
+					<if test="dbName == 'oracle'">'%'||#{caseName}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{caseName}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{caseName},'%')</if>
+				</if>
+				
+				<if test="status != null and status != ''">
+					AND c.type = #{status}
+				</if>
+				
+				<if test="handleUser != null and handleUser.id != null and handleUser.id != ''">
+					AND a.handle_user = #{handleUser.id}
+				</if>
+				<if test="beginHandleDeadline != null and endHandleDeadline != null and beginHandleDeadline != '' and endHandleDeadline != ''">
+					AND a.handle_deadline BETWEEN #{beginHandleDeadline} AND #{endHandleDeadline}
+				</if>
+				<if test="isSupervise != null and isSupervise != ''">
+					AND a.is_supervise = #{isSupervise}
+				</if>
+				<if test="handleStatus != null and handleStatus != ''">
+					AND a.handle_status = #{handleStatus}
+				</if>
+			</where>
+			UNION
+			SELECT
+			<include refid="ccmEventCasedealColumnsWithWechatEvent" />
+			FROM ccm_event_casedeal a
+			<include refid="ccmEventCasedealJoins" />
+			<include refid="ccmEventIncidentJoinsUser" />
+			<include refid="ccmEventCasedealJoinsWithWechatEvent" />	
+			<where>
+				a.obj_type = 'ccm_wechat_event'
+				AND a.del_flag = #{DEL_FLAG_NORMAL}
+				<if test="currentUser.id !='1'.toString()  and isCheck != 'check'">
+					AND a.handle_user = #{currentUser.id}
+				</if>
+				<if test="objId != null and objId != ''">
+					AND a.obj_id LIKE
+					<if test="dbName == 'oracle'">'%'||#{objId}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{objId}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{objId},'%')</if>
+				</if>
+				
+				<if test="objType != null and objType != ''">
+					AND a.obj_type = #{objType}
+				</if>
+				
+				<if test="caseName != null and caseName != ''">
+					AND c.report_info LIKE
+					<if test="dbName == 'oracle'">'%'||#{caseName}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{caseName}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{caseName},'%')</if>
+				</if>
+				
+				<if test="status != null and status != ''">
+					AND c.status = #{status}
+				</if>
+				
+				<if test="handleUser != null and handleUser.id != null and handleUser.id != ''">
+					AND a.handle_user = #{handleUser.id}
+				</if>
+				<if test="beginHandleDeadline != null and endHandleDeadline != null and beginHandleDeadline != '' and endHandleDeadline != ''">
+					AND a.handle_deadline BETWEEN #{beginHandleDeadline} AND #{endHandleDeadline}
+				</if>
+				<if test="isSupervise != null and isSupervise != ''">
+					AND a.is_supervise = #{isSupervise}
+				</if>
+				<if test="handleStatus != null and handleStatus != ''">
+					AND a.handle_status = #{handleStatus}
+				</if>
+			</where>
+		) rr
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY rr.updateDate DESC
+			</otherwise>
+		</choose>
+	</select>
+
+	<!-- listWithPID -->
+	<select id="listWithPID" resultType="CcmEventCasedeal">
+		SELECT
+		<include refid="ccmEventCasedealColumns" />
+		FROM ccm_event_casedeal a
+		<include refid="ccmEventCasedealJoins" />
+		<where>
+		<!--  Not deleted-->
+			a.del_flag = "0"
+			and a.obj_id = #{id}
+		</where>
+		order by a.create_date DESC
+	</select>
+	
+	<sql id="ccmLogTailColumns">
+		a.id AS "id",
+		a.relevance_id AS "relevanceId",
+		a.relevance_table AS "relevanceTable",
+		a.type AS "type",
+		a.tail_case AS "tailCase",
+		a.tail_content AS "tailContent",
+		a.tail_person AS "tailPerson",
+		a.tail_time AS "tailTime",
+		a.more1 AS "more1",
+		a.more2 AS "more2",
+		a.more3 AS "more3",
+		a.file AS "file",
+		a.create_by AS "createBy",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag"
+	</sql>
+	
+	<!-- listWithPID -->
+	<select id="findLogTailByRelevanceId" resultType="CcmEventCasedeal">
+		SELECT
+		<include refid="ccmLogTailColumns" />
+		FROM ccm_log_tail a
+		<where>
+			a.del_flag = "0"
+			AND a.relevance_id = #{id}
+		</where>
+		order by a.create_date DESC
+	</select>
+	
+	
+	<!-- 定时请求事件处理状态 -->
+	<select id="getEventCasedealMap" resultType="CcmEventCasedeal">
+		SELECT
+			a.id AS "id",
+			a.update_date AS "updateDate",
+			a.handle_step AS "handleStep",
+			u.name AS "caseName"
+		FROM
+			ccm_event_casedeal a
+		LEFT JOIN ccm_event_incident b ON b.id = a.obj_id
+		LEFT JOIN sys_user u ON u.id = a.handle_user
+			WHERE
+			a.del_flag = 0
+			AND b.del_flag = 0
+			AND a.handle_step is not NULL
+			AND a.handle_step != ""
+			AND(a.update_date &gt; SUBDATE(now(),interval 2 minute))
+			<if test="handleStatus != null and handleStatus != ''">
+				AND b.id = #{id}
+			</if>
+		ORDER BY a.update_date DESC
+			LIMIT 1
+	</select>
+	
+	<!-- 事件处理未处理数量 -->
+	<select id="getNumEventCasedeal" resultType="int">
+		SELECT 
+			count(1)
+		FROM ccm_event_casedeal a
+		WHERE 
+			a.del_flag = 0
+		<if test="handleUser != null and handleUser.id != null and handleUser.id != ''">
+			AND a.handle_user = #{handleUser.id}
+		</if>
+		AND a.handle_status = '01'
+	</select>
+	
+	
+	
+	
+
+	<select id="findAllList" resultType="CcmEventCasedeal">
+		SELECT 
+			<include refid="ccmEventCasedealColumns"/>
+		FROM ccm_event_casedeal a
+		<include refid="ccmEventCasedealJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+
+	<insert id="insert">
+		INSERT INTO ccm_event_casedeal(
+			id,
+			obj_id,
+			obj_type,
+			handle_user,
+			handle_deadline,
+			is_supervise,
+			handle_date,
+			handle_step,
+			handle_status,
+			handle_feedback,
+			check_date,
+			check_user,
+			check_opinion,
+			check_score,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag,
+			manage_type,
+			file,
+			grade_num,		
+			effect_type
+		) VALUES (
+			#{id},
+			#{objId},
+			#{objType},
+			#{handleUser.id},
+			#{handleDeadline},
+			#{isSupervise},
+			#{handleDate},
+			#{handleStep},
+			#{handleStatus},
+			#{handleFeedback},
+			#{checkDate},
+			#{checkUser},
+			#{checkOpinion},
+			#{checkScore},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag},
+			#{manageType},
+			#{file},
+			#{gradeNum},		
+			#{effectType}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE ccm_event_casedeal SET 	
+			obj_id = #{objId},
+			obj_type = #{objType},
+			handle_user = #{handleUser.id},
+			handle_deadline = #{handleDeadline},
+			is_supervise = #{isSupervise},
+			handle_date = #{handleDate},
+			handle_step = #{handleStep},
+			handle_status = #{handleStatus},
+			handle_feedback = #{handleFeedback},
+			check_date = #{checkDate},
+			check_user = #{checkUser},
+			check_opinion = #{checkOpinion},
+			check_score = #{checkScore},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks},
+			manage_type = #{manageType},
+			file = #{file},
+			grade_num = #{gradeNum},		
+			effect_type = #{effectType}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE ccm_event_casedeal SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+
+</mapper>

@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.arjjs.ccm.modules.plm.purchase.dao.PlmPurchaseDeclareDetailDao">
+    
+	<sql id="plmPurchaseDeclareDetailColumns">
+		a.id AS "id",
+		a.pre_id AS "preId.id",
+		a.name AS "name",
+		a.spec AS "spec",
+		a.number AS "number",
+		a.declare_money AS "declareMoney",
+		a.verify_money AS "verifyMoney",
+		a.place AS "place",
+		a.user_id AS "user.id",
+		a.files AS "files",
+		a.type AS "type",
+		a.extend1 AS "extend1",
+		a.extend2 AS "extend2",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag",
+		u9.name AS "user.name"
+	</sql>
+	
+	<sql id="plmPurchaseDeclareDetailJoins">
+		LEFT JOIN plm_purchase_declare b ON b.id = a.pre_id
+		LEFT JOIN sys_user u9 ON u9.id = a.user_id
+	</sql>
+    
+	<select id="get" resultType="PlmPurchaseDeclareDetail">
+		SELECT 
+			<include refid="plmPurchaseDeclareDetailColumns"/>
+		FROM plm_purchase_declare_detail a
+		<include refid="plmPurchaseDeclareDetailJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="PlmPurchaseDeclareDetail">
+		SELECT 
+			<include refid="plmPurchaseDeclareDetailColumns"/>
+		FROM plm_purchase_declare_detail a
+		<include refid="plmPurchaseDeclareDetailJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="preId != null and preId != ''">
+				AND a.pre_id = #{preId.id}
+			</if>
+			<if test="name != null and name != ''">
+				AND a.name LIKE 
+					<if test="dbName == 'oracle'">'%'||#{name}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{name}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{name},'%')</if>
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.create_date ASC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="PlmPurchaseDeclareDetail">
+		SELECT 
+			<include refid="plmPurchaseDeclareDetailColumns"/>
+		FROM plm_purchase_declare_detail a
+		<include refid="plmPurchaseDeclareDetailJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.create_date ASC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO plm_purchase_declare_detail(
+			id,
+			pre_id,
+			name,
+			spec,
+			number,
+			declare_money,
+			verify_money,
+			place,
+			user_id,
+			files,
+			type,
+			extend1,
+			extend2,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag
+		) VALUES (
+			#{id},
+			#{preId.id},
+			#{name},
+			#{spec},
+			#{number},
+			#{declareMoney},
+			#{verifyMoney},
+			#{place},
+			#{user.id},
+			#{files},
+			#{type},
+			#{extend1},
+			#{extend2},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE plm_purchase_declare_detail SET 	
+			pre_id = #{preId.id},
+			name = #{name},
+			spec = #{spec},
+			number = #{number},
+			declare_money = #{declareMoney},
+			verify_money = #{verifyMoney},
+			place = #{place},
+			user_id = #{user.id},
+			files = #{files},
+			type = #{type},
+			extend1 = #{extend1},
+			extend2 = #{extend2},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE plm_purchase_declare_detail SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		<choose>
+			<when test="id !=null and id != ''">
+				WHERE id = #{id}
+			</when>
+			<otherwise>
+				WHERE pre_id = #{preId.id}
+			</otherwise>
+		</choose>
+	</update>
+	
+</mapper>

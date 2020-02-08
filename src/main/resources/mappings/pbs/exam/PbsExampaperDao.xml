@@ -1,0 +1,230 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.arjjs.ccm.modules.pbs.exam.dao.PbsExampaperDao">
+
+	<sql id="pbsExampaperColumns">
+		a.id AS "id",
+		a.s_name AS "sName",
+		a.s_title AS "sTitle",
+		a.s_major AS "sMajor.id",
+		major.s_name AS "sMajor.sName",
+		a.s_project AS
+		"sProject.id",
+		project.s_name AS "sProject.sName",
+		a.s_level AS
+		"sLevel.id",
+		level.s_name AS "sLevel.sName",
+		a.dt_start AS "dtStart",
+		a.dt_end AS "dtEnd",
+		a.i_examtime
+		AS "iExamtime",
+		a.s_way AS "sWay",
+		a.i_ratiocs AS "iRatiocs",
+		a.i_ratiocm AS "iRatiocm",
+		a.i_ratioj AS
+		"iRatioj",
+		a.i_ratioq AS "iRatioq",
+		a.s_stat AS "sStat",
+		<!-- a.s_spare01 AS
+		"sSpare01",
+		a.s_spare02 AS "sSpare02",
+		a.s_spare03 AS "sSpare03",
+		a.s_spare04 AS "sSpare04", -->
+		a.create_by AS
+		"createBy.id",
+		a.create_date AS
+		"createDate",
+		a.update_by AS
+		"updateBy.id",
+		a.update_date AS
+		"updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag"
+	</sql>
+
+	<sql id="pbsExampaperJoins">
+		LEFT JOIN pbs_question_major major ON a.s_major = major.id
+		LEFT JOIN pbs_question_project project ON project.id = a.s_project
+		LEFT JOIN pbs_question_level level ON level.id = a.s_level
+	</sql>
+
+	<select id="get" resultType="PbsExampaper">
+		SELECT
+		<include refid="pbsExampaperColumns" />
+		FROM pbs_exampaper a
+		<include refid="pbsExampaperJoins" />
+		WHERE a.id = #{id}
+	</select>
+
+	<select id="findList" resultType="PbsExampaper">
+		SELECT
+		<include refid="pbsExampaperColumns" />
+		FROM pbs_exampaper a
+		<include refid="pbsExampaperJoins" />
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="sName != null and sName != ''">
+				AND a.s_name LIKE CONCAT('%',#{sName},'%') 
+			</if>
+			<if test="sTitle != null and sTitle != ''">
+				AND a.s_title LIKE CONCAT('%', #{sTitle},'%')
+			</if>
+			<if test="sStat != null and sStat != ''">
+				AND a.s_stat = #{sStat}
+			</if>
+			<if test="sWay != null and sWay != ''">
+				AND a.s_way = #{sWay}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+
+	<select id="findAllList" resultType="PbsExampaper">
+		SELECT
+		<include refid="pbsExampaperColumns" />
+		FROM pbs_exampaper a
+		<include refid="pbsExampaperJoins" />
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+
+	<insert id="insert">
+		INSERT INTO pbs_exampaper(
+		id,
+		s_name,
+		s_title,
+		s_major,
+		s_project,
+		s_level,
+		dt_start,
+		dt_end,
+		i_examtime,
+		s_way,
+		i_ratiocs,
+		i_ratiocm,
+		i_ratioj,
+		i_ratioq,
+		s_stat,
+		s_spare01,
+		s_spare02,
+		s_spare03,
+		s_spare04,
+		create_by,
+		create_date,
+		update_by,
+		update_date,
+		remarks,
+		del_flag
+		) VALUES (
+		#{id},
+		#{sName},
+		#{sTitle},
+		#{sMajor.id},
+		#{sProject.id},
+		#{sLevel.id},
+		#{dtStart},
+		#{dtEnd},
+		#{iExamtime},
+		#{sWay},
+		#{iRatiocs},
+		#{iRatiocm},
+		#{iRatioj},
+		#{iRatioq},
+		#{sStat},
+		#{sSpare01},
+		#{sSpare02},
+		#{sSpare03},
+		#{sSpare04},
+		#{createBy.id},
+		#{createDate},
+		#{updateBy.id},
+		#{updateDate},
+		#{remarks},
+		#{delFlag}
+		)
+	</insert>
+
+	<update id="update">
+		UPDATE pbs_exampaper SET
+		s_name = #{sName},
+		s_title =
+		#{sTitle},
+		s_major = #{sMajor.id},
+		s_project = #{sProject.id},
+		s_level =
+		#{sLevel.id},
+		dt_start = #{dtStart},
+		dt_end = #{dtEnd},
+		i_examtime =
+		#{iExamtime},
+		s_way = #{sWay},
+		i_ratiocs = #{iRatiocs},
+		i_ratiocm =
+		#{iRatiocm},
+		i_ratioj = #{iRatioj},
+		i_ratioq = #{iRatioq},
+		s_stat =
+		#{sStat},
+		s_spare01 = #{sSpare01},
+		s_spare02 = #{sSpare02},
+		s_spare03 =
+		#{sSpare03},
+		s_spare04 = #{sSpare04},
+		update_by = #{updateBy.id},
+		update_date = #{updateDate},
+		remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+
+	<update id="delete">
+		UPDATE pbs_exampaper SET
+		del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+
+	<update id="updateStat">
+		UPDATE pbs_exampaper SET
+		s_stat = #{sStat}
+		WHERE id =
+		#{id}
+	</update>
+
+	<select id="findListByLast" resultType="PbsExampaper">
+		SELECT
+		a.s_name AS "sName",
+		a.id AS "id",
+		a.s_title AS "sTitle",
+		a.s_stat AS "sStat",
+		a.create_by AS "createBy.id",
+		max(a.create_date ) AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS
+		"delFlag"
+		FROM pbs_exampaper a
+		<include refid="pbsExampaperJoins" />
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+				AND a.s_stat = "1"
+				AND a.s_way = "0"
+		</where>
+	</select>
+
+</mapper>

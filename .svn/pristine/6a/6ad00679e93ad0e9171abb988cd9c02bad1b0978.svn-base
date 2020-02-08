@@ -1,0 +1,120 @@
+
+<html>
+<head>
+
+	<title>会议申请管理</title>
+	<meta name="decorator" content="default"/>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<style type="text/css">
+	body{
+	margin-left: 45px;
+	margin-right: 45px;
+	font-family: Arial Unicode MS;
+	font-size: 10px;
+	}
+	h2{
+		margin:0 auto;
+		text-align: center;
+	}	
+	table {
+	
+    border-spacing: 0;
+    margin: auto;
+	width: 100%;
+	border-collapse: collapse;
+	border: 1px solid #444444;
+	}
+	.table td {
+	height: 40px;	
+}
+  .table .shenpi{
+	height: auto;	
+}
+	#table td{
+	 border: 1px solid black;
+	 word-wrap:break-word; 
+	 max-width: 80%;
+	  word-break:break-all;
+     word-wrap:break-word;
+	}
+	#tabletop { 
+	border: 0px
+	}
+	#tabletop .tabletop {
+	border-top: 0px  ;
+	}		
+	.table .trtop{		
+		text-align:center;
+		font-weight:800 ;
+		
+	}	
+	
+	</style>
+	
+</head>
+<body>
+	
+	<form id="inputForm"  class="form-horizontal" >
+		<h2>会议申请单</h2>	
+	    <table id="tabletop" class="table">
+			<tr>
+				<td class="tabletop" colspan="2">申请编号:<u><span>${code!''}</span></u></td>
+				<td class="tabletop" colspan="2">申请人:<u><span>${initiator.name!''}</span></u></td>
+				<td class="tabletop" colspan="2">所属部门:<u><span>${initiator.office.name!''}</span></u></td>
+				<td class="tabletop" colspan="2">申请日期： <u><span>${createDate!''}</span></u></td>
+			</tr>
+		</table>		
+			
+		<table id="table" class="table table-condensed">
+			<tr>
+				<td class="trtop" colspan="2" style="width: 20%">会议名称</td>
+				<td colspan="2" style="width: 30%">${subject!''}</td>
+				<td class="trtop" colspan="2" style="width: 20%">会议类型</td>
+				<td colspan="2" style="width: 30%">${type!''}</td>
+			</tr>	
+			<tr>
+				<td class="trtop" colspan="2">会议地点</td>
+				<td colspan="6">${room.subject!''}</td>
+			</tr>				
+			<tr>
+				<td class="trtop" colspan="2" style="width: 20%">会议主持人</td>
+				<td colspan="2" style="width: 30%">${presider.name!''}</td>
+				<td class="trtop" colspan="2" style="width: 20%">会议记录人</td>
+				<td colspan="2" style="width: 30%">${recorder.name!''}</td>
+			</tr>
+			<tr>
+				<td class="trtop" colspan="2" style="width: 20%">开始时间</td>
+				<td colspan="2" style="width: 30%">${startTime!''}</td>
+				<td class="trtop" colspan="2" style="width: 20%">结束时间</td>
+				<td colspan="2" style="width: 30%">${endTime!''}</td>
+			</tr>							
+			<tr>
+				<td class="trtop" colspan="2">详细内容</td>
+				<td colspan="6">${details!''}</td>
+			</tr>
+			<tr>
+				<td class="trtop" colspan="2">参会人员</td>
+				<td colspan="6">共${number!''}人</td>
+			</tr>
+			<tr>
+				<td class="trtop" colspan="2">是否督办</td>
+				<td colspan="2">${isSup!''}</td>
+				<td class="trtop" colspan="2">督办人</td>
+				<td colspan="2">${plmAct.supExe.name!''}</td>
+			</tr>		
+			<tr>
+				<td class="trtop" colspan="2">督办明细</td>
+				<td colspan="6">${plmAct.supDetail!''}</td>
+			</tr>				
+			${actProcIns!''}
+		</table>				
+		
+		
+	
+		
+	</form>
+	
+	
+	
+</body>
+</html>

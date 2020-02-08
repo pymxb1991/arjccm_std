@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper
+	namespace="com.arjjs.ccm.modules.flat.deviceonline.dao.CcmDeviceOnlineDao">
+
+	<sql id="ccmDeviceOnlineColumns">
+		a.id AS "id",
+		a.create_by AS "createBy.id",
+		a.create_date AS
+		"createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS
+		"updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag",
+		a.device_id AS "deviceId",
+		a.login_time AS "loginTime",
+		a.update_time AS
+		"updateTime",
+		a.status AS "status"
+	</sql>
+
+	<sql id="ccmDeviceOnlineJoins">
+	</sql>
+
+	<select id="get" resultType="CcmDeviceOnline">
+		SELECT
+		<include refid="ccmDeviceOnlineColumns" />
+		FROM ccm_device_online a
+		<include refid="ccmDeviceOnlineJoins" />
+		WHERE a.id = #{id}
+	</select>
+
+
+	<select id="getByDeviceId" resultType="CcmDeviceOnline">
+		SELECT
+		<include refid="ccmDeviceOnlineColumns" />
+		FROM ccm_device_online a
+		<include refid="ccmDeviceOnlineJoins" />
+		WHERE a.device_id = #{deviceId}
+	</select>
+
+	<select id="findList" resultType="CcmDeviceOnline">
+		SELECT
+		<include refid="ccmDeviceOnlineColumns" />
+		FROM ccm_device_online a
+		<include refid="ccmDeviceOnlineJoins" />
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="deviceId != null and deviceId != ''">
+				AND a.device_id = #{deviceId}
+			</if>
+			<if test="status != null and status != ''">
+				AND a.status = #{status}
+			</if>
+		</where>
+		<choose>
+			<when
+				test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+
+	<select id="findAllList" resultType="CcmDeviceOnline">
+		SELECT
+		<include refid="ccmDeviceOnlineColumns" />
+		FROM ccm_device_online a
+		<include refid="ccmDeviceOnlineJoins" />
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>
+		<choose>
+			<when
+				test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+
+	<insert id="insert">
+		INSERT INTO ccm_device_online(
+		id,
+		create_by,
+		create_date,
+		update_by,
+		update_date,
+		remarks,
+		del_flag,
+		device_id,
+		login_time,
+		update_time,
+		status
+		) VALUES (
+		#{id},
+		#{createBy.id},
+		#{createDate},
+		#{updateBy.id},
+		#{updateDate},
+		#{remarks},
+		#{delFlag},
+		#{deviceId},
+		#{loginTime},
+		#{updateTime},
+		#{status}
+		)
+	</insert>
+
+	<update id="update">
+		UPDATE ccm_device_online SET
+		update_by = #{updateBy.id},
+		update_date = #{updateDate},
+		remarks = #{remarks},
+		device_id = #{deviceId},
+		login_time = #{loginTime},
+		update_time = #{updateTime},
+		status = #{status}
+		WHERE id = #{id}
+	</update>
+
+	<update id="delete">
+		UPDATE ccm_device_online SET
+		del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+
+</mapper>

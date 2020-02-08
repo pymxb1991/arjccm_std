@@ -1,0 +1,81 @@
+<%@ page contentType="text/html;charset=UTF-8" %>
+<%@ include file="/WEB-INF/views/include/taglib.jsp"%>
+<html>
+<head>
+	<title>系统信息配置管理</title>
+	<meta name="decorator" content="default"/>
+	<script type="text/javascript">
+		$(document).ready(function() {
+			parent.$.jBox.tip('正在更新配置信息 ');
+		});
+		function page(n,s){
+			$("#pageNo").val(n);
+			$("#pageSize").val(s);
+			$("#searchForm").submit();
+        	return false;
+        }
+	</script>
+	<style type="text/css">
+		.lableStyle{width: 70px;margin-right: 10px;text-align: right;}
+		.high{margin-bottom: 10px}
+	</style>
+</head>
+<body>
+	<ul class="nav nav-tabs">
+		<li class="active"><a href="${ctx}/sys/sysConfig/listForm">系统信息配置</a></li>
+	</ul>
+	<!--<sys:message content="${message}"/>	-->
+	<!-- 系统应用级别 -->
+	<form:form id="inputFormSystemLevel" modelAttribute="systemLevel" action="${ctx}/sys/sysConfig/save" method="post" class="form-horizontal">
+		<form:hidden path="id"/>
+		<form:hidden path="remarks"/>	
+		<div class="control-group">
+			<label class="control-label">系统应用级别：</label>
+			<div class="controls">
+				<form:select path="paramStr" class="input-medium">
+					<form:options items="${fns:getDictList('sys_config_system_level')}" itemLabel="label" itemValue="value" htmlEscape="false"/>
+				</form:select>
+				<span style="float:right; margin-right: 200px">
+					<shiro:hasPermission name="sys:sysConfig:edit">
+						<input id="btnSubmit" class="btn btn-primary" type="submit" value="保 存"/>
+					</shiro:hasPermission>
+				</span>
+			</div>
+		</div>
+	</form:form>
+	<!-- 日志保存天数 -->
+	<form:form id="inputFormLogSaveConfig" modelAttribute="logSaveConfig" action="${ctx}/sys/sysConfig/save" method="post" class="form-horizontal">
+		<form:hidden path="id"/>
+		<form:hidden path="remarks"/>	
+		<div class="control-group">
+			<label class="control-label">${logSaveConfig.remarks}：</label>
+			<div class="controls">
+				<form:input path="paramInt" htmlEscape="false" maxlength="8" class="input-xlarge digits" type="number"/>
+				<span style="float:right; margin-right: 200px">
+					<shiro:hasPermission name="sys:sysConfig:edit">
+						<input id="btnSubmit" class="btn btn-primary" type="submit" value="保 存"/>
+					</shiro:hasPermission>
+				</span>
+			</div>
+		</div>
+	</form:form>
+	<!-- 上级域系统设置 -->
+	<form:form id="inputFormUpperSystemConfig" modelAttribute="upperSystemConfig" action="${ctx}/sys/sysConfig/save" method="post" class="form-horizontal">
+		<form:hidden path="id"/>
+		<form:hidden path="remarks"/>	
+		<div class="control-group">
+			<label class="control-label">${upperSystemConfig.remarks}：</label>
+			<div class="controls"><br>
+				<label class="high"><label class="lableStyle">URL：</label><form:input path="url" htmlEscape="false" maxlength="128" class="input-xlarge "/></label><span class="help-inline">上级接口rest地址，如：http://192.168.1.243:8080/arjccm</span><br>
+				<label class="high"><label class="lableStyle">用户名：</label><form:input path="username" htmlEscape="false" maxlength="128" class="input-xlarge "/></label><br>
+				<label class="high"><label class="lableStyle">密码：</label><form:input path="password" htmlEscape="false" maxlength="128" class="input-xlarge "/></label>
+				<span style="float:right; margin-right: 200px">
+					<shiro:hasPermission name="sys:sysConfig:edit">
+						<input id="btnSubmit" class="btn btn-primary" type="submit" value="保 存"/>
+					</shiro:hasPermission>
+				</span>
+			</div>
+		</div>
+	</form:form>
+</body>
+</html>

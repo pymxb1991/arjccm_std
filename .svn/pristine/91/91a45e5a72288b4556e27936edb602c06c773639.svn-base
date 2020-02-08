@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.arjjs.ccm.modules.ccm.test.dao.CcmMapTestDao">
+    
+	<sql id="ccmMapTestColumns">
+		a.id AS "id",
+		a.name AS "name",
+		a.ccm_point AS "ccmPoint",
+		a.ccm_mpoint AS "ccmMpoint",
+		a.ccm_polygon AS "ccmPolygon",
+		a.ccm_mpolygon AS "ccmMpolygon",
+		a.memo AS "memo",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag"
+	</sql>
+	
+	<sql id="ccmMapTestJoins">
+	</sql>
+    
+	<select id="get" resultType="CcmMapTest">
+		SELECT 
+			<include refid="ccmMapTestColumns"/>
+		FROM ccm_map_test a
+		<include refid="ccmMapTestJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="CcmMapTest">
+		SELECT 
+			<include refid="ccmMapTestColumns"/>
+		FROM ccm_map_test a
+		<include refid="ccmMapTestJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="name != null and name != ''">
+				AND a.name LIKE 
+					<if test="dbName == 'oracle'">'%'||#{name}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{name}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{name},'%')</if>
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="CcmMapTest">
+		SELECT 
+			<include refid="ccmMapTestColumns"/>
+		FROM ccm_map_test a
+		<include refid="ccmMapTestJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO ccm_map_test(
+			id,
+			name,
+			ccm_point,
+			ccm_mpoint,
+			ccm_polygon,
+			ccm_mpolygon,
+			memo,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag
+		) VALUES (
+			#{id},
+			#{name},
+			#{ccmPoint},
+			#{ccmMpoint},
+			#{ccmPolygon},
+			#{ccmMpolygon},
+			#{memo},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE ccm_map_test SET 	
+			name = #{name},
+			ccm_point = #{ccmPoint},
+			ccm_mpoint = #{ccmMpoint},
+			ccm_polygon = #{ccmPolygon},
+			ccm_mpolygon = #{ccmMpolygon},
+			memo = #{memo},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE ccm_map_test SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

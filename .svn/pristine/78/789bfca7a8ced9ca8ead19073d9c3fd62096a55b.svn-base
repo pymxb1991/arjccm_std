@@ -1,0 +1,54 @@
+<!DOCTYPE HTML>
+<html>
+	<head>
+		<title>扁平化平台-APP下载</title>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+		<link rel="stylesheet" href="assets/css/main.css" />
+		<noscript><link rel="stylesheet" href="assets/css/noscript.css" /></noscript>
+		<script type="text/javascript"  >
+$(document).ready(function() {
+	//生成二维码
+    getAppInfo();
+    
+});
+//生成二维码
+function getAppInfo(){
+    var url = "";
+	$.getJSON(ctx+'/appupload/sysAppUpload/getAppInfo',function(data){
+		url=data;
+		console.log("App 下载地址 " ,url);
+	})
+    console.log("22222222 " ,url);
+	var qrcode = new QRCode("qrcode",{
+		width:150,
+		height:150,
+		colorDark:'#000000',
+		colorLight:'#ffffff',
+		correctLevel:QRCode.CorrectLevel.H
+		//src:'http://34.121.33.250:8080/arjflat/userfiles/1/images/photo/2019/05/3.jpg'
+	});
+    qrcode.makeCode(url);
+}
+</script>   
+	</head>
+	<body class="is-preload">
+			<header id="header">
+				<div class="content">
+					<h1><a href="#">扁平化</a></h1>
+					<ul class="actions">
+						<li><a href="./app.apk" class="button primary icon fa-download">APP下载</a></li>
+					</ul>
+				</div>
+				<div class="image phone"><div class="inner"><img src="images/dg1.jpg" alt="" /></div></div>
+			</header>
+
+			<script src="assets/js/jquery.min.js"></script>
+			<script src="assets/js/jquery.scrolly.min.js"></script>
+			<script src="assets/js/browser.min.js"></script>
+			<script src="assets/js/breakpoints.min.js"></script>
+			<script src="assets/js/util.js"></script>
+			<script src="assets/js/main.js"></script>
+
+	</body>
+</html>

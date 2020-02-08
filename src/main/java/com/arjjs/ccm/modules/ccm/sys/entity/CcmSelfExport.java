@@ -1,0 +1,348 @@
+/**
+ * Copyright &copy; 2012-2016 <a href="https://github.com/thinkgem/jeesite">JeeSite</a> All rights reserved.
+ */
+package com.arjjs.ccm.modules.ccm.sys.entity;
+
+import com.arjjs.ccm.common.persistence.DataEntity;
+import com.arjjs.ccm.common.utils.StringUtils;
+import com.arjjs.ccm.common.utils.excel.annotation.ExcelField;
+import com.arjjs.ccm.modules.sys.entity.Office;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.google.common.collect.Lists;
+import org.hibernate.validator.constraints.Length;
+
+import java.util.Date;
+import java.util.List;
+
+/**
+ * 工作日志Entity
+ * @author arj
+ * @version 2018-03-08
+ */
+public class CcmSelfExport extends DataEntity<CcmSelfExport> {
+
+	private static final long serialVersionUID = 1L;
+	private String type;		// 类型
+	private Date beginDate;		// 开始日期
+	private Date endDate;		// 结束日期
+	private String title;		// 标题
+	private String content;		// 内容
+	private String files;		// 附件
+	private String status;		// 状态
+	private String areaPoint;		// 坐标（点）
+	private String createName;  // 创建人姓名
+	private String readNum;		// 已读
+	private String unReadNum;	// 未读
+	private boolean isSelf;		// 是否只查询自己的通知
+	private String readFlag;	// 本人阅读状态
+	private String readFlagLable;	// 本人阅读状态
+
+	private Office office;	// 归属部门
+	private String typeLable;	//用于app接口列表显示;
+
+	private String place;  //走访地址
+	private String eventtypeid;  //事件类型
+	private String telephone;  //电话
+	private String name; //行政社区名称
+	private Date createDate;  //创建日志时间
+
+	private int jobnum;
+	private int visitnum;
+	private int eventnum;
+	private int sum;
+
+	@JsonIgnore
+	public Office getOffice() {
+		return office;
+	}
+	public void setOffice(Office office) {
+		this.office = office;
+	}
+
+	private String value1;//报表:工作日志
+
+	private String value2;
+
+	private String value3;
+
+	private String value4;
+
+	private String value5;
+
+	private String value6;
+
+	private String value7;
+
+
+
+	public String getValue1() {
+		return value1;
+	}
+
+	public void setValue1(String value1) {
+		this.value1 = value1;
+	}
+
+	public String getValue2() {
+		return value2;
+	}
+
+	public void setValue2(String value2) {
+		this.value2 = value2;
+	}
+
+	public String getValue3() {
+		return value3;
+	}
+
+	public void setValue3(String value3) {
+		this.value3 = value3;
+	}
+
+	public String getValue4() {
+		return StringUtils.isEmpty(value4) ? "0" : value4;
+	}
+
+	public void setValue4(String value4) {
+		this.value4 = value4;
+	}
+
+	public String getValue5() {
+		return value5;
+	}
+
+	public void setValue5(String value5) {
+		this.value5 = value5;
+	}
+
+	public String getValue6() {
+		return value6;
+	}
+
+	public void setValue6(String value6) {
+		this.value6 = value6;
+	}
+
+	public String getValue7() {
+		return value7;
+	}
+
+	public void setValue7(String value7) {
+		this.value7= value7;
+	}
+
+
+
+	private List<CcmWorkReportRead> ccmWorkReportReadList = Lists.newArrayList();
+
+	public CcmSelfExport() {
+		super();
+	}
+
+	public CcmSelfExport(String id){
+		super(id);
+	}
+
+	@Length(min=0, max=2, message="类型长度必须介于 0 和 2 之间")
+	@ExcelField(title="类型", align=2, sort=2,dictType="ccm_work_report_type")
+	public String getType() {
+		return type;
+	}
+
+	public void setType(String type) {
+		this.type = type;
+	}
+	
+	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+	public Date getBeginDate() {
+		return beginDate;
+	}
+
+	public void setBeginDate(Date beginDate) {
+		this.beginDate = beginDate;
+	}
+	
+	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+	public Date getEndDate() {
+		return endDate;
+	}
+
+	public void setEndDate(Date endDate) {
+		this.endDate = endDate;
+	}
+	
+	@Length(min=0, max=100, message="标题长度必须介于 0 和 100 之间")
+	@ExcelField(title="标题", align=2, sort=0)
+	public String getTitle() {
+		return title;
+	}
+
+	public void setTitle(String title) {
+		this.title = title;
+	}
+	
+	@Length(min=0, max=1000, message="内容长度必须介于 0 和 1000 之间")
+	public String getContent() {
+		return content;
+	}
+
+	public void setContent(String content) {
+		this.content = content;
+	}
+	
+	@Length(min=0, max=1000, message="附件长度必须介于 0 和 1000 之间")
+	public String getFiles() {
+		return files;
+	}
+
+	public void setFiles(String files) {
+		this.files = files;
+	}
+	
+	@Length(min=0, max=2, message="状态长度必须介于 0 和 2 之间")
+	public String getStatus() {
+		return status;
+	}
+
+	public void setStatus(String status) {
+		this.status = status;
+	}
+	
+	@Length(min=0, max=40, message="坐标（点）长度必须介于 0 和 40 之间")
+	public String getAreaPoint() {
+		return areaPoint;
+	}
+
+	public void setAreaPoint(String areaPoint) {
+		this.areaPoint = areaPoint;
+	}
+	
+	public String getReadNum() {
+		return readNum;
+	}
+
+	public void setReadNum(String readNum) {
+		this.readNum = readNum;
+	}
+
+	public String getUnReadNum() {
+		return unReadNum;
+	}
+
+	public void setUnReadNum(String unReadNum) {
+		this.unReadNum = unReadNum;
+	}
+	
+	public List<CcmWorkReportRead> getCcmWorkReportReadList() {
+		return ccmWorkReportReadList;
+	}
+
+	public void setCcmWorkReportReadList(List<CcmWorkReportRead> ccmWorkReportReadList) {
+		this.ccmWorkReportReadList = ccmWorkReportReadList;
+	}
+	
+
+	public String getPlace() {
+		return place;
+	}
+	public void setPlace(String place) {
+		this.place = place;
+	}
+	
+	public String getEventtypeid() {
+		return eventtypeid;
+	}
+	public void setEventtypeid(String eventtypeid) {
+		this.eventtypeid = eventtypeid;
+	}
+	public String getTelephone() {
+		return telephone;
+	}
+	public void setTelephone(String telephone) {
+		this.telephone = telephone;
+	}
+
+	public String getName() {
+		return name;
+	}
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+	@ExcelField(title="提交时间", align=2, sort=5)
+	public Date getCreateDate() {
+		return createDate;
+	}
+
+	public void setCreateDate(Date createDate) {
+		this.createDate = createDate;
+	}
+
+	public int getJobnum() {
+		return jobnum;
+	}
+	public void setJobnum(int jobnum) {
+		this.jobnum = jobnum;
+	}
+	public int getVisitnum() {
+		return visitnum;
+	}
+	public void setVisitnum(int visitnum) {
+		this.visitnum = visitnum;
+	}
+	public int getEventnum() {
+		return eventnum;
+	}
+	public void setEventnum(int eventnum) {
+		this.eventnum = eventnum;
+	}
+	public int getSum() {
+		return sum;
+	}
+	public void setSum(int sum) {
+		this.sum = sum;
+	}
+
+	public boolean isSelf() {
+		return isSelf;
+	}
+
+	public void setSelf(boolean isSelf) {
+		this.isSelf = isSelf;
+	}
+
+	@ExcelField(title="查阅状态", align=2, sort=6,dictType="oa_notify_read")
+	public String getReadFlag() {
+		return readFlag;
+	}
+
+	public void setReadFlag(String readFlag) {
+		this.readFlag = readFlag;
+	}
+
+	@ExcelField(title="提交人", align=2, sort=3)
+	public String getCreateName() {
+		return createName;
+	}
+
+	public void setCreateName(String createName) {
+		this.createName = createName;
+	}
+	public String getTypeLable() {
+		return typeLable;
+	}
+	public void setTypeLable(String typeLable) {
+		this.typeLable = typeLable;
+	}
+	public String getReadFlagLable() { 
+		return readFlagLable;
+	}
+	public void setReadFlagLable(String readFlagLable) {
+		this.readFlagLable = readFlagLable;
+	}
+	
+	
+	
+}

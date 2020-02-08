@@ -1,0 +1,187 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.arjjs.ccm.modules.ccm.know.dao.CcmKnowSpaceDao">
+    
+	<sql id="ccmKnowSpaceColumns">
+		a.id AS "id",
+		a.level AS "level",
+		a.type AS "type",
+		a.name AS "name",
+		a.lss_no AS "lssNo",
+		a.rel_dept AS "relDept",
+		a.rel_date AS "relDate",
+		a.imp_date AS "impDate",
+		a.ratify_dept AS "ratifyDept",
+		a.ratify_date AS "ratifyDate",
+		a.prescription AS "prescription",
+		a.content AS "content",
+		a.file1 AS "file1",
+		a.file2 AS "file2",
+		a.file3 AS "file3",
+		a.extend1 AS "extend1",
+		a.extend2 AS "extend2",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag"
+	</sql>
+	
+	<sql id="ccmKnowSpaceJoins">
+	</sql>
+    
+	<select id="get" resultType="CcmKnowSpace">
+		SELECT 
+			<include refid="ccmKnowSpaceColumns"/>
+		FROM ccm_know_policy a
+		<include refid="ccmKnowSpaceJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="CcmKnowSpace">
+		SELECT 
+			<include refid="ccmKnowSpaceColumns"/>
+		FROM ccm_know_policy a
+		<include refid="ccmKnowSpaceJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="type ='04'">
+				AND a.type LIKE 
+					<if test="dbName == 'oracle'">'%'||#{type}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{type}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{type},'%')</if>
+			</if>
+			<if test="name != null and name != ''">
+				AND a.name LIKE 
+					<if test="dbName == 'oracle'">'%'||#{name}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{name}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{name},'%')</if>
+			</if>
+			<if test="content != null and content != ''">
+				AND a.content LIKE 
+					<if test="dbName == 'oracle'">'%'||#{content}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{content}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{content},'%')</if>
+			</if>
+			<if test="lssNo != null and lssNo != ''">
+				AND a.lss_no LIKE 
+					<if test="dbName == 'oracle'">'%'||#{lssNo}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{lssNo}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{lssNo},'%')</if>
+			</if>
+			<if test="beginPublishDate != null and endPublishDate != null and beginPublishDate != '' and endPublishDate != ''">
+				AND a.rel_date BETWEEN #{beginPublishDate} AND #{endPublishDate}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="CcmKnowSpace">
+		SELECT 
+			<include refid="ccmKnowSpaceColumns"/>
+		FROM ccm_know_policy a
+		<include refid="ccmKnowSpaceJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO ccm_know_policy(
+			id,
+			level,
+			type,
+			name,
+			lss_no,
+			rel_dept,
+			rel_date,
+			imp_date,
+			ratify_dept,
+			ratify_date,
+			prescription,
+			content,
+			file1,
+			file2,
+			file3,
+			extend1,
+			extend2,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag
+		) VALUES (
+			#{id},
+			#{level},
+			#{type},
+			#{name},
+			#{lssNo},
+			#{relDept},
+			#{relDate},
+			#{impDate},
+			#{ratifyDept},
+			#{ratifyDate},
+			#{prescription},
+			#{content},
+			#{file1},
+			#{file2},
+			#{file3},
+			#{extend1},
+			#{extend2},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE ccm_know_policy SET 	
+			level = #{level},
+			type = #{type},
+			name = #{name},
+			lss_no = #{lssNo},
+			rel_dept = #{relDept},
+			rel_date = #{relDate},
+			imp_date = #{impDate},
+			ratify_dept = #{ratifyDept},
+			ratify_date = #{ratifyDate},
+			prescription = #{prescription},
+			content = #{content},
+			file1 = #{file1},
+			file2 = #{file2},
+			file3 = #{file3},
+			extend1 = #{extend1},
+			extend2 = #{extend2},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE ccm_know_policy SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

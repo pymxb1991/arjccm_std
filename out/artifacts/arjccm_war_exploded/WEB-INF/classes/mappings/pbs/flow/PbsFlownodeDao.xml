@@ -1,0 +1,229 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.arjjs.ccm.modules.pbs.flow.dao.PbsFlownodeDao">
+
+	<sql id="pbsFlownodeColumns">
+		a.id AS "id",
+		a.s_name AS "sName",
+		a.s_flowid AS
+		"sFlowid.id",
+		a.s_flowurl AS "sFlowurl",
+		a.s_prevnodeid AS
+		"sPrevnodeid.id",
+		a.s_nextnodeid AS "sNextnodeid.id",
+		a.s_manual AS
+		"sManual",
+		a.s_opearatecontent AS "sOpearatecontent",
+		a.s_nodetype AS
+		"sNodetype",
+		a.s_description AS
+		"sDescription",
+		a.s_sort AS "sSort",
+		a.s_spare01 AS
+		"sSpare01",
+		a.s_spare02 AS "sSpare02",
+		a.s_spare03 AS
+		"sSpare03",
+		a.s_spare04 AS "sSpare04",
+		a.create_by AS
+		"createBy.id",
+		a.create_date AS
+		"createDate",
+		a.update_by AS
+		"updateBy.id",
+		a.update_date AS
+		"updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS
+		"delFlag",
+		flowdefinition.s_name AS "sFlowid.sName",
+		prenode.s_name AS
+		"sPrevnodeid.sName",
+		nextnode.s_name AS "sNextnodeid.sName"
+	</sql>
+
+	<sql id="pbsFlownodeJoins">
+		LEFT JOIN pbs_flowdefinition flowdefinition on
+		flowdefinition.id = a.s_flowid
+	</sql>
+
+	<sql id="pbsFlownodeJoinNextnode">
+		LEFT JOIN pbs_flownode prenode on prenode.id =
+		a.s_prevnodeid
+	</sql>
+
+	<sql id="pbsFlownodeJoinPrevnode">
+		LEFT JOIN pbs_flownode nextnode on nextnode.id =
+		a.s_nextnodeid
+	</sql>
+
+
+	<select id="get" resultType="PbsFlownode">
+		SELECT
+		<include refid="pbsFlownodeColumns" />
+		FROM pbs_flownode a
+		<include refid="pbsFlownodeJoins" />
+		<include refid="pbsFlownodeJoinNextnode" />
+		<include refid="pbsFlownodeJoinPrevnode" />
+		WHERE a.id = #{id}
+	</select>
+
+	<select id="findList" resultType="PbsFlownode">
+		SELECT
+		<include refid="pbsFlownodeColumns" />
+		FROM pbs_flownode a
+		<include refid="pbsFlownodeJoins" />
+		<include refid="pbsFlownodeJoinNextnode" />
+		<include refid="pbsFlownodeJoinPrevnode" />
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if
+				test="sFlowid !=null and sFlowid !='' and  sFlowid.id !=null and sFlowid.id !=''">
+				AND a.s_flowid = #{sFlowid.id}
+			</if>
+			<if
+				test="sFlowid !=null and sFlowid !='' and  sFlowid.sName !=null and sFlowid.sName !=''">
+				AND flowdefinition.s_name LIKE
+				<if test="dbName == 'oracle'">'%'||#{sFlowid.sName}||'%'</if>
+				<if test="dbName == 'mssql'">'%'+#{sFlowid.sName}+'%'</if>
+				<if test="dbName == 'mysql'">concat('%',#{sFlowid.sName},'%')</if>
+			</if>
+			<if test="sNodetype != null and sNodetype != '' ">
+				AND a.s_nodetype = #{sNodetype}
+			</if>
+		</where>
+		GROUP BY  a.id
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.s_flowid,a.s_sort ASC
+			</otherwise>
+		</choose>
+	</select>
+
+	<select id="findAllList" resultType="PbsFlownode">
+		SELECT
+		<include refid="pbsFlownodeColumns" />
+		FROM pbs_flownode a
+		<include refid="pbsFlownodeJoins" />
+		<include refid="pbsFlownodeJoinNextnode" />
+		<include refid="pbsFlownodeJoinPrevnode" />
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+
+	<insert id="insert">
+		INSERT INTO pbs_flownode(
+		id,
+		s_name,
+		s_flowid,
+		s_flowurl,
+		s_prevnodeid,
+		s_nextnodeid,
+		s_manual,
+		s_opearatecontent,
+		s_nodetype ,
+		s_description,
+		create_by,
+		create_date,
+		update_by,
+		update_date,
+		remarks,
+		del_flag,
+		s_sort
+		) VALUES (
+		#{id},
+		#{sName},
+		#{sFlowid.id},
+		#{sFlowurl},
+		#{sPrevnodeid.id},
+		#{sNextnodeid.id},
+		#{sManual},
+		#{sOpearatecontent},
+		#{sNodetype},
+		#{sDescription},
+		#{createBy.id},
+		#{createDate},
+		#{updateBy.id},
+		#{updateDate},
+		#{remarks},
+		#{delFlag},
+		#{sSort}
+		)
+	</insert>
+
+	<update id="update">
+		UPDATE pbs_flownode SET
+		s_name = #{sName},
+		s_flowid =
+		#{sFlowid.id},
+		s_flowurl = #{sFlowurl},
+		s_prevnodeid =
+		#{sPrevnodeid.id},
+		s_nextnodeid = #{sNextnodeid.id},
+		s_manual =
+		#{sManual},
+		s_opearatecontent = #{sOpearatecontent},
+		s_nodetype=
+		#{sNodetype},
+		s_description = #{sDescription},
+		update_by =
+		#{updateBy.id},
+		update_date = #{updateDate},
+		s_sort =#{sSort}
+
+		WHERE id =
+		#{id}
+	</update>
+
+	<update id="delete">
+		UPDATE pbs_flownode SET
+		del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+
+	<update id="deleteBysFlowid">
+		UPDATE pbs_flownode SET
+		del_flag = #{DEL_FLAG_DELETE}
+		WHERE s_flowid = #{sFlowid.id}
+	</update>
+
+	<select id="findMaxSort" resultType="java.lang.String">
+		SELECT
+		MAX(node.s_sort)
+		FROM
+		pbs_flownode node
+		WHERE
+		node.s_sort != 99
+		AND node.s_flowid =
+		#{id}
+	</select>
+
+	<update id="updatesSort">
+		UPDATE pbs_flownode
+		SET s_sort =CASE id
+		<foreach collection="list" open="" close="" item="item"
+			separator="">
+			WHEN #{item.id} THEN #{item.sSort}
+		</foreach>
+		END
+		WHERE
+		id IN (
+		<foreach collection="list" open="" close="" item="item"
+			separator=",">
+			#{item.id}
+		</foreach>
+		)
+	</update>
+</mapper>

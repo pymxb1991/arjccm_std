@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.arjjs.ccm.modules.plm.car.dao.PlmCarViolationDao">
+    
+	<sql id="plmCarViolationColumns">
+		a.id AS "id",
+		a.car_use_id AS "carUseId",
+		a.car_id AS "car.id",
+		a.driver_id AS "driver.id",
+		a.use_id AS "use.id",
+		a.statue AS "statue",
+		a.viol_date AS "violDate",
+		a.type AS "type",
+		a.addr AS "addr",
+		a.forfeit AS "forfeit",
+		a.deduction AS "deduction",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag",
+		u5.name AS "use.name",
+		u5.phone AS "use.phone",
+		b.vehicle AS "car.vehicle",
+		c.name AS "driver.name",
+		c.phone AS "driver.phone"	
+	</sql>
+	
+	
+	<sql id="plmCarViolationJoins">
+		LEFT JOIN sys_user u5 ON u5.id = a.use_id
+		LEFT JOIN plm_car b ON b.id = a.car_id
+		LEFT JOIN plm_car_driver c ON c.id = a.driver_id	
+	</sql>
+    
+	<select id="get" resultType="PlmCarViolation">
+		SELECT 
+			<include refid="plmCarViolationColumns"/>
+		FROM plm_car_violation a
+		<include refid="plmCarViolationJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="PlmCarViolation">
+		SELECT 
+			<include refid="plmCarViolationColumns"/>
+		FROM plm_car_violation a
+		<include refid="plmCarViolationJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="carUseId != null and carUseId != ''">
+				AND a.car_use_id = #{carUseId}
+			</if>			
+			<if test="car != null and car.id != null and car.id != ''">
+				AND a.car_id = #{car.id}
+			</if>
+			<if test="driver != null and driver.id != null and driver.id != ''">
+				AND a.driver_id = #{driver.id}
+			</if>
+			<if test="statue != null and statue != ''">
+				AND a.statue = #{statue}
+			</if>
+			<if test="beginViolDate != null and endViolDate != null and beginViolDate != '' and endViolDate != ''">
+				AND a.viol_date BETWEEN #{beginViolDate} AND #{endViolDate}
+			</if>
+			<if test="type != null and type != ''">
+				AND a.type = #{type}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="PlmCarViolation">
+		SELECT 
+			<include refid="plmCarViolationColumns"/>
+		FROM plm_car_violation a
+		<include refid="plmCarViolationJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO plm_car_violation(
+			id,
+			car_use_id,
+			car_id,
+			driver_id,
+			use_id,
+			statue,
+			viol_date,
+			type,
+			addr,
+			forfeit,
+			deduction,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag
+		) VALUES (
+			#{id},
+			#{carUseId},
+			#{car.id},
+			#{driver.id},
+			#{use.id},
+			#{statue},
+			#{violDate},
+			#{type},
+			#{addr},
+			#{forfeit},
+			#{deduction},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE plm_car_violation SET 	
+			car_use_id = #{carUseId},
+			car_id = #{car.id},
+			driver_id = #{driver.id},
+			use_id = #{use.id},
+			statue = #{statue},
+			viol_date = #{violDate},
+			type = #{type},
+			addr = #{addr},
+			forfeit = #{forfeit},
+			deduction = #{deduction},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE plm_car_violation SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

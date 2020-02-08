@@ -1,0 +1,147 @@
+<%@ page contentType="text/html;charset=UTF-8" %>
+<%@ include file="/WEB-INF/views/include/taglib.jsp"%>
+<html>
+<head>
+	<title>调解组织管理</title>
+	<meta name="decorator" content="default"/>
+	<script type="text/javascript">
+		$(document).ready(function() {
+			//$("#name").focus();
+			$("#inputForm").validate({
+				submitHandler: function(form){
+					loading('正在提交，请稍等...');
+					form.submit();
+				},
+				errorContainer: "#messageBox",
+				errorPlacement: function(error, element) {
+					$("#messageBox").text("输入有误，请先更正。");
+					if (element.is(":checkbox")||element.is(":radio")||element.parent().is(".input-append")){
+						error.appendTo(element.parent().parent());
+					} else {
+						error.insertAfter(element);
+					}
+				}
+			});
+		});
+	</script>
+</head>
+<body>
+	<ul class="nav nav-tabs">
+		<li><a href="${ctx}/organization/ccmEventOrganization/">调解组织列表</a></li>
+		<li class="active"><a href="${ctx}/organization/ccmEventOrganization/form?id=${ccmEventOrganization.id}">调解组织<shiro:hasPermission name="organization:ccmEventOrganization:edit">${not empty ccmEventOrganization.id?'修改':'添加'}</shiro:hasPermission><shiro:lacksPermission name="organization:ccmEventOrganization:edit">查看</shiro:lacksPermission></a></li>
+	</ul><br/>
+	<form:form id="inputForm" modelAttribute="ccmEventOrganization" action="${ctx}/organization/ccmEventOrganization/save" method="post" class="form-horizontal">
+		<form:hidden path="id"/>
+		<sys:message content="${message}"/>		
+		<%-- <div class="control-group">
+			<label class="control-label">父级编号：</label>
+			<div class="controls">
+				<form:input path="more2" htmlEscape="false" maxlength="64" class="input-xlarge "/>
+			</div>
+		</div>
+		<div class="control-group">
+			<label class="control-label">所有父级编号：</label>
+			<div class="controls">
+				<form:input path="more3" htmlEscape="false" maxlength="2000" class="input-xlarge "/>
+			</div>
+		</div>
+		<div class="control-group">
+			<label class="control-label">排序：</label>
+			<div class="controls">
+				<form:input path="more4" htmlEscape="false" class="input-xlarge "/>
+			</div>
+		</div> --%>
+		
+		<div class="control-group">
+			<label class="control-label">组织名称：</label>
+			<div class="controls">
+				<form:input path="orgName" htmlEscape="false" maxlength="100" class="input-xlarge "/>
+			</div>
+		</div>
+		<div class="control-group">
+			<label class="control-label">归属区域：</label>
+			<div class="controls">
+				<sys:treeselect id="area" name="area.id" value="${ccmEventOrganization.area.id}" labelName="area.name" labelValue="${ccmEventOrganization.area.name}"
+					title="区域" url="/sys/area/treeData" cssClass="" allowClear="true" notAllowSelectParent="true"/>
+			</div>
+		</div>
+		<div class="control-group">
+			<label class="control-label">区域编码：</label>
+			<div class="controls">
+				<form:input path="code" htmlEscape="false" maxlength="100" class="input-xlarge "/>
+			</div>
+		</div>
+		
+		<div class="control-group">
+			<label class="control-label">组织联系方式：</label>
+			<div class="controls">
+				<form:input path="orgPhone" htmlEscape="false" maxlength="50" class="input-xlarge "/>
+			</div>
+		</div>
+		<div class="control-group">
+			<label class="control-label">组织详址：</label>
+			<div class="controls">
+				<form:input path="orgAdd" htmlEscape="false" maxlength="200" class="input-xlarge "/>
+			</div>
+		</div>
+		<div class="control-group">
+			<label class="control-label">组织类型：</label>
+			<div class="controls">
+				<form:input path="orgType" htmlEscape="false" maxlength="2" class="input-xlarge "/>
+			</div>
+		</div>
+		<div class="control-group">
+			<label class="control-label">组织层级：</label>
+			<div class="controls">
+				<form:input path="orgScale" htmlEscape="false" maxlength="2" class="input-xlarge "/>
+			</div>
+		</div>
+		<%-- <div class="control-group">
+			<label class="control-label">业务指导部门：</label>
+			<div class="controls">
+				<form:input path="guidePart" htmlEscape="false" maxlength="200" class="input-xlarge "/>
+			</div>
+		</div> --%>
+		<div class="control-group">
+			<label class="control-label">人员数量：</label>
+			<div class="controls">
+				<form:input path="manNum" htmlEscape="false" maxlength="6" class="input-xlarge "/>
+			</div>
+		</div>
+		<div class="control-group">
+			<label class="control-label">主要职能：</label>
+			<div class="controls">
+				<form:input path="mainFunc" htmlEscape="false" maxlength="1024" class="input-xlarge "/>
+			</div>
+		</div>
+		<div class="control-group">
+			<label class="control-label">冗余字段1：</label>
+			<div class="controls">
+				<form:input path="more1" htmlEscape="false" maxlength="100" class="input-xlarge "/>
+			</div>
+		</div>
+		<%-- <div class="control-group">
+			<label class="control-label">区域图：</label>
+			<div class="controls">
+				<form:input path="areaMap" htmlEscape="false" maxlength="2000" class="input-xlarge "/>
+			</div>
+		</div>
+		<div class="control-group">
+			<label class="control-label">中心点：</label>
+			<div class="controls">
+				<form:input path="areaPoint" htmlEscape="false" maxlength="40" class="input-xlarge "/>
+			</div>
+		</div> --%>
+		<div class="control-group">
+			<label class="control-label">备注信息：</label>
+			<div class="controls">
+				<form:textarea path="remarks" htmlEscape="false" rows="4" maxlength="255" class="input-xxlarge "/>
+			</div>
+		</div>
+		<div class="form-actions">
+			<shiro:hasPermission name="organization:ccmEventOrganization:edit"><input id="btnSubmit" class="btn btn-primary" type="submit" value="保 存"/>&nbsp;</shiro:hasPermission>
+			<input id="btnCancel" class="btn" type="button" value="返 回" onclick="history.go(-1)"/>
+		</div>
+	</form:form>
+</body>
+</html>

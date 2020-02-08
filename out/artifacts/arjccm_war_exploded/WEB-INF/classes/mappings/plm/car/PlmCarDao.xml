@@ -1,0 +1,267 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.arjjs.ccm.modules.plm.car.dao.PlmCarDao">
+    
+	<sql id="plmCarColumns">
+		a.id AS "id",
+		a.vehicle AS "vehicle",
+		a.photo AS "photo",		
+		a.vehicle_status AS "vehicleStatus",
+		a.brand AS "brand",
+		a.vmodel AS "vmodel",
+		a.vtype AS "vtype",
+		a.engine_num AS "engineNum",
+		a.product_date AS "productDate",
+		a.load_num AS "loadNum",
+		a.load_capacity AS "loadCapacity",
+		a.buy_date AS "buyDate",
+		a.annual_date AS "annualDate",
+		a.inspection_date AS "inspectionDate",
+		a.insurance_type AS "insuranceType",
+		a.traf_date AS "trafDate",
+		a.comm_date AS "commDate",
+		a.mileage AS "mileage",
+		a.maintain_mil AS "maintainMil",
+		a.state_description AS "stateDescription",
+		a.car_flag AS "carFlag",
+		a.car_feature AS "carFeature",
+		a.office_id AS "office.id",
+		o.name AS "office.name",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag"
+	</sql>
+	
+	<sql id="plmCarJoins">
+		LEFT JOIN sys_office o ON o.id = a.office_id
+	</sql>
+    
+	<select id="get" resultType="PlmCar">
+		SELECT 
+			<include refid="plmCarColumns"/>
+		FROM plm_car a
+		<include refid="plmCarJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="count" resultType="Integer">
+		SELECT 
+			count(*)
+		FROM plm_car a
+		
+		WHERE a.del_flag = "0"
+	</select>
+	
+	<select id="findList" resultType="PlmCar">
+		SELECT 
+			<include refid="plmCarColumns"/>
+		FROM plm_car a
+		<include refid="plmCarJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="vehicle != null and vehicle != ''">
+				AND a.vehicle LIKE 
+					<if test="dbName == 'oracle'">'%'||#{vehicle}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{vehicle}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{vehicle},'%')</if>
+			</if>
+			<if test="vehicleStatus != null and vehicleStatus != ''">
+				AND a.vehicle_status = #{vehicleStatus}
+			</if>
+			<if test="vtype != null and vtype != ''">
+				AND a.vtype = #{vtype}
+			</if>
+			<if test="loadNum != null and loadNum != ''">
+				AND a.load_num &gt;= #{loadNum}
+			</if>
+			<if test="carFlag != null and carFlag != ''">
+				AND a.car_flag = #{carFlag}
+			</if>
+			<if test="carFeature != null and carFeature != ''">
+				AND a.car_feature = #{carFeature}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="PlmCar">
+		SELECT 
+			<include refid="plmCarColumns"/>
+		FROM plm_car a
+		<include refid="plmCarJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findSelect2Type" resultType="com.arjjs.ccm.tool.Select2Type">
+		SELECT 
+			a.id AS "id",
+			a.vehicle AS "text"
+		FROM plm_car a
+		<include refid="plmCarJoins"/>
+		<where>
+			a.del_flag = '0'
+			<if test="vehicleStatus != null and vehicleStatus != ''">
+				AND a.vehicle_status = #{vehicleStatus}
+			</if>
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<!-- 车辆类型统计，按车辆类型 -->
+	<select id="selectNumByVtype" resultType="com.arjjs.ccm.tool.EchartType" parameterType="Office">
+		SELECT
+			vtype AS "type",
+			count(*) AS "value"
+		FROM plm_car a
+		<where>
+			del_flag = #{DEL_FLAG_NORMAL}
+			<if test="id != null and id != ''">
+				office_id = #{id}
+			</if>
+		</where>		
+		group by vtype
+	
+	</select>	
+	
+	<!-- 车辆使用状态统计 -->
+	<select id="countByStatusAjax" resultType="com.arjjs.ccm.tool.EchartType" >
+		SELECT
+			vehicle_status AS "type",
+			count(*) AS "value"
+		FROM plm_car a
+		<where>
+			del_flag = "0"
+			
+		</where>		
+		group by vehicle_status
+	   ORDER BY "value" ASC
+	</select>	
+	
+	<insert id="insert">
+		INSERT INTO plm_car(
+			id,
+			vehicle,
+			photo,
+			vehicle_status,
+			brand,
+			vmodel,
+			vtype,
+			engine_num,
+			product_date,
+			load_num,
+			load_capacity,
+			buy_date,
+			annual_date,
+			inspection_date,
+			insurance_type,
+			traf_date,
+			comm_date,
+			mileage,
+			maintain_mil,
+			state_description,
+			office_id,
+			car_flag,
+			car_feature,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag
+		) VALUES (
+			#{id},
+			#{vehicle},
+			#{photo},
+			#{vehicleStatus},
+			#{brand},
+			#{vmodel},
+			#{vtype},
+			#{engineNum},
+			#{productDate},
+			#{loadNum},
+			#{loadCapacity},
+			#{buyDate},
+			#{annualDate},
+			#{inspectionDate},
+			#{insuranceType},
+			#{trafDate},
+			#{commDate},
+			#{mileage},
+			#{maintainMil},
+			#{stateDescription},
+			#{office.id},			
+			#{carFlag},
+			#{carFeature},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE plm_car SET 	
+			vehicle = #{vehicle},
+			photo = #{photo},
+			vehicle_status = #{vehicleStatus},
+			brand = #{brand},
+			vmodel = #{vmodel},
+			vtype = #{vtype},
+			engine_num = #{engineNum},
+			product_date = #{productDate},
+			load_num = #{loadNum},
+			load_capacity = #{loadCapacity},
+			buy_date = #{buyDate},
+			annual_date = #{annualDate},
+			inspection_date = #{inspectionDate},
+			insurance_type = #{insuranceType},
+			traf_date = #{trafDate},
+			comm_date = #{commDate},
+			mileage = #{mileage},
+			maintain_mil = #{maintainMil},
+			state_description = #{stateDescription},
+			    office_id=#{office.id},
+			car_flag = #{carFlag},
+			car_feature = #{carFeature},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE plm_car SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

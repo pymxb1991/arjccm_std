@@ -1,0 +1,172 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.arjjs.ccm.modules.flat.planstep.dao.BphPlanStepDao">
+    
+	<sql id="bphPlanStepColumns">
+		a.id AS "id",
+		a.plan_id AS "planId",
+		a.step_id AS "stepId",
+		a.sort AS "sort",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag"
+	</sql>
+	
+	<sql id="bphPlanStepANDPlanInfoColumns">
+		b.id AS "id",
+		b.plan_id AS "planId",
+		b.step_id AS "stepId",
+		b.create_by AS "createBy.id",
+		b.create_date AS "createDate",
+		b.update_by AS "updateBy.id",
+		b.update_date AS "updateDate",
+		b.remarks AS "remarks",
+		b.del_flag AS "delFlag",
+		pi.name AS ,
+			p.NAME,
+			ai.`name` 
+	</sql>
+	
+	<sql id="bphPlanStepJoins">
+	</sql>
+    
+	<select id="get" resultType="BphPlanStep">
+		SELECT 
+			<include refid="bphPlanStepColumns"/>
+		FROM bph_plan_step a
+		<include refid="bphPlanStepJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findLastSort" resultType="BphPlanStep">
+		SELECT
+			<include refid="bphPlanStepColumns"/>
+		FROM bph_plan_step a
+		<where>
+			a.plan_id = #{planId}
+		</where>
+		ORDER BY a.id DESC LIMIT 1
+	</select>
+	
+	<select id="getStepByPlanId" resultType="BphStepInfo">
+		SELECT
+			stepInfo.id AS "id",
+			stepInfo.name AS "name",
+			planStep.plan_id AS "planId"
+		FROM
+			bph_step_info stepInfo
+			LEFT JOIN bph_plan_step	planStep ON planStep.step_id = stepInfo.id
+		WHERE planStep.plan_id = #{planId}
+		AND stepInfo.del_flag = #{DEL_FLAG_NORMAL}
+		AND planStep.del_flag = #{DEL_FLAG_NORMAL}
+		ORDER BY planStep.sort
+	</select>
+	
+	<select id="findList" resultType="BphPlanStep">
+		SELECT 
+			<include refid="bphPlanStepColumns"/>
+		FROM bph_plan_step a
+		<include refid="bphPlanStepJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="BphPlanStep">
+		SELECT 
+			<include refid="bphPlanStepColumns"/>
+		FROM bph_plan_step a
+		<include refid="bphPlanStepJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findListByPlanInfoId" resultType="BphPlanStep">
+		SELECT
+			<include refid="bphPlanStepANDPlanInfoColumns"/> 
+		FROM
+			bph_plan_step b
+			LEFT JOIN bph_plan_info pi ON pi.id = b.plan_id
+			LEFT JOIN bph_step_info p ON b.step_id = p.id
+			LEFT JOIN bph_step_action ba ON ba.step_id = p.id
+			LEFT JOIN bph_action_info ai ON ai.id = ba.action_id 
+		<where>
+			b.del_flag = 0 
+			AND p.del_flag = 0 
+			AND ba.del_flag = 0 
+			AND ai.del_flag = 0
+			<if test="bphPlanInfo.id != null and bphPlanInfo.id != ''">
+			AND pi.id = #{bphPlanInfo.id}
+			</if>
+		</where>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO bph_plan_step(
+			id,
+			plan_id,
+			step_id,
+			sort,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag
+		) VALUES (
+			#{id},
+			#{planId},
+			#{stepId},
+			#{sort},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE bph_plan_step SET 	
+			plan_id = #{planId},
+			step_id = #{stepId},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE bph_plan_step SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE step_id = #{stepId} 
+	</update>
+	
+	<update id="deleteByStepIdAndPlanId">
+		UPDATE bph_plan_step SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE (step_id = #{stepId} AND plan_id = #{planId})
+	</update>
+	
+</mapper>

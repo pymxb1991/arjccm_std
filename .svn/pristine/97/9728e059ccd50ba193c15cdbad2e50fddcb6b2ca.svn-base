@@ -1,0 +1,294 @@
+<%@ page contentType="text/html;charset=UTF-8"%>
+<%@ include file="/WEB-INF/views/include/taglib.jsp"%>
+<html>
+<head>
+<title>社交关系</title>
+<meta name="decorator" content="default" />
+<script type="text/javascript"
+	src="${ctxStatic}/ccm/house/js/ccmHouseReleaseInfo.js">
+</script>
+<script type="text/javascript"
+		src="${ctxStatic}/ccm/pop/js/ccmCommon.js"></script>
+<script type="text/javascript"
+		src="${ctxStatic}/indexStat/Scripts/js/echarts.js"></script>
+</head>
+<body>
+
+	<ul id="myTab" class="nav nav-tabs">
+		<li class="active"><a href="#SocialRelations" data-toggle="tab">社会关系图谱</a></li>
+		<li ><a href="#roomPop" data-toggle="tab">同住人员信息</a></li>
+		<li><a href="#homePop" data-toggle="tab">家庭成员信息</a></li>
+	</ul>
+	<div id="myTabContent" class="tab-content">
+	<div class="tab-pane fade in active" id="SocialRelations">
+	 <div id="SocialRelationsEcharts" style="width:980px;height:580px"></div>
+	</div>
+
+		<div class="tab-pane fade" id="roomPop">
+			<table class="table table-striped table-bordered table-condensed">
+				<tr>
+					<td>人员图片</td>
+					<td>姓名</td>
+					<td>性别</td>
+					<td>出生日期</td>
+					<td>公民身份号码</td>
+					<td>联系方式</td>
+				</tr>
+				<c:forEach items="${listRoomPeople}" var="ccmpop">
+					<tr>
+						<td width="100px">
+							<img src="${ccmpop.images}" style="height:80px;"/>
+						</td>
+						<td>${ccmpop.name}</td>
+						<td>${fns:getDictLabel(ccmpop.sex, 'sex', '')}</td>
+						<td><fmt:formatDate value="${ccmpop.birthday}" pattern="yyyy-MM-dd"/></td>
+						<td>${ccmpop.ident}</td>
+						<td>${ccmpop.telephone}</td>
+					</tr>
+				</c:forEach>
+				<c:if test="${empty listAccount}">
+					<tr>
+						<td>暂无数据</td>
+						<td></td>
+						<td></td>
+						<td></td>
+						<td></td>
+					</tr>
+				</c:if>
+			</table>
+		</div>
+		<div class="tab-pane fade" id="homePop">
+			<table class="table table-striped table-bordered table-condensed">
+				<tr>
+					<td>人员图片</td>
+					<td>姓名</td>
+					<td>性别</td>
+					<td>出生日期</td>
+					<td>公民身份号码</td>
+					<td>联系方式</td>
+					<td>与户主关系</td>
+				</tr>
+				<c:forEach items="${listAccount}" var="ccmpop">
+					<tr>
+						<td width="100px">
+							<img src="${ccmpop.images}" style="height:80px;"/>
+						</td>
+						<td>${ccmpop.name}</td>
+						<td>${fns:getDictLabel(ccmpop.sex, 'sex', '')}</td>
+						<td><fmt:formatDate value="${ccmpop.birthday}" pattern="yyyy-MM-dd"/></td>
+						<td>${ccmpop.ident}</td>
+						<td>${ccmpop.telephone}</td>
+						<td>${fns:getDictLabel(ccmpop.accountrelation,'sys_ccm_fami_ties',"")}
+						</td>
+					</tr>
+				</c:forEach>
+				<c:if test="${empty listAccount}">
+					<tr>
+						<td>暂无数据</td>
+						<td></td>
+						<td></td>
+						<td></td>
+						<td></td>
+					</tr>
+				</c:if>
+			</table>
+		</div>
+	</div>
+	<script>
+	   $(function(){
+		   var cppPopPopType={};
+		   var cppWebType={};
+		   var cppVehileType={};
+		   var cppPhoneType={};
+			$.ajax({
+				type : "post",
+				url : "${ctx}/sys/dict/listData?type=cpp_pop_pop_type",
+				async : false,
+				success : function(data){
+					for(var i in data){
+						cppPopPopType[data[i].value]=data[i].label;
+					}
+				}
+			});
+			$.ajax({
+				type : "post",
+				url : "${ctx}/sys/dict/listData?type=cpp_vehile_type",
+				async : false,
+				success : function(data){
+					for(var i in data){
+						cppVehileType[data[i].value]=data[i].label;
+					}
+				}
+			});
+			$.ajax({
+				type : "post",
+				url : "${ctx}/sys/dict/listData?type=cpp_web_type",
+				async : false,
+				success : function(data){
+					for(var i in data){
+						cppWebType[data[i].value]=data[i].label;
+					}
+				}
+			});
+			$.ajax({
+				type : "post",
+				url : "${ctx}/sys/dict/listData?type=cpp_phone_type",
+				async : false,
+				success : function(data){
+					for(var i in data){
+						cppPhoneType[data[i].value]=data[i].label;
+					}
+				}
+			});
+		   $.getJSON('${ctx}/pop/ccmPeople/relation?id=${ccmPeople.id}',function(data){
+			   var cppPopPop=data.cppPopPop;
+			   var cppPopVehile=data.cppPopVehile;
+			   var name="${ccmPeople.name}";
+			   var myChartData=[{
+	                name: name,
+	                draggable: true,
+	            }];
+			   for(var i in cppPopPop){
+				   myChartData.push({
+		                name: cppPopPop[i].otherName,
+		                type:cppPopPopType[cppPopPop[i].type],
+		                category: 1,
+		                draggable: true,
+		            })
+			   }
+			   for(var i in cppPopVehile){
+				   if(cppPopVehile[i].type=='01'){
+					   myChartData.push({
+			                name:cppPopVehile[i].textName,
+			                type:cppVehileType[cppPopVehile[i].subType],
+			                category: 1,
+			                draggable: true,
+			            })
+				   }else if(cppPopVehile[i].type=='02'){
+					   myChartData.push({
+			                name:cppPopVehile[i].textName,
+			               type:cppPhoneType[cppPopVehile[i].subType],
+			                category: 1,
+			                draggable: true,
+			            })
+				   }else if(cppPopVehile[i].type=='03'){
+					   myChartData.push({
+			                name:cppPopVehile[i].textName,
+			                type:cppWebType[cppPopVehile[i].subType],
+			                category: 1,
+			                draggable: true,
+			            })
+				   }else if(cppPopVehile[i].type=='04'){
+					   myChartData.push({
+			                name:cppPopVehile[i].textName,
+			                type:cppPopVehile[i].otherTypeName,
+			                category: 1,
+			                draggable: true,
+			            })
+				   }
+				    
+			   }
+			   
+			   debugger
+			   console.log(myChartData)
+			   var linksData=[];
+			   var len=myChartData.length;
+			   var j=1;
+			   if(len>0){
+				   for(var j=1;j<len;j++){
+					   linksData.push({
+			                source: 0,
+			                target: Number(j),
+			                value: myChartData[j].type
+			            })
+				   }
+			   }
+			   console.log(linksData)
+			   var myChart = echarts.init(document.getElementById("SocialRelationsEcharts"));
+			   var option = {
+					    title: {
+					        text: ''
+					    },
+					    tooltip: {},
+					    animationDurationUpdate: 1500,
+					    animationEasingUpdate: 'quinticInOut',
+					    label: {
+					        normal: {
+					            show: true,
+					            textStyle: {
+					                fontSize: 12
+					            },
+					        }
+					    },
+					    series: [
+
+					        {
+					            type: 'graph',
+					            layout: 'force',
+					            symbolSize: 45,
+					            focusNodeAdjacency: true,
+					            roam: true,
+					            categories: [{
+					                name: '夫妻',
+					                itemStyle: {
+					                    normal: {
+					                        color: "#009800",
+					                    }
+					                }
+					            }, {
+					                name: '战友',
+					                itemStyle: {
+					                    normal: {
+					                        color: "#4592FF",
+					                    }
+					                }
+					            }, {
+					                name: '亲戚',
+					                itemStyle: {
+					                    normal: {
+					                        color: "#3592F",
+					                    }
+					                }
+					            }],
+					            label: {
+					                normal: {
+					                    show: true,
+					                    textStyle: {
+					                        fontSize: 12
+					                    },
+					                }
+					            },
+					            force: {
+					                repulsion: 1000
+					            },
+					            edgeSymbolSize: [4, 50],
+					            edgeLabel: {
+					                normal: {
+					                    show: true,
+					                    textStyle: {
+					                        fontSize: 10
+					                    },
+					                    formatter: "{c}"
+					                }
+					            },
+					            data:myChartData,
+					            links:linksData,
+					            lineStyle: {
+					                normal: {
+					                    opacity: 0.9,
+					                    width: 1,
+					                    curveness: 0
+					                }
+					            }
+					        }
+					    ]
+					};
+				myChart.setOption(option);
+			   
+		   })
+		   
+		  
+	   })
+	</script>
+</body>
+</html>

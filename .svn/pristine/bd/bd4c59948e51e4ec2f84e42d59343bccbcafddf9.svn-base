@@ -1,0 +1,436 @@
+/**
+ * Copyright &copy; 2012-2016 <a href="https://github.com/thinkgem/jeesite">JeeSite</a> All rights reserved.
+ */
+package com.arjjs.ccm.modules.ccm.pop.service;
+
+import java.util.List;
+import java.util.Map;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.arjjs.ccm.common.persistence.Page;
+import com.arjjs.ccm.common.service.CrudService;
+import com.arjjs.ccm.common.utils.StringUtils;
+import com.arjjs.ccm.modules.ccm.pop.entity.CcmPeople;
+import com.arjjs.ccm.modules.ccm.pop.entity.CcmPopBehind;
+import com.arjjs.ccm.modules.sys.entity.User;
+import com.arjjs.ccm.modules.sys.utils.UserUtils;
+import com.arjjs.ccm.tool.EchartType;
+import com.arjjs.ccm.tool.SearchTabMore;
+import com.arjjs.ccm.tool.SysConfigInit;
+import com.arjjs.ccm.modules.ccm.ccmsys.entity.CcmUploadLog;
+import com.arjjs.ccm.modules.ccm.ccmsys.service.CcmUploadLogService;
+import com.arjjs.ccm.modules.ccm.house.dao.CcmHouseAidsDao;
+import com.arjjs.ccm.modules.ccm.house.dao.CcmHouseDangerousDao;
+import com.arjjs.ccm.modules.ccm.house.dao.CcmHouseDrugsDao;
+import com.arjjs.ccm.modules.ccm.house.dao.CcmHouseHeresyDao;
+import com.arjjs.ccm.modules.ccm.house.dao.CcmHouseKymDao;
+import com.arjjs.ccm.modules.ccm.house.dao.CcmHousePetitionDao;
+import com.arjjs.ccm.modules.ccm.house.dao.CcmHousePsychogenyDao;
+import com.arjjs.ccm.modules.ccm.house.dao.CcmHouseRectificationDao;
+import com.arjjs.ccm.modules.ccm.house.dao.CcmHouseReleaseDao;
+import com.arjjs.ccm.modules.ccm.house.entity.CcmHouseAids;
+import com.arjjs.ccm.modules.ccm.house.entity.CcmHouseDangerous;
+import com.arjjs.ccm.modules.ccm.house.entity.CcmHouseDrugs;
+import com.arjjs.ccm.modules.ccm.house.entity.CcmHouseHeresy;
+import com.arjjs.ccm.modules.ccm.house.entity.CcmHouseKym;
+import com.arjjs.ccm.modules.ccm.house.entity.CcmHousePetition;
+import com.arjjs.ccm.modules.ccm.house.entity.CcmHousePsychogeny;
+import com.arjjs.ccm.modules.ccm.house.entity.CcmHouseRectification;
+import com.arjjs.ccm.modules.ccm.house.entity.CcmHouseRelease;
+import com.arjjs.ccm.modules.ccm.house.service.CcmHouseAidsService;
+import com.arjjs.ccm.modules.ccm.house.service.CcmHouseDangerousService;
+import com.arjjs.ccm.modules.ccm.house.service.CcmHouseDrugsService;
+import com.arjjs.ccm.modules.ccm.house.service.CcmHouseHeresyService;
+import com.arjjs.ccm.modules.ccm.house.service.CcmHouseKymService;
+import com.arjjs.ccm.modules.ccm.house.service.CcmHousePetitionService;
+import com.arjjs.ccm.modules.ccm.house.service.CcmHousePsychogenyService;
+import com.arjjs.ccm.modules.ccm.house.service.CcmHouseRectificationService;
+import com.arjjs.ccm.modules.ccm.house.service.CcmHouseReleaseService;
+import com.arjjs.ccm.modules.ccm.pop.dao.CcmPeopleDao;
+import com.arjjs.ccm.modules.ccm.pop.dao.CcmPopBehindDao;
+
+/**
+ * 实有人口Service
+ * 
+ * @author liang
+ * @version 2018-01-04
+ */
+@Service
+@Transactional(readOnly = true)
+public class CcmPeopleService extends CrudService<CcmPeopleDao, CcmPeople> {
+
+	@Autowired
+	private CcmPeopleDao ccmPeopleDao;
+	@Autowired
+	private CcmPopBehindDao ccmPopBehindDao;
+	@Autowired
+	private CcmPopBehindService ccmPopBehindService;
+	@Autowired
+	private CcmHouseAidsDao ccmHouseAidsDao;
+	@Autowired
+	private CcmHouseAidsService ccmHouseAidsService;
+	@Autowired
+	private CcmHouseDangerousDao ccmHouseDangerousDao;
+	@Autowired
+	private CcmHouseDangerousService ccmHouseDangerousService;
+	@Autowired
+	private CcmHouseDrugsDao ccmHouseDrugsDao;
+	@Autowired
+	private CcmHouseDrugsService ccmHouseDrugsService;
+	@Autowired
+	private CcmHouseHeresyDao ccmHouseHeresyDao;
+	@Autowired
+	private CcmHouseHeresyService ccmHouseHeresyService;
+	@Autowired
+	private CcmHouseKymDao ccmHouseKymDao;
+	@Autowired
+	private CcmHouseKymService ccmHouseKymService;
+	@Autowired
+	private CcmHousePetitionDao ccmHousePetitionDao;
+	@Autowired
+	private CcmHousePetitionService ccmHousePetitionService;
+	@Autowired
+	private CcmHousePsychogenyDao ccmHousePsychogenyDao;
+	@Autowired
+	private CcmHousePsychogenyService ccmHousePsychogenyService;
+	@Autowired
+	private CcmHouseRectificationDao ccmHouseRectificationDao;
+	@Autowired
+	private CcmHouseRectificationService ccmHouseRectificationService;
+	@Autowired
+	private CcmHouseReleaseDao ccmHouseReleaseDao;
+	@Autowired
+	private CcmHouseReleaseService ccmHouseReleaseService;
+	
+	
+	
+	//上传上级平台记录
+	@Autowired
+	private CcmUploadLogService ccmUploadLogService;
+	
+	// 人员信息弹框
+	public CcmPeople getHousePopForm(CcmPeople ccmPeople) {
+		ccmPeople = ccmPeopleDao.getHousePopForm(ccmPeople);
+		return ccmPeople;
+	}
+
+	// getNation
+	public String getNation(CcmPeople ccmPeople) {
+		return ccmPeopleDao.getNation(ccmPeople);
+	}
+
+	// getRelation
+	public String getRelation(CcmPeople ccmPeople) {
+		return ccmPeopleDao.getRelation(ccmPeople);
+	}
+
+	// 楼栋-房屋-住户信息弹框
+	public List<CcmPeople> getHousePopList(CcmPeople ccmPeople) {
+		return ccmPeopleDao.getHousePopList(ccmPeople);
+	}
+
+	// 校园周边重点人员列表
+	public Page<CcmPeople> findPagePop(Page<CcmPeople> page, CcmPeople ccmPeople) {
+		ccmPeople.setPage(page);
+		page.setList(ccmPeopleDao.findPagePop(ccmPeople));
+		return page;
+	}
+
+	// 户籍户号调用
+	public Page<CcmPeople> listAccount(Page<CcmPeople> page, CcmPeople ccmPeople) {
+		ccmPeople.setPage(page);
+		page.setList(ccmPeopleDao.listAccount(ccmPeople));
+		return page;
+	}
+
+	//
+	public CcmPeople get(String id) {
+		return super.get(id);
+	}
+
+	public List<CcmPeople> findList(CcmPeople ccmPeople) {
+		return super.findList(ccmPeople);
+	}
+
+	public Page<CcmPeople> findPage(Page<CcmPeople> page, CcmPeople ccmPeople) {
+		return super.findPage(page, ccmPeople);
+	}
+	/**
+	 * @see 党员
+	 * @param user
+	 * @return
+	 */
+	public Page<CcmPeople> findCommunistPage(Page<CcmPeople> page, CcmPeople ccmPeople) {
+		ccmPeople.setPage(page);
+		page.setList(ccmPeopleDao.findCommunistList(ccmPeople));
+		return page;
+	}
+	/**
+	 * @see 老年人
+	 * @param user
+	 * @return
+	 */
+	public Page<CcmPeople> findOlderPage(Page<CcmPeople> page, CcmPeople ccmPeople) {
+		ccmPeople.setPage(page);
+		page.setList(ccmPeopleDao.findOlderPage(ccmPeople));
+		return page;
+	}
+	@Transactional(readOnly = false)
+	public void save(CcmPeople ccmPeople) {
+		boolean isNew = false;
+		if (ccmPeople.getId() == null || "".equals(ccmPeople.getId())) {//无主键ID，则是新记录
+			isNew = true;
+		}
+		if (ccmPeople.getIsNewRecord()) {//指定了是新增记录，则算新记录
+			isNew = true;
+		}
+		
+		super.save(ccmPeople);
+		
+		//上传上级平台记录
+		if (!SysConfigInit.UPPER_URL.equals("")) {//有上级平台地址时，才存入上传上级平台记录的日志
+			CcmUploadLog uploadLog = new CcmUploadLog();
+			if (isNew) {//新增数据
+				uploadLog.setOperateType("1");
+				uploadLog.setRemarks("新增人口数据：" + ccmPeople.getName());
+			} else {//编辑数据
+				uploadLog.setOperateType("2");
+				uploadLog.setRemarks("编辑人口数据：" + ccmPeople.getName());
+			}
+			uploadLog.setTableName("ccm_people");
+			uploadLog.setDataId(ccmPeople.getId());
+			uploadLog.setUploadStatus("1");
+			User user = UserUtils.getUser();
+			if (user == null || StringUtils.isBlank(user.getId())){
+				uploadLog.setCreateBy(new User("1"));
+				uploadLog.setUpdateBy(new User("1"));
+			}
+			ccmUploadLogService.save(uploadLog);
+		}
+	}
+
+	@Transactional(readOnly = false)
+	public void delete(CcmPeople ccmPeople) {
+		ccmPeople = ccmPeopleDao.get(ccmPeople.getId());
+		super.delete(ccmPeople);
+		//1
+		if(ccmPeople.getIsBehind()!=null && ccmPeople.getIsBehind()==1){
+			CcmPopBehind ccmPopBehind = new CcmPopBehind();
+			ccmPopBehind.setPeopleId(ccmPeople.getId());
+			List<CcmPopBehind> list1 = ccmPopBehindService.findList(ccmPopBehind);
+			for(CcmPopBehind l1:list1){
+				ccmPopBehindDao.delete(l1);
+			}
+		}
+		//2
+		if(ccmPeople.getIsAids()!=null && ccmPeople.getIsAids()==1){
+			CcmHouseAids ccmHouseAids = new CcmHouseAids();
+			ccmHouseAids.setPeopleId(ccmPeople.getId());
+			List<CcmHouseAids> list2 = ccmHouseAidsService.findList(ccmHouseAids);
+			for(CcmHouseAids l2:list2){
+				ccmHouseAidsDao.delete(l2);
+			}
+		}
+		//3
+		if(ccmPeople.getIsDangerous()!=null && ccmPeople.getIsDangerous()==1){
+			CcmHouseDangerous ccmHouseDangerous = new CcmHouseDangerous();
+			ccmHouseDangerous.setPeopleId(ccmPeople.getId());
+			List<CcmHouseDangerous> list3 = ccmHouseDangerousService.findList(ccmHouseDangerous);
+			for(CcmHouseDangerous l3:list3){
+				ccmHouseDangerousDao.delete(l3);
+			}
+		}
+		//4
+		if(ccmPeople.getIsDrugs()!=null && ccmPeople.getIsDrugs()==1){
+			CcmHouseDrugs ccmHouseDrugs = new CcmHouseDrugs();
+			ccmHouseDrugs.setPeopleId(ccmPeople.getId());
+			List<CcmHouseDrugs> list4 = ccmHouseDrugsService.findList(ccmHouseDrugs);
+			for(CcmHouseDrugs l4:list4){
+				ccmHouseDrugsDao.delete(l4);
+			}
+		}
+		//5
+		if(ccmPeople.getIsHeresy()!=null && ccmPeople.getIsHeresy()==1){
+			CcmHouseHeresy ccmHouseHeresy = new CcmHouseHeresy();
+			ccmHouseHeresy.setPeopleId(ccmPeople.getId());
+			List<CcmHouseHeresy> list5 = ccmHouseHeresyService.findList(ccmHouseHeresy);
+			for(CcmHouseHeresy l5:list5){
+				ccmHouseHeresyDao.delete(l5);
+			}
+		}
+		//6
+		if(ccmPeople.getIsKym()!=null && ccmPeople.getIsKym()==1){
+			CcmHouseKym ccmHouseKym = new CcmHouseKym();
+			ccmHouseKym.setPeopleId(ccmPeople.getId());
+			List<CcmHouseKym> list6 = ccmHouseKymService.findList(ccmHouseKym);
+			for(CcmHouseKym l6:list6){
+				ccmHouseKymDao.delete(l6);
+			}
+		}
+		//7
+		if(ccmPeople.getIsVisit()!=null && ccmPeople.getIsVisit()==1){
+			CcmHousePetition ccmHousePetition = new CcmHousePetition();
+			ccmHousePetition.setPeopleId(ccmPeople.getId());
+			List<CcmHousePetition> list7 = ccmHousePetitionService.findList(ccmHousePetition);
+			for(CcmHousePetition l7:list7){
+				ccmHousePetitionDao.delete(l7);
+			}
+		}
+		//8
+		if(ccmPeople.getIsPsychogeny()!=null && ccmPeople.getIsPsychogeny()==1){
+			CcmHousePsychogeny ccmHousePsychogeny = new CcmHousePsychogeny();
+			ccmHousePsychogeny.setPeopleId(ccmPeople.getId());
+			List<CcmHousePsychogeny> list8 = ccmHousePsychogenyService.findList(ccmHousePsychogeny);
+			for(CcmHousePsychogeny l8:list8){
+				ccmHousePsychogenyDao.delete(l8);
+			}
+		}
+		//9
+		if(ccmPeople.getIsRectification()!=null && ccmPeople.getIsRectification()==1){
+			CcmHouseRectification ccmHouseRectification = new CcmHouseRectification();
+			ccmHouseRectification.setPeopleId(ccmPeople.getId());
+			List<CcmHouseRectification> list9 = ccmHouseRectificationService.findList(ccmHouseRectification);
+			for(CcmHouseRectification l9:list9){
+				ccmHouseRectificationDao.delete(l9);
+			}
+		}
+		//10
+		if(ccmPeople.getIsRelease()!=null && ccmPeople.getIsRelease()==1){
+			CcmHouseRelease ccmHouseRelease = new CcmHouseRelease();
+			ccmHouseRelease.setPeopleId(ccmPeople.getId());
+			List<CcmHouseRelease> list10 = ccmHouseReleaseService.findList(ccmHouseRelease);
+			for(CcmHouseRelease l10:list10){
+				ccmHouseReleaseDao.delete(l10);
+			}
+		}
+		
+		//上传上级平台记录
+		if (!SysConfigInit.UPPER_URL.equals("")) {//有上级平台地址时，才存入上传上级平台记录的日志
+			CcmUploadLog uploadLog = new CcmUploadLog();
+			uploadLog.setOperateType("3");
+			uploadLog.setRemarks("删除人口数据：" + ccmPeople.getName());
+			uploadLog.setTableName("ccm_people");
+			uploadLog.setDataId(ccmPeople.getId());
+			uploadLog.setUploadStatus("1");
+			User user = UserUtils.getUser();
+			if (user == null || StringUtils.isBlank(user.getId())){
+				uploadLog.setCreateBy(new User("1"));
+				uploadLog.setUpdateBy(new User("1"));
+			}
+			ccmUploadLogService.save(uploadLog);
+		}
+	}
+
+	/**
+	 * @see 返回 以整月 下的 list求和数
+	 * @param user
+	 * @return
+	 */
+	public List<EchartType> getListByMon(User user, CcmPeople ccmPeople) {
+		return ccmPeopleDao.getListByMon(user, ccmPeople);
+	}
+
+	/**
+	 * @see 返回 以整日 下的 list求和数
+	 * @param user
+	 * @return
+	 */
+	public List<EchartType> getListByDay(User user, CcmPeople ccmPeople) {
+		return ccmPeopleDao.getListByDay(user, ccmPeople);
+	}
+
+	// 查询指定的重点人员
+	public List<CcmPeople> findSpeList(CcmPeople ccmPeople) {
+		return ccmPeopleDao.findSpeList(ccmPeople);
+	}
+
+	// 查询指定的 人员身份证是否可以存入数据库
+	public boolean checkPeopleIden(CcmPeople ccmPeople) {
+		return ccmPeopleDao.checkPeopleIden(ccmPeople) == 0 ? false : true;
+	}
+
+	// 查询相关户籍家庭人口
+	public List<CcmPeople> listAccount(CcmPeople ccmPeople){
+		return ccmPeopleDao.listAccount(ccmPeople);
+	}
+
+	//导出实有人口数据---老年人
+	public List<CcmPeople> findOlder(CcmPeople ccmPeople) {
+		return ccmPeopleDao.findOlderPage(ccmPeople);
+	}
+
+	//导出实有人口数据---党员
+	public List<CcmPeople> findCommunist(CcmPeople ccmPeople) {
+		return ccmPeopleDao.findCommunistList(ccmPeople);
+	}
+
+	//特殊关怀人员数量
+	public int findListNum(CcmPeople ccmPeople) {
+		return ccmPeopleDao.findListNum(ccmPeople);
+	}
+
+	//数组查询id
+	public List<CcmPeople> findListLimite(CcmPeople ccmPeople2) {
+		return ccmPeopleDao.findListLimite(ccmPeople2);
+	}
+
+	//特殊关怀
+	public Page<CcmPeople> findCarePage(Page<CcmPeople> page, CcmPeople ccmPeople) {
+		ccmPeople.setPage(page);
+		page.setList(ccmPeopleDao.findCareList(ccmPeople));
+		return page;
+	}
+
+	// 特殊关怀First
+	public Page<CcmPeople> findCareFirst(Page<CcmPeople> page, CcmPeople ccmPeople) {
+		ccmPeople.setPage(page);
+		page.setList(ccmPeopleDao.findCareFirst(ccmPeople));
+		return page;
+	}
+
+	//常住人口
+	public Page<CcmPeople> findPermanentPage(Page<CcmPeople> page, CcmPeople ccmPeople) {
+		ccmPeople.setPage(page);
+		page.setList(ccmPeopleDao.findPermanentList(ccmPeople));
+		return page;
+	}
+	
+	/**
+	 * 区域内人员统计
+	 */
+	public int countSelect(List<String> coordianteList){
+		return ccmPeopleDao.countSelect(coordianteList);
+	}
+	/**
+	 * zhanghao
+	 * @param 事件周边嫌疑人
+	 * @return
+	 */
+	public List<CcmPeople> locatingSuspects(List<String> coordianteList) {
+		return ccmPeopleDao.locatingSuspects(coordianteList);
+	}
+	
+	//数组查询id  V2 版本
+	public List<CcmPeople> findListLimite_V2(CcmPeople ccmPeople2) {
+		return ccmPeopleDao.findListLimite_V2(ccmPeople2);
+	}
+
+	public CcmPeople getByIdent(String string){
+
+		return ccmPeopleDao.getByIdent(string);
+
+	}
+	
+	@Transactional(readOnly = false)
+	public void updatePeople(CcmPeople ccmPeople) {
+		ccmPeopleDao.updatePeople(ccmPeople);
+	}
+
+	public int findCount() {
+		int count = ccmPeopleDao.findCount();
+		return count;
+	}
+}

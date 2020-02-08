@@ -1,0 +1,56 @@
+/**
+ * Copyright &copy; 2012-2016 <a href="https://github.com/thinkgem/jeesite">JeeSite</a> All rights reserved.
+ */
+package com.arjjs.ccm.modules.ccm.patrollog.service;
+
+import java.util.List;
+
+import org.apache.ibatis.annotations.Param;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.arjjs.ccm.common.persistence.Page;
+import com.arjjs.ccm.common.service.CrudService;
+import com.arjjs.ccm.modules.ccm.patrollog.entity.CcmPatrolLog;
+import com.arjjs.ccm.modules.ccm.patrollog.dao.CcmPatrolLogDao;
+
+/**
+ * 巡检日志Service
+ * @author 刘永建
+ * @version 2019-07-15
+ */
+@Service
+@Transactional(readOnly = true)
+public class CcmPatrolLogService extends CrudService<CcmPatrolLogDao, CcmPatrolLog> {
+
+	@Autowired
+	private CcmPatrolLogDao ccmPatrolLogDao;
+	
+	public CcmPatrolLog get(String id) {
+		return super.get(id);
+	}
+	
+	public List<CcmPatrolLog> findList(CcmPatrolLog ccmPatrolLog) {
+		return super.findList(ccmPatrolLog);
+	}
+	
+	public Page<CcmPatrolLog> findPage(Page<CcmPatrolLog> page, CcmPatrolLog ccmPatrolLog) {
+		return super.findPage(page, ccmPatrolLog);
+	}
+	
+	@Transactional(readOnly = false)
+	public void save(CcmPatrolLog ccmPatrolLog) {
+		super.save(ccmPatrolLog);
+	}
+	
+	@Transactional(readOnly = false)
+	public void delete(CcmPatrolLog ccmPatrolLog) {
+		super.delete(ccmPatrolLog);
+	}
+	@Transactional(readOnly = false)
+	public List<CcmPatrolLog> findListByUser(String id){
+		return ccmPatrolLogDao.findListByUser(id);
+	}
+	
+}

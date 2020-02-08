@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.arjjs.ccm.modules.ccm.partyserverproject.dao.CcmPartyServerProjectDao">
+    
+	<sql id="ccmPartyServerProjectColumns">
+		a.id AS "id",
+		a.name AS "name",
+		a.project_create_date AS "projectCreateDate",
+		a.community AS "community.id",
+		a4.name AS "community.name",
+		a.user_id AS "userId",
+		a.telphone AS "telphone",
+		a.rela_name AS "relaName",
+		a.rela_telphone AS "relaTelphone",
+		a.content AS "content",
+		a.clail_num AS "clailNum",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag"
+	</sql>
+	
+	<sql id="ccmPartyServerProjectJoins">
+		LEFT JOIN sys_area a4 ON a4.id = a.community
+	</sql>
+
+	<select id="get" resultType="CcmPartyServerProject">
+		SELECT 
+			<include refid="ccmPartyServerProjectColumns"/>
+		FROM ccm_party_server_project a
+		<include refid="ccmPartyServerProjectJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="CcmPartyServerProject">
+		SELECT 
+			<include refid="ccmPartyServerProjectColumns"/>
+		FROM ccm_party_server_project a
+		<include refid="ccmPartyServerProjectJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="name != null and name != ''">
+				AND a.name LIKE 
+					<if test="dbName == 'oracle'">'%'||#{name}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{name}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{name},'%')</if>
+			</if>
+			<if test="community != null and community != ''">
+				AND a.community = #{community}
+			</if>
+			<if test="createDate != null and createDate != ''">
+				AND a.create_date = #{createDate}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="CcmPartyServerProject">
+		SELECT 
+			<include refid="ccmPartyServerProjectColumns"/>
+		FROM ccm_party_server_project a
+		<include refid="ccmPartyServerProjectJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO ccm_party_server_project(
+			id,
+			name,
+			project_create_date,
+			community,
+			user_id,
+			telphone,
+			rela_name,
+			rela_telphone,
+			content,
+			clail_num,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag
+		) VALUES (
+			#{id},
+			#{name},
+			#{projectCreateDate},
+			#{community.id},
+			#{userId},
+			#{telphone},
+			#{relaName},
+			#{relaTelphone},
+			#{content},
+			#{clailNum},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE ccm_party_server_project SET 	
+			name = #{name},
+			project_create_date = #{projectCreateDate},
+			community = #{community.id},
+			user_id = #{userId},
+			telphone = #{telphone},
+			rela_name = #{relaName},
+			rela_telphone = #{relaTelphone},
+			content = #{content},
+			clail_num = #{clailNum},
+			create_by = #{createBy.id},
+			create_date = #{createDate},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks},
+			del_flag = #{delFlag}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE ccm_party_server_project SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

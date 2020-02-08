@@ -1,0 +1,212 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.arjjs.ccm.modules.pbs.task.dao.PbsTaskoprecDao">
+
+	<sql id="pbsTaskoprecColumns">
+		a.id AS "id",
+		a.s_taskid AS "sTaskid.id",
+		taskrec.s_resume AS
+		"sTaskid.sResume",
+		a.s_sort AS "sSort",
+		a.s_type AS "sType",
+		a.s_content
+		AS "sContent",
+		a.s_execdepartment AS "sExecdepartment.id",
+		o6.`name` AS
+		"sExecdepartment.name",
+		a.s_executor AS "sExecutor.id",
+		mem2.s_name AS "sExecutor.sName",
+		a.s_operator AS "sOperator.id",
+		u7.`name` AS "sOperator.name",
+		a.s_bindmember AS "sBindmember.id",
+		mem.s_name AS "sBindmember.sName",
+		a.s_optstatus AS "sOptstatus",
+		<!-- a.s_spare01 AS "sSpare01",
+		a.s_spare02 AS "sSpare02",
+		a.s_spare03 AS "sSpare03",
+		a.s_spare04 AS "sSpare04", -->
+		a.create_by AS "createBy.id",
+		a.create_date
+		AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS
+		"updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag"
+	</sql>
+
+	<sql id="pbsTaskoprecJoins">
+		LEFT JOIN sys_office o6 ON o6.id = a.s_execdepartment
+		LEFT JOIN pbs_partymem mem2  ON mem2.id = a.s_executor
+		LEFT JOIN sys_user u7 ON u7.id = a.s_operator
+		LEFT JOIN pbs_partymem mem ON mem.id = a.s_bindmember
+		LEFT JOIN pbs_taskrec taskrec ON taskrec.id = a.s_taskid
+
+	</sql>
+
+	<select id="get" resultType="PbsTaskoprec">
+		SELECT
+		<include refid="pbsTaskoprecColumns" />
+		FROM pbs_taskoprec a
+		<include refid="pbsTaskoprecJoins" />
+		WHERE a.id = #{id}
+	</select>
+
+	<select id="findList" resultType="PbsTaskoprec">
+		SELECT
+		<include refid="pbsTaskoprecColumns" />
+		FROM pbs_taskoprec a
+		<include refid="pbsTaskoprecJoins" />
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if
+				test="sTaskid != null and sTaskid != '' and sTaskid.id != null and sTaskid.id != ''">
+				AND a.s_taskid = #{sTaskid.id}
+			</if>
+			<if
+                test="sTaskid != null and sTaskid != '' and sTaskid.sResume != null and sTaskid.sResume != ''">
+               AND taskrec.s_resume LIKE
+                <if test="dbName == 'oracle'">'%'||#{sTaskid.sResume}||'%'</if>
+                <if test="dbName == 'mssql'">'%'+#{sTaskid.sResume}+'%'</if>
+                <if test="dbName == 'mysql'">concat('%',#{sTaskid.sResume},'%')</if>
+            </if>
+			<if
+				test="sOperator != null and sOperator != '' and sOperator.id != null and sOperator.id != ''">
+				AND a.s_operator = #{sOperator.id}
+			</if>
+			<if test="sOptstatus != null and sOptstatus != '' ">
+				AND a.s_optstatus = #{sOptstatus}
+			</if>
+			<if test="sType != null and sType != '' ">
+				AND a.s_type = #{sType}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+
+	<select id="findAllList" resultType="PbsTaskoprec">
+		SELECT
+		<include refid="pbsTaskoprecColumns" />
+		FROM pbs_taskoprec a
+		<include refid="pbsTaskoprecJoins" />
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+
+	<insert id="insert">
+		INSERT INTO pbs_taskoprec(
+		id,
+		s_taskid,
+		s_sort,
+		s_type,
+		s_content,
+		s_execdepartment,
+		s_executor,
+		s_operator,
+		s_bindmember,
+		s_optstatus,
+		s_spare01,
+		s_spare02,
+		s_spare03,
+		s_spare04,
+		create_by,
+		create_date,
+		update_by,
+		update_date,
+		remarks,
+		del_flag
+		) VALUES (
+		#{id},
+		#{sTaskid.id},
+		#{sSort},
+		#{sType},
+		#{sContent},
+		#{sExecdepartment.id},
+		#{sExecutor.id},
+		#{sOperator.id},
+		#{sBindmember.id},
+		#{sOptstatus},
+		#{sSpare01},
+		#{sSpare02},
+		#{sSpare03},
+		#{sSpare04},
+		#{createBy.id},
+		#{createDate},
+		#{updateBy.id},
+		#{updateDate},
+		#{remarks},
+		#{delFlag}
+		)
+	</insert>
+
+	<update id="update">
+		UPDATE pbs_taskoprec SET
+		s_taskid = #{sTaskid.id},
+		s_sort = #{sSort},
+		s_type = #{sType},
+		s_content = #{sContent},
+		s_execdepartment = #{sExecdepartment.id},
+		s_executor = #{sExecutor.id},
+		s_operator = #{sOperator.id},
+		s_bindmember = #{sBindmember.id},
+		s_optstatus = #{sOptstatus},
+		s_spare01 = #{sSpare01},
+		s_spare02 =
+		#{sSpare02},
+		s_spare03 = #{sSpare03},
+		s_spare04 = #{sSpare04},
+		update_by
+		= #{updateBy.id},
+		update_date = #{updateDate},
+		remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+
+	<update id="delete">
+		UPDATE pbs_taskoprec SET
+		del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+        
+	<update id="deleteBysTaskid">
+		UPDATE pbs_taskoprec SET
+		del_flag = #{DEL_FLAG_DELETE}
+		WHERE s_taskid = #{sTaskid.id}
+	</update>
+
+
+	<select id="checkExist" resultType="java.lang.Integer">
+		SELECT
+		count(1)
+		FROM
+		pbs_taskoprec a
+		<where>
+			<if test="id != null and id != ''">
+				AND id &lt;&gt; #{id}
+			</if>
+			and s_taskid = #{sTaskid.id}
+			and s_operator = #{sOperator.id}
+			and
+			s_optstatus = #{sOptstatus}
+			and del_flag = #{DEL_FLAG_NORMAL}
+		</where>
+	</select>
+
+
+</mapper>

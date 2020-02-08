@@ -1,0 +1,103 @@
+<%@ page contentType="text/html;charset=UTF-8" %>
+<%@ include file="/WEB-INF/views/include/taglib.jsp"%>
+<html>
+<head>
+	<title>消息管理管理</title>
+	<meta name="decorator" content="default"/>
+	<script type="text/javascript">
+		$(document).ready(function() {
+            $('#btnSubmit').click(function(){
+                $('#searchForm').submit();
+            });
+		});
+		function page(n,s){
+			$("#pageNo").val(n);
+			$("#pageSize").val(s);
+			$("#searchForm").submit();
+        	return false;
+        }
+	</script>
+</head>
+<body>
+<%--<img  src="${ctxStatic}/images/shouyedaohang.png"; class="nav-home">--%>
+<%--<span class="nav-position">当前位置 ：</span><span class="nav-menu"><%=session.getAttribute("activeMenuName")%>></span><span class="nav-menu2">通知公告</span>--%>
+<ul class="back-list">
+	<ul class="nav nav-tabs">
+		<li class="active"><a class="nav-head" href="${ctx}/news/message/">消息管理列表</a></li>
+		<%-- <shiro:hasPermission name="news:message:edit"><li><a href="${ctx}/news/message/form">消息管理添加</a></li></shiro:hasPermission> --%>
+	</ul>
+	<form:form id="searchForm" modelAttribute="message" action="${ctx}/news/message/" method="post" class="breadcrumb form-search">
+		<input id="pageNo" name="pageNo" type="hidden" value="${page.pageNo}"/>
+		<input id="pageSize" name="pageSize" type="hidden" value="${page.pageSize}"/>
+		<ul class="ul-form">
+			<li class="first-line"><label>消息类型：</label>
+				<form:select path="type" class="input-medium">
+					<form:option value="" label="全部"/>
+					<form:options items="${fns:getDictList('message_type')}" itemLabel="label" itemValue="value" htmlEscape="false"/>
+				</form:select>
+			<li/>
+			<li class="first-line"><label>消息内容：</label>
+				<form:input path="content" htmlEscape="false" maxlength="255" class="input-medium"/>
+			</li>
+			<li class="first-line"><label>发送人：</label>
+				<sys:treeselect id="createBy" name="createBy" value="${message.createBy}" labelName="createByName" labelValue="${message.createByName}"
+					title="用户" url="/sys/office/treeData?type=3" cssClass="input-medium" allowClear="true" notAllowSelectParent="true"/>
+			</li>
+			<li class="first-line"><label>发送开始日期：</label>
+				<input name="beginDates" type="text" readonly="readonly" maxlength="20" class="input-medium Wdate"
+					value="<fmt:formatDate value="${message.beginDates}" pattern="yyyy-MM-dd HH:mm:ss"/>"
+					onclick="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss',isShowClear:true});"/>
+			</li>
+
+			<li class="first-line"><label>发送结束日期：</label>
+				<input name="endDatas" type="text" readonly="readonly" maxlength="20" class="input-medium Wdate"
+					   value="<fmt:formatDate value="${message.endDatas}" pattern="yyyy-MM-dd HH:mm:ss"/>"
+					   onclick="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss',isShowClear:true});"/>
+			</li>
+
+
+			<li class="clearfix"></li>
+		</ul>
+	</form:form>
+	<sys:message content="${message}"/>
+	<ul>
+		<li class="btns"><input id="btnSubmit" class="btn btn-primary" style="width: 75px;display:inline-block;float: right;margin-left: 20px;margin-right: 14px;margin-bottom: 20px" type="submit" value="查询"/></li>
+	</ul>
+	<table id="contentTable" class="table table-striped table-bordered table-condensed table-gradient">
+		<thead>
+			<tr>
+				<th>消息类型</th>
+				<th>消息内容</th>
+				<th>发送人</th>
+				<th>发送时间</th>
+				<shiro:hasPermission name="news:message:edit"><th>操作</th></shiro:hasPermission>
+			</tr>
+		</thead>
+		<tbody>
+		<c:forEach items="${page.list}" var="message">
+			<tr>
+				<td style="height: 50px">
+					${fns:getDictLabel(message.type, 'message_type', '')}
+				</td>
+				<td style="height: 50px">
+					<a onclick="parent.LayerDialog('${ctx}/news/message/form?id=${message.id}', '详情', '800px', '300px')">
+						${message.content}
+					</a>
+				</td>
+				<td style="height: 50px">
+					${message.createByName}
+				</td>
+				<td style="height: 50px">
+					<fmt:formatDate value="${message.updateDate}" pattern="yyyy-MM-dd HH:mm:ss"/>
+				</td>
+				<shiro:hasPermission name="news:message:edit"><td style="height: 50px">
+					<a class="btnList" onclick="parent.LayerDialog('${ctx}/news/message/form?id=${message.id}', '详情', '800px', '300px')" title="详情"><i class="icon-pencil"></i></a>
+				</td></shiro:hasPermission>
+			</tr>
+		</c:forEach>
+		</tbody>
+	</table>
+	<div class="pagination" style="float: right; margin-top: 12px">${page}</div>
+</ul>
+</body>
+</html>

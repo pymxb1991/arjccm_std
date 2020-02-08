@@ -1,0 +1,70 @@
+package com.arjjs.ccm.modules.ccm.house.service;
+
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.arjjs.ccm.modules.ccm.house.dao.CcmHouseEmphasisDao;
+import com.arjjs.ccm.modules.ccm.log.entity.CcmLogTail;
+import com.arjjs.ccm.modules.ccm.pop.entity.CcmPeople;
+import com.arjjs.ccm.modules.sys.entity.Dict;
+import com.arjjs.ccm.tool.LayUIBean;
+import com.arjjs.ccm.tool.Result;
+
+/**
+ * 方法描述：重点人员service
+ * @author liu
+ * @version 2019-4-10
+ */
+@Service
+@Transactional(readOnly = true)
+public class CcmHouseEmphasisService {
+
+	@Autowired
+	private CcmHouseEmphasisDao ccmHouseEmphasisDao;
+	
+	public Result findTableNameInDict() {
+		Result result = new Result();
+		Dict dict = new Dict();
+		dict.setDescription("重点人员分类");
+		List<Dict> tableNameList = ccmHouseEmphasisDao.findTableNameByDescription(dict);
+		if(tableNameList != null && tableNameList.size() > 0) {
+			result.setContent(tableNameList);
+			result.setCount(tableNameList.size());
+			result.setRet(Result.ERROR_OK);
+		}else {
+			result.setRet(Result.ERROR_PARAM);
+		}
+		return result;
+	}
+	
+	public LayUIBean findEmphasisDataByTableName(CcmPeople ccmPeople) {
+		LayUIBean result = new LayUIBean();
+		List<CcmPeople> peoList = ccmHouseEmphasisDao.findEmphasisDataByTableName(ccmPeople);
+		if(peoList != null && peoList.size() > 0) {
+			result.setCount(ccmHouseEmphasisDao.count(ccmPeople));
+			result.setData(peoList);
+			result.setCode(Result.ERROR_OK);
+			result.setMsg("");
+		}else {
+			result.setCode(Result.ERROR_PARAM);
+		}
+		return result;
+	}
+	
+	public LayUIBean findVisitRecord(CcmLogTail ccmLogTail) {
+		LayUIBean result = new LayUIBean();
+		List<CcmLogTail> logTailList = ccmHouseEmphasisDao.findVisitRecord(ccmLogTail);
+		if(logTailList != null && logTailList.size() > 0) {
+			result.setCount(logTailList.size());
+			result.setData(logTailList);
+			result.setCode(Result.ERROR_OK);
+			result.setMsg("");
+		}else {
+			result.setCode(Result.ERROR_PARAM);
+		}
+		return result;
+	}
+}

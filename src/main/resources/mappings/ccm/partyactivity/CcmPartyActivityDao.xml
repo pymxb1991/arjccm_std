@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.arjjs.ccm.modules.ccm.partyactivity.dao.CcmPartyActivityDao">
+    
+	<sql id="ccmPartyActivityColumns">
+		a.id AS "id",
+		a.type AS "type",
+		a.community AS "community.id",
+		a3.name AS "community.name",
+		a.activit_time AS "activitTime",
+		a.organization AS "organization.id",
+		a4.name AS "organization.name",
+		a.should_join_party AS "shouldJoinParty",
+		a.reality_join_paryt AS "realityJoinParyt",
+		a.leave_person_id AS "leavePersonId",
+		a.activit_title AS "activitTitle",
+		a.activit_content AS "activitContent",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag"
+	</sql>
+	
+	<sql id="ccmPartyActivityJoins">
+		LEFT JOIN sys_area a3 ON a3.id = a.community
+  	</sql>
+	<sql id="ccmPartyActivityJoinsOrg">
+		LEFT JOIN ccm_party_organization a4 ON a4.id = a.organization
+	</sql>
+
+
+    
+	<select id="get" resultType="CcmPartyActivity">
+		SELECT 
+			<include refid="ccmPartyActivityColumns"/>
+		FROM ccm_party_activity a
+		<include refid="ccmPartyActivityJoins"/>
+		<include refid="ccmPartyActivityJoinsOrg"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="CcmPartyActivity">
+		SELECT 
+			<include refid="ccmPartyActivityColumns"/>
+		FROM ccm_party_activity a
+		<include refid="ccmPartyActivityJoins"/>
+		<include refid="ccmPartyActivityJoinsOrg"/>
+			<if test="officeId != null and officeId != ''">
+				LEFT JOIN sys_office office ON office.area_id = a3.id
+			</if>
+		<where>
+			<if test="officeId != null and officeId != ''">
+				(office.id = #{officeId} or office.parent_ids LIKE concat('%',#{officeId},'%')) AND 
+			</if>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="type != null and type != ''">
+				AND a.type = #{type}
+			</if>
+			<if test="organization != null and organization.id != null and organization.id != ''">
+				AND a.organization = #{organization.id}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="CcmPartyActivity">
+		SELECT 
+			<include refid="ccmPartyActivityColumns"/>
+		FROM ccm_party_activity a
+		<include refid="ccmPartyActivityJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="type != null and type != ''">
+				AND a.type = #{type}
+			</if>
+			<if test="organization != null and organization.id != null and organization.id != ''">
+				AND a.organization = #{organization.id}
+			</if>
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO ccm_party_activity(
+			id,
+			type,
+			community,
+			activit_time,
+			organization,
+			should_join_party,
+			reality_join_paryt,
+			leave_person_id,
+			activit_title,
+			activit_content,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag
+		) VALUES (
+			#{id},
+			#{type},
+			#{community.id},
+			#{activitTime},
+			#{organization.id},
+			#{shouldJoinParty},
+			#{realityJoinParyt},
+			#{leavePersonId},
+			#{activitTitle},
+			#{activitContent},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE ccm_party_activity SET 	
+			type = #{type},
+			community = #{community.id},
+			activit_time = #{activitTime},
+			organization = #{organization.id},
+			should_join_party = #{shouldJoinParty},
+			reality_join_paryt = #{realityJoinParyt},
+			leave_person_id = #{leavePersonId},
+			activit_title = #{activitTitle},
+			activit_content = #{activitContent},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE ccm_party_activity SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

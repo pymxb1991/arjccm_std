@@ -1,0 +1,47 @@
+.mainselectCity>div {
+	position: relative;
+	display: inline-block
+}
+
+.mainselectCity #showCityName {
+	/* 	border: 1px solid #cccccc; */
+	height: 40px;
+	line-height: 40px;
+	display: inline-block;
+	border-radius: 4px;
+	text-align: center;
+	width: 70%;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.mainselectCity #maincontent {
+	width: 120px;
+	border: 1px solid #cccccc;
+	border-radius: 4px;
+	box-shadow: 0 7px 12px #cccccc;
+	text-align: center
+}
+
+.mainselectCity .normal {
+	padding: 2px 8px 2px 20px;
+	display: block;
+}
+
+.mainselectCity .main-content-input {
+	padding: 2px 8px 2px 8px;
+	display: block
+}
+
+.mainselectCity .main-content {
+	display: block;
+	font-size: 14px;
+	font-weight: 700;
+	text-align: left;
+	background-color: #ffffff;
+}
+
+input[type=checkbox]:hover {
+	cursor: pointer;
+}

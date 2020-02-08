@@ -1,0 +1,170 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.arjjs.ccm.modules.pbs.task.dao.PbsTaskevaluateDao">
+
+	<sql id="pbsTaskevaluateColumns">
+		a.id AS "id",
+		a.s_taskid AS "sTaskid.id",
+		task.s_resume AS "sTaskid.sResume",
+		a.s_content AS "sContent",
+		a.s_execmember AS "sExecmember.id",
+		mem1.s_name AS "sExecmember.sName",
+		a.s_value AS "sValue",
+		a.s_operator AS "sOperator.id",
+		u6.`name` AS "sOperator.name",
+		a.s_bindmember AS "sBindmember.id",
+		mem2.s_name AS "sBindmember.sName",
+		a.s_status AS "sStatus",
+		a.s_spare01 AS "sSpare01",
+		a.s_spare02 AS "sSpare02",
+		a.s_spare03 AS "sSpare03",
+		a.s_spare04 AS "sSpare04",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag"
+	</sql>
+
+	<sql id="pbsTaskevaluateJoins">
+		LEFT JOIN sys_user u6 ON u6.id = a.s_operator
+        LEFT JOIN pbs_taskrec task ON task.id = a.s_taskid
+        LEFT JOIN pbs_partymem mem1 ON mem1.id = a.s_execmember
+        LEFT JOIN pbs_partymem mem2 ON mem2.id = a.s_bindmember
+	</sql>
+
+	<select id="get" resultType="PbsTaskevaluate">
+		SELECT
+		<include refid="pbsTaskevaluateColumns" />
+		FROM pbs_taskevaluate a
+		<include refid="pbsTaskevaluateJoins" />
+		WHERE a.id = #{id}
+	</select>
+
+	<select id="findList" resultType="PbsTaskevaluate">
+		SELECT
+		<include refid="pbsTaskevaluateColumns" />
+		FROM pbs_taskevaluate a
+		<include refid="pbsTaskevaluateJoins" />
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if
+				test="sTaskid != null and sTaskid != '' and sTaskid.id != null and sTaskid.id != ''">
+				AND a.s_taskid = #{sTaskid.id}
+			</if>
+			<if
+				test="sTaskid != null and sTaskid != '' and sTaskid.sResume != null and sTaskid.sResume != ''">
+				AND task.s_resume LIKE CONCAT('%',#{sTaskid.sResume},'%')
+			</if>
+			<if test="sContent != null and sContent != ''">
+				AND a.s_content = #{sContent}
+			</if>
+			<if
+				test="sExecmember != null and sExecmember != '' and  sExecmember.id != null and sExecmember.id != ''">
+				AND a.s_execmember = #{sExecmember.id}
+			</if>
+			<if
+				test="sExecmember != null and sExecmember != '' and  sExecmember.sName != null and sExecmember.sName != ''">
+				AND mem1.s_name LIKE CONCAT('%',#{sExecmember.sName},'%') 
+			</if>
+			<if test="sValue != null and sValue != ''">
+				AND a.s_value = #{sValue}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+
+	<select id="findAllList" resultType="PbsTaskevaluate">
+		SELECT
+		<include refid="pbsTaskevaluateColumns" />
+		FROM pbs_taskevaluate a
+		<include refid="pbsTaskevaluateJoins" />
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+
+	<insert id="insert">
+		INSERT INTO pbs_taskevaluate(
+		id,
+		s_taskid,
+		s_content,
+		s_execmember,
+		s_value,
+		s_operator,
+		s_bindmember,
+		s_status,
+		s_spare01,
+		s_spare02,
+		s_spare03,
+		s_spare04,
+		create_by,
+		create_date,
+		update_by,
+		update_date,
+		remarks,
+		del_flag
+		) VALUES (
+		#{id},
+		#{sTaskid.id},
+		#{sContent},
+		#{sExecmember.id},
+		#{sValue},
+		#{sOperator.id},
+		#{sBindmember.id},
+		#{sStatus},
+		#{sSpare01},
+		#{sSpare02},
+		#{sSpare03},
+		#{sSpare04},
+		#{createBy.id},
+		#{createDate},
+		#{updateBy.id},
+		#{updateDate},
+		#{remarks},
+		#{delFlag}
+		)
+	</insert>
+
+	<update id="update">
+		UPDATE pbs_taskevaluate SET
+		s_taskid = #{sTaskid.id},
+		s_content = #{sContent},
+		s_execmember = #{sExecmember.id},
+		s_value = #{sValue},
+		s_operator = #{sOperator.id},
+		s_bindmember = #{sBindmember.id},
+		s_status = #{sStatus},
+		s_spare01 = #{sSpare01},
+		s_spare02 = #{sSpare02},
+		s_spare03 = #{sSpare03},
+		s_spare04 = #{sSpare04},
+		update_by = #{updateBy.id},
+		update_date = #{updateDate},
+		remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+
+	<update id="delete">
+		UPDATE pbs_taskevaluate SET
+		del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+
+</mapper>

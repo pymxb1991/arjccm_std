@@ -1,0 +1,60 @@
+/**
+ * Copyright &copy; 2012-2016 <a href="https://github.com/thinkgem/jeesite">JeeSite</a> All rights reserved.
+ */
+package com.arjjs.ccm.modules.ccm.ccmsys.service;
+
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.arjjs.ccm.common.persistence.Page;
+import com.arjjs.ccm.common.service.CrudService;
+import com.arjjs.ccm.modules.ccm.ccmsys.entity.CcmDevice;
+import com.arjjs.ccm.modules.ccm.ccmsys.dao.CcmDeviceDao;
+
+/**
+ * 设备管理Service
+ * @author arj
+ * @version 2018-01-25
+ */
+@Service
+@Transactional(readOnly = true)
+public class CcmDeviceService extends CrudService<CcmDeviceDao, CcmDevice> {
+
+	@Autowired
+	private CcmDeviceDao ccmDeviceDao;
+	
+	public CcmDevice get(String id) {
+		return super.get(id);
+	}
+	
+	public List<CcmDevice> findList(CcmDevice ccmDevice) {
+		return super.findList(ccmDevice);
+	}
+	
+	public Page<CcmDevice> findPage(Page<CcmDevice> page, CcmDevice ccmDevice) {
+		return super.findPage(page, ccmDevice);
+	}
+	
+	@Transactional(readOnly = false)
+	public void save(CcmDevice ccmDevice) {
+		super.save(ccmDevice);
+	}
+	
+	@Transactional(readOnly = false)
+	public void delete(CcmDevice ccmDevice) {
+		super.delete(ccmDevice);
+	}
+	
+	@Transactional(readOnly = false)
+	public boolean updateCoordinates(CcmDevice ccmDevice){
+		return ccmDeviceDao.updateCoordinates(ccmDevice)>0;
+	}
+
+	public CcmDevice getByIp(String ip) {
+		return ccmDeviceDao.getByIp(ip);
+	}
+	
+}

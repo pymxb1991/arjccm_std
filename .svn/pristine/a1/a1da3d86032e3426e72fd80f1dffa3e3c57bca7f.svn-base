@@ -1,0 +1,76 @@
+package com.arjjs.ccm.modules.ccm.rest.entity;
+
+import com.arjjs.ccm.common.config.Global;
+
+/**
+ * rest接口统一返回对象
+ * 
+ * @author pengjianqiang
+ * @version 2018-02-02
+ */
+public class CcmRestResult {
+	private int code; // 返回代码，代码值见CcmRestType.java
+	private Object result; // 返回信息对象
+	private Integer count; // 数量
+	private String fileServerUrl = Global.getConfig("FILE_UPLOAD_URL");// 图片服务器路径
+	private boolean returnFlag = false; // 是否返回信息
+
+	public CcmRestResult() {
+		code = -1;
+		result = null;
+	}
+
+	public CcmRestResult(int code, Object result, Integer count) {
+		super();
+		this.code = code;
+		this.result = result;
+		this.count = count;
+	}
+
+	public CcmRestResult(int code, Object result) {
+		super();
+		this.code = code;
+		this.result = result;
+	}
+
+	public int getCode() {
+		return code;
+	}
+
+	public void setCode(int code) {
+		this.code = code;
+	}
+
+	public Object getResult() {
+		return result;
+	}
+
+	public void setResult(Object result) {
+		this.result = result;
+	}
+
+	public Integer getCount() {
+		return count;
+	}
+
+	public void setCount(Integer count) {
+		this.count = count;
+	}
+
+	public String getFileServerUrl() {
+		return fileServerUrl;
+	}
+
+	public void setFileServerUrl(String fileServerUrl) {
+		this.fileServerUrl = fileServerUrl;
+	}
+
+	public boolean isReturnFlag() {
+		return returnFlag;
+	}
+
+	public void setReturnFlag(boolean returnFlag) {
+		this.returnFlag = returnFlag;
+	}
+
+}

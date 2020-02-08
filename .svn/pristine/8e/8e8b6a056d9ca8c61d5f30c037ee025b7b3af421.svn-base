@@ -1,0 +1,67 @@
+/**
+ * Copyright &copy; 2012-2016 <a href="https://github.com/thinkgem/jeesite">JeeSite</a> All rights reserved.
+ */
+package com.arjjs.ccm.modules.ccm.event.service;
+
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.arjjs.ccm.common.persistence.Page;
+import com.arjjs.ccm.common.service.CrudService;
+import com.arjjs.ccm.modules.ccm.event.entity.CcmEventCasedeal;
+import com.arjjs.ccm.modules.ccm.event.dao.CcmEventCasedealDao;
+
+/**
+ * 事件处理Service
+ * @author arj
+ * @version 2018-01-10
+ */
+@Service
+@Transactional(readOnly = true)
+public class CcmEventCasedealService extends CrudService<CcmEventCasedealDao, CcmEventCasedeal> {
+
+	@Autowired
+	private CcmEventCasedealDao ccmEventCasedealDao;
+	
+	
+	public CcmEventCasedeal get(String id) {
+		return super.get(id);
+	}
+	
+	public List<CcmEventCasedeal> findList(CcmEventCasedeal ccmEventCasedeal) {
+		return super.findList(ccmEventCasedeal);
+	}
+	
+	public Page<CcmEventCasedeal> findPage(Page<CcmEventCasedeal> page, CcmEventCasedeal ccmEventCasedeal) {
+		return super.findPage(page, ccmEventCasedeal);
+	}
+	
+	@Transactional(readOnly = false)
+	public void save(CcmEventCasedeal ccmEventCasedeal) {
+		super.save(ccmEventCasedeal);
+	}
+	
+	@Transactional(readOnly = false)
+	public void delete(CcmEventCasedeal ccmEventCasedeal) {
+		super.delete(ccmEventCasedeal);
+	}
+
+	//查询obj_id
+	public List<CcmEventCasedeal> findCasedealList(String id) {
+		return ccmEventCasedealDao.listWithPID(id);
+	}
+
+	//定时请求事件处理状态
+	public CcmEventCasedeal getEventCasedealMap(CcmEventCasedeal ccmEventCasedeal) {
+		return ccmEventCasedealDao.getEventCasedealMap(ccmEventCasedeal);
+	}
+
+	//事件处理未处理数量
+	public int getNumEventCasedeal(CcmEventCasedeal ccmEventCasedeal) {
+		return ccmEventCasedealDao.getNumEventCasedeal(ccmEventCasedeal);
+	}
+	
+}

@@ -1,0 +1,541 @@
+ /* .navbar-inner {
+	background-color: #35404d;
+	background-image: linear-gradient(to bottom, #35404d, #35404d);
+	background-repeat: repeat-x;  
+}
+
+  #left {
+	background: #2a2d33;
+}
+
+#left .collapse {
+	position: static;
+	background: #1e2125;
+}
+
+.accordion-inner {
+	border-top: 1px solid #2a2d33;
+}
+
+.accordion-inner .nav-list>li>a,.accordion-heading a {
+	color: #7f8796;
+	text-shadow: none;
+	-moz-transition: all .1s;
+	-webkit-transition: all .1s;
+	-o-transition: all .1s;
+	-ms-transition: all .1s;
+	transition: all .1s;
+	position: relative;
+}
+.accordion-heading a i{
+	position: absolute;
+	left:auto;
+	right:14px;
+	font-size: 12px;
+}
+.accordion-heading>a.active {
+	color: #fff;
+	background: none
+}
+.accordion-heading>a.active i{
+	opacity: 1
+}
+.nav-list {
+    padding-right: 0px;
+    padding-left: 0px;
+    margin-bottom: 0;
+}
+.nav nav-list li{
+	line-height:24px;
+}
+.nav-list li a {
+    margin-top: 0px; 
+    margin-bottom: 0px; 
+ 
+}
+.accordion-inner .nav-list li a {
+    padding: 8px 8px 8px 44px;
+}
+
+.accordion-inner .nav-list>li>a:hover,.accordion-heading a:hover {
+	color: #fff;
+	background: none;
+}
+.accordion-inner .nav-list>li>a:hover i,.accordion-heading a:hover i{
+	opacity: 1
+}
+
+.accordion-group {
+	margin-bottom: 2px;
+	border: 0;
+	-webkit-border-radius: 0px;
+	-moz-border-radius: 0px;
+	border-radius: 0px;
+	background: #2a3542;
+}
+
+.accordion-heading {
+	white-space: nowrap;
+	background-color: #fff;
+	background-image: -moz-linear-gradient(top, #2a3542, #2a3542);
+	background-image: -ms-linear-gradient(top, #2a3542, #2a3542);
+	background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#2a3542),
+		to(#f5f5f5));
+	background-image: -webkit-linear-gradient(top, #2a3542, #2a3542);
+	background-image: -o-linear-gradient(top, #2a3542, #2a3542);
+	background-image: linear-gradient(top, #2a3542, #2a3542);
+	background-repeat: repeat-x;
+	background: none;
+}
+.accordion-inner {
+    padding: 0  8px;
+}
+.accordion-inner .nav-list {
+    margin-bottom: 0;
+}
+.accordion-inner .nav-list>.active>a,.accordion-inner .nav-list>.active>a:hover {
+	color: #fff;
+	text-shadow: none;
+	background-color: #18191d;
+	position: relative;
+}
+.accordion-inner .nav-list>.active>a i{
+	opacity: 1
+}
+.accordion-inner .nav-list>.active>a:after{
+	content: "";
+    top: 0;
+    bottom: 0;
+    width: 4px;
+    position: absolute;
+    right: auto;
+    left: 7px;
+    background: #1aaada;
+} */ 
+.table th {
+	color: #666;
+	background-color: #f2f2f2;
+	background-image: none;
+	font-weight: 400
+}
+/*#header {
+    margin: 0!important;
+}*/
+#main .container-fluid {
+	/*   background-color: #f1f2f7;*/
+	
+}
+
+.btn {
+	display: inline-block;
+	/*padding: 6px 12px;*/
+	margin-bottom: 0;
+	font-size: 14px;
+	font-weight: 400;
+	line-height: 1.42857143;
+	text-align: center;
+	white-space: nowrap;
+	vertical-align: middle;
+	-ms-touch-action: manipulation;
+	touch-action: manipulation;
+	cursor: pointer;
+	-webkit-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
+	background-image: none;
+	border: 1px solid transparent;
+	border-radius: 4px;
+}
+
+.btn.focus, .btn:focus, .btn:hover {
+	color: #fff;
+	text-decoration: none;
+}
+
+.btn-primary {
+	color: #fff;
+	background-color: #3bb4f2;
+	border-color: #3bb4f2;
+}
+
+.btn-primary:hover {
+	color: #fff;
+	background-color: #19a7f0;
+	border-color: #19a7f0;
+}
+.btn-export,.btn-export:hover{
+	color: #fff;
+	background-color: #9652a9;
+	border-color: #9652a9;
+}
+.select2-container .select2-choice {
+	border: 1px solid #ccc;
+	-webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
+	-moz-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
+	-o-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
+	-ms-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
+	box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
+	-webkit-transition: border linear .2s, box-shadow linear .2s;
+	-moz-transition: border linear .2s, box-shadow linear .2s;
+	-o-transition: border linear .2s, box-shadow linear .2s;
+	-ms-transition: border linear .2s, box-shadow linear .2s;
+	transition: border linear .2s, box-shadow linear .2s;
+	background-image: none;
+}
+
+.select2-container-active .select2-choice, .select2-container-active .select2-choices
+	{
+	border: 1px solid #5897fb;
+	outline: 0;
+	-webkit-box-shadow: 0 0 5px rgba(0, 0, 0, .3);
+	box-shadow: 0 0 5px rgba(0, 0, 0, .3);
+}
+
+.select2-container .select2-choice .select2-arrow {
+	border-left: 0;
+	background-image: none;
+	background: none;
+}
+#right {
+    background:#fff;
+}
+#main {
+	background: #f0f3f4 !important;
+}
+
+#footer {
+	border-top: 0 !important;
+	background-color: #5b6e84;
+	margin: 0 !important;
+	padding: 8px 0 !important;
+	color: #fff !important;
+}
+
+.btn-info, .btn-info:hover, .btn-info:focus, .btn-info:active, .btn-info.active,
+	.btn-info.disabled, .btn-info[disabled] {
+	color: #fff;
+	background-color: #2f96b4 !important;
+}
+
+.name-btn {
+	width: 86%;
+	text-align: left
+}
+
+a {
+	cursor: pointer;
+}
+
+@media screen and (max-width: 1366px) {
+	.navbar .nav>li>a {
+		padding: 16px 8px 14px;
+	}
+}
+
+a.btnList {
+	display: inline-block;
+	margin-left: 5px;
+	-webkit-transition: background-color .2s ease-in;
+	-moz-transition: background-color .2s ease-in;
+	-o-transition: background-color .2s ease-in;
+	-ms-transition: background-color .2s ease-in;
+	transition: background-color .2s ease-in;
+}
+
+a.btnList:hover {
+	text-decoration: none;
+}
+
+a.btnList  i {
+	font-size: 14px;
+	display: inline-block;
+}
+
+a.btnList i:hover {
+	-moz-transform: scale(1.2);
+	-webkit-transform: scale(1.2);
+	-o-transform: scale(1.2);
+	-ms-transform: scale(1.2);
+	transform: scale(1.2);
+	opacity: 1;
+	position: static;
+}
+
+a.btnList  i.icon-pencil, a.btnList  i.icon-file,a.btnList  i.icon-list-alt {
+	color: #2fa4e7;
+}
+
+a.btnList  i.icon-trash ,a.btnList  i.icon-copy{
+	color: #dd5a43;
+}
+
+a.btnList  i.icon-home, a.btnList  i.icon-user {
+	color: #3c8dbc;
+}
+
+a.btnList  i.icon-plus {
+	color: #7bb33d;
+}
+a.btnList  i.icon-eye-open {
+	color: #8B3A62;
+}
+a.btnList  i.icon-legal {
+	color: #7bb33d;
+}
+a.btnList  i.icon-tint,a.btnList  i.icon-list-ul{
+	color: #5569e6;
+}
+
+a.btnList  i.icon-tint:before{
+	-webkit-transform: rotate(180deg);
+	-moz-transform: rotate(180deg);
+	-ms-transform: rotate(180deg);.
+	-o-transform: rotate(180deg);
+	transform: rotate(180deg);
+}
+a.btnList .icon-group{
+       color: #ffa000;
+}
+/* 妗堜簨浠跺彂鍏夊瓧浣� */
+@media all and (-webkit-min-device-pixel-ratio:0) and (min-resolution: .001dpcm) { 
+    .masked.active{
+      
+        -webkit-animation: masked-animation 4s infinite  linear;
+          background-image: -webkit-linear-gradient(left, #147B96, #E6D205 25%, #147B96 50%, #E6D205 75%, #147B96);
+        -webkit-text-fill-color: transparent;
+		-moz-text-fill-color: transparent;
+		-ms-text-fill-color: transparent;
+		-o-text-fill-color: transparent;
+		 text-fill-color: transparent;
+		-webkit-background-clip: text;
+		-moz-background-clip: text;
+		-ms-background-clip: text;
+		-o-background-clip: text;
+	     background-clip: text;
+		-webkit-background-size: 200% 100%;
+		-moz-background-size: 200% 100%;
+		-ms-background-size: 200% 100%;
+		-o-background-size: 200% 100%;
+		background-size: 200% 100%;
+    }
+}
+@-webkit-keyframes masked-animation {
+    0%  { background-position: 0 0;
+      
+		}
+    100% {
+        background-position: -100% 0;
+        background-image: -webkit-linear-gradient(left, #147B96, #E6D205 25%, #147B96 50%, #E6D205 75%, #147B96);
+        -webkit-text-fill-color: transparent;
+		-moz-text-fill-color: transparent;
+		-ms-text-fill-color: transparent;
+		-o-text-fill-color: transparent;
+		text-fill-color: transparent;
+		-webkit-background-clip: text;
+		-moz-background-clip: text;
+		-ms-background-clip: text;
+		-o-background-clip: text;
+		 background-clip: text;
+		-webkit-background-size: 200% 100%;
+		-moz-background-size: 200% 100%;
+		-ms-background-size: 200% 100%;
+		-o-background-size: 200% 100%;
+		background-size: 200% 100%;
+    }
+}
+.eventScaleCss{
+	display: inline-block;
+	width:60px;
+	height:24px;
+	margin: auto;
+	color:#fff;
+	text-align: center;
+	line-height:25px;
+	border-radius: 3px
+	
+}
+.eventScaleCss-01{
+	background:#f83d3d
+}
+.eventScaleCss-02{
+	background:#ee7c40;
+}
+.eventScaleCss-03{
+	background:#ffde00
+}
+.eventScaleCss-04{
+	background:#25cf71
+}
+
+.statusCss-01{
+	background:#f83d3d
+}
+.statusCss-02{
+	background:#eea807
+}
+.statusCss-03{
+	background:#25cf71
+}
+.statusCss-04{
+	background:#d41e24
+}
+.menu .nav-icon{
+	display: block;
+	margin: auto;
+	text-align: center;
+	font-size: 24px;
+}
+.menu .nav-name{
+	display: block;
+	text-align: center;
+}
+/* .menu .iconfont.icon-ai-home{
+	    color: #e38a2e;
+}
+ .menu .iconfont.icon-msnui-org-struct{
+   color: #01ad5c;
+ }
+ .menu .iconfont.icon-wanggexinxi01{
+   color: #3c9fd6
+ }
+  .menu .iconfont.icon-wanggegongzuoO{
+   color: #e9558f
+ }				
+ .menu .iconfont.icon-neirongguanli01{
+   color: #3c9fd6
+ }
+  .menu .iconfont.icon-shijianchuli1{
+   color: #e9493b
+ }
+   .menu .iconfont.icon-shipinjiankong{
+   color: #2fa0d7
+ }
+   .menu .iconfont.icon-fenxi7{
+   color:#ffa000
+ }
+    .menu .iconfont.icon-weibiaoti47{
+   color:#64b532
+ }
+   .menu .iconfont.icon-fengxianguankong{
+   color:#ff0000
+ }
+ .menu .iconfont.icon-perfoemance-old{
+   color:#e9558f
+ }
+ .menu .iconfont.icon-ziliaoku2{
+   color:#ffca28
+ }
+  .menu .iconfont.icon-renwu1{
+   color:#00c17b
+ }
+  .menu .iconfont.icon-xitongshezhi{
+   color:#1d4fd4
+ }
+ } */
+  #bodydiv{
+    background-color: #f5f5f5; 
+ }
+ .alarm-body table{
+	border-top: 1px solid #eee;     
+}
+ .alarm-body .table  .titletd
+{
+   border-right: 1px solid #eee;
+	}
+.portletcolumn
+{   
+	background-color:white;
+}
+ .menu .iconfont.icon-ai-home{
+	    color: #fff;
+}
+ .menu .iconfont.icon-msnui-org-struct{
+    color: #fff;
+ }
+ .menu .iconfont.icon-wanggexinxi01{
+     color: #fff;
+     font-weight: 600;
+ }
+  .menu .iconfont.icon-wanggegongzuoO{
+    color: #fff;
+ }				
+ .menu .iconfont.icon-neirongguanli01{
+     color: #fff;
+ }
+  .menu .iconfont.icon-shijianchuli1{
+     color: #fff;
+ }
+   .menu .iconfont.icon-shipinjiankong{
+     color: #fff;
+ }
+   .menu .iconfont.icon-fenxi7{
+     color: #fff;
+ }
+    .menu .iconfont.icon-weibiaoti47{
+     color: #fff;
+ }
+   .menu .iconfont.icon-fengxianguankong{
+    color: #fff;
+ }
+ .menu .iconfont.icon-perfoemance-old{
+    color: #fff;
+ }
+ .menu .iconfont.icon-ziliaoku2{
+    color: #fff;
+ }
+  .menu .iconfont.icon-renwu1{
+    color: #fff;
+ }
+  .menu .iconfont.icon-xitongshezhi{
+     color: #fff;
+ }
+ #treeType{
+    width: 250px;
+    margin-left: 10px;
+}
+#resourceDiv .input-append{
+	 margin-left: 10px;
+}
+#secuPlace{
+	width: 204px!important;
+}
+.nav>li>a.menu:hover, .nav>li>a.menu:focus {
+    background-color: #20c694!important; 
+}
+.business_list_div:hover,#keyPerson_div .keyPerson_list_div:hover,#businessDiv .businessZtree .business_choose {
+    background-color: #20c694!important; 
+    color:#fff;
+}
+.accordion-heading .nav>li>a:hover,.accordion-heading .nav>li>a:focus{
+	 background-color: #20c694!important; 
+	 color:#fff;
+}
+#keyPersonHandleLayer .layer-common-center ,#videoLayer  .layer-common-center,#keyPersonHandleLayer  .layer-common-center,#TodayVideoLayer .layer-common-center,#TodayCommunityLayer .layer-common-center,#TodayHandleLayer  .layer-common-center,#TodayHandleDialogLayer   .layer-common-center,#setIntervalLayer  .layer-common-center,#TodyAlarmLayer  .layer-common-center,#PopInfoLayer .layer-common-center,#showSelect .layer-common-center,
+#keyPersonHandleLayer  .layer-common-center{
+    background:none!important; 
+}
+.event-name{
+	color:#333!important; 
+}
+#keyPersonHandleLayer .layer-common-header,#videoLayer  .layer-common-header,#keyPersonHandleLayer  .layer-common-header,#TodayVideoLayer .layer-common-header,#TodayCommunityLayer .layer-common-header,#TodayHandleLayer  .layer-common-header,#TodayHandleDialogLayer   .layer-common-header,#setIntervalLayer  .layer-common-header,#TodyAlarmLayer  .layer-common-header,#PopInfoLayer .layer-common-header,#showSelect .layer-common-header,
+#keyPersonHandleLayer  .layer-common-header{
+	background-color: #0970e9!important;
+    background: linear-gradient(to top, #0970e9, #1290ff) !important;
+}
+#keyPerson_div .keyPerson_choose {
+	background-color: #20c694!important; 
+    color: #fff;
+}
+#left.mapIndex{
+	background: #f0f3f4!important; 
+}
+#left.mapIndex .accordion-inner .nav-list>li>a,#left.mapIndex .accordion-heading a{
+	color: #8b9298;
+}
+#left.mapIndex .nav-tabs>.active>a{
+	color: #000;
+}
+#left.mapIndex .accordion-heading .nav>li>a:hover,#left.mapIndex .accordion-heading .nav>li>a:focus{
+	color:#fff;
+}

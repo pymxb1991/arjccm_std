@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.arjjs.ccm.modules.ccm.event.dao.wechat.CcmWechatEventReplyDao">
+    
+	<sql id="ccmWechatEventReplyColumns">
+		a.id AS "id",
+		a.event_id AS "event.id",
+		a.reply_time AS "replyTime",
+		a.reply_user_id AS "replyUserId",
+		a.reply_info AS "replyInfo",
+		a.status AS "status",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag",
+		b.report_info AS "event.reportInfo",
+		c.name AS "createBy.name"
+	</sql>
+	
+	<sql id="ccmWechatEventReplyJoinsWechatEvent">
+		LEFT JOIN ccm_wechat_event b ON b.id = a.event_id
+	</sql>
+	<sql id="ccmWechatEventReplyJoinsUser">
+		LEFT JOIN sys_user c ON c.id = a.create_by
+	</sql>    
+	<select id="get" resultType="CcmWechatEventReply">
+		SELECT 
+			<include refid="ccmWechatEventReplyColumns"/>
+		FROM ccm_wechat_event_reply a
+		<include refid="ccmWechatEventReplyJoinsWechatEvent"/>
+		<include refid="ccmWechatEventReplyJoinsUser"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="CcmWechatEventReply">
+		SELECT 
+			<include refid="ccmWechatEventReplyColumns"/>
+		FROM ccm_wechat_event_reply a
+		<include refid="ccmWechatEventReplyJoinsWechatEvent"/>
+		<include refid="ccmWechatEventReplyJoinsUser"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="event != null and event.reportInfo != null and event.reportInfo != ''">
+				AND b.report_info LIKE 
+					<if test="dbName == 'oracle'">'%'||#{event.reportInfo}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{event.reportInfo}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{event.reportInfo},'%')</if>
+			</if>
+			<if test="event != null and event.id != null and event.id != ''">
+				AND a.event_id = #{event.id}
+			</if>
+			<if test="event != null and event.state != null and event.state != ''">
+				AND b.report_info = #{event.state}
+			</if>
+			
+			<if test="beginReplyTime != null and endReplyTime != null and beginReplyTime != '' and endReplyTime != ''">
+				AND a.reply_time BETWEEN #{beginReplyTime} AND #{endReplyTime}
+			</if>
+			<if test="status != null and status != ''">
+				AND a.status = #{status}
+			</if>
+			<if test="createBy != null and createBy.name != null and createBy.name != ''">
+				AND c.name LIKE 
+					<if test="dbName == 'oracle'">'%'||#{createBy.name}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{createBy.name}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{createBy.name},'%')</if>
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="CcmWechatEventReply">
+		SELECT 
+			<include refid="ccmWechatEventReplyColumns"/>
+		FROM ccm_wechat_event_reply a
+		<include refid="ccmWechatEventReplyJoinsWechatEvent"/>
+		<include refid="ccmWechatEventReplyJoinsUser"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO ccm_wechat_event_reply(
+			id,
+			event_id,
+			reply_time,
+			reply_user_id,
+			reply_info,
+			status,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag
+		) VALUES (
+			#{id},
+			#{event.id},
+			#{replyTime},
+			#{replyUserId},
+			#{replyInfo},
+			#{status},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE ccm_wechat_event_reply SET 	
+			event_id = #{event.id},
+			reply_time = #{replyTime},
+			reply_user_id = #{replyUserId},
+			reply_info = #{replyInfo},
+			status = #{status},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE ccm_wechat_event_reply SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

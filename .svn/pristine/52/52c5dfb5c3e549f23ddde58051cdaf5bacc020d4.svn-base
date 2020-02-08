@@ -1,0 +1,209 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.arjjs.ccm.modules.risk.audit.dao.RiskAuditDao">
+    
+	<sql id="riskAuditColumns">
+		a.id AS "id",
+		a.report_id AS "riskReport.id",
+		a.user_id AS "user.id",
+		a.read_flag AS "readFlag",
+		a.read_time AS "readTime",
+		a.opinion AS "opinion",
+		a.result AS "result",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag",
+		u3.name AS "user.name",
+		r.fileName AS "riskReport.fileName",
+		r.file AS "riskReport.file",
+		g.name AS "riskReport.riskEventGreat.name",
+		o.name AS "user.office.name"
+	</sql>
+	
+	<sql id="riskAuditJoins">
+		LEFT JOIN sys_user u3 ON u3.id = a.user_id
+		LEFT JOIN risk_report r ON r.id = a.report_id
+		LEFT JOIN risk_event_great g ON g.id = r.event_id
+		JOIN sys_office o ON o.id = u3.office_id
+	</sql>
+    
+	<select id="get" resultType="RiskAudit">
+		SELECT 
+			<include refid="riskAuditColumns"/>
+		FROM risk_audit a
+		<include refid="riskAuditJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	<!-- 审核上报表单提交，保存audit -->
+	<insert id="saveInsertAll" parameterType="List">
+		INSERT INTO risk_audit(
+		id,
+		report_id,
+		user_id,
+		read_flag,
+		result,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			del_flag
+		)
+		<if test="list.get(0).dbName == 'oracle'">
+			<foreach collection="list" item="r" separator=" union all ">
+				SELECT #{r.id},
+				#{r.riskReport.id},
+				#{r.user.id},
+				#{r.readFlag},
+				#{r.result},
+				#{r.createBy.id},
+				#{r.createDate},
+				#{r.updateBy.id},
+				#{r.updateDate},
+				#{r.delFlag} FROM dual
+			</foreach>
+		</if>
+		<if test="list.get(0).dbName == 'mssql' or list.get(0).dbName == 'mysql'">
+			VALUES
+			<foreach collection="list" item="r" open="" separator=","
+				close="">
+				(#{r.id},
+				#{r.riskReport.id},
+				#{r.user.id},
+				#{r.readFlag},
+				#{r.result},
+				#{r.createBy.id},
+				#{r.createDate},
+				#{r.updateBy.id},
+				#{r.updateDate},
+				#{r.delFlag} )
+			</foreach>
+		</if>
+	</insert>
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	<!--  -->
+	<select id="findList" resultType="RiskAudit">
+		SELECT 
+			<include refid="riskAuditColumns"/>
+		FROM risk_audit a
+		<include refid="riskAuditJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="riskReport != null and riskReport.id != null and riskReport.id != ''">
+				AND a.report_id = #{riskReport.id}
+			</if>
+			<if test="user != null and user.id != null and user.id != ''">
+				AND a.user_id = #{user.id}
+			</if>
+			<if test="readFlag != null and readFlag != ''">
+				AND a.read_flag = #{readFlag}
+			</if>
+			<if test="result != null and result != ''">
+				AND a.result = #{result}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="RiskAudit">
+		SELECT 
+			<include refid="riskAuditColumns"/>
+		FROM risk_audit a
+		<include refid="riskAuditJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO risk_audit(
+			id,
+			report_id,
+			user_id,
+			read_flag,
+			read_time,
+			opinion,
+			result,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag
+		) VALUES (
+			#{id},
+			#{riskReport.id},
+			#{user.id},
+			#{readFlag},
+			#{readTime},
+			#{opinion},
+			#{result},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE risk_audit SET 	
+			report_id = #{riskReport.id},
+			user_id = #{user.id},
+			read_flag = #{readFlag},
+			read_time = #{readTime},
+			opinion = #{opinion},
+			result = #{result},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE risk_audit SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

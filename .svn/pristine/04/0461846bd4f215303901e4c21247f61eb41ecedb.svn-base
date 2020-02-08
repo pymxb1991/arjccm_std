@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.arjjs.ccm.modules.pbs.activity.dao.PbsActivityecommentDao">
+    
+	<sql id="pbsActivityecommentColumns">
+		a.id AS "id",
+		a.s_activityid AS "sActivityid.id",
+		rec.s_title AS "sActivityid.sTitle",
+		a.s_content AS "sContent",
+		a.s_feedbackid AS "sFeedbackid",
+		a.s_value AS "sValue",
+		a.s_operator AS "sOperator.id",
+		u6.name AS "sOperator.name",
+		a.s_bindmember AS "sBindmember.id",
+		mem.s_name AS "sBindmember.sName",
+		mem.s_photo AS "sBindmember.sPhoto",
+		a.s_status AS "sStatus",
+		a.s_spare01 AS "sSpare01",
+		a.s_spare02 AS "sSpare02",
+		a.s_spare03 AS "sSpare03",
+		a.s_spare04 AS "sSpare04",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag"
+	</sql>
+	
+	<sql id="pbsActivityecommentJoins">
+	    LEFT JOIN pbs_activityrec rec on rec.id= a.s_activityid
+		LEFT JOIN sys_user u6 ON u6.id = a.s_operator
+		LEFT JOIN pbs_partymem mem ON mem.id = a.s_bindmember
+	</sql>
+    
+	<select id="get" resultType="PbsActivityecomment">
+		SELECT 
+			<include refid="pbsActivityecommentColumns"/>
+		FROM pbs_activityecomment a
+		<include refid="pbsActivityecommentJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="PbsActivityecomment">
+		SELECT 
+			<include refid="pbsActivityecommentColumns"/>
+		FROM pbs_activityecomment a
+		<include refid="pbsActivityecommentJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="sActivityid != null and sActivityid != '' and sActivityid.id != null and sActivityid.id != ''">
+				AND a.s_activityid = #{sActivityid.id}
+			</if>
+			<if test="sActivityid != null and sActivityid != '' and sActivityid.sTitle != null and sActivityid.sTitle != ''">
+				AND rec.s_title LIKE CONCAT('%',#{sActivityid.sTitle},'%') 
+			</if>
+			<if test="sOperator != null and sOperator != '' and sOperator.id != null and sOperator.id != ''">
+                AND a.s_operator = #{sOperator.id}
+            </if>
+			
+			<if test="sContent != null and sContent != ''">
+				AND a.s_content LIKE CONCAT('%',#{sContent},'%') 
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="PbsActivityecomment">
+		SELECT 
+			<include refid="pbsActivityecommentColumns"/>
+		FROM pbs_activityecomment a
+		<include refid="pbsActivityecommentJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO pbs_activityecomment(
+			id,
+			s_activityid,
+			s_content,
+			s_operator,
+			s_bindmember,
+			s_status,
+			s_spare01,
+			s_spare02,
+			s_spare03,
+			s_spare04,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag
+		) VALUES (
+			#{id},
+			#{sActivityid.id},
+			#{sContent},
+			#{sOperator.id},
+			#{sBindmember.id},
+			#{sStatus},
+			#{sSpare01},
+			#{sSpare02},
+			#{sSpare03},
+			#{sSpare04},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE pbs_activityecomment SET 	
+			s_activityid = #{sActivityid.id},
+			s_content = #{sContent},
+			s_operator = #{sOperator.id},
+			s_bindmember = #{sBindmember.id},
+			s_status = #{sStatus},
+			s_spare01 = #{sSpare01},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE pbs_activityecomment SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

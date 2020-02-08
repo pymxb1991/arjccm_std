@@ -1,0 +1,265 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.arjjs.ccm.modules.pbs.exam.dao.PbsExamactionitemDao">
+
+	<sql id="pbsExamactionitemColumns">
+		a.id AS "id",
+		a.s_exampaper AS "sExampaper.id",
+		paper.s_name
+		AS "sExampaper.sName",
+		a.s_item AS "sItem.id",
+		objective.s_body AS
+		"sItem.sBody",
+		objective.s_answer AS
+		"sItem.sAnswer",
+		a.s_examinee AS
+		"sExaminee.id",
+		mem.s_name AS
+		"sExaminee.sName",
+		a.s_doanswer AS
+		"sDoanswer",
+		a.s_judge AS
+		"sJudge",
+		a.s_actionid AS "sActionid.id",
+		a.i_score AS "iScore",
+		<!-- a.s_spare01 AS
+		"sSpare01",
+		a.s_spare02
+		AS
+		"sSpare02",
+		a.s_spare03 AS
+		"sSpare03",
+		a.s_spare04 AS "sSpare04", -->
+		a.create_by AS "createBy.id",
+		a.create_date
+		AS "createDate",
+		a.update_by
+		AS "updateBy.id",
+		a.update_date AS
+		"updateDate",
+		a.remarks
+		AS "remarks",
+		a.del_flag AS
+		"delFlag"
+	</sql>
+
+	<sql id="pbsExamactionitemJoins">
+		LEFT JOIN pbs_partymem mem on mem.id = a.s_examinee
+		LEFT
+		JOIN pbs_exampaper paper on paper.id = a.s_exampaper
+		LEFT JOIN
+		pbs_examaction action on action.id = a.s_actionid
+		LEFT JOIN
+		pbs_question_objective objective on objective.id = a.s_item
+	</sql>
+
+	<select id="get" resultType="PbsExamactionitem">
+		SELECT
+		<include refid="pbsExamactionitemColumns" />
+		FROM pbs_examactionitem a
+		<include refid="pbsExamactionitemJoins" />
+		WHERE a.id = #{id}
+	</select>
+
+	<select id="findList" resultType="PbsExamactionitem">
+		SELECT
+		<include refid="pbsExamactionitemColumns" />
+		FROM pbs_examactionitem a
+		<include refid="pbsExamactionitemJoins" />
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if
+				test="sExampaper != null and sExampaper != '' and sExampaper.id != null and sExampaper.id != ''">
+				AND a.s_exampaper = #{sExampaper.id}
+			</if>
+			<if
+				test="sExampaper != null and sExampaper != '' and sExampaper.sName != null and sExampaper.sName != ''">
+				AND paper.s_name like "%${sExampaper.sName}%"
+			</if>
+			<if test="sItem != null and sItem.sBody != null and sItem.sBody != ''">
+				AND objective.s_body LIKE "%${sItem.sBody}%"
+			</if>
+			<if
+				test="sItem != null and sItem != '' and sItem.id != null and sItem.id != ''">
+				AND paper.s_item = #{sItem.id}
+			</if>
+			<if
+				test="sActionid != null and sActionid != '' and sActionid.id != null and sActionid.id != ''">
+				AND a.s_actionid = #{sActionid.id}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+
+	<select id="findAllList" resultType="PbsExamactionitem">
+		SELECT
+		<include refid="pbsExamactionitemColumns" />
+		FROM pbs_examactionitem a
+		<include refid="pbsExamactionitemJoins" />
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+
+	<insert id="insert">
+		INSERT INTO pbs_examactionitem(
+		id,
+		s_exampaper,
+		s_item,
+		s_examinee,
+		s_doanswer,
+		s_judge,
+		s_actionid,
+		i_score,
+		s_spare01,
+		s_spare02,
+		s_spare03,
+		s_spare04,
+		create_by,
+		create_date,
+		update_by,
+		update_date,
+		remarks,
+		del_flag
+		) VALUES (
+		#{id},
+		#{sExampaper.id},
+		#{sItem.id},
+		#{sExaminee.id},
+		#{sDoanswer},
+		#{sJudge},
+		#{sActionid.id},
+		#{iScore},
+		#{sSpare01},
+		#{sSpare02},
+		#{sSpare03},
+		#{sSpare04},
+		#{createBy.id},
+		#{createDate},
+		#{updateBy.id},
+		#{updateDate},
+		#{remarks},
+		#{delFlag}
+		)
+	</insert>
+
+	<update id="update">
+		UPDATE pbs_examactionitem SET
+		s_exampaper =
+		#{sExampaper.id},
+		s_item = #{sItem.id},
+		s_examinee = #{sExaminee.id},
+		s_doanswer = #{sDoanswer},
+		s_judge = #{sJudge},
+		s_actionid =
+		#{sActionid.id},
+		i_score = #{iScore},
+		update_by = #{updateBy.id},
+		update_date = #{updateDate},
+		remarks =
+		#{remarks}
+		WHERE id = #{id}
+	</update>
+
+	<update id="delete">
+		UPDATE pbs_examactionitem SET
+		del_flag =
+		#{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+
+
+	<insert id="insertAll" parameterType="List">
+		INSERT INTO pbs_examactionitem(
+		id,
+		s_exampaper,
+		s_item,
+		s_examinee,
+		s_doanswer,
+		s_judge,
+		s_actionid,
+		i_score,
+		s_spare01,
+		s_spare02,
+		s_spare03,
+		s_spare04,
+		create_by,
+		create_date,
+		update_by,
+		update_date,
+		remarks,
+		del_flag
+		)
+		<if test="list.get(0).dbName == 'mssql' or list.get(0).dbName == 'mysql'">
+			VALUES
+			<foreach collection="list" item="e" open="" separator=","
+				close="">
+				(
+				#{e.id},
+				#{e.sExampaper.id},
+				#{e.sItem.id},
+				#{e.sExaminee.id},
+				#{e.sDoanswer},
+				#{e.sJudge},
+				#{e.sActionid.id},
+				#{e.iScore},
+				#{e.sSpare01},
+				#{e.sSpare02},
+				#{e.sSpare03},
+				#{e.sSpare04},
+				#{e.createBy.id},
+				#{e.createDate},
+				#{e.updateBy.id},
+				#{e.updateDate},
+				#{e.remarks},
+				#{e.delFlag}
+				)
+			</foreach>
+		</if>
+	</insert>
+	<select id="findErrorList" resultType="PbsExamactionitem">
+		SELECT
+		<include refid="pbsExamactionitemColumns" />
+		FROM pbs_examactionitem a
+		<include refid="pbsExamactionitemJoins" />
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if
+				test="sExampaper != null and sExampaper != '' and sExampaper.sWay != null and sExampaper.sWay != ''">
+				AND paper.s_way = #{sExampaper.sWay}
+			</if>
+			<if
+				test="sJudge != null and sJudge != ''">
+				AND a.s_judge = #{sJudge}
+			</if>
+			<if
+				test="sExaminee != null and sExaminee != '' and sExaminee.id != null and sExaminee.id != ''">
+				AND a.s_examinee = #{sExaminee.id}
+			</if>
+		</where>
+		GROUP BY a.s_item
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+</mapper>

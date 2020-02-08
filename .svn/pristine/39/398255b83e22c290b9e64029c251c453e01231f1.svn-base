@@ -1,0 +1,682 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.arjjs.ccm.modules.ccm.report.dao.CcmPeopleAmountDao">
+
+	<sql id="ccmPeopleAmountColumns">
+		a.id AS "id",
+		a.area_id AS "area.id",
+		a.amount_date AS
+		"amountDate",
+		a.person_amount AS "personAmount",
+		a.oversea_amount AS
+		"overseaAmount",
+		a.float_amount AS "floatAmount",
+		a.unsettle_amount AS "unsettleAmount",
+		a.permanent_amount AS "permanentAmount",
+		a.aids_amount AS
+		"aidsAmount",
+		a.dispute_amount AS "disputeAmount",
+		a.psychogeny_amount AS "psychogenyAmount",
+		a.rectification_amount AS "rectificationAmount",
+		a.release_amount AS
+		"releaseAmount",
+		a.drugs_amount AS "drugsAmount",
+		a.escape_amount AS "escapeAmount",
+		a.harmNational_amount AS "harmNationalAmount",
+		a.deliberatelyIllegal_amount AS "deliberatelyIllegalAmount",
+		a.behind_amount AS
+		"behindAmount",
+		a.visit_amount AS "visitAmount",
+		a.heresy_amount AS "heresyAmount",
+		a.dangerous_amount AS "dangerousAmount",
+		a.kym_amount AS "kymAmount",
+		a.care_amount AS "careAmount",
+		a.older_amount AS "olderAmount",
+		a.communist_amount AS "communistAmount",
+		a.age_child As "ageChild" ,
+		a.age_adult As "ageAdult" ,
+		a.age_middle As "ageMiddle" ,
+		a.age_old As "ageOld" ,
+		a.age_newborn As "ageNewborn" ,
+		a.sex_male As "sexMale" ,
+		a.sex_female As "sexFemale" ,
+		a.sex_male_single As "sexMaleSingle" ,
+		a.sex_female_single As "sexFemaleSingle" ,
+		a.edu_doctor As "eduDoctor" ,
+		a.edu_master As "eduMaster" ,
+		a.edu_college As "eduCollege" ,
+		a.edu_senior As "eduSenior" ,
+		a.edu_junior As "eduJunior" ,
+		a.atte_high As "atteHigh" ,
+		a.atte_middle As "atteMiddle" ,
+		a.atte_low As "atteLow" ,
+		a.native_floating As "nativeFloating" ,
+		a.more1 AS "more1",
+		a.more2
+		AS "more2",
+		a.more3 AS "more3",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS
+		"delFlag",
+		a2.name AS "area.name"
+	</sql>
+
+	<sql id="ccmPeopleAmountJoins">
+		LEFT JOIN sys_area a2 ON a2.id = a.area_id
+	</sql>
+
+	<!-- 实有人口统计情况 -->
+	<select id="getAnalyzePopData" resultType="com.arjjs.ccm.tool.SearchTab">
+		SELECT
+		 	SUM(a.person_amount) AS "value1",
+			SUM(a.oversea_amount) AS "value2",
+			SUM(a.float_amount) AS "value3",
+			SUM(a.unsettle_amount) AS "value4",
+			SUM(a.permanent_amount) AS "value"       
+		        FROM
+		        ccm_people_amount a
+		        LEFT JOIN sys_config c ON c.id = 'system_level'
+		        where
+		        a.del_flag=0
+				AND c.param_str=a.system_level
+		        AND(a.amount_date &gt; date_format(
+							DATE_SUB(curdate()
+							, INTERVAL 0
+							MONTH), '%Y-%m')
+							AND
+							a.amount_date &lt;
+							date_format( DATE_SUB(curdate(),
+							INTERVAL - 1
+							MONTH), '%Y-%m'))
+	</select>
+	<!-- 特殊人群分析 -->
+	<select id="getSpecialPopData" resultType="com.arjjs.ccm.tool.SearchTabMore">
+		SELECT
+		 	SUM(a.behind_amount) AS "value1",
+			SUM(a.rectification_amount) AS "value2",
+			SUM(a.psychogeny_amount) AS "value3",   
+			SUM(a.drugs_amount) AS "value4",   
+			SUM(a.escape_amount) AS "value20",
+			SUM(a.harmNational_amount) AS "value21",
+			
+			SUM(a.deliberatelyIllegal_amount) AS "value23",	
+			SUM(a.dispute_amount) AS "value24",		
+			SUM(a.release_amount) AS "value5",   
+			SUM(a.aids_amount) AS "value6",   
+			SUM(a.visit_amount) AS "value11",   
+			SUM(a.heresy_amount) AS "value12",   
+			SUM(a.dangerous_amount) AS "value13"      
+		        FROM
+		        ccm_people_amount a
+		        LEFT JOIN sys_config c ON c.id = 'system_level'
+		        where
+		        a.del_flag=0
+				AND a.system_level = c.param_str
+		        AND(a.amount_date &gt; date_format(
+							DATE_SUB(curdate()
+							, INTERVAL 0
+							MONTH), '%Y-%m')
+							AND
+							a.amount_date &lt;
+							date_format( DATE_SUB(curdate(),
+							INTERVAL - 1
+							MONTH), '%Y-%m'))
+	</select>
+	<!-- 实有人口统计情况 -->
+	<select id="getCameraTotal" resultType="com.arjjs.ccm.tool.EchartType">
+		SELECT
+		 	(SUM(IFNULL(a.person_amount,0))+SUM(IFNULL(a.oversea_amount,0))+SUM(IFNULL(a.float_amount,0))+SUM(IFNULL(a.unsettle_amount,0))) AS "value"
+		        FROM
+		        ccm_people_amount a
+		        LEFT JOIN sys_config c ON c.id = 'system_level'
+		        where
+		        a.del_flag=0
+		        AND c.param_str=a.system_level
+		        AND(a.amount_date &gt; date_format(
+							DATE_SUB(curdate()
+							, INTERVAL 0
+							MONTH), '%Y-%m')
+							AND
+							a.amount_date &lt;
+							date_format( DATE_SUB(curdate(),
+							INTERVAL - 1
+							MONTH), '%Y-%m'))
+	</select>
+	<!-- 本月人口信息 -->
+	<select id="getnumPopFollowPop" resultType="com.arjjs.ccm.tool.SearchTabMore">
+		SELECT
+		 	SUM(a.person_amount) AS "value1",
+			SUM(a.float_amount) AS "value2",  
+			SUM(a.oversea_amount) AS "value3",
+			SUM(a.unsettle_amount) AS "value",
+			SUM(a.permanent_amount) AS "value17",
+			SUM(a.behind_amount) AS "value4",
+			SUM(a.rectification_amount) AS "value5",
+			SUM(a.psychogeny_amount) AS "value6",   
+			SUM(a.drugs_amount) AS "value7",   
+			SUM(a.release_amount) AS "value8",   
+			SUM(a.aids_amount) AS "value9",
+			SUM(a.kym_amount) AS "value10",
+			SUM(a.visit_amount) AS "value11",
+			SUM(a.heresy_amount) AS "value12",
+			SUM(a.dangerous_amount) AS "value13",
+			SUM(a.care_amount) AS "value14",
+			SUM(a.older_amount) AS "value15",
+			SUM(a.communist_amount) AS "value16",
+			SUM(a.escape_amount) AS "value20" ,
+			SUM(a.harmNational_amount) AS "value21" ,
+			
+			SUM(a.deliberatelyIllegal_amount) AS "value23",
+			SUM(a.dispute_amount) AS "value24"
+		        FROM
+		        ccm_people_amount a
+		        LEFT JOIN sys_config c ON c.id = 'system_level'
+		        where
+		        a.del_flag=0
+				AND c.param_str=a.system_level
+		        AND(a.amount_date &gt; date_format(
+							DATE_SUB(curdate()
+							, INTERVAL 0
+							MONTH), '%Y-%m')
+							AND
+							a.amount_date &lt;
+							date_format( DATE_SUB(curdate(),
+							INTERVAL - 1
+							MONTH), '%Y-%m'))
+	</select>
+	<!-- 重点青少年统计 -->
+	<select id="getnumPopFollowEcharts" resultType="com.arjjs.ccm.tool.EchartType">
+		SELECT
+			(
+				CASE c.param_str
+				WHEN '1' THEN community.name 
+				WHEN '2' THEN street.name
+				ELSE street.name
+				END
+			)AS "type",
+			(
+				CASE c.param_str
+				WHEN '1' THEN COUNT(community.id) 
+				WHEN '2' THEN COUNT(street.id)
+				ELSE street.name
+				END
+			) AS "value"
+		FROM
+			ccm_house_kym a
+		LEFT JOIN ccm_people b ON b.id = a.people_id
+		LEFT JOIN sys_area community ON community.id = b.area_com_id
+		LEFT JOIN sys_area street ON street.id = community.parent_id
+		LEFT JOIN sys_config c ON c.id = 'system_level'
+		WHERE
+			a.del_flag = 0 
+		AND b.del_flag = 0 
+		AND community.del_flag = 0 
+		AND street.del_flag = 0 
+		GROUP BY
+			(
+				CASE c.param_str
+				WHEN '1' THEN community.id
+				WHEN '2' THEN street.id
+				ELSE street.name
+				END
+			)
+		ORDER BY
+			 VALUE DESC
+		LIMIT 0,
+		 10
+	</select>
+<!-- 社区特殊人群类型统计 -->
+	<select id="findPopByArea" resultType="com.arjjs.ccm.tool.SearchTabMore">
+		SELECT
+		 	a.behind_amount AS "value1",
+			a.rectification_amount AS "value2",
+			a.psychogeny_amount AS "value3",   
+			a.drugs_amount AS "value4",   
+			a.release_amount AS "value5",   
+			a.aids_amount AS "value6",   
+			a.visit_amount AS "value11",   
+			a.heresy_amount AS "value12",   
+			a.dangerous_amount AS "value13",
+			a.escape_amount AS "value20"  ,    
+			a.harmNational_amount AS "value21" ,
+			
+			a.deliberatelyIllegal_amount AS "value23",
+			a.dispute_amount AS "value24"
+		        FROM
+		        ccm_people_amount a
+		        
+		        where
+		        a.del_flag=0
+				AND a.area_id=#{area.id}
+		        AND(a.amount_date &gt; date_format(
+							DATE_SUB(curdate()
+							, INTERVAL 0
+							MONTH), '%Y-%m')
+							AND
+							a.amount_date &lt;
+							date_format( DATE_SUB(curdate(),
+							INTERVAL - 1
+							MONTH), '%Y-%m'))
+	</select>
+
+<!-- 社区特殊人群变化趋势 -->
+	<select id="findPopTrendByArea" resultType="com.arjjs.ccm.tool.SearchTabMore">
+		SELECT
+			concat(
+				YEAR (amount_date),
+				"-",
+				MONTH (amount_date)
+			) AS "type",
+					a.rectification_amount AS "value1",
+					a.psychogeny_amount AS "value2",   
+					a.drugs_amount AS "value3",   
+					a.release_amount AS "value4",   
+					a.aids_amount AS "value5",
+					a.float_amount  AS "value6",
+					a.oversea_amount  AS "value7",
+					a.permanent_amount  AS "value",
+					a.person_amount  AS "value8",
+					a.visit_amount  AS "value11",
+					a.heresy_amount  AS "value12",
+					a.dangerous_amount  AS "value13",
+					a.escape_amount AS "value20",
+					a.harmNational_amount AS "value21" ,
+					
+					a.deliberatelyIllegal_amount AS "value23",
+					a.dispute_amount AS "value24"
+		FROM
+			ccm_people_amount a
+		WHERE
+			a.del_flag = 0
+		<if test="area != null and area.id != null and area.id != ''">
+			AND a.area_id=#{area.id}
+		</if>
+		AND (
+			a.amount_date &gt; date_format(
+				DATE_SUB(curdate(), INTERVAL 11 MONTH),
+				'%Y-%m'
+			)
+			AND a.amount_date &lt; date_format(
+				DATE_SUB(curdate(), INTERVAL - 1 MONTH),
+				'%Y-%m'
+			)
+		)
+		GROUP BY
+			concat(
+				YEAR (amount_date),
+				MONTH (amount_date)
+			)
+		ORDER BY
+			concat(
+				YEAR (amount_date),
+		
+			IF (
+				MONTH (amount_date) &gt; 9,
+				MONTH (amount_date),
+				concat("0", MONTH(amount_date))
+			)
+			) ASC
+		LIMIT 12
+	</select>
+
+	<!-- 首页社区弹框：人口结构 -->
+	<select id="findMonthAreaAmount" resultType="CcmPeopleAmount">
+		SELECT
+		<include refid="ccmPeopleAmountColumns" />
+		FROM ccm_people_amount a
+		<include refid="ccmPeopleAmountJoins" />
+		WHERE 
+			 a.del_flag=0
+				AND a.area_id=#{area.id}
+		        AND(a.amount_date &gt; date_format(
+							DATE_SUB(curdate()
+							, INTERVAL 0
+							MONTH), '%Y-%m')
+							AND
+							a.amount_date &lt;
+							date_format( DATE_SUB(curdate(),
+							INTERVAL - 1
+							MONTH), '%Y-%m'))
+	</select>
+	<!-- 各街道人口数据对比（重点人群与特殊人群关系）-大屏-滨海新区社会网格化管理信息平台 -->
+	<select id="getStreetPopData" resultType="com.arjjs.ccm.tool.SearchTab">
+		SELECT
+			a2.name AS "type",
+			(a.kym_amount + a.care_amount + a.older_amount + a.communist_amount) 
+			AS "value1",
+			(a.rectification_amount + a.psychogeny_amount + a.drugs_amount + a.release_amount + a.aids_amount + a.visit_amount + a.heresy_amount + a.dangerous_amount) 
+			AS "value2" 
+        FROM
+        ccm_people_amount a
+				LEFT JOIN sys_area a2 ON a2.id = a.area_id
+				LEFT JOIN sys_config c ON c.id = 'system_level' 
+        where
+        a.del_flag=0
+				AND a.system_level = c.param_str
+        AND(a.amount_date &gt; date_format(
+					DATE_SUB(curdate()
+					, INTERVAL 0
+					MONTH), '%Y-%m')
+					AND
+					a.amount_date &lt;
+					date_format( DATE_SUB(curdate(),
+					INTERVAL - 1
+					MONTH), '%Y-%m'))
+	</select>
+
+
+
+	
+	
+	
+	
+	
+	
+	
+	
+<!--  -->
+	<select id="get" resultType="CcmPeopleAmount">
+		SELECT
+		<include refid="ccmPeopleAmountColumns" />
+		FROM ccm_people_amount a
+		<include refid="ccmPeopleAmountJoins" />
+		WHERE a.id = #{id}
+	</select>
+
+	<select id="findList" resultType="CcmPeopleAmount">
+		SELECT
+		<include refid="ccmPeopleAmountColumns" />
+		FROM ccm_people_amount a
+		<include refid="ccmPeopleAmountJoins" />
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="area != null and area.id != null and area.id != ''">
+				AND a.area_id = #{area.id}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+
+	<select id="findAllList" resultType="CcmPeopleAmount">
+		SELECT
+		<include refid="ccmPeopleAmountColumns" />
+		FROM ccm_people_amount a
+		<include refid="ccmPeopleAmountJoins" />
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+
+	<insert id="insert">
+		INSERT INTO ccm_people_amount(
+		id,
+		area_id,
+		amount_date,
+		person_amount,
+		oversea_amount,
+		float_amount,
+		unsettle_amount,
+		aids_amount,
+		dispute_amount,
+		psychogeny_amount,
+		rectification_amount,
+		release_amount,
+		drugs_amount,
+		escape_amount,
+		harmNational_amount ,
+		deliberatelyIllegal_amount,
+		behind_amount,
+		kym_amount,
+		care_amount,
+		older_amount,
+		communist_amount,
+		visit_amount,
+		heresy_amount,
+		dangerous_amount,
+		age_child,
+		age_adult,
+		age_middle,
+		age_old,
+		age_newborn,
+		sex_male,
+		sex_female,
+		sex_male_single,
+		sex_female_single,
+		edu_doctor,
+		edu_master,
+		edu_college,
+		edu_senior,
+		edu_junior,
+		atte_high,
+		atte_middle,
+		atte_low,
+		native_floating,
+		more1,
+		more2,
+		more3,
+		create_by,
+		create_date,
+		update_by,
+		update_date,
+		remarks,
+		del_flag
+		) VALUES (
+		#{id},
+		#{area.id},
+		#{amountDate},
+		#{personAmount},
+		#{overseaAmount},
+		#{floatAmount},
+		#{unsettleAmount},
+		#{aidsAmount},
+		#{disputeAmount},
+		#{psychogenyAmount},
+		#{rectificationAmount},
+		#{releaseAmount},
+		#{drugsAmount},
+		#{escapeAmount},
+		#{harmNationalAmount},
+		#{deliberatelyIllegalAmount},
+		#{behindAmount},
+		#{kymAmount},
+		#{careAmount},
+		#{olderAmount},
+		#{communistAmount},
+		#{visitAmount},
+		#{heresyAmount},
+		#{dangerousAmount},
+		#{ageChild},
+		#{ageAdult},
+		#{ageMiddle},
+		#{ageOld},
+		#{ageNewborn},
+		#{sexMale},
+		#{sexFemale},
+		#{sexMaleSingle},
+		#{sexFemaleSingle},
+		#{eduDoctor},
+		#{eduMaster},
+		#{eduCollege},
+		#{eduSenior},
+		#{eduJunior},
+		#{atteHigh},
+		#{atteMiddle},
+		#{atteLow},
+		#{nativeFloating},
+		#{more1},
+		#{more2},
+		#{more3},
+		#{createBy.id},
+		#{createDate},
+		#{updateBy.id},
+		#{updateDate},
+		#{remarks},
+		#{delFlag}
+		)
+	</insert>
+
+	<update id="update">
+		UPDATE ccm_people_amount SET
+		area_id = #{area.id},
+		amount_date = #{amountDate},
+		person_amount = #{personAmount},
+		oversea_amount = #{overseaAmount},
+		float_amount = #{floatAmount},
+		unsettle_amount = #{unsettleAmount},
+		aids_amount = #{aidsAmount},
+		dispute_amount = {disputeAmount},
+		psychogeny_amount = #{psychogenyAmount},
+		rectification_amount = #{rectificationAmount},
+		release_amount =
+		#{releaseAmount},
+		drugs_amount = #{drugsAmount},
+		escape_amount = #{escapeAmount},
+		behind_amount =
+		#{behindAmount},
+		kym_amount = #{kymAmount},
+		care_amount = #{careAmount},
+		older_amount = #{olderAmount},
+		communist_amount = #{communistAmount},
+		visit_amount = #{visitAmount},
+		heresy_amount = #{heresyAmount},
+		dangerous_amount = #{dangerousAmount},
+		age_child=#{ageChild},
+		age_adult=#{ageAdult},
+		age_middle=#{ageMiddle},
+		age_old=#{ageOld},
+		age_newborn=#{ageNewborn},
+		sex_male=#{sexMale},
+		sex_female=#{sexFemale},
+		sex_male_single=#{sexMaleSingle},
+		sex_female_single=#{sexFemaleSingle},
+		edu_doctor=#{eduDoctor},
+		edu_master=#{eduMaster},
+		edu_college=#{eduCollege},
+		edu_senior=#{eduSenior},
+		edu_junior=#{eduJunior},
+		atte_high=#{atteHigh},
+		atte_middle=#{atteMiddle},
+		atte_low=#{atteLow},
+		native_floating=#{nativeFloating},
+		more1 = #{more1},
+		more2 =
+		#{more2},
+		more3 = #{more3},
+		update_by = #{updateBy.id},
+		update_date =
+		#{updateDate},
+		remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+
+	<update id="delete">
+		UPDATE ccm_people_amount SET
+		del_flag =
+		#{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+
+	<select id="findListBySum" resultType="com.arjjs.ccm.tool.EchartType">
+		SELECT
+		ifnull(SUM(a.${column}),0) AS 'value',
+		date_format(a.amount_date, '%Y-%c') AS 'type'
+		FROM
+		ccm_people_amount a
+		LEFT JOIN sys_config c ON c.param_str=a.system_level
+		WHERE
+		a.del_flag = 0
+		AND c.id = 'system_level' 
+		GROUP BY
+		a.amount_date
+		ORDER BY
+		a.amount_date 
+	</select>
+
+	<select id="findListByMon" resultType="com.arjjs.ccm.tool.EchartType">
+		SELECT
+		ifnull(a.${column},0) AS
+		"value",
+		a2. NAME AS "type"
+		FROM
+		ccm_people_amount a
+		LEFT JOIN sys_area a2
+		ON a2.id = a.area_id
+		LEFT JOIN sys_config c ON c.param_str=a.system_level
+		WHERE
+		a.del_flag = 0
+		AND c.id = 'system_level' 
+		and (a.amount_date &gt;
+		date_format(DATE_SUB(curdate(), INTERVAL 0
+		MONTH),'%Y-%m')
+		AND
+		a.amount_date &lt; date_format(DATE_SUB(curdate(), INTERVAL -1
+		MONTH),'%Y-%m'))
+		GROUP BY a.area_id
+		ORDER BY a2.`code` Desc
+
+	</select>
+	<select id="findPeopleAndEventByArea" resultType="com.arjjs.ccm.tool.EchartType">
+		SELECT
+			a.`name` AS type,
+			b.`value` AS typeO,
+			c.value2 AS `value`
+		FROM
+			sys_area a
+		LEFT JOIN (
+			SELECT
+				a21.`name`,
+				COUNT(a21.`name`) AS
+			VALUE
+		
+			FROM
+				ccm_people a
+			LEFT JOIN sys_area a20 ON a20.id = a.area_com_id
+			LEFT JOIN sys_area a21 ON a21.id = a20.parent_id
+			WHERE
+				a.del_flag = '0'
+			AND a21.del_flag = '0'
+			GROUP BY
+				a21.`name`
+		) b ON a.`name` = b.`name`
+		LEFT JOIN (
+			SELECT
+				a22.`name`,
+				COUNT(a22.`name`) AS
+			VALUE2
+		
+			FROM
+				ccm_event_incident a
+			LEFT JOIN sys_area a20 ON a20.id = a.case_place
+			LEFT JOIN sys_area a21 ON a21.id = a20.parent_id
+			LEFT JOIN sys_area a22 ON a22.id = a21.parent_id
+			WHERE
+				a.del_flag = '0'
+			AND a22.del_flag = '0'
+			GROUP BY
+				a22.`name`
+		) c ON a.`name` = c.`name`
+		WHERE
+			a.type = '5' <!-- AND (b.`value` IS NOT NULL OR c.value2 IS NOT NULL) 是否只显示街道的数据-->
+		ORDER BY
+			a. CODE
+	</select>
+</mapper>

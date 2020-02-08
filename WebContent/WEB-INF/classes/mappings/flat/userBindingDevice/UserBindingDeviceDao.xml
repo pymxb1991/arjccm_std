@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.arjjs.ccm.modules.flat.userBindingDevice.dao.UserBindingDeviceDao">
+	
+	<select id="finduserBindingDeviceList" resultType="UserBindingDevice">
+		SELECT DISTINCT 
+			a.id AS "id",
+			u.id AS "userId",
+			a.defualt_device AS "defualtDevice",
+			u.office_id AS "office.id",
+			f.name AS "office.name",
+			f.parent_id AS "office.parent.id",
+    		f.parent_ids AS "office.parentIds",
+			u.name AS "name",
+			u.login_name AS "loginName",
+			u.phone AS "phone",
+			u.mobile AS "mobile",
+			a.police_phone_code AS  "policePhoneCode",
+			a.interphone_code AS "interPhoneCode",
+			a.action_recorder_code AS "actionRecoderCode",
+			c.param AS "param",
+			o.name AS "company.name",
+			u.company_id AS "company.id"
+		FROM 
+			sys_user u
+			LEFT JOIN sys_office o ON o.id = u.company_id
+			LEFT JOIN bph_user_extend a ON u.id = a.user_id AND a.del_flag = #{DEL_FLAG_NORMAL}
+			LEFT JOIN sys_office f ON f.id = u.office_id AND f.del_flag = #{DEL_FLAG_NORMAL}
+			LEFT JOIN ccm_mobile_device c ON c.device_id = a.police_phone_code AND c.del_flag = #{DEL_FLAG_NORMAL}
+		<where>
+			u.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="company != null and company.id != null and company.id != ''">
+				and u.company_id LIKE
+				<if test="dbName == 'oracle'">'%'||#{company.id}||'%'</if>
+				<if test="dbName == 'mssql'">'%'+#{company.id}+'%'</if>
+				<if test="dbName == 'mysql'">concat('%',#{company.id},'%')</if>
+			</if>
+			<if test="loginName != null and loginName != ''">
+				and u.login_name LIKE
+				<if test="dbName == 'oracle'">'%'||#{loginName}||'%'</if>
+				<if test="dbName == 'mssql'">'%'+#{loginName}+'%'</if>
+				<if test="dbName == 'mysql'">concat('%',#{loginName},'%')</if>
+			</if>
+			<if test="office != null and office.id != null and office.id != ''">
+				and (f.id = #{office.id} OR f.parent_ids LIKE 
+				<if test="dbName == 'oracle'">'%'||#{office.id}||'%'</if>
+				<if test="dbName == 'mssql'">'%'+#{office.id}+'%'</if>
+				<if test="dbName == 'mysql'">concat('%',#{office.id},'%'))</if>
+			</if>
+			<if test="name != null and name != ''">
+				and u.name LIKE
+				<if test="dbName == 'oracle'">'%'||#{name}||'%'</if>
+				<if test="dbName == 'mssql'">'%'+#{name}+'%'</if>
+				<if test="dbName == 'mysql'">concat('%',#{name},'%')</if>
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY u.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="get" resultType="UserBindingDevice">
+		SELECT 
+			a.id AS "id",
+			a.defualt_device AS "defualtDevice",
+			u.office_id AS "office.id",
+			f.name AS "office.name",
+			u.name AS "name",
+			u.login_name AS "loginName",
+			u.phone AS "phone",
+			u.mobile AS "mobile",
+			a.police_phone_code AS  "policePhoneCode",
+			a.interphone_code AS "interPhoneCode",
+			a.action_recorder_code AS "actionRecoderCode"
+		FROM
+		    sys_user u
+			LEFT JOIN bph_user_extend a ON u.id = a.user_id
+			LEFT JOIN sys_office f ON u.office_id = f.id
+		WHERE a.id = #{id}
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO bph_user_extend (
+			id,
+			user_id,
+			police_phone_code,
+			action_recorder_code,
+			interphone_code,
+			defualt_device,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag
+		) VALUES (
+			#{id}, 
+			#{userId}, 
+			#{policePhoneCode}, 
+			#{actionRecoderCode}, 
+			#{interPhoneCode},
+			#{defualtDevice}, 
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE bph_user_extend SET
+			police_phone_code = #{policePhoneCode}, 
+			action_recorder_code = #{actionRecoderCode}, 
+			interphone_code = #{interPhoneCode},
+			defualt_device = #{defualtDevice},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			user_id = #{userId}
+		WHERE id = #{id}
+	</update>
+    <update id="updateBinding">
+		UPDATE bph_user_extend SET
+			user_id = #{userId}
+		WHERE
+		  id = #{userBindId}
+	</update>
+	
+	<update id="delete">
+		UPDATE bph_user_extend SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+
+	<select id="findDeviceByPolicePhoneCode"  parameterType="String" resultType="String">
+			select t.id from bph_user_extend t where t.police_phone_code = #{phoneCode}
+	</select>
+</mapper>

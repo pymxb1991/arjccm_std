@@ -1,0 +1,214 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.arjjs.ccm.modules.plm.storage.dao.PlmIncomingEntryDao">
+    
+	<sql id="plmIncomingEntryColumns">
+		a.id AS "id",
+		a.provide AS "provide.id",
+		a.proc_ins_id AS "procInsId",
+		a.incoming_date AS "incomingDate",
+		a.incoming_code AS "incomingCode",
+		a.incoming_type AS "incomingType",
+		a.delivery_number AS "deliveryNumber",
+		a.invoice_value AS "invoiceValue",
+		a.invoice AS "invoice",
+		a.bill_date AS "billDate",
+		a.apply_user AS "user.id",
+		a.apply_job AS "userJob.id",
+		a.apply_cause AS "cause",
+		a.deadline_date AS "deadLineDate",
+		a.file AS "file",
+		a.type AS "type",
+		a.extend1 AS "extend1",
+		a.extend2 AS "extend2",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag",
+		p.name AS "provide.name",
+		u20.name AS "user.name",
+		o21.name AS "userJob.name"
+	</sql>
+	
+	<sql id="plmIncomingEntryJoins">
+		LEFT JOIN sys_user u20 ON u20.id = a.apply_user
+		LEFT JOIN sys_office o21 ON o21.id = a.apply_job
+		LEFT JOIN plm_provide_info p ON p.id = a.provide
+	</sql>
+    
+	<select id="get" resultType="PlmIncomingEntry">
+		SELECT 
+			<include refid="plmIncomingEntryColumns"/>
+		FROM plm_incoming_entry a
+		<include refid="plmIncomingEntryJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="PlmIncomingEntry">
+		SELECT 
+			<include refid="plmIncomingEntryColumns"/>
+		FROM plm_incoming_entry a
+		<include refid="plmIncomingEntryJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="provide != null and provide.id !=''">
+				AND a.provide = #{provide.id}
+			</if>
+
+			<if  test="beginIncomingDate != null and beginIncomingDate != ''">
+				AND a.incoming_date &gt;= #{beginIncomingDate}
+			</if>
+			<if  test="endIncomingDate != null and endIncomingDate != ''">
+				AND a.incoming_date &lt;= #{endIncomingDate}
+			</if>
+			<if test="incomingCode != null and incomingCode != ''">
+				AND a.incoming_code LIKE 
+				<if test="dbName == 'oracle'">'%'||#{incomingCode}||'%'</if>
+				<if test="dbName == 'mssql'">'%'+#{incomingCode}+'%'</if>
+				<if test="dbName == 'mysql'">concat('%',#{incomingCode},'%')</if>
+			</if>
+			<if test="incomingType != null and incomingType != ''">
+				AND a.incoming_type = #{incomingType}
+				
+			</if>
+			<choose>
+				<when test="type != null and type != ''">
+					AND a.type = #{type}
+				</when>
+				<otherwise>
+					<if test="flag != null and flag != ''">
+						<choose>
+							<when test='flag == "0"'>
+								AND a.type IN ('0','1','2')
+							</when>
+							<when test='flag == "1"'>
+								AND a.type IN ('3','4','5')
+							</when>
+							<otherwise>
+								AND a.type IN ('0','1','2')
+							</otherwise>
+						</choose>
+					</if>
+				</otherwise>
+			</choose>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="PlmIncomingEntry">
+		SELECT 
+			<include refid="plmIncomingEntryColumns"/>
+		FROM plm_incoming_entry a
+		<include refid="plmIncomingEntryJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO plm_incoming_entry(
+			id,
+			provide,
+			proc_ins_id,
+			incoming_date,
+			incoming_code,
+			incoming_type,
+			delivery_number,
+			invoice_value,
+			invoice,
+			bill_date,
+			deadline_date,
+			apply_user,
+			apply_job,
+			apply_cause,
+			file,
+			type,
+			extend1,
+			extend2,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag
+		) VALUES (
+			#{id},
+			#{provide.id},
+			#{procInsId},
+			#{incomingDate},
+			#{incomingCode},
+			#{incomingType},
+			#{deliveryNumber},
+			#{invoiceValue},
+			#{invoice},
+			#{billDate},
+			#{deadLineDate},
+			#{user.id},
+			#{userJob.id},
+			#{cause},
+			#{file},
+			#{type},
+			#{extend1},
+			#{extend2},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE plm_incoming_entry SET 	
+			provide = #{provide.id},
+			proc_ins_id = #{procInsId},
+			incoming_date = #{incomingDate},
+			incoming_code = #{incomingCode},
+			incoming_type = #{incomingType},
+			delivery_number = #{deliveryNumber},
+			invoice_value = #{invoiceValue},
+			invoice = #{invoice},
+			bill_date = #{billDate},
+			deadline_date = #{deadLineDate},
+			apply_cause = #{cause},
+			file = #{file},
+			type = #{type},
+			extend1 = #{extend1},
+			extend2 = #{extend2},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE plm_incoming_entry SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="updateIncomingStatus">
+		UPDATE plm_incoming_entry SET 
+			type = #{type}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

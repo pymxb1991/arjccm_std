@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.arjjs.ccm.modules.ccm.message.dao.CcmMessageDao">
+
+	<sql id="ccmMessageColumns">
+		a.id AS "id",
+		a.type AS "type",
+		a.obj_id AS "objId",
+		a.content AS "content",
+		a.user_id AS "userId",
+		a.read_flag AS "readFlag",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag",
+		a.deadline AS "deadline"
+	</sql>
+
+	<select id="get" resultType="CcmMessage">
+		SELECT
+		<include refid="ccmMessageColumns" />
+		FROM ccm_message a
+		WHERE a.id = #{id}
+	</select>
+
+	<update id="update">
+		UPDATE ccm_message SET
+		id = #{id},
+		type = #{type},
+		obj_id = #{objId},
+		content = #{content},
+		user_id = #{userId},
+		read_flag = #{readFlag},
+		update_by = #{updateBy.id},
+		update_date = #{updateDate},
+		remarks = #{remarks},
+		del_flag = #{delFlag},
+		deadline = #{deadline}
+		WHERE id = #{id}
+	</update>
+
+	<insert id="insertEventAll" parameterType="List">
+		INSERT INTO ccm_message(
+		id,
+		type,
+		obj_id,
+		content,
+		user_id,
+		read_flag,
+		create_by,
+		create_date,
+		update_by,
+		update_date,
+		remarks,
+		del_flag,
+		deadline
+		)
+		<if test="list.get(0).dbName == 'mssql' or list.get(0).dbName == 'mysql'">
+			VALUES
+			<foreach collection="list" item="e" open="" separator=","
+					 close="">
+				(
+				#{e.id},
+				#{e.type},
+				#{e.objId},
+				#{e.content},
+				#{e.userId},
+				#{e.readFlag},
+				#{e.createBy.id},
+				#{e.createDate},
+				#{e.updateBy.id},
+				#{e.updateDate},
+				#{e.remarks},
+				#{e.delFlag},
+				#{e.deadline}
+				)
+			</foreach>
+		</if>
+	</insert>
+
+	<insert id="insert">
+		INSERT INTO ccm_message(
+		id,
+		type,
+		obj_id,
+		content,
+		user_id,
+		read_flag,
+		create_by,
+		create_date,
+		update_by,
+		update_date,
+		remarks,
+		del_flag,
+		deadline
+		) VALUES (
+		#{id},
+		#{type},
+		#{objId},
+		#{content},
+		#{userId},
+		#{readFlag},
+		#{createBy.id},
+		#{createDate},
+		#{updateBy.id},
+		#{updateDate},
+		#{remarks},
+		#{delFlag},
+		#{deadline}
+		)
+	</insert>
+
+
+	<select id="getListTodayAndUnread" resultType="CcmMessage">
+		SELECT
+		<include refid="ccmMessageColumns"/>
+		FROM ccm_message a
+		WHERE
+		a.del_flag='0'
+		AND a.user_id = #{userId}
+		AND(((
+		(a.create_date &gt;= date_format(DATE_SUB(curdate(), INTERVAL 0 DAY), '%Y-%m-%d') AND
+		a.create_date &lt; date_format(DATE_SUB(curdate(),INTERVAL - 1 DAY), '%Y-%m-%d'))
+		OR a.read_flag = 0) AND a.type != "04")
+		OR (a.type = "04" AND a.read_flag = 0 AND a.deadline IS NOT NULL AND a.deadline &lt; now()
+		))
+		ORDER BY
+		a.read_flag , a.create_date DESC
+<!--		LIMIT 10-->
+	</select>
+
+
+
+	<select id="getListTodayAndUnreadBymessage" resultType="CcmMessage">
+		SELECT
+		<include refid="ccmMessageColumns"/>
+		FROM ccm_message a
+		WHERE
+		a.del_flag='0'
+		AND a.user_id = #{userId}
+		AND(((
+		(a.create_date &gt;= date_format(DATE_SUB(curdate(), INTERVAL 0 DAY), '%Y-%m-%d') AND
+		a.create_date &lt; date_format(DATE_SUB(curdate(),INTERVAL - 1 DAY), '%Y-%m-%d'))
+		OR a.read_flag = 0) AND a.type != "04")
+		OR (a.type = "04" AND a.read_flag = 0 AND a.deadline IS NOT NULL AND a.deadline &lt; now()
+		))
+		<if test="type != null and type != ''">
+			AND a.type = #{type}
+		</if>
+		ORDER BY
+		a.read_flag , a.create_date DESC
+		<!--		LIMIT 10-->
+	</select>
+</mapper>

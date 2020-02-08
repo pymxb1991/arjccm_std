@@ -1,0 +1,199 @@
+
+<html>
+<head>
+
+	<title>资产内部调拨单</title>
+	<meta name="decorator" content="default"/>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<style type="text/css">
+	body{
+	margin-left: 45px;
+	margin-right: 45px;
+	font-family: Arial Unicode MS;
+	font-size: 10px;
+	}
+	h2{
+		margin:0 auto;
+		text-align: center;
+	}	
+	table {
+	
+    border-spacing: 0;
+    margin: auto;
+	width: 100%;
+	border-collapse: collapse;
+	border: 1px solid #444444;
+	}
+	.table td {
+	height: 40px;	
+}
+  .table .shenpi{
+	height: auto;	
+}
+	#table td{
+	 border: 1px solid black;
+	 word-wrap:break-word; 
+	 max-width: 80%;
+	  word-break:break-all;
+     word-wrap:break-word;
+	}
+	#tabletop { 
+	border: 0px
+	}
+	#tabletop .tabletop {
+	border-top: 0px  ;
+	}		
+	.table .trtop{		
+		text-align:center;
+		font-weight:800 ;
+		
+	}	
+	#contentTable th{
+	background-color: white;
+	text-align: center;
+	font-weight: 800;
+	border-color:black;
+	border:1px;
+	}
+	#contentTable {
+	border: 0px ;
+	border-radius:0px;
+	margin-bottom: 0px
+	}
+	#contentTable td{
+	border-width: 1px 0px 0px 1px ;
+	text-align: center;
+	}
+	 #table .ntable td {
+    	border: 0;
+	}
+	#table table {
+    	border: 0;
+    	border-width: 0 0 0 0;
+	}
+	img{
+	height: 45px;
+	width: 45px;
+	}
+	</style>
+	
+</head>
+<body>
+	
+	<form id="inputForm"  class="form-horizontal" >
+		
+		
+			    <h2>资产内部调拨单</h2>
+			
+			<table id="tabletop" class="table">
+			<tr>
+				<td class="tabletop" colspan="2" width="33.33%">申请人:
+				<span>${applyer.name!''}</span></td>
+				<td class="tabletop" colspan="2" width="33.33%">填写日期: 
+				<span>${addDate!''}</span></td>
+				<td class="tabletop" colspan="2" width="33.33%">申请编号(系统生成):
+				<span>${code!''}</span></td>
+			</tr>
+		</table>
+		<table id="table" class="table table-condensed">
+			<tr>
+				<td class="trtop" colspan="1">标题</td>
+				<td colspan="5">${title!''}</td>
+			</tr>
+			<tr>
+				<td colspan="6">
+					<table class="table ntable table-condensed">
+						<thead>
+							<tr>
+								<th>物品名称</th>
+								<th>规格型号</th>
+								<th>计量单位</th>
+								<th>数量</th>
+								<th>单价(元)</th>
+								<th>价值(元)</th>
+								<th>二维码</th>
+								<th>备注</th>
+							</tr>
+						</thead>
+					
+							<tbody >
+							  ${detail!''}
+					
+						</tbody>
+					</table>
+				</td>
+			</tr>
+			<tr>
+				<td class="trtop" colspan="1">资产合计大写</td>
+				<td colspan="2">${sumCap!''}</td>
+				<td class="trtop" colspan="1">资产合计小写</td>
+				<td colspan="2">${sumLow!''}</td>
+			</tr>
+			<tr>
+				<td colspan="6">
+					<table class="table ntable table-condensed" >
+						<tr><td colspan="6"><h5>调出审核单位</h5></td>	</tr>
+						<tr>
+							<td class="trtop" colspan="1" style="width: 20%;">资产调出部门</td>
+							<td colspan="2" style="width: 30%;">${outDep.name!''}</td>
+							<td class="trtop" style="width: 20%;">负责人</td>
+							<td colspan="2" style="width: 30%;">${outManager.name!''}</td>
+						</tr>
+						<tr>
+							
+							<td class="trtop" style="width: 20%;">经办人</td>
+							<td colspan="2">${outOperator.name!''}</td>
+							<td class="trtop" style="width: 20%;">日期</td>
+							<td colspan="2">${outDate!''}</td>
+						</tr>
+					</table>
+				</td>
+		   </tr>
+			<tr>
+				<td colspan="6">
+					<table class="table ntable table-condensed">
+						<tr> <td colspan="6">
+						<h5>调入审核单位</h5>
+						    </td>					
+						</tr>
+						<tr>
+							<td class="trtop" colspan="1" style="width: 20%;">资产调入部门</td>
+							<td colspan="2" style="width: 30%;">${inDep.name!''}</td>
+							<td  class="trtop" style="width: 20%;">负责人</td>
+							<td colspan="2" style="width: 30%;">${inManager.name!''}</td>
+						</tr>
+						<tr>
+							
+							<td  class="trtop" style="width: 20%;">经办人</td>
+							<td colspan="2">${inOperator.name!''}</td>
+							<td  class="trtop" style="width: 20%;">日期</td>
+							<td colspan="2">${outDate!''}</td>
+						</tr>
+					</table>
+				</td>
+			</tr>
+			<tr>
+				<td class="trtop" colspan="1">备注信息</td>
+				<td colspan="5">${remarks!''}</td>
+			</tr>
+		<tr>
+				<td class="trtop" colspan="1" style="width: 20%">是否督办</td>
+				<td colspan="2" style="width: 30%">${isSup!''}</td>
+				<td class="trtop" colspan="1" style="width: 20%">督办人</td>
+				<td colspan="2" style="width: 30%">${plmAct.supExe.name!''}</td>
+			</tr>		
+			<tr>
+				<td class="trtop" colspan="1">督办明细</td>
+				<td colspan="5">${plmAct.supDetail!''}</td>
+			</tr>			
+		     ${actProcIns!''}
+		
+	
+	</table>
+		
+	</form>
+	
+	
+	
+</body>
+</html>

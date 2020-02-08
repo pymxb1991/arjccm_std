@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.arjjs.ccm.modules.plm.allot.dao.PlmAllotDetailDao">
+    
+	<sql id="plmAllotDetailColumns">
+		a.id AS "id",
+		a.allot_id AS "allotId",
+		a.equ_code AS "equCode",
+		equ.name AS "name",
+		equ.code AS "code",
+		equ.spec AS "spec",
+		equ.unit AS "unit",
+		equ.erial_number AS "erialNumber",
+		equ.price AS "price",
+		a.extend1 AS "extend1",
+		a.extend2 AS "extend2",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag"
+	</sql>
+	
+	<sql id="plmAllotDetailJoins">
+		LEFT JOIN plm_equipment equ on equ.id = a.equ_code
+	</sql>
+    
+	<select id="get" resultType="PlmAllotDetail">
+		SELECT 
+			<include refid="plmAllotDetailColumns"/>
+		FROM plm_allot_detail a
+		<include refid="plmAllotDetailJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="PlmAllotDetail">
+		SELECT 
+			<include refid="plmAllotDetailColumns"/>
+		FROM plm_allot_detail a
+		<include refid="plmAllotDetailJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test=" allotId != null and allotId != ''">
+			and a.allot_id =#{allotId}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="PlmAllotDetail">
+		SELECT 
+			<include refid="plmAllotDetailColumns"/>
+		FROM plm_allot_detail a
+		<include refid="plmAllotDetailJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO plm_allot_detail(
+			id,
+			allot_id,
+			equ_code,
+			extend1,
+			extend2,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag
+		) VALUES (
+			#{id},
+			#{allotId},
+			#{equCode},
+			#{extend1},
+			#{extend2},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE plm_allot_detail SET 	
+			allot_id = #{allotId},
+			equ_code = #{equCode},
+			extend1 = #{extend1},
+			extend2 = #{extend2},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE plm_allot_detail SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="deleteByAllotId">
+		UPDATE plm_allot_detail SET 
+			del_flag = 1
+		WHERE allot_id = #{allotId} 
+	</update>
+	
+</mapper>

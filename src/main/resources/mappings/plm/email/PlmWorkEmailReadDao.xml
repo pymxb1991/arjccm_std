@@ -1,0 +1,224 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.arjjs.ccm.modules.plm.email.dao.PlmWorkEmailReadDao">
+
+	<sql id="plmWorkEmailReadColumns">
+		a.id AS "id",
+		a.report_id AS "reportId",
+		a.user_id AS
+		"user.id",
+		a.type AS "type",
+		a.read_flag AS "readFlag",
+		a.read_time AS "readTime",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks
+		AS "remarks",
+		a.del_flag AS "delFlag",
+		u3.name AS "user.name",
+		o.name AS
+		"user.office.name"
+	</sql>
+
+	<sql id="plmWorkEmailReadJoins">
+		LEFT JOIN sys_user u3 ON u3.id = a.user_id
+		JOIN sys_office o
+		ON o.id = u3.office_id
+	</sql>
+
+	<select id="get" resultType="PlmWorkEmailRead">
+		SELECT
+		<include refid="plmWorkEmailReadColumns" />
+		FROM plm_work_email_read a
+		<include refid="plmWorkEmailReadJoins" />
+		WHERE a.id = #{id}
+	</select>
+
+	<select id="findList" resultType="PlmWorkEmailRead">
+		SELECT
+		<include refid="plmWorkEmailReadColumns" />
+		FROM plm_work_email_read a
+		<include refid="plmWorkEmailReadJoins" />
+		<where>
+			<!-- a.del_flag = #{DEL_FLAG_NORMAL} -->
+			<if test="user != null and user.id != null and user.id != ''">
+				AND a.user_id = #{user.id}
+			</if>
+			
+			<if test="reportId != null and reportId != ''">
+                AND a.report_id = #{reportId}
+            </if>
+            
+ 			<if test="status != null and status != ''">
+                AND a.status = #{status}
+            </if>  
+ 			<if test="type != null and type != ''">
+                AND a.type = #{type}
+            </if>                      
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+
+	<select id="findAllList" resultType="PlmWorkEmailRead">
+		SELECT
+		<include refid="plmWorkEmailReadColumns" />
+		FROM plm_work_email_read a
+		<include refid="plmWorkEmailReadJoins" />
+		<!-- <where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where> -->
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+
+	<insert id="insert">
+		INSERT INTO plm_work_email_read(
+		id,
+		report_id,
+		user_id,
+		read_flag,
+		read_time,
+		create_by,
+		create_date,
+		update_by,
+		update_date,
+		remarks,
+		del_flag
+		) VALUES (
+		#{id},
+		#{reportId},
+		#{user.id},
+		#{readFlag},
+		#{readTime},
+		#{createBy.id},
+		#{createDate},
+		#{updateBy.id},
+		#{updateDate},
+		#{remarks},
+		#{delFlag}
+		)
+	</insert>
+
+	<update id="update">
+		UPDATE plm_work_email_read SET
+		report_id = #{reportId},
+		user_id = #{user.id},
+		read_flag = #{readFlag},
+		read_time = #{readTime},
+		update_by = #{updateBy.id},
+		update_date = #{updateDate},
+		remarks = #{remarks}
+		WHERE report_id = #{reportId}
+		AND USER_ID = #{user.id}
+		AND READ_FLAG != '1'
+	</update>
+
+	<update id="delete">
+		UPDATE plm_work_email_read SET
+		del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+
+	<update id="selfDelete">
+		UPDATE plm_work_email_read SET
+		status = #{status}
+		WHERE report_id = #{reportId} AND user_id = #{user.id}
+	</update>
+
+	<update id="selfStar">
+		UPDATE plm_work_email_read SET
+		is_star = #{isStar}
+		WHERE report_id = #{reportId} AND user_id = #{user.id}
+	</update>
+
+	<delete id="deleteByWorkReportId">
+		DELETE FROM plm_work_email_read
+		WHERE report_id = #{reportId}
+	</delete>
+	<!-- read_time AS "readTime" -->
+	<insert id="insertCaoGaoAll" parameterType="List">
+		INSERT INTO plm_work_email_read(
+		id,
+		report_id,
+		type,
+		user_id,
+		status,
+		is_star,
+		read_flag
+		)
+		<if test="list.get(0).dbName == 'oracle'">
+			<foreach collection="list" item="e" separator=" union all ">
+				SELECT #{e.id},
+				#{e.plmWorkEmail.id},
+				#{e.type},
+				#{e.user.id},
+				'5',
+				'0',
+				#{e.readFlag} FROM dual
+			</foreach>
+		</if>
+		<if test="list.get(0).dbName == 'mssql' or list.get(0).dbName == 'mysql'">
+			VALUES
+			<foreach collection="list" item="e" open="" separator=","
+				close="">
+				(#{e.id},
+				#{e.plmWorkEmail.id},
+				#{e.type},
+				#{e.user.id},
+				'5',
+				'0',
+				#{e.readFlag} )
+			</foreach>
+		</if>
+	</insert>
+		<insert id="insertFaSongAll" parameterType="List">
+		INSERT INTO plm_work_email_read(
+		id,
+		report_id,
+		type,
+		user_id,
+		status,
+		is_star,
+		read_flag
+		)
+		<if test="list.get(0).dbName == 'oracle'">
+			<foreach collection="list" item="e" separator=" union all ">
+				SELECT #{e.id},
+				#{e.plmWorkEmail.id},
+				#{e.type},
+				#{e.user.id},
+				'1',
+				'0',
+				#{e.readFlag} FROM dual
+			</foreach>
+		</if>
+		<if test="list.get(0).dbName == 'mssql' or list.get(0).dbName == 'mysql'">
+			VALUES
+			<foreach collection="list" item="e" open="" separator=","
+				close="">
+				(#{e.id},
+				#{e.plmWorkEmail.id},
+				#{e.type},
+				#{e.user.id},
+				'1',
+				'0',
+				#{e.readFlag} )
+			</foreach>
+		</if>
+	</insert>
+</mapper>

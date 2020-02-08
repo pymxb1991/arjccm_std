@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.arjjs.ccm.modules.ccm.patrol.dao.CcmPatrolRespointDao">
+
+	<sql id="ccmPatrolRespointColumns">
+		a.id AS "id",
+		a.result_id AS "resultId.id",
+        result.name AS "resultId.name",
+		a.point_id AS "pointId.id",
+		point.name AS "pointId.name",
+		a.result AS "result",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS
+		"delFlag"
+	</sql>
+
+	<sql id="ccmPatrolRespointJoins">
+	left join ccm_patrol_result result on result.id =a.result_id
+	left join ccm_patrol_point point on point.id =a.point_id
+	</sql>
+
+	<select id="get" resultType="CcmPatrolRespoint">
+		SELECT
+		<include refid="ccmPatrolRespointColumns" />
+		FROM ccm_patrol_respoint a
+		<include refid="ccmPatrolRespointJoins" />
+		WHERE a.id = #{id}
+	</select>
+
+	<select id="findList" resultType="CcmPatrolRespoint">
+		SELECT
+		<include refid="ccmPatrolRespointColumns" />
+		FROM ccm_patrol_respoint a
+		<include refid="ccmPatrolRespointJoins" />
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="resultId !=null and resultId.id != null and resultId.id != ''">
+                AND a.result_id = #{resultId.id}
+            </if>
+            <if test="pointId !=null and pointId.id != null and pointId.id != ''">
+                AND a.point_id = #{pointId.id}
+            </if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+
+	<select id="findAllList" resultType="CcmPatrolRespoint">
+		SELECT
+		<include refid="ccmPatrolRespointColumns" />
+		FROM ccm_patrol_respoint a
+		<include refid="ccmPatrolRespointJoins" />
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+
+	<insert id="insert">
+		INSERT INTO ccm_patrol_respoint(
+		id,
+		result_id,
+		point_id,
+		result,
+		create_by,
+		create_date,
+		update_by,
+		update_date,
+		remarks,
+		del_flag
+		) VALUES (
+		#{id},
+		#{resultId.id},
+		#{pointId.id},
+		#{result},
+		#{createBy.id},
+		#{createDate},
+		#{updateBy.id},
+		#{updateDate},
+		#{remarks},
+		#{delFlag}
+		)
+	</insert>
+
+	<update id="update">
+		UPDATE ccm_patrol_respoint SET
+		result_id =
+		#{resultId.id},
+		point_id = #{pointId.id},
+		result = #{result},
+		update_by =
+		#{updateBy.id},
+		update_date = #{updateDate},
+		remarks = #{remarks}
+		WHERE
+		id = #{id}
+	</update>
+
+	<update id="delete">
+		UPDATE ccm_patrol_respoint SET
+		del_flag =
+		#{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+
+	<select id="exitCheck" resultType="java.lang.Integer">
+		SELECT
+		count(1)
+		FROM
+		ccm_patrol_respoint
+		WHERE result_id = #{resultId.id}
+		and point_id = #{pointId.id}
+		and del_flag = #{DEL_FLAG_DELETE}
+	</select>
+
+	<update id="updateRespoint">
+		UPDATE ccm_patrol_respoint SET
+		result_id = #{resultId.id},
+		point_id = #{pointId.id},
+		result = #{result},
+		update_by =
+		#{updateBy.id},
+		update_date = #{updateDate},
+		remarks = #{remarks}
+		WHERE
+		result_id = #{resultId.id}
+		and
+		point_id = #{pointId.id}
+	</update>
+
+</mapper>

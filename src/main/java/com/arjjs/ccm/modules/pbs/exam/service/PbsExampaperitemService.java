@@ -1,0 +1,59 @@
+/**
+ * Copyright &copy; 2012-2016 <a href="https://github.com/thinkgem/jeesite">JeeSite</a> All rights reserved.
+ */
+package com.arjjs.ccm.modules.pbs.exam.service;
+
+import java.util.List;
+
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.arjjs.ccm.common.persistence.Page;
+import com.arjjs.ccm.common.service.CrudService;
+import com.arjjs.ccm.modules.pbs.exam.entity.PbsExampaperitem;
+import com.arjjs.ccm.modules.pbs.exam.dao.PbsExampaperitemDao;
+
+/**
+ * 试卷题目Service
+ * @author lc
+ * @version 2018-06-11
+ */
+@Service
+@Transactional(readOnly = true)
+public class PbsExampaperitemService extends CrudService<PbsExampaperitemDao, PbsExampaperitem> {
+
+	public PbsExampaperitem get(String id) {
+		return super.get(id);
+	}
+	
+	public List<PbsExampaperitem> findList(PbsExampaperitem pbsExampaperitem) {
+		return super.findList(pbsExampaperitem);
+	}
+	
+	public Page<PbsExampaperitem> findPage(Page<PbsExampaperitem> page, PbsExampaperitem pbsExampaperitem) {
+		return super.findPage(page, pbsExampaperitem);
+	}
+	
+	@Transactional(readOnly = false)
+	public void save(PbsExampaperitem pbsExampaperitem) {
+		super.save(pbsExampaperitem);
+	}
+	
+	@Transactional(readOnly = false)
+	public void delete(PbsExampaperitem pbsExampaperitem) {
+		super.delete(pbsExampaperitem);
+	}
+	
+	// 新增所有试卷题目信息
+	@Transactional(readOnly = false)
+	public void insertAll(List<PbsExampaperitem> list) {
+		// 遍历所有的题目信息 补充所有信息
+		if(list.size()>0) {
+			for(PbsExampaperitem item: list) {
+				item.preInsert();
+			}
+			dao.insertAll(list);
+		}
+	}
+	
+}

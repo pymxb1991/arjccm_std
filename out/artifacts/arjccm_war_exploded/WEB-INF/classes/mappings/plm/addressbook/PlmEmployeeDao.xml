@@ -1,0 +1,313 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper
+	namespace="com.arjjs.ccm.modules.plm.addressbook.dao.PlmEmployeeDao">
+
+	<sql id="plmEmployeeColumns">
+		a.id AS "id",
+		a.code AS "code",
+		a.name AS "name",
+		a.ename AS
+		"ename",
+		a.de_pid AS "dePid.id",
+		a.sex AS "sex",
+		a.card AS "card",
+		a.amac AS
+		"amac",
+		a.car_type AS "carType",
+		a.driving_licence AS "drivingLicence",
+		a.car_illegally AS "carIllegally",
+		a.state AS "state",
+		a.duty AS "duty",
+		a.phoneone AS "phoneone",
+		a.phonetwo AS "phonetwo",
+		a.accounts AS
+		"accounts",
+		a.birthday AS "birthday",
+		a.job AS "job",
+		a.email AS "email",
+		a.web AS "web",
+		a.faxes AS "faxes",
+		a.open_bank AS "openBank",
+		a.top AS
+		"top",
+		a.degree AS "degree",
+		a.go_time AS "goTime",
+		a.graduate_time AS
+		"graduateTime",
+		a.pactstart_time AS "pactstartTime",
+		a.pactend_time AS
+		"pactendTime",
+		a.now_mailid AS "nowMailid",
+		a.family_phone AS
+		"familyPhone",
+		a.family_place AS "familyPlace",
+		a.now_place AS
+		"nowPlace",
+		a.exigence_man AS "exigenceMan",
+		a.exigence_phone AS
+		"exigencePhone",
+		a.family_mailid AS "familyMailid",
+		a.extend1 AS
+		"extend1",
+		a.extend2 AS "extend2",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.type AS "type",
+		a.del_flag AS "delFlag",
+		o5.name AS "dePid.name",
+		a.gr_id AS
+		"groups.id",
+		g.name AS "groups.name",
+		a.imgul AS "imgul"
+
+	</sql>
+
+	<sql id="plmEmployeeJoins">
+		LEFT JOIN sys_office o5 ON o5.id = a.de_pid
+		LEFT JOIN
+		plm_employee_groups g ON g.id = a.gr_id
+	</sql>
+
+	<select id="get" resultType="PlmEmployee">
+		SELECT
+		<include refid="plmEmployeeColumns" />
+		FROM plm_employee a
+		<include refid="plmEmployeeJoins" />
+		WHERE a.id = #{id}
+	</select>
+
+	<select id="findView" resultType="PlmEmployee">
+		SELECT
+		<include refid="plmEmployeeColumns" />
+		FROM plm_employee a
+		<include refid="plmEmployeeJoins" />
+		WHERE a.id = #{id} AND a.del_flag ='0' AND a.type = 1
+	</select>
+
+	<select id="findList" resultType="PlmEmployee">
+		SELECT
+		<include refid="plmEmployeeColumns" />
+		FROM plm_employee a
+		<include refid="plmEmployeeJoins" />
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="code != null and code != ''">
+				AND a.code = #{code}
+			</if>
+			<if test="name != null and name != ''">
+				AND a.name LIKE
+				<if test="dbName == 'oracle'">'%'||#{name}||'%'</if>
+				<if test="dbName == 'mssql'">'%'+#{name}+'%'</if>
+				<if test="dbName == 'mysql'">concat('%',#{name},'%')</if>
+			</if>
+			<if
+				test="groups != null and groups.id != null and groups.id != ''">
+				AND (g.id = #{groups.id} OR g.parent_ids LIKE
+				<if test="dbName == 'oracle'">'%,'||#{groups.id}||',%')</if>
+				<if test="dbName == 'mssql'">'%,'+#{groups.id}+',%')</if>
+				<if test="dbName == 'mysql'">CONCAT('%,', #{groups.id}, ',%'))</if>
+			</if>
+			<if test="dePid != null and dePid != ''">
+				AND a.de_pid = #{dePid}
+			</if>
+			<if test="state != null and state != ''">
+				AND a.state = #{state}
+			</if>
+			<if test="duty != null and duty != ''">
+				AND a.duty LIKE
+				<if test="dbName == 'oracle'">'%'||#{duty}||'%'</if>
+				<if test="dbName == 'mssql'">'%'+#{duty}+'%'</if>
+				<if test="dbName == 'mysql'">concat('%',#{duty},'%')</if>
+			</if>
+			<if test="type != null and type != ''">
+				AND a.type = #{type}
+			</if>
+			<if test ="types != null and type != ''">
+				AND a.type != #{types}
+			</if>
+			<if test = "updateBy != null and updateBy != ''">
+			    AND a.update_by = #{updateBy.id}
+			</if>
+		</where>
+		<choose>
+			<when
+				test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+
+	<select id="findAllList" resultType="PlmEmployee">
+		SELECT
+		<include refid="plmEmployeeColumns" />
+		FROM plm_employee a
+		<include refid="plmEmployeeJoins" />
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>
+		<choose>
+			<when
+				test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+
+	<insert id="insert">
+		INSERT INTO plm_employee(
+		id,
+		code,
+		name,
+		ename,
+		de_pid,
+		sex,
+		card,
+		amac,
+		state,
+		duty,
+		phoneone,
+		phonetwo,
+		accounts,
+		birthday,
+		job,
+		email,
+		web,
+		faxes,
+		open_bank,
+		top,
+		degree,
+		go_time,
+		graduate_time,
+		pactstart_time,
+		pactend_time,
+		now_mailid,
+		family_phone,
+		family_place,
+		now_place,
+		exigence_man,
+		exigence_phone,
+		family_mailid,
+		extend1,
+		extend2,
+		create_by,
+		create_date,
+		update_by,
+		update_date,
+		remarks,
+		type,
+		del_flag,
+		gr_id,
+		imgul
+		) VALUES (
+		#{id},
+		#{code},
+		#{name},
+		#{ename},
+		#{dePid.id},
+		#{sex},
+		#{card},
+		#{amac},
+		#{state},
+		#{duty},
+		#{phoneone},
+		#{phonetwo},
+		#{accounts},
+		#{birthday},
+		#{job},
+		#{email},
+		#{web},
+		#{faxes},
+		#{openBank},
+		#{top},
+		#{degree},
+		#{goTime},
+		#{graduateTime},
+		#{pactstartTime},
+		#{pactendTime},
+		#{nowMailid},
+		#{familyPhone},
+		#{familyPlace},
+		#{nowPlace},
+		#{exigenceMan},
+		#{exigencePhone},
+		#{familyMailid},
+		#{extend1},
+		#{extend2},
+		#{createBy.id},
+		#{createDate},
+		#{updateBy.id},
+		#{updateDate},
+		#{remarks},
+		#{type},
+		#{delFlag},
+		#{groups.id},
+		#{imgul}
+		)
+	</insert>
+
+	<update id="update">
+		UPDATE plm_employee SET
+		code = #{code},
+		name = #{name},
+		ename = #{ename},
+		de_pid = #{dePid.id},
+		sex = #{sex},
+		card = #{card},
+		amac =
+		#{amac},
+		state = #{state},
+		duty = #{duty},
+		phoneone = #{phoneone},
+		phonetwo = #{phonetwo},
+		accounts = #{accounts},
+		birthday = #{birthday},
+		job = #{job},
+		email = #{email},
+		web = #{web},
+		faxes = #{faxes},
+		open_bank
+		= #{openBank},
+		top = #{top},
+		degree = #{degree},
+		go_time = #{goTime},
+		graduate_time = #{graduateTime},
+		pactstart_time = #{pactstartTime},
+		pactend_time = #{pactendTime},
+		now_mailid = #{nowMailid},
+		family_phone =
+		#{familyPhone},
+		family_place = #{familyPlace},
+		now_place = #{nowPlace},
+		exigence_man = #{exigenceMan},
+		exigence_phone = #{exigencePhone},
+		family_mailid = #{familyMailid},
+		extend1 = #{extend1},
+		extend2 =
+		#{extend2},
+		update_by = #{updateBy.id},
+		update_date = #{updateDate},
+		remarks = #{remarks},
+		type = #{type},
+		gr_id = #{groups.id},
+		imgul =
+		#{imgul}
+		WHERE id = #{id}
+	</update>
+
+	<update id="delete">
+		UPDATE plm_employee SET
+		del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+
+</mapper>

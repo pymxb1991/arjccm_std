@@ -1,0 +1,40 @@
+/**
+ * Copyright &copy; 2012-2016 <a href="http://www.arjjs.com">arjjs</a> All rights reserved.
+ */
+package com.arjjs.ccm.modules.sys.dao;
+
+import com.arjjs.ccm.common.persistence.CrudDao;
+import com.arjjs.ccm.common.persistence.annotation.MyBatisDao;
+import com.arjjs.ccm.modules.ccm.rest.entity.SysDictLbVo;
+import com.arjjs.ccm.modules.ccm.sys.entity.SysDict;
+import com.arjjs.ccm.modules.sys.entity.Dict;
+import org.apache.ibatis.annotations.Param;
+
+import java.util.List;
+
+/**
+ * 字典DAO接口
+ * @author admin001
+ * @version 2014-05-16
+ */
+@MyBatisDao
+public interface DictDao extends CrudDao<Dict> {
+
+	public List<String> findTypeList(Dict dict);
+	
+	public List<Dict> findListAll(Dict dict);
+	public List<Dict> findAll(Dict dict);
+	public List<Dict> findNumberAll(Dict dict);
+	public List<Dict> findAllNumber(Dict dict);
+	/**
+	 * <!--查询所有流程的留成标识和名称  -->
+	 * @return
+	 */
+	public List<Dict> findActKeyAndName();
+	
+	public void updateTypeAndLabel(Dict dict);
+
+    List<SysDictLbVo> selectAlarmTypeInfo();
+
+    List<SysDict> selectDictByType(@Param("type") String type);
+}

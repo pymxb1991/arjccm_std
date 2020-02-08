@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.arjjs.ccm.modules.pbs.ncount.dao.PbsNcountDao">
+
+	<sql id="pbsNcountColumns">
+		a.id AS "id",
+		a.s_type AS "sType",
+		a.s_name AS "sName",
+		a.i_number AS "iNumber",
+		a.s_subitem AS "sSubitem",
+		a.dt_date AS
+		"dtDate",
+		a.s_desc AS "sDesc",
+		a.s_spare01 AS "sSpare01",
+		a.s_spare02 AS
+		"sSpare02",
+		a.s_spare03 AS "sSpare03",
+		a.s_spare04 AS "sSpare04",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks
+		AS "remarks",
+		a.del_flag AS "delFlag"
+	</sql>
+
+	<sql id="pbsNcountJoins">
+	</sql>
+
+	<select id="get" resultType="PbsNcount">
+		SELECT
+		<include refid="pbsNcountColumns" />
+		FROM pbs_ncount a
+		<include refid="pbsNcountJoins" />
+		WHERE a.id = #{id}
+	</select>
+
+	<select id="findList" resultType="PbsNcount">
+		SELECT
+		<include refid="pbsNcountColumns" />
+		FROM pbs_ncount a
+		<include refid="pbsNcountJoins" />
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="sType != null and sType != ''">
+				AND a.s_type = #{sType}
+			</if>
+			<if test="sName != null and sName != ''">
+				AND a.s_name LIKE  CONCAT('%',#{sName},'%')
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+
+	<select id="findAllList" resultType="PbsNcount">
+		SELECT
+		<include refid="pbsNcountColumns" />
+		FROM pbs_ncount a
+		<include refid="pbsNcountJoins" />
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+
+	<insert id="insert">
+		INSERT INTO pbs_ncount(
+		id,
+		s_type,
+		s_name,
+		i_number,
+		s_subitem,
+		dt_date,
+		s_desc,
+		create_by,
+		create_date,
+		update_by,
+		update_date,
+		remarks,
+		del_flag
+		) VALUES (
+		#{id},
+		#{sType},
+		#{sName},
+		#{iNumber},
+		#{sSubitem},
+		#{dtDate},
+		#{sDesc},
+		#{createBy.id},
+		#{createDate},
+		#{updateBy.id},
+		#{updateDate},
+		#{remarks},
+		#{delFlag}
+		)
+	</insert>
+
+	<update id="update">
+		UPDATE pbs_ncount SET
+		s_type = #{sType},
+		s_name =
+		#{sName},
+		i_number = #{iNumber},
+		s_subitem = #{sSubitem},
+		dt_date =
+		#{dtDate},
+		s_desc = #{sDesc},
+		update_by = #{updateBy.id},
+		update_date =
+		#{updateDate},
+		remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+
+	<update id="delete">
+		UPDATE pbs_ncount SET
+		del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+
+	<delete id="clearData">
+		DELETE FROM pbs_ncount
+		<where>
+			<if test="sType != null and sType != ''">
+				AND a.s_type = #{sType}
+			</if>
+			<if test="sName != null and sName != ''">
+				AND a.s_name = #{sName}
+			</if>
+		</where>
+	</delete>
+
+</mapper>

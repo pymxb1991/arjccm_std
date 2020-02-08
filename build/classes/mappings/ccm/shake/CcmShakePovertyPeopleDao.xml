@@ -1,0 +1,217 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.arjjs.ccm.modules.ccm.shake.dao.CcmShakePovertyPeopleDao">
+    
+	<sql id="ccmShakePovertyPeopleColumns">
+		a.id AS "id",
+		a.name AS "name",
+		a.sex AS "sex",
+		a.area_grid_id AS "areaGridId.id",
+		a.ident AS "ident",
+		a.accountidentity AS "accountidentity",
+		a.birthday AS "birthday",
+		a.filing_time AS "filingTime",
+		a.area_town_id AS "areaTownId.id",
+		a.area_community_id AS "areaCommunityId.id",
+		a.sp_alleviation AS "spAlleviation",
+		a.sp_people_alleviation AS "spPeopleAlleviation",
+		a.sp_reason AS "spReason",
+		a.sp_health AS "spHealth",
+		a.sp_labor_skill AS "spLaborSkill",
+		a.sp_income_type AS "spIncomeType",
+		a.sp_income_amount AS "spIncomeAmount",
+		a.sp_time AS "spTime",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag",
+		a4.name AS "areaGridId.name",
+		a9.name AS "areaTownId.name",
+		a10.name AS "areaCommunityId.name"
+	</sql>
+	
+	<sql id="ccmShakePovertyPeopleJoins">
+		LEFT JOIN sys_area a4 ON a4.id = a.area_grid_id
+		LEFT JOIN sys_area a9 ON a9.id = a.area_town_id
+		LEFT JOIN sys_area a10 ON a10.id = a.area_community_id
+	</sql>
+    
+	<select id="get" resultType="CcmShakePovertyPeople">
+		SELECT 
+			<include refid="ccmShakePovertyPeopleColumns"/>
+		FROM ccm_shake_poverty_people a
+		<include refid="ccmShakePovertyPeopleJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="CcmShakePovertyPeople">
+		SELECT 
+			<include refid="ccmShakePovertyPeopleColumns"/>
+		FROM ccm_shake_poverty_people a
+		<include refid="ccmShakePovertyPeopleJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="name != null and name != ''">
+				AND a.name LIKE 
+					<if test="dbName == 'oracle'">'%'||#{name}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{name}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{name},'%')</if>
+			</if>
+			<if test="sex != null and sex != ''">
+				AND a.sex = #{sex}
+			</if>
+			<if test="areaGridId != null and areaGridId.id != null and areaGridId.id != ''">
+				AND a.area_grid_id = #{areaGridId.id}
+			</if>
+			<if test="areaTownId != null and areaTownId.id != null and areaTownId.id != ''">
+				AND a.area_town_id = #{areaTownId.id}
+			</if>
+			<if test="areaCommunityId != null and areaCommunityId.id != null and areaCommunityId.id != ''">
+				AND a.area_community_id = #{areaCommunityId.id}
+			</if>
+			<if test="spAlleviation != null and spAlleviation != ''">
+				AND a.sp_alleviation = #{spAlleviation}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="CcmShakePovertyPeople">
+		SELECT 
+			<include refid="ccmShakePovertyPeopleColumns"/>
+		FROM ccm_shake_poverty_people a
+		<include refid="ccmShakePovertyPeopleJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO ccm_shake_poverty_people(
+			id,
+			name,
+			sex,
+			area_grid_id,
+			ident,
+			accountidentity,
+			birthday,
+			filing_time,
+			area_town_id,
+			area_community_id,
+			sp_alleviation,
+			sp_people_alleviation,
+			sp_reason,
+			sp_health,
+			sp_labor_skill,
+			sp_income_type,
+			sp_income_amount,
+			sp_time,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag
+		) VALUES (
+			#{id},
+			#{name},
+			#{sex},
+			#{areaGridId.id},
+			#{ident},
+			#{accountidentity},
+			#{birthday},
+			#{filingTime},
+			#{areaTownId.id},
+			#{areaCommunityId.id},
+			#{spAlleviation},
+			#{spPeopleAlleviation},
+			#{spReason},
+			#{spHealth},
+			#{spLaborSkill},
+			#{spIncomeType},
+			#{spIncomeAmount},
+			#{spTime},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE ccm_shake_poverty_people SET 	
+			name = #{name},
+			sex = #{sex},
+			area_grid_id = #{areaGridId.id},
+			ident = #{ident},
+			accountidentity = #{accountidentity},
+			birthday = #{birthday},
+			filing_time = #{filingTime},
+			area_town_id = #{areaTownId.id},
+			area_community_id = #{areaCommunityId.id},
+			sp_alleviation = #{spAlleviation},
+			sp_people_alleviation = #{spPeopleAlleviation},
+			sp_reason = #{spReason},
+			sp_health = #{spHealth},
+			sp_labor_skill = #{spLaborSkill},
+			sp_income_type = #{spIncomeType},
+			sp_income_amount = #{spIncomeAmount},
+			sp_time = #{spTime},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE ccm_shake_poverty_people SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+	<select id="findGroupByTown" resultType="ccmShakePovertyPeople">
+		SELECT  
+		b.name as townName,
+		count(case when a.sp_alleviation='01' then a.sp_alleviation else null end) as sptownFan,
+		count(case when a.sp_alleviation='02' then a.sp_alleviation else null end) as sptownWei,
+		count(case when a.sp_alleviation='03' then a.sp_alleviation else null end) as sptownTuo
+		FROM ccm_shake_poverty_people a, sys_area b 
+		where 
+		a.area_town_id = b.id
+		AND b.type = '5'
+		GROUP BY b.id
+	</select>
+	
+	<select id="findByBirNum" resultType="ccmShakePovertyPeople">
+		SELECT  
+		b.name as townName,
+		Count(CASE WHEN FLOOR(DATEDIFF(CURDATE(), birthday)/365.2422) BETWEEN 0 and 18 THEN 1 ELSE null END) as baob,
+		Count(CASE WHEN FLOOR(DATEDIFF(CURDATE(), birthday)/365.2422) BETWEEN 19 and 60 THEN 1 ELSE null END) as baqo,
+		Count(CASE WHEN FLOOR(DATEDIFF(CURDATE(), birthday)/365.2422)>60 THEN 1 ELSE null END) as baow
+		FROM ccm_shake_poverty_people a, sys_area b 
+		where 
+		a.area_town_id = b.id
+		AND b.type = '5'
+		GROUP BY b.id
+	</select>
+	
+</mapper>

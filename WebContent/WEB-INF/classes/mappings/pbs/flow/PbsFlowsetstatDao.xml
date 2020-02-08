@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.arjjs.ccm.modules.pbs.flow.dao.PbsFlowsetstatDao">
+
+	<sql id="pbsFlowsetstatColumns">
+		a.id AS "id",
+		a.s_flowid AS "sFlowid.id",
+		a.s_flownodeid AS
+		"sFlownodeid.id",
+		a.s_opeatertype AS "sOpeatertype",
+		a.s_name AS
+		"sName",
+		a.s_collection AS "sCollection",
+		a.s_property AS "sProperty",
+		a.s_setval AS "sSetval",
+		a.s_description AS "sDescription",
+		a.s_spare01
+		AS "sSpare01",
+		a.s_spare02 AS "sSpare02",
+		a.s_spare03 AS "sSpare03",
+		a.s_spare04 AS "sSpare04",
+		a.create_by AS "createBy.id",
+		a.create_date
+		AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS
+		"updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag",
+		flowdefinition.s_name AS "sFlowid.sName",
+		flownode.s_name AS
+		"sFlownodeid.sName"
+	</sql>
+
+	<sql id="pbsFlowsetstatJoins">
+		LEFT JOIN pbs_flowdefinition flowdefinition on
+		flowdefinition.id = a.s_flowid
+		LEFT JOIN pbs_flownode flownode on
+		flownode.id = a.s_flownodeid
+	</sql>
+
+	<select id="get" resultType="PbsFlowsetstat">
+		SELECT
+		<include refid="pbsFlowsetstatColumns" />
+		FROM pbs_flowsetstat a
+		<include refid="pbsFlowsetstatJoins" />
+		WHERE a.id = #{id}
+	</select>
+
+	<select id="findList" resultType="PbsFlowsetstat">
+		SELECT
+		<include refid="pbsFlowsetstatColumns" />
+		FROM pbs_flowsetstat a
+		<include refid="pbsFlowsetstatJoins" />
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>
+		GROUP BY  a.id
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+
+	<select id="findAllList" resultType="PbsFlowsetstat">
+		SELECT
+		<include refid="pbsFlowsetstatColumns" />
+		FROM pbs_flowsetstat a
+		<include refid="pbsFlowsetstatJoins" />
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+
+	<insert id="insert">
+		INSERT INTO pbs_flowsetstat(
+		id,
+		s_flowid,
+		s_flownodeid,
+		s_opeatertype,
+		s_name,
+		s_collection,
+		s_property,
+		s_setval,
+		s_description,
+		s_spare01,
+		s_spare02,
+		s_spare03,
+		s_spare04,
+		create_by,
+		create_date,
+		update_by,
+		update_date,
+		remarks,
+		del_flag
+		) VALUES (
+		#{id},
+		#{sFlowid.id},
+		#{sFlownodeid.id},
+		#{sOpeatertype},
+		#{sName},
+		#{sCollection},
+		#{sProperty},
+		#{sSetval},
+		#{sDescription},
+		#{sSpare01},
+		#{sSpare02},
+		#{sSpare03},
+		#{sSpare04},
+		#{createBy.id},
+		#{createDate},
+		#{updateBy.id},
+		#{updateDate},
+		#{remarks},
+		#{delFlag}
+		)
+	</insert>
+
+	<update id="update">
+		UPDATE pbs_flowsetstat SET
+		s_flowid = #{sFlowid.id},
+		s_flownodeid = #{sFlownodeid.id},
+		s_opeatertype = #{sOpeatertype},
+		s_name = #{sName},
+		s_collection = #{sCollection},
+		s_property =
+		#{sProperty},
+		s_setval = #{sSetval},
+		s_description = #{sDescription},
+		update_by = #{updateBy.id},
+		update_date = #{updateDate}
+		WHERE id = #{id}
+	</update>
+
+	<update id="delete">
+		UPDATE pbs_flowsetstat SET
+		del_flag =
+		#{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+
+	<update id="updateOperation">
+		UPDATE ${sCollection} SET
+		${sProperty} = #{sSetval}
+		WHERE id = #{key}
+	</update>
+
+</mapper>

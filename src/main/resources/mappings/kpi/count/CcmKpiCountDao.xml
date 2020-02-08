@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper
+	namespace="com.arjjs.ccm.modules.kpi.count.dao.CcmKpiCountDao">
+
+	<sql id="ccmKpiCountColumns">
+		a.id AS "id",
+		a.create_date AS "createDate",
+		a.update_date AS
+		"updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag",
+		a.user_name AS "userName",
+		a.tail_times AS "tailTimes",
+		a.people_number
+		AS "peopleNumber",
+		a.tenant_number AS "tenantNumber",
+		a.org_number AS
+		"orgNumber",
+		a.components_number AS "componentsNumber",
+		a.reports_times
+		AS "reportsTimes",
+		a.relief_times AS "reliefTimes",
+		a.relief_time AS
+		"reliefTime",
+		a.patrol_times AS "patrolTimes",
+		a.patrol_time AS
+		"patrolTime",
+		a.police_task_times AS "policeTaskTimes"
+	</sql>
+
+	<sql id="ccmKpiCountJoins">
+	</sql>
+
+	<select id="get" resultType="CcmKpiCount">
+		SELECT
+		<include refid="ccmKpiCountColumns" />
+		FROM ccm_kpi_count a
+		<include refid="ccmKpiCountJoins" />
+		WHERE a.id = #{id}
+	</select>
+
+	<select id="getRank"
+		resultType="com.arjjs.ccm.modules.flat.analyst.entity.Count">
+		SELECT
+		user_name AS userId,
+		( IFNULL(tail_times,0)+ IFNULL(people_number,0) +
+		IFNULL(tenant_number,0) + IFNULL(org_number,0) +
+		IFNULL(components_number,0) + IFNULL(reports_times,0)+
+		IFNULL(relief_times,0) + IFNULL(relief_time,0) +
+		IFNULL(patrol_times,0) + IFNULL(patrol_time,0) ) AS counts
+		FROM
+		ccm_kpi_count
+		WHERE
+		del_flag = 1
+		GROUP
+		BY
+		user_name
+		ORDER BY counts DESC
+	</select>
+
+	<select id="findList" resultType="CcmKpiCount">
+		SELECT
+		<include refid="ccmKpiCountColumns" />
+		FROM ccm_kpi_count a
+		<include refid="ccmKpiCountJoins" />
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="userName != null and userName != ''">
+				AND a.user_name LIKE
+				<if test="dbName == 'oracle'">'%'||#{userName}||'%'</if>
+				<if test="dbName == 'mssql'">'%'+#{userName}+'%'</if>
+				<if test="dbName == 'mysql'">concat('%',#{userName},'%')</if>
+			</if>
+		</where>
+		<choose>
+			<when
+				test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+
+	<select id="findAllList" resultType="CcmKpiCount">
+		SELECT
+		<include refid="ccmKpiCountColumns" />
+		FROM ccm_kpi_count a
+		<include refid="ccmKpiCountJoins" />
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>
+		<choose>
+			<when
+				test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+
+	<insert id="insert">
+		INSERT INTO ccm_kpi_count(
+		id,
+		create_date,
+		update_date,
+		remarks,
+		del_flag,
+		user_name,
+		tail_times,
+		people_number,
+		tenant_number,
+		org_number,
+		components_number,
+		reports_times,
+		relief_times,
+		relief_time,
+		patrol_times,
+		patrol_time,
+		police_task_times
+		) VALUES (
+		#{id},
+		#{createDate},
+		#{updateDate},
+		#{remarks},
+		#{delFlag},
+		#{userName},
+		#{tailTimes},
+		#{peopleNumber},
+		#{tenantNumber},
+		#{orgNumber},
+		#{componentsNumber},
+		#{reportsTimes},
+		#{reliefTimes},
+		#{reliefTime},
+		#{patrolTimes},
+		#{patrolTime},
+		#{policeTaskTimes}
+		)
+	</insert>
+
+	<update id="update">
+		UPDATE ccm_kpi_count SET
+		update_date = #{updateDate},
+		remarks = #{remarks},
+		user_name = #{userName},
+		tail_times = #{tailTimes},
+		people_number = #{peopleNumber},
+		tenant_number = #{tenantNumber},
+		org_number = #{orgNumber},
+		components_number = #{componentsNumber},
+		reports_times = #{reportsTimes},
+		relief_times = #{reliefTimes},
+		relief_time = #{reliefTime},
+		patrol_times = #{patrolTimes},
+		patrol_time = #{patrolTime},
+		police_task_times = #{policeTaskTimes}
+		WHERE id = #{id}
+	</update>
+
+	<update id="delete">
+		UPDATE ccm_kpi_count SET
+		del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+
+</mapper>

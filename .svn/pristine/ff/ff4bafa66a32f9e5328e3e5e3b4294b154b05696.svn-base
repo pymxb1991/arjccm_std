@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.arjjs.ccm.modules.ccm.service.dao.CcmServiceCivilDao">
+    
+	<sql id="ccmServiceCivilColumns">
+		a.id AS "id",
+		a.type AS "type",
+		a.times AS "times",
+		a.adds AS "adds",
+		a.receiver AS "receiver",
+		a.gods AS "gods",
+		a.details AS "details",
+		a.file AS "file",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag"
+	</sql>
+	
+	<sql id="ccmServiceCivilJoins">
+	</sql>
+    
+	<select id="get" resultType="CcmServiceCivil">
+		SELECT 
+			<include refid="ccmServiceCivilColumns"/>
+		FROM ccm_service_civil a
+		<include refid="ccmServiceCivilJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="CcmServiceCivil">
+		SELECT 
+			<include refid="ccmServiceCivilColumns"/>
+		FROM ccm_service_civil a
+		<include refid="ccmServiceCivilJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="type != null and type != ''">
+				AND a.type = #{type}
+			</if>
+			<if test="beginTimes != null and endTimes != null and beginTimes != '' and endTimes != ''">
+				AND a.times BETWEEN #{beginTimes} AND #{endTimes}
+			</if>
+			<if test="receiver != null and receiver != ''">
+				AND a.receiver LIKE 
+					<if test="dbName == 'oracle'">'%'||#{receiver}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{receiver}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{receiver},'%')</if>
+			</if>
+			<if test="gods != null and gods != ''">
+				AND a.gods LIKE 
+					<if test="dbName == 'oracle'">'%'||#{gods}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{gods}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{gods},'%')</if>
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="CcmServiceCivil">
+		SELECT 
+			<include refid="ccmServiceCivilColumns"/>
+		FROM ccm_service_civil a
+		<include refid="ccmServiceCivilJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO ccm_service_civil(
+			id,
+			type,
+			times,
+			adds,
+			receiver,
+			gods,
+			details,
+			file,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag
+		) VALUES (
+			#{id},
+			#{type},
+			#{times},
+			#{adds},
+			#{receiver},
+			#{gods},
+			#{details},
+			#{file},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE ccm_service_civil SET 	
+			type = #{type},
+			times = #{times},
+			adds = #{adds},
+			receiver = #{receiver},
+			gods = #{gods},
+			details = #{details},
+			file = #{file},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE ccm_service_civil SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>
